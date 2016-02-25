@@ -1,0 +1,10 @@
+# Ignore the build folder
+**/x64/*
+**/ipch/*
+
+*.opensdf
+*.suo
+*.sdf
+Debug
+Release
+
