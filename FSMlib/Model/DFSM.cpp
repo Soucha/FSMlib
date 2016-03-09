@@ -22,7 +22,7 @@
 
 #include "DFSM.h"
 
-bool isReacheableWithoutEdge(DFSM* fsm, num_states_t start, num_inputs_t input) {
+static bool isReacheableWithoutEdge(DFSM* fsm, num_states_t start, num_inputs_t input) {
 	vector<bool> isReachable(fsm->getNumberOfStates(), false);
 	queue<num_states_t> fifo;
 	num_states_t state, nextState, end = fsm->getNextState(start, input);
@@ -47,32 +47,346 @@ bool isReacheableWithoutEdge(DFSM* fsm, num_states_t start, num_inputs_t input) 
 
 state_t DFSM::getNextState(state_t state, input_t input) {
 	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
-		throw "DFSM::getNextState - bad state id";
+		cerr << typeNames[_type] << "::getNextState - bad state id" << endl;
+		return WRONG_STATE;
 	}
 	if (input == STOUT_INPUT) {
 		return state;
 	}
 	if (num_inputs_t(input) >= _numberOfInputs) {
-		throw "DFSM::getNextState - bad input";
+		cerr << typeNames[_type] << "::getNextState - bad input" << endl;
+		return WRONG_STATE;
 	}
 	return _transition[num_states_t(state)][num_inputs_t(input)];
 }
 
+state_t DFSM::getEndPathState(state_t state, sequence_in_t path) {
+	for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
+		state = this->getNextState(state, *inputIt);
+		if (state == WRONG_STATE) return state;
+	}
+	return state;
+}
+
 output_t DFSM::getOutput(state_t state, input_t input) {
 	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
-		throw "DFSM::getOutput - bad state id";
+		cerr << typeNames[_type] << "::getOutput - bad state id" << endl;
+		return WRONG_OUTPUT;
 	}
 	if (input == STOUT_INPUT) {
 		return _outputState[num_states_t(state)];
 	}
 	if (num_inputs_t(input) >= _numberOfInputs) {
-		throw "DFSM::getOutput - bad input";
+		cerr << typeNames[_type] << "::getOutput - bad input" << endl;
+		return WRONG_OUTPUT;
 	}
 	num_states_t nextState = num_states_t(_transition[num_states_t(state)][num_inputs_t(input)]);
 	if ((state_t(nextState) == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		throw "DFSM::getOutput - there is no such transition";
+		cerr << typeNames[_type] << "::getOutput - there is no such transition" << endl;
+		return WRONG_OUTPUT;
 	}
 	return _outputTransition[num_states_t(state)][num_inputs_t(input)];
+}
+
+sequence_out_t DFSM::getOutputAlongPath(state_t state, sequence_in_t path) {
+	sequence_out_t sOut;
+	for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
+		sOut.push_back(this->getOutput(state, *inputIt));
+		state = this->getNextState(state, *inputIt);
+		if ((state == WRONG_STATE) || (sOut.back() == WRONG_OUTPUT)) {
+			sOut.clear();
+			sOut.push_back(WRONG_OUTPUT);
+			return sOut;
+		}
+	}
+	return sOut;
+}
+
+bool DFSM::removeUnreachableStates() {
+	vector<bool> isReachable(_usedStateIDs.size(), false);
+	queue<num_states_t> fifo;
+	isReachable[0] = true;
+	fifo.push(0);
+	while (!fifo.empty()) {
+		auto state = fifo.front();
+		fifo.pop();
+		for (num_inputs_t input = 0; input < _numberOfInputs; input++) {
+			state_t& nextState = _transition[state][input];
+			if ((nextState != NULL_STATE) && (!isReachable[num_states_t(nextState)])) {
+				isReachable[num_states_t(nextState)] = true;
+				fifo.push(num_states_t(nextState));
+			}
+		}
+	}
+	for (num_states_t s = 0; s < _usedStateIDs.size(); s++) {
+		if (_usedStateIDs[s] && !isReachable[s]) {
+			for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
+				_transition[s][i] = NULL_STATE;
+				if (!_outputTransition.empty()) _outputTransition[s][i] = DEFAULT_OUTPUT;
+			}
+			if (!_outputState.empty()) _outputState[s] = DEFAULT_OUTPUT;
+			_usedStateIDs[s] = false;
+			_numberOfStates--;
+		}
+	}
+	return true;
+}
+
+bool DFSM::distinguishByStateOutputs(queue< vector< num_states_t > >& blocks) {
+	auto block = blocks.front();
+	blocks.pop();
+	vector< vector< num_states_t > > sameOutput(_numberOfOutputs + 1);
+	for each (num_states_t state in block) {
+		auto output = this->getOutput(state_t(state), STOUT_INPUT);
+		if (output == WRONG_OUTPUT) return false;
+		if (output == DEFAULT_OUTPUT) {
+			sameOutput[_numberOfOutputs].push_back(state);
+		}
+		else {
+			sameOutput[num_outputs_t(output)].push_back(state);
+		}
+	}
+	for (num_outputs_t output = 0; output < _numberOfOutputs + 1; output++) {
+		if (!sameOutput[output].empty()) {
+			vector< num_states_t > tmp(sameOutput[output]);
+			blocks.push(tmp);
+		}
+	}
+	return true;
+}
+
+bool DFSM::distinguishByTransitionOutputs(queue< vector< num_states_t > >& blocks) {
+	num_states_t stop, counter;
+	vector< vector< num_states_t > > sameOutput(_numberOfOutputs + 2);
+	stop = blocks.size();
+	for (num_inputs_t input = 0; input < _numberOfInputs; input++) {
+		counter = 0;
+		do {
+			auto block = blocks.front();
+			blocks.pop();
+			for each (num_states_t state in block) {
+				auto output = this->getOutput(state_t(state), input_t(input));
+				if (output == WRONG_OUTPUT) {// there is no transition
+					sameOutput[_numberOfOutputs + 1].push_back(state);
+				} else if (output == DEFAULT_OUTPUT) {
+					sameOutput[_numberOfOutputs].push_back(state);
+				}
+				else {
+					sameOutput[num_outputs_t(output)].push_back(state);
+				}
+			}
+			for (num_outputs_t output = 0; output < _numberOfOutputs + 2; output++) {
+				if (!sameOutput[output].empty()) {
+					vector< num_states_t > tmp(sameOutput[output]);
+					blocks.push(tmp);
+					sameOutput[output].clear();
+					counter++;
+				}
+			}
+		} while (--stop != 0);
+		stop = counter;
+		if (counter == _numberOfStates) return true;// FSM reduced
+	}
+	return true;
+}
+
+bool DFSM::distinguishByTransitions(queue< vector< num_states_t > >& blocks) {
+	vector< num_states_t > stateGroup(_usedStateIDs.size());
+	vector< vector< num_states_t > > sameOutput(_numberOfStates + 1);
+	set<num_states_t> outputGroups;
+	num_states_t counter, stop, nextStateGroup, group;
+	num_inputs_t input, inputStop;
+	stop = blocks.size();
+	for (counter = 0; counter < stop; counter++) {
+		auto block = blocks.front();
+		blocks.pop();
+		for each (num_states_t state in block) {
+			stateGroup[state] = counter;
+		}
+		if (block.size() > 1) blocks.push(block);
+	}
+	stop = blocks.size() + 1;// +1 due to the stop condition (--stop)
+	group = counter;
+	counter = 0;// the number of blocks for the next round
+	
+	bool newGroup = false;
+	input = 0;
+	inputStop = _numberOfInputs;
+	while (!blocks.empty()) {
+		auto block = blocks.front();
+		blocks.pop();
+		if (--stop == 0) {// iterate input
+			if (newGroup) {
+				newGroup = false;
+				inputStop = _numberOfInputs;
+			}
+			else if (--inputStop == 0) {
+				blocks.push(block);
+				break;// blocks contain only indistinguishable blocks of states
+			}
+			input++;
+			input %= _numberOfInputs;
+			stop = counter;
+			counter = 0;
+		}
+		if (block.size() == 1) continue;
+		outputGroups.clear();
+		for each (num_states_t state in block) {
+			auto nextState = this->getNextState(state_t(state), input_t(input));
+			if (nextState == NULL_STATE) {
+				nextStateGroup = _numberOfStates;
+			}
+			else {
+				nextStateGroup = stateGroup[num_states_t(nextState)];
+			}
+			sameOutput[nextStateGroup].push_back(state);
+			outputGroups.insert(nextStateGroup);
+		}
+		for (set<num_states_t>::iterator it = outputGroups.begin(); it != outputGroups.end(); it++) {
+			if (it != outputGroups.begin()) {
+				for each (num_states_t state in sameOutput[*it]) {
+					stateGroup[state] = group;
+				}
+				group++;
+				newGroup = true;
+				//if (group == _numberOfStates) return true;
+				//   there are only singletons in blocks but they must be popped first
+			}
+			if (sameOutput[*it].size() != 1) {
+				vector<state_t> tmp(sameOutput[*it]);
+				blocks.push(tmp);
+				counter++;
+			}
+			sameOutput[*it].clear();
+		}
+	}
+	return true;
+}
+
+void DFSM::mergeEquivalentStates(queue< vector< num_states_t > >& equivalentStates) {
+	vector< num_states_t > stateEquiv(_usedStateIDs.size());
+	for (num_states_t state = 0; state < stateEquiv.size(); state++) {
+		stateEquiv[state] = state;
+	}
+	while (!equivalentStates.empty()) {
+		auto block = equivalentStates.front();
+		equivalentStates.pop();
+		for (num_states_t state = 1; state < block.size(); state++) {
+			stateEquiv[block[state]] = block[0];
+			if (!_outputState.empty()) _outputState[block[state]] = DEFAULT_OUTPUT;
+		}
+		_numberOfStates -= (block.size() - 1);
+	}
+	for (num_states_t s = 0; s < _usedStateIDs.size(); s++) {
+		if (_usedStateIDs[s]) {
+			for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
+				state_t& nextState = _transition[s][i];
+				if (stateEquiv[s] != s) {
+					_transition[s][i] = NULL_STATE;
+					if (!_outputTransition.empty()) _outputTransition[s][i] = DEFAULT_OUTPUT;
+				} else if ((nextState != NULL_STATE) && 
+					(stateEquiv[num_states_t(nextState)] != num_states_t(nextState))) {
+					_transition[s][i] = state_t(stateEquiv[num_states_t(nextState)]);
+				}
+			}
+		}
+	}
+}
+
+void DFSM::makeCompact() {
+	if (_numberOfStates == _usedStateIDs.size()) return;
+
+	vector< num_states_t > stateEquiv(_usedStateIDs.size());
+	for (num_states_t state = 0; state < stateEquiv.size(); state++) {
+		stateEquiv[state] = state;
+	}
+	num_states_t oldState = _usedStateIDs.size()-1, newState = 0;
+	while (_usedStateIDs[newState]) newState++;
+	while (!_usedStateIDs[oldState]) oldState--;
+	while (newState < oldState) {
+		// transfer state
+		if (!_outputState.empty()) _outputState[newState] = _outputState[oldState];
+		for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
+			_transition[newState][i] = _transition[oldState][i];
+			if (!_outputTransition.empty()) _outputTransition[newState][i] = _outputTransition[oldState][i];
+		}
+		stateEquiv[oldState] = newState;
+		_usedStateIDs[newState] = true;
+		_usedStateIDs[oldState] = false;
+		while (_usedStateIDs[newState]) newState++;
+		while (!_usedStateIDs[oldState]) oldState--;
+	}
+
+	if (!_outputState.empty()) _outputState.resize(_numberOfStates);
+	if (!_outputTransition.empty()) _outputTransition.resize(_numberOfStates);
+	_transition.resize(_numberOfStates);
+	_usedStateIDs.resize(_numberOfStates);
+	num_inputs_t greatestInput = 0;
+	num_outputs_t greatestOutput = 0;
+	for (num_states_t s = 0; s < _numberOfStates; s++) {
+		for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
+			state_t& nextState = _transition[s][i];
+			if ((nextState != NULL_STATE) &&
+				(stateEquiv[num_states_t(nextState)] != num_states_t(nextState))) {
+				_transition[s][i] = state_t(stateEquiv[num_states_t(nextState)]);
+			}
+			if ((nextState != NULL_STATE) && (i > greatestInput)) {
+				greatestInput = i;
+			}
+			if (!_outputTransition.empty() && (_outputTransition[s][i] != DEFAULT_OUTPUT)
+				&& (num_outputs_t(_outputTransition[s][i]) > greatestOutput)) {
+				greatestOutput = num_outputs_t(_outputTransition[s][i]);
+			}
+		}
+		if (!_outputState.empty() && (_outputState[s] != DEFAULT_OUTPUT) 
+			&& (num_outputs_t(_outputState[s]) > greatestOutput)) {
+			greatestOutput = num_outputs_t(_outputState[s]);
+		}
+	}
+	if (greatestInput < _numberOfInputs) {
+		_numberOfInputs = greatestInput;
+		for (num_states_t s = 0; s < _numberOfStates; s++) {
+			_transition[s].resize(_numberOfInputs);
+			if (!_outputTransition.empty()) _outputTransition[s].resize(_numberOfInputs);
+		}
+	}
+	_numberOfOutputs = greatestOutput;
+}
+
+bool DFSM::mimimize() {
+	if (!removeUnreachableStates()) return false;
+
+	queue< vector< num_states_t > > blocks;
+	vector< num_states_t > block;	
+	for (num_states_t state = 0; state < _usedStateIDs.size(); state++) {
+		if (_usedStateIDs[state]) block.push_back(state);
+	}
+	blocks.push(block);
+
+	if (!_outputState.empty()) {
+		if (!distinguishByStateOutputs(blocks)) return false;
+		if (blocks.size() == _numberOfStates) {
+			_isReduced = true;
+			return true;
+		}
+	}
+	if (!_outputTransition.empty()) {
+		if (!distinguishByTransitionOutputs(blocks)) return false;
+		if (blocks.size() == _numberOfStates) {
+			_isReduced = true;
+			return true;
+		}
+	}
+	if (!distinguishByTransitions(blocks)) return false;
+	if (blocks.empty()) {
+		_isReduced = true;
+		return true;
+	}
+	mergeEquivalentStates(blocks);
+	makeCompact();
+
+	_isReduced = true;
+	return true;
 }
 
 void DFSM::clearTransitions() {
@@ -353,8 +667,6 @@ bool DFSM::loadTransitionOutputs(ifstream& file) {
 bool DFSM::loadTransitions(ifstream& file) {
 	num_states_t tmpState;
 	_transition.resize(_numberOfStates);
-	_usedStateIDs.resize(_numberOfStates, false);
-	_usedStateIDs[0] = true;
 	for (num_states_t state = 0; state < _numberOfStates; state++) {
 		file >> tmpState;
 		if (tmpState != state) {
@@ -370,6 +682,18 @@ bool DFSM::loadTransitions(ifstream& file) {
 				return false;
 			}
 			_transition[state][input] = state_t(tmpState);
+			
+		}
+	}
+	_usedStateIDs.resize(_numberOfStates, false);
+	_usedStateIDs[0] = true;
+	queue<num_states_t> fifo;
+	fifo.push(0);
+	while (!fifo.empty()) {
+		tmpState = fifo.front();
+		fifo.pop();
+		for (num_inputs_t input = 0; input < _numberOfInputs; input++) {
+			state_t& state = _transition[tmpState][input];
 			if (_usedStateIDs[state] && (state_t(tmpState) != NULL_STATE)) {
 				_usedStateIDs[tmpState] = true;
 			}
@@ -522,6 +846,7 @@ state_t DFSM::addState(output_t stateOutput) {
 		cerr << typeNames[_type] << "::addState - bad output (increase the number of outputs first)" << endl;
 		return NULL_STATE;
 	}
+	_isReduced = false;
 	if (_usedStateIDs.size() == _numberOfStates) {
 		_usedStateIDs.push_back(true);
 		if (!_outputState.empty()) _outputState.push_back(stateOutput);
@@ -562,6 +887,7 @@ bool DFSM::setOutput(state_t state, output_t output, input_t input) {
 		return false;
 	}
 	_outputTransition[num_states_t(state)][num_inputs_t(input)] = output;
+	_isReduced = false;
 	return true; 
 }
 
@@ -588,6 +914,7 @@ bool DFSM::setTransition(state_t from, input_t input, state_t to, output_t outpu
 	}
 	_transition[num_states_t(from)][num_inputs_t(input)] = to;
 	_outputTransition[num_states_t(from)][num_inputs_t(input)] = output;
+	_isReduced = false;
 	return true;
 }
 
@@ -596,17 +923,25 @@ bool DFSM::removeState(state_t state) {
 		cerr << typeNames[_type] << "::removeState - bad state" << endl;
 		return false;
 	}
-	_usedStateIDs[num_states_t(state)] = false;
+	if (num_states_t(state) == 0) {
+		cerr << typeNames[_type] << "::removeState - the initial state cannot be removed" << endl;
+		return false;
+	}
 	if (!_outputState.empty()) _outputState[num_states_t(state)] = DEFAULT_OUTPUT;
-	for (num_states_t s = 0; s < _numberOfStates; s++) {
-		for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
-			if ((_transition[s][i] == state) || (s == num_states_t(state))) {
-				_transition[s][i] = NULL_STATE;
-				if (!_outputTransition.empty()) _outputTransition[s][i] = DEFAULT_OUTPUT;
+	for (num_states_t s = 0; s < _usedStateIDs.size(); s++) {
+		if (_usedStateIDs[s]) {
+			for (num_inputs_t i = 0; i < _numberOfInputs; i++) {
+				if ((_transition[s][i] == state) || (s == num_states_t(state))) {
+					_transition[s][i] = NULL_STATE;
+					if (!_outputTransition.empty()) _outputTransition[s][i] = DEFAULT_OUTPUT;
+				}
 			}
 		}
 	}
-	return true; 
+	_usedStateIDs[num_states_t(state)] = false;
+	_numberOfStates--;
+	_isReduced = false;
+	return true;
 }
 
 bool DFSM::removeTransition(state_t from, input_t input, state_t to, output_t output) {
@@ -630,6 +965,7 @@ bool DFSM::removeTransition(state_t from, input_t input, state_t to, output_t ou
 	}
 	_transition[num_states_t(from)][num_inputs_t(input)] = NULL_STATE;
 	if (!_outputTransition.empty()) _outputTransition[num_states_t(from)][num_inputs_t(input)] = DEFAULT_OUTPUT;
+	_isReduced = false;
 	return true;
 }
 
@@ -645,64 +981,4 @@ void DFSM::incNumberOfInputs(num_inputs_t byNum) {
 
 void DFSM::incNumberOfOutputs(num_outputs_t byNum) {
 	_numberOfOutputs += byNum;
-}
-
-void DFSM::setEquivalence(queue<vector<state_t> >& equivalentStates) {
-	state_t state;
-	vector<state_t> actBlock, removedStates, stateEquiv(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		stateEquiv[state] = state;
-	}
-	while (!equivalentStates.empty()) {
-		actBlock = equivalentStates.front();
-		equivalentStates.pop();
-		for (state = 1; state < actBlock.size(); state++) {
-			stateEquiv[actBlock[state]] = actBlock[0];
-			removedStates.push_back(actBlock[state]);
-		}
-	}
-	sort(removedStates.begin(), removedStates.end());
-	state = _numberOfStates - 1;
-	for (state_t i = 0; i < removedStates.size(); i++) {
-		while (stateEquiv[state] != state) state--;
-		if (state <= removedStates[i]) break;
-		_transition[removedStates[i]] = _transition[state];
-		_outputState[removedStates[i]] = _outputState[state];
-		stateEquiv[state] = removedStates[i];
-	}
-	_numberOfStates -= removedStates.size();
-	_transition.resize(_numberOfStates);
-	_outputState.resize(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		for (input_t input = 0; input < _numberOfInputs; input++) {
-			_transition[state][input] = stateEquiv[_transition[state][input]];
-		}
-	}
-}
-
-void DFSM::removeUnreachableStates(vector<state_t>& unreachableStates) {
-	state_t state;
-	vector<state_t> stateEquiv(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		stateEquiv[state] = state;
-	}
-	for (state = 0; state < unreachableStates.size(); state++) {
-		stateEquiv[unreachableStates[state]] = 0;
-	}
-	state = _numberOfStates - 1;
-	for (state_t i = 0; i < unreachableStates.size(); i++) {
-		while (stateEquiv[state] != state) state--;
-		if (state <= unreachableStates[i]) break;
-		_transition[unreachableStates[i]] = _transition[state];
-		_outputState[unreachableStates[i]] = _outputState[state];
-		stateEquiv[state] = unreachableStates[i];
-	}
-	_numberOfStates -= unreachableStates.size();
-	_transition.resize(_numberOfStates);
-	_outputState.resize(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		for (input_t input = 0; input < _numberOfInputs; input++) {
-			_transition[state][input] = stateEquiv[_transition[state][input]];
-		}
-	}
 }

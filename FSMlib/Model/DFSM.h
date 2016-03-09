@@ -50,54 +50,38 @@ public:
 	//<-- TRANSITION SYSTEM -->//
 
 	/**
-	* Get identification of next state after applying given input from given state.
+	* Gets identification of next state after applying given input from given state.
 	* @param state
 	* @param input
-	* @return Next state
-	* @throw Exception if given state or input is not valid
+	* @return Next state or WRONG_STATE if given state or input is not valid
 	*/
 	virtual state_t getNextState(state_t state, input_t input);
 
 	/**
-	* Get identification of last state after applying given input sequence from given state.
+	* Gets identification of last state after applying given input sequence from given state.
 	* @param state
 	* @param path
-	* @return end state
-	* @throw Exception if given state or input is not valid
+	* @return end state or WRONG_STATE if given state or path is not valid
 	*/
-	state_t getEndPathState(state_t state, sequence_in_t path) {
-		for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
-			state = this->getNextState(state, *inputIt);
-		}
-		return state;
-	}
+	state_t getEndPathState(state_t state, sequence_in_t path);
 
 	//<-- OUTPUT BEHAVIOUR -->//
 
 	/**
-	* Get output observed after applying given input from given state.
+	* Gets output observed after applying given input from given state.
 	* @param state
 	* @param input
-	* @return Output
-	* @throw Exception if given state or input is not valid
+	* @return Output or WRONG_OUTPUT if given state or input is not valid
 	*/
 	virtual output_t getOutput(state_t state, input_t input);
 
 	/**
-	* Get output sequence observed after applying given input sequence from given state.
+	* Gets output sequence observed after applying given input sequence from given state.
 	* @param state
 	* @param path
-	* @return output sequence
-	* @throw Exception if given state or input is not valid
+	* @return output sequence or WRONG_OUTPUT if given state or path is not valid
 	*/
-	sequence_out_t getOutputAlongPath(state_t state, sequence_in_t path) {
-		sequence_out_t sOut;
-		for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
-			sOut.push_back(this->getOutput(state, *inputIt));
-			state = this->getNextState(state, *inputIt);
-		}
-		return sOut;
-	}
+	sequence_out_t getOutputAlongPath(state_t state, sequence_in_t path);
 
 	//<-- MODEL INITIALIZATION -->//
 
@@ -121,19 +105,47 @@ public:
 	void incNumberOfInputs(num_inputs_t byNum);
 	void incNumberOfOutputs(num_outputs_t byNum);
 
+	/**
+	* Transforms given DFSM into the form without unreachable states.
+	* @param dfsm
+	* @return True if unreachable states were removed (or given had no unreachable state),
+	*         false if an error occured while unreachable states were removing
+	*/
+	bool removeUnreachableStates();
+
+	/**
+	* Eliminates unused rows from transition table and
+	* sets the number of inputs and outputs to the greatest
+	* input or output occurred in this model.
+	*
+	* Note that some states change their identification.
+	*/
+	void makeCompact();
+
+	/*
+	* Reduces this FSM into its minimal form.
+	* @return True on success, False if an error occurred
+	*/
+	bool mimimize();
+
 protected:
 	bool _isReduced;
 	vector< vector< state_t > > _transition;
 	vector< vector< output_t > > _outputTransition;
 	vector< output_t > _outputState;
 
+	bool distinguishByStateOutputs(queue< vector< num_states_t > >& blocks);
+	bool distinguishByTransitionOutputs(queue< vector< num_states_t > >& blocks);
+	bool distinguishByTransitions(queue< vector< num_states_t > >& blocks);
+	void mergeEquivalentStates(queue< vector< num_states_t > >& equivalentStates);
+	
 	void clearStateOutputs();
 	void clearTransitionOutputs();
 	void clearTransitions();
 	
 	void generateStateOutputs(num_outputs_t nOutputs);
 	void generateTransitionOutputs(num_outputs_t nOutputs, num_outputs_t firstOutput);
-	// generate coherent transition system
+	// generates coherent transition system
 	void generateTransitions();
 	
 	bool loadStateOutputs(ifstream& file);
@@ -150,9 +162,4 @@ protected:
 	void writeDotStates(ofstream& file, bool withOutputs = true);
 	void writeDotTransitions(ofstream& file, bool withOutputs = true);
 	void writeDotEnd(ofstream& file);
-
-private:
-	void setEquivalence(queue< vector<state_t> >& equivalentStates);
-	void removeUnreachableStates(vector<state_t>& unreachableStates);
-
 };

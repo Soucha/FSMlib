@@ -22,3 +22,67 @@
 #include "DFSM.h"
 #include "FSM.h"
 
+namespace FSMmodel {
+	/**
+	* Compares two DFSMs with same input and output alphabet and initial state 0.
+	* FSMs are isomorphic only if they differ in permutation of states.
+	*
+	* Function minimizes given FSMs if they are not in reduced form.
+	* @param fsm1
+	* @param fsm2
+	* @return True if given machines are isomorphic
+	*/
+	FSMLIB_API bool areIsomorphic(DFSM * dfsm1, DFSM * dfsm2);
+
+	/**
+	* Transform given FSM into its minimal (reduced) form.
+	* @param dfsm for minimization
+	* @return True if given machine was minimized
+	*/
+	//FSMLIB_API bool minimize(DFSM * dfsm);
+
+	/**
+	* Checks if each state is reacheable from each other.
+	* @param dfsm
+	* @return true if the given DFSM is strongly connected
+	*/
+	FSMLIB_API bool isStronglyConnected(DFSM * dfsm);
+
+	/**
+	* Creates GIF file from DOT file.
+	* @param fileName of DOT file
+	* @param show - set true if cygwin should show GIF file
+	* @throw Exception if system was not able to run appropriate commands.
+	*/
+	//void createGIF(string fileName, bool show = false);
+
+	/**
+	* Creates JPG file from DOT file.
+	* @param fileName of DOT file
+	* @param show - set true if cygwin should show JPG file
+	* @throw Exception if system was not able to run appropriate commands.
+	*/
+	//void createJPG(string fileName, bool show = false);
+
+	/**
+	* Creates PNG file from DOT file.
+	* @param fileName of DOT file
+	* @param show - set true if cygwin should show PNG file
+	* @throw Exception if system was not able to run appropriate commands.
+	*/
+	//void createPNG(string fileName, bool show = false);
+
+	/**
+	* Prints given sequence into a string
+	* @param input sequence
+	* @return sequence as string
+	*/
+	FSMLIB_API string getInSequenceAsString(sequence_in_t sequence);
+
+	/**
+	* Prints given sequence into a string
+	* @param output sequence
+	* @return sequence as string
+	*/
+	FSMLIB_API string getOutSequenceAsString(sequence_out_t sequence);
+}

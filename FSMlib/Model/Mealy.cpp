@@ -25,14 +25,17 @@
 
 output_t Mealy::getOutput(state_t state, input_t input) {
 	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
-		throw "Mealy::getOutput - bad state id";
+		cerr << typeNames[_type] << "::getOutput - bad state id" << endl;
+		return WRONG_OUTPUT;
 	}
 	if ((num_inputs_t(input) >= _numberOfInputs) || (input == STOUT_INPUT)) {
-		throw "Mealy::getOutput - bad input";
+		cerr << typeNames[_type] << "::getOutput - bad input" << endl;
+		return WRONG_OUTPUT;
 	}
 	num_states_t nextState = num_states_t(_transition[num_states_t(state)][num_inputs_t(input)]);
 	if ((state_t(nextState) == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		throw "Mealy::getOutput - there is no such transition";
+		cerr << typeNames[_type] << "::getOutput - there is no such transition" << endl;
+		return WRONG_OUTPUT;
 	}
 	return _outputTransition[num_states_t(state)][num_inputs_t(input)];
 }

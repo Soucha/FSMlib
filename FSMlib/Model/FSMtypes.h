@@ -60,12 +60,17 @@ static const char* typeNames[] = {
 
 // an input invoking the output of a state
 #define STOUT_INPUT     input_t(-1)
+#define STOUT_SYMBOL	"S"
+#define EPSILON_INPUT	input_t(-2)
+#define EPSILON_SYMBOL	"E"
 
 #define DEFAULT_OUTPUT	output_t(-1)
+#define DEFAULT_OUTPUT_SYMBOL	"-"
 #define WRONG_OUTPUT	output_t(-2)
+#define WRONG_OUTPUT_SYMBOL		"X"
 
 #define NULL_STATE		state_t(-1)
-
+#define WRONG_STATE		state_t(-2)
 
 typedef unsigned int state_t;
 typedef unsigned int input_t;
@@ -80,7 +85,7 @@ typedef list<output_t> sequence_out_t;
 
 struct seqcomp {
 	/**
-	* compares two input sequences firstly by their length,
+	* Compares two input sequences firstly by their length,
 	* shorter fisrt, then lexigraphically by their content
 	*/
 	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
@@ -106,14 +111,14 @@ struct AdaptiveDS {
 
 namespace Utils {
 	/**
-	* Generate random sequence of alpha-numeric characters.
+	* Generates random sequence of alpha-numeric characters.
 	* @param length of sequence
 	* @return generated string
 	*/
 	string hashCode(int length);
 
 	/**
-	* Concatenate given name with generated hash and given suffix
+	* Concatenates given name with generated hash and given suffix
 	* so that new filename will be unique in given path.
 	* @param name by which new file name begins
 	* @param suffix of new file name
@@ -123,7 +128,7 @@ namespace Utils {
 	string getUniqueName(string name, string suffix, string path = "");
 
 	/**
-	* Convert number to string.
+	* Converts number to string.
 	* @param number - integer value
 	* @return number as string
 	*/

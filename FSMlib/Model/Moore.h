@@ -68,8 +68,10 @@ public:
 	/// inherited
 	//void incNumberOfOutputs(num_outputs_t byNum);
 
-private:
-	void setEquivalence(queue< vector<state_t> >& equivalentStates);
-	void removeUnreachableStates(vector<state_t>& unreachableStates);
-
+	/// inherited
+	//bool removeUnreachableStates();
+	/// inherited
+	//void makeCompact();
+	/// inherited
+	//bool mimimize();
 };

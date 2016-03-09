@@ -25,17 +25,20 @@
 
 output_t Moore::getOutput(state_t state, input_t input) {
 	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
-		throw "Moore::getOutput - bad state id";
+		cerr << typeNames[_type] << "::getOutput - bad state id" << endl;
+		return WRONG_OUTPUT;
 	}
 	if (input == STOUT_INPUT) {
 		return _outputState[num_states_t(state)];
 	}
 	if (num_inputs_t(input) >= _numberOfInputs) {
-		throw "Moore::getOutput - bad input";
+		cerr << typeNames[_type] << "::getOutput - bad input" << endl;
+		return WRONG_OUTPUT;
 	}
 	num_states_t nextState = num_states_t(_transition[num_states_t(state)][num_inputs_t(input)]);
 	if ((state_t(nextState) == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		throw "Moore::getOutput - there is no such transition";
+		cerr << typeNames[_type] << "::getOutput - there is no such transition" << endl;
+		return WRONG_OUTPUT;
 	}
 	return _outputState[nextState];
 }
@@ -204,65 +207,5 @@ bool Moore::setTransition(state_t from, input_t input, state_t to, output_t outp
 	}
 	_transition[num_states_t(from)][num_inputs_t(input)] = to;
 	return true;
-}
-
-void Moore::setEquivalence(queue<vector<state_t> >& equivalentStates) {
-	state_t state;
-	vector<state_t> actBlock, removedStates, stateEquiv(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		stateEquiv[state] = state;
-	}
-	while (!equivalentStates.empty()) {
-		actBlock = equivalentStates.front();
-		equivalentStates.pop();
-		for (state = 1; state < actBlock.size(); state++) {
-			stateEquiv[actBlock[state]] = actBlock[0];
-			removedStates.push_back(actBlock[state]);
-		}
-	}
-	sort(removedStates.begin(), removedStates.end());
-	state = _numberOfStates - 1;
-	for (state_t i = 0; i < removedStates.size(); i++) {
-		while (stateEquiv[state] != state) state--;
-		if (state <= removedStates[i]) break;
-		_transition[removedStates[i]] = _transition[state];
-		_outputState[removedStates[i]] = _outputState[state];
-		stateEquiv[state] = removedStates[i];
-	}
-	_numberOfStates -= removedStates.size();
-	_transition.resize(_numberOfStates);
-	_outputState.resize(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		for (input_t input = 0; input < _numberOfInputs; input++) {
-			_transition[state][input] = stateEquiv[_transition[state][input]];
-		}
-	}
-}
-
-void Moore::removeUnreachableStates(vector<state_t>& unreachableStates) {
-	state_t state;
-	vector<state_t> stateEquiv(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		stateEquiv[state] = state;
-	}
-	for (state = 0; state < unreachableStates.size(); state++) {
-		stateEquiv[unreachableStates[state]] = 0;
-	}
-	state = _numberOfStates - 1;
-	for (state_t i = 0; i < unreachableStates.size(); i++) {
-		while (stateEquiv[state] != state) state--;
-		if (state <= unreachableStates[i]) break;
-		_transition[unreachableStates[i]] = _transition[state];
-		_outputState[unreachableStates[i]] = _outputState[state];
-		stateEquiv[state] = unreachableStates[i];
-	}
-	_numberOfStates -= unreachableStates.size();
-	_transition.resize(_numberOfStates);
-	_outputState.resize(_numberOfStates);
-	for (state = 0; state < _numberOfStates; state++) {
-		for (input_t input = 0; input < _numberOfInputs; input++) {
-			_transition[state][input] = stateEquiv[_transition[state][input]];
-		}
-	}
 }
 

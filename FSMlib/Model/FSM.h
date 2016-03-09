@@ -76,7 +76,7 @@ public:
 	}
 
 	/**
-	* Get type of this FSM.
+	* Gets type of this FSM.
 	* Possible types are listed in FSMtypes.h.
 	* @return The type of this FSM
 	*/
@@ -87,7 +87,7 @@ public:
 	//<-- MODEL INITIALIZATION -->//
 
 	/**
-	* Create an empty model with the given number of states and
+	* Creates an empty model with the given number of states and
 	* expected numbers of inputs and outputs.
 	* @param numberOfStates
 	* @param numberOfInputs
@@ -96,7 +96,7 @@ public:
 	virtual void create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) = 0;
 
 	/**
-	* Generate a connected FSM with the given number of states and the number of inputs.
+	* Generates a connected FSM with the given number of states and the number of inputs.
 	* The given number of outputs can be scaled down depending to the type of FSM,
 	* the number of states and the number of inputs.
 	* @param numberOfStates
@@ -106,7 +106,7 @@ public:
 	virtual void generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) = 0;
 
 	/**
-	* Try to load FSM from file.
+	* Tries to load FSM from file.
 	* @param fileName of a FSM to load
 	* @return True on success. Otherwise, an error is written on standard error output.
 	*/
@@ -115,14 +115,14 @@ public:
 	//<-- STORING -->//
 
 	/**
-	* Try to save the FSM to a file.
+	* Tries to save the FSM to a file.
 	* @param path to an existing folder where new file should be stored
 	* @return The name of a file with the saved FSM, or the empty string if there is an error
 	*/
 	virtual string save(string path) = 0;
 
 	/**
-	* Try to write the FSM to DOT file which can be displayed using Graphviz.
+	* Tries to write the FSM to DOT file which can be displayed using Graphviz.
 	* @param path to an existing folder where new file should be stored
 	* @return The name of a file with the saved FSM in DOT format, or the empty string if there is an error
 	*/
@@ -131,14 +131,14 @@ public:
 	//<-- EDITING THE MODEL -->//
 
 	/**
-	* Add a new state to this FSM.
+	* Adds a new state to this FSM.
 	* @param output of the state (Optional for some FSM types)
 	* @return Identification of new state, or NULL_STATE if there is an error.
 	*/
 	virtual state_t addState(output_t stateOutput = DEFAULT_OUTPUT) = 0;
 
 	/**
-	* Update the output of an existing state or transition identified by given state and input.
+	* Updates the output of an existing state or transition identified by given state and input.
 	* @param state 
 	* @param output
 	* @param input (Optional for some FSM types)
@@ -147,7 +147,7 @@ public:
 	virtual bool setOutput(state_t state, output_t output, input_t input = STOUT_INPUT) = 0;
 
 	/**
-	* Add or update a transition identified by given state From and input.
+	* Adds or updates a transition identified by given state From and input.
 	* @param from 
 	* @param input
 	* @param to
@@ -157,7 +157,7 @@ public:
 	virtual bool setTransition(state_t from, input_t input, state_t to, output_t output = DEFAULT_OUTPUT) = 0;
 
 	/**
-	* Remove given state (and all related transitions).<br>
+	* Removes given state (and all related transitions).<br>
 	* Note that a successive call of addState can return given identifier of a new state.
 	* @param state 
 	* @return True if the state was removed
@@ -165,7 +165,7 @@ public:
 	virtual bool removeState(state_t state) = 0;
 
 	/**
-	* Remove given transition.
+	* Removes given transition.
 	* The transition is identified by given state From and input
 	* if this FSM is deterministic.
 	* Otherwise, the identification requires the next state To (and output).
@@ -178,13 +178,13 @@ public:
 	virtual bool removeTransition(state_t from, input_t input, state_t to = NULL_STATE, output_t output = DEFAULT_OUTPUT) = 0;
 
 	/**
-	* Increase the number of inputs by given number.
+	* Increases the number of inputs by given number.
 	* @param positive increment
 	*/
 	virtual void incNumberOfInputs(num_inputs_t byNum) = 0;
 
 	/**
-	* Increase the number of outputs by given number.
+	* Increases the number of outputs by given number.
 	* @param positive increment
 	*/
 	virtual void incNumberOfOutputs(num_outputs_t byNum) = 0;
