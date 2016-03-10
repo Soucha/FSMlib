@@ -43,8 +43,8 @@ public:
 
 	//<-- MODEL INITIALIZATION -->//
 
-	void create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
-	void generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
+	void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
+	void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
 	bool load(string fileName);
 
 	//<-- STORING -->//
@@ -69,13 +69,15 @@ public:
 	//bool removeTransition(state_t from, input_t input, state_t to = NULL_STATE, output_t output = DEFAULT_OUTPUT);
 
 	/// inherited
-	//void incNumberOfInputs(num_inputs_t byNum);
+	//void incNumberOfInputs(input_t byNum);
 
 	/// it is not possible to increase the number of outputs for DFA
-	void incNumberOfOutputs(num_outputs_t byNum);
+	void incNumberOfOutputs(output_t byNum);
 
-private:
-	//void setEquivalence(queue< vector<state_t> >& equivalentStates);
-	//void removeUnreachableStates(vector<state_t>& unreachableStates);
-
+	/// inherited
+	//bool removeUnreachableStates();
+	/// inherited
+	//void makeCompact();
+	/// inherited
+	//bool mimimize();
 };

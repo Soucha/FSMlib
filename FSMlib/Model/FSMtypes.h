@@ -76,10 +76,6 @@ typedef unsigned int state_t;
 typedef unsigned int input_t;
 typedef unsigned int output_t;
 
-typedef unsigned int num_states_t;
-typedef unsigned int num_inputs_t;
-typedef unsigned int num_outputs_t;
-
 typedef list<input_t> sequence_in_t;
 typedef list<output_t> sequence_out_t;
 

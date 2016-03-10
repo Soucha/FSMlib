@@ -67,11 +67,10 @@ namespace FSMmodel {
 			(fsm1->getType() != fsm2->getType())) {
 			return false;
 		}
-		num_states_t state;
-		state_t nextState1, nextState2;
+		state_t state, nextState1, nextState2;
 		vector<state_t> stateEq(fsm1->getNumberOfStates());
 		vector<bool> used(fsm1->getNumberOfStates(), false);
-		queue<num_states_t> fifo;
+		queue<state_t> fifo;
 
 		stateEq[0] = 0;
 		used[0] = true;
@@ -79,27 +78,27 @@ namespace FSMmodel {
 		while (!fifo.empty()) {
 			state = fifo.front();
 			fifo.pop();
-			if (fsm1->getOutput(state_t(state), STOUT_INPUT) != fsm2->getOutput(stateEq[state], STOUT_INPUT)) {
+			if (fsm1->getOutput(state, STOUT_INPUT) != fsm2->getOutput(stateEq[state], STOUT_INPUT)) {
 				return false;
 			}
-			for (num_inputs_t input = 0; input < fsm1->getNumberOfInputs(); input++) {
-				if (fsm1->getOutput(state_t(state), input_t(input)) != fsm2->getOutput(stateEq[state], input_t(input))) {
+			for (input_t input = 0; input < fsm1->getNumberOfInputs(); input++) {
+				if (fsm1->getOutput(state, input) != fsm2->getOutput(stateEq[state], input)) {
 					return false;
 				}
-				nextState1 = fsm1->getNextState(state_t(state), input_t(input));
-				nextState2 = fsm2->getNextState(stateEq[state], input_t(input));
+				nextState1 = fsm1->getNextState(state, input);
+				nextState2 = fsm2->getNextState(stateEq[state], input);
 				if ((nextState1 == WRONG_STATE) || (nextState2 == WRONG_STATE)) {
 					return false;
 				} else if ((nextState1 == NULL_STATE) || (nextState2 == NULL_STATE)) {
 					if (nextState1 != nextState2) return false;
-				} else if (used[num_states_t(nextState1)]) {
-					if (stateEq[num_states_t(nextState1)] != nextState2) {
+				} else if (used[nextState1]) {
+					if (stateEq[nextState1] != nextState2) {
 						return false;
 					}
 				} else {
-					stateEq[num_states_t(nextState1)] = nextState2;
-					used[num_states_t(nextState1)] = true;
-					fifo.push(num_states_t(nextState1));
+					stateEq[nextState1] = nextState2;
+					used[nextState1] = true;
+					fifo.push(nextState1);
 				}
 			}
 		}
@@ -114,11 +113,11 @@ namespace FSMmodel {
 	string getInSequenceAsString(sequence_in_t sequence) {
 		if (sequence.empty()) return "EMPTY";
 		string s = ((sequence.front() == STOUT_INPUT) ? STOUT_SYMBOL : 
-			((sequence.front() == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(num_inputs_t(sequence.front()))));
+			((sequence.front() == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(sequence.front())));
 		sequence_in_t::iterator inputIt = sequence.begin();
 		for (++inputIt; inputIt != sequence.end(); inputIt++) {
 			s += SEQUENCE_SEPARATOR + ((*inputIt == STOUT_INPUT) ? STOUT_SYMBOL :
-				((*inputIt == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(num_inputs_t(*inputIt))));
+				((*inputIt == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(*inputIt)));
 		}
 		return s;
 	}
@@ -126,11 +125,11 @@ namespace FSMmodel {
 	string getOutSequenceAsString(sequence_out_t sequence) {
 		if (sequence.empty()) return "EMPTY";
 		string s = ((sequence.front() == DEFAULT_OUTPUT) ? DEFAULT_OUTPUT_SYMBOL :
-			((sequence.front() == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(num_outputs_t(sequence.front()))));
+			((sequence.front() == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(sequence.front())));
 		sequence_out_t::iterator outputIt = sequence.begin();
 		for (++outputIt; outputIt != sequence.end(); outputIt++) {
 			s += SEQUENCE_SEPARATOR + ((*outputIt == DEFAULT_OUTPUT) ? DEFAULT_OUTPUT_SYMBOL :
-				((*outputIt == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(num_outputs_t(*outputIt))));
+				((*outputIt == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(*outputIt)));
 		}
 		return s;
 	}

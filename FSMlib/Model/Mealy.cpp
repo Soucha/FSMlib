@@ -24,23 +24,23 @@
 #include "Mealy.h"
 
 output_t Mealy::getOutput(state_t state, input_t input) {
-	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
+	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		cerr << typeNames[_type] << "::getOutput - bad state id" << endl;
 		return WRONG_OUTPUT;
 	}
-	if ((num_inputs_t(input) >= _numberOfInputs) || (input == STOUT_INPUT)) {
+	if ((input >= _numberOfInputs) || (input == STOUT_INPUT)) {
 		cerr << typeNames[_type] << "::getOutput - bad input" << endl;
 		return WRONG_OUTPUT;
 	}
-	num_states_t nextState = num_states_t(_transition[num_states_t(state)][num_inputs_t(input)]);
-	if ((state_t(nextState) == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
+	state_t& nextState = _transition[state][input];
+	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
 		cerr << typeNames[_type] << "::getOutput - there is no such transition" << endl;
 		return WRONG_OUTPUT;
 	}
-	return _outputTransition[num_states_t(state)][num_inputs_t(input)];
+	return _outputTransition[state][input];
 }
 
-void Mealy::create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) {
+void Mealy::create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfOutputs > (numberOfStates * numberOfInputs)) {
 		cerr << typeNames[_type] << "::create - the number of outputs reduced to maximum of "
 			<< (numberOfStates * numberOfInputs) << endl;
@@ -66,7 +66,7 @@ void Mealy::create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num
 	clearTransitionOutputs();
 }
 
-void Mealy::generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) {
+void Mealy::generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfInputs == 0) {
 		cerr << typeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfInputs = 1;
@@ -103,7 +103,8 @@ bool Mealy::load(string fileName) {
 		cerr << typeNames[_type] << "::load - unable to open file" << endl;
 		return false;
 	}
-	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs;
+	state_t maxState;
+	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs >> maxState;
 	if (_type != TYPE_MEALY) {
 		cerr << typeNames[_type] << "::load - bad type of FSM" << endl;
 		file.close();
@@ -126,10 +127,14 @@ bool Mealy::load(string fileName) {
 	}
 	if (_numberOfOutputs > (_numberOfStates * _numberOfInputs)) {
 		cerr << typeNames[_type] << "::load - the number of outputs cannot be greater than the maximum value of "
-			<< (_numberOfStates * _numberOfInputs) << endl;
+			<< (_numberOfStates * _numberOfInputs) << ". Consider minimization!" << endl;
+	}
+	if (maxState < _numberOfStates) {
+		cerr << typeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
 		file.close();
 		return false;
 	}
+	_usedStateIDs.resize(maxState, false);
 	if (!loadTransitionOutputs(file) || !loadTransitions(file)) {
 		file.close();
 		return false;
@@ -171,23 +176,24 @@ string Mealy::writeDOTfile(string path) {
 }
 
 bool Mealy::setOutput(state_t state, output_t output, input_t input) {
-	if ((num_states_t(state) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(state)])) {
+	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		cerr << typeNames[_type] << "::setOutput - bad state" << endl;
 		return false;
 	}
-	if ((num_outputs_t(output) >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
+	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
 		cerr << typeNames[_type] << "::setOutput - bad output (increase the number of outputs first)" << endl;
 		return false;
 	}
-	if ((num_inputs_t(input) >= _numberOfInputs) || (input == STOUT_INPUT)) {
+	if ((input >= _numberOfInputs) || (input == STOUT_INPUT)) {
 		cerr << typeNames[_type] << "::setOutput - bad input" << endl;
 		return false;
 	}
-	if (_transition[num_states_t(state)][num_inputs_t(input)] == NULL_STATE) {
+	if (_transition[state][input] == NULL_STATE) {
 		cerr << typeNames[_type] << "::setOutput - there is no such transition" << endl;
 		return false;
 	}
-	_outputTransition[num_states_t(state)][num_inputs_t(input)] = output;
+	_outputTransition[state][input] = output;
+	_isReduced = false;
 	return true;
 }
 
@@ -196,24 +202,25 @@ bool Mealy::setTransition(state_t from, input_t input, state_t to, output_t outp
 		cerr << typeNames[_type] << "::setTransition - STOUT_INPUT is not allowed" << endl;
 		return false;
 	}
-	if ((num_states_t(from) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(from)])) {
+	if ((from >= _usedStateIDs.size()) || (!_usedStateIDs[from])) {
 		cerr << typeNames[_type] << "::setTransition - bad state From" << endl;
 		return false;
 	}
-	if (num_inputs_t(input) >= _numberOfInputs) {
+	if (input >= _numberOfInputs) {
 		cerr << typeNames[_type] << "::setTransition - bad input" << endl;
 		return false;
 	}
-	if ((num_states_t(to) >= _usedStateIDs.size()) || (!_usedStateIDs[num_states_t(to)])) {
+	if ((to >= _usedStateIDs.size()) || (!_usedStateIDs[to])) {
 		cerr << typeNames[_type] << "::setTransition - bad state To" << endl;
 		return false;
 	}
-	if ((num_outputs_t(output) >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
+	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
 		cerr << typeNames[_type] << "::setTransition - bad output (increase the number of outputs first)" << endl;
 		return false;
 	}
-	_transition[num_states_t(from)][num_inputs_t(input)] = to;
-	_outputTransition[num_states_t(from)][num_inputs_t(input)] = output;
-	return true; 
+	_transition[from][input] = to;
+	_outputTransition[from][input] = output;
+	_isReduced = false;
+	return true;
 }
 

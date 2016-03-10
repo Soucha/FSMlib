@@ -57,21 +57,21 @@ public:
 	/**
 	* @return The number of states
 	*/
-	num_states_t getNumberOfStates() const {
+	state_t getNumberOfStates() const {
 		return _numberOfStates;
 	}
 
 	/**
 	* @return The number of inputs
 	*/
-	num_inputs_t getNumberOfInputs() const {
+	input_t getNumberOfInputs() const {
 		return _numberOfInputs;
 	}
 
 	/**
 	* @return The number of outputs
 	*/
-	num_outputs_t getNumberOfOutputs() const {
+	output_t getNumberOfOutputs() const {
 		return _numberOfOutputs;
 	}
 
@@ -93,7 +93,7 @@ public:
 	* @param numberOfInputs
 	* @param numberOfOutputs
 	*/
-	virtual void create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) = 0;
+	virtual void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) = 0;
 
 	/**
 	* Generates a connected FSM with the given number of states and the number of inputs.
@@ -103,7 +103,7 @@ public:
 	* @param numberOfInputs
 	* @param numberOfOutputs
 	*/
-	virtual void generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) = 0;
+	virtual void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) = 0;
 
 	/**
 	* Tries to load FSM from file.
@@ -181,18 +181,18 @@ public:
 	* Increases the number of inputs by given number.
 	* @param positive increment
 	*/
-	virtual void incNumberOfInputs(num_inputs_t byNum) = 0;
+	virtual void incNumberOfInputs(input_t byNum) = 0;
 
 	/**
 	* Increases the number of outputs by given number.
 	* @param positive increment
 	*/
-	virtual void incNumberOfOutputs(num_outputs_t byNum) = 0;
+	virtual void incNumberOfOutputs(output_t byNum) = 0;
 
 protected:
-	num_inputs_t _numberOfInputs;
-	num_states_t _numberOfStates;
-	num_outputs_t _numberOfOutputs;
+	input_t _numberOfInputs;
+	state_t _numberOfStates;
+	output_t _numberOfOutputs;
 	machine_type_t _type;
 	vector<bool> _usedStateIDs;
 };

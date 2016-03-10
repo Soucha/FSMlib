@@ -23,7 +23,7 @@
 
 #include "DFA.h"
 
-void DFA::create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) {
+void DFA::create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfOutputs > 2) {
 		cerr << typeNames[_type] << "::create - the number of outputs reduced to maximum of 2" << endl;
 		numberOfOutputs = 2;
@@ -48,7 +48,7 @@ void DFA::create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_o
 	clearStateOutputs();
 }
 
-void DFA::generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs) {
+void DFA::generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfInputs == 0) {
 		cerr << typeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfInputs = 1;
@@ -84,7 +84,8 @@ bool DFA::load(string fileName) {
 		cerr << typeNames[_type] << "::load - unable to open file" << endl;
 		return false;
 	}
-	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs;
+	state_t maxState;
+	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs >> maxState;
 	if (_type != TYPE_DFA) {
 		cerr << typeNames[_type] << "::load - bad type of FSM" << endl;
 		file.close();
@@ -110,6 +111,12 @@ bool DFA::load(string fileName) {
 		file.close();
 		return false;
 	}
+	if (maxState < _numberOfStates) {
+		cerr << typeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
+		file.close();
+		return false;
+	}
+	_usedStateIDs.resize(maxState, false);
 	if (!loadStateOutputs(file) || !loadTransitions(file)) {
 		file.close();
 		return false;
@@ -118,6 +125,6 @@ bool DFA::load(string fileName) {
 	return true;
 }
 
-void DFA::incNumberOfOutputs(num_outputs_t byNum) {
+void DFA::incNumberOfOutputs(output_t byNum) {
 	cerr << typeNames[_type] << "::incNumberOfOutputs - the number of outputs cannot be increased" << endl;
 }

@@ -42,8 +42,8 @@ public:
 
 	//<-- MODEL INITIALIZATION -->//
 
-	void create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
-	void generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
+	void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
+	void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
 	bool load(string fileName);
 
 	//<-- STORING -->//
@@ -64,9 +64,9 @@ public:
 	//bool removeTransition(state_t from, input_t input, state_t to = NULL_STATE, output_t output = DEFAULT_OUTPUT);
 
 	/// inherited
-	//void incNumberOfInputs(num_inputs_t byNum);
+	//void incNumberOfInputs(input_t byNum);
 	/// inherited
-	//void incNumberOfOutputs(num_outputs_t byNum);
+	//void incNumberOfOutputs(output_t byNum);
 
 	/// inherited
 	//bool removeUnreachableStates();

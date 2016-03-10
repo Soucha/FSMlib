@@ -85,8 +85,8 @@ public:
 
 	//<-- MODEL INITIALIZATION -->//
 
-	void create(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
-	void generate(num_states_t numberOfStates, num_inputs_t numberOfInputs, num_outputs_t numberOfOutputs);
+	void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
+	void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
 	bool load(string fileName);
 
 	//<-- STORING -->//
@@ -102,8 +102,8 @@ public:
 	bool removeState(state_t state);
 	bool removeTransition(state_t from, input_t input, state_t to = NULL_STATE, output_t output = DEFAULT_OUTPUT);
 
-	void incNumberOfInputs(num_inputs_t byNum);
-	void incNumberOfOutputs(num_outputs_t byNum);
+	void incNumberOfInputs(input_t byNum);
+	void incNumberOfOutputs(output_t byNum);
 
 	/**
 	* Transforms given DFSM into the form without unreachable states.
@@ -134,17 +134,17 @@ protected:
 	vector< vector< output_t > > _outputTransition;
 	vector< output_t > _outputState;
 
-	bool distinguishByStateOutputs(queue< vector< num_states_t > >& blocks);
-	bool distinguishByTransitionOutputs(queue< vector< num_states_t > >& blocks);
-	bool distinguishByTransitions(queue< vector< num_states_t > >& blocks);
-	void mergeEquivalentStates(queue< vector< num_states_t > >& equivalentStates);
+	bool distinguishByStateOutputs(queue< vector< state_t > >& blocks);
+	bool distinguishByTransitionOutputs(queue< vector< state_t > >& blocks);
+	bool distinguishByTransitions(queue< vector< state_t > >& blocks);
+	void mergeEquivalentStates(queue< vector< state_t > >& equivalentStates);
 	
 	void clearStateOutputs();
 	void clearTransitionOutputs();
 	void clearTransitions();
 	
-	void generateStateOutputs(num_outputs_t nOutputs);
-	void generateTransitionOutputs(num_outputs_t nOutputs, num_outputs_t firstOutput);
+	void generateStateOutputs(output_t nOutputs);
+	void generateTransitionOutputs(output_t nOutputs, output_t firstOutput);
 	// generates coherent transition system
 	void generateTransitions();
 	
