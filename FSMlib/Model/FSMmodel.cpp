@@ -64,7 +64,9 @@ namespace FSMmodel {
 		if ((fsm1->getNumberOfStates() != fsm2->getNumberOfStates()) ||
 			(fsm1->getNumberOfInputs() != fsm2->getNumberOfInputs()) ||
 			(fsm1->getNumberOfOutputs() != fsm2->getNumberOfOutputs()) ||
-			(fsm1->getType() != fsm2->getType())) {
+			(fsm1->getType() != fsm2->getType()) ||
+			(fsm1->isOutputState() != fsm2->isOutputState()) ||
+			(fsm1->isOutputTransition() != fsm2->isOutputTransition())) {
 			return false;
 		}
 		state_t state, nextState1, nextState2;
@@ -78,11 +80,13 @@ namespace FSMmodel {
 		while (!fifo.empty()) {
 			state = fifo.front();
 			fifo.pop();
-			if (fsm1->getOutput(state, STOUT_INPUT) != fsm2->getOutput(stateEq[state], STOUT_INPUT)) {
+			if (fsm1->isOutputState() && 
+				(fsm1->getOutput(state, STOUT_INPUT) != fsm2->getOutput(stateEq[state], STOUT_INPUT))) {
 				return false;
 			}
 			for (input_t input = 0; input < fsm1->getNumberOfInputs(); input++) {
-				if (fsm1->getOutput(state, input) != fsm2->getOutput(stateEq[state], input)) {
+				if (fsm1->isOutputTransition() && 
+					(fsm1->getOutput(state, input) != fsm2->getOutput(stateEq[state], input))) {
 					return false;
 				}
 				nextState1 = fsm1->getNextState(state, input);

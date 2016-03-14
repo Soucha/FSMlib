@@ -33,10 +33,13 @@ public:
 		_transition.clear();
 		_outputState.clear();
 		_outputTransition.clear();
+		_isOutputState = true;
+		_isOutputTransition = true;
 	}
 
 	DFSM(const DFSM& other) :
 		FSM(other), _isReduced(other._isReduced), _transition(other._transition),
+		_isOutputState(other._isOutputState), _isOutputTransition(other._isOutputTransition),
 		_outputTransition(other._outputTransition), _outputState(other._outputState) {
 	}
 
@@ -45,6 +48,20 @@ public:
 	*/
 	bool isReduced() const {
 		return _isReduced;
+	}
+
+	/**
+	* @return True if states are labelled by outputs
+	*/
+	bool isOutputState() const {
+		return _isOutputState;
+	}
+
+	/**
+	* @return True if transitions are labelled by outputs
+	*/
+	bool isOutputTransition() const {
+		return _isOutputTransition;
 	}
 
 	//<-- TRANSITION SYSTEM -->//
@@ -130,6 +147,8 @@ public:
 
 protected:
 	bool _isReduced;
+	bool _isOutputState;
+	bool _isOutputTransition;
 	vector< vector< state_t > > _transition;
 	vector< vector< output_t > > _outputTransition;
 	vector< output_t > _outputState;
@@ -159,7 +178,7 @@ protected:
 	void saveTransitions(ofstream& file);
 	
 	void writeDotStart(ofstream& file);
-	void writeDotStates(ofstream& file, bool withOutputs = true);
-	void writeDotTransitions(ofstream& file, bool withOutputs = true);
+	void writeDotStates(ofstream& file);
+	void writeDotTransitions(ofstream& file);
 	void writeDotEnd(ofstream& file);
 };

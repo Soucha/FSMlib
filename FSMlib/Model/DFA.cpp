@@ -25,16 +25,20 @@
 
 void DFA::create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfOutputs > 2) {
-		cerr << typeNames[_type] << "::create - the number of outputs reduced to maximum of 2" << endl;
+		cerr << machineTypeNames[_type] << "::create - the number of outputs reduced to maximum of 2" << endl;
 		numberOfOutputs = 2;
 	}
 	if (numberOfInputs == 0) {
-		cerr << typeNames[_type] << "::create - the number of inputs needs to be greater than 0 (set to 1)" << endl;
+		cerr << machineTypeNames[_type] << "::create - the number of inputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfInputs = 1;
 	}
 	if (numberOfOutputs == 0) {
-		cerr << typeNames[_type] << "::create - the number of outputs needs to be greater than 0 (set to 1)" << endl;
+		cerr << machineTypeNames[_type] << "::create - the number of outputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfOutputs = 1;
+	}
+	if (numberOfStates == 0) {
+		cerr << machineTypeNames[_type] << "::create - the number of states needs to be greater than 0 (set to 1)" << endl;
+		numberOfStates = 1;
 	}
 
 	_numberOfStates = numberOfStates;
@@ -42,6 +46,7 @@ void DFA::create(state_t numberOfStates, input_t numberOfInputs, output_t number
 	_numberOfOutputs = numberOfOutputs;
 	_type = TYPE_DFA;
 	_isReduced = false;
+	_usedStateIDs.clear();
 	_usedStateIDs.resize(_numberOfStates, true);
 
 	clearTransitions();
@@ -50,19 +55,19 @@ void DFA::create(state_t numberOfStates, input_t numberOfInputs, output_t number
 
 void DFA::generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
 	if (numberOfInputs == 0) {
-		cerr << typeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
+		cerr << machineTypeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfInputs = 1;
 	}
 	if (numberOfOutputs == 0) {
-		cerr << typeNames[_type] << "::generate - the number of outputs needs to be greater than 0 (set to 1)" << endl;
+		cerr << machineTypeNames[_type] << "::generate - the number of outputs needs to be greater than 0 (set to 1)" << endl;
 		numberOfOutputs = 1;
 	}
 	if (numberOfStates == 0) {
-		cerr << typeNames[_type] << "::generate - the number of states needs to be greater than 0 (set to 1)" << endl;
+		cerr << machineTypeNames[_type] << "::generate - the number of states needs to be greater than 0 (set to 1)" << endl;
 		numberOfStates = 1;
 	}
 	if (numberOfOutputs > 2) {
-		cerr << typeNames[_type] << "::create - the number of outputs reduced to maximum of 2" << endl;
+		cerr << machineTypeNames[_type] << "::create - the number of outputs reduced to maximum of 2" << endl;
 		numberOfOutputs = 2;
 	}
 	_numberOfStates = numberOfStates;
@@ -70,6 +75,7 @@ void DFA::generate(state_t numberOfStates, input_t numberOfInputs, output_t numb
 	_numberOfOutputs = numberOfOutputs;
 	_type = TYPE_DFA;
 	_isReduced = false;
+	_usedStateIDs.clear();
 	_usedStateIDs.resize(_numberOfStates, true);
 
 	srand(time(NULL));
@@ -81,41 +87,40 @@ void DFA::generate(state_t numberOfStates, input_t numberOfInputs, output_t numb
 bool DFA::load(string fileName) {
 	ifstream file(fileName.c_str());
 	if (!file.is_open()) {
-		cerr << typeNames[_type] << "::load - unable to open file" << endl;
+		cerr << machineTypeNames[_type] << "::load - unable to open file" << endl;
 		return false;
 	}
 	state_t maxState;
 	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs >> maxState;
 	if (_type != TYPE_DFA) {
-		cerr << typeNames[_type] << "::load - bad type of FSM" << endl;
+		cerr << machineTypeNames[_type] << "::load - bad type of FSM" << endl;
 		file.close();
 		return false;
 	}
 	if (_numberOfInputs == 0) {
-		cerr << typeNames[_type] << "::load - the number of inputs needs to be greater than 0" << endl;
+		cerr << machineTypeNames[_type] << "::load - the number of inputs needs to be greater than 0" << endl;
 		file.close();
 		return false;
 	}
 	if (_numberOfOutputs == 0) {
-		cerr << typeNames[_type] << "::load - the number of outputs needs to be greater than 0" << endl;
+		cerr << machineTypeNames[_type] << "::load - the number of outputs needs to be greater than 0" << endl;
 		file.close();
 		return false;
 	}
 	if (_numberOfStates == 0) {
-		cerr << typeNames[_type] << "::load - the number of states needs to be greater than 0" << endl;
-		file.close();
-		return false;
+		cerr << machineTypeNames[_type] << "::load - the number of states should be greater than 0" << endl;
 	}
 	if (_numberOfOutputs > 2) {
-		cerr << typeNames[_type] << "::load - the number of outputs cannot be greater than 2" << endl;
+		cerr << machineTypeNames[_type] << "::load - the number of outputs cannot be greater than 2" << endl;
 		file.close();
 		return false;
 	}
 	if (maxState < _numberOfStates) {
-		cerr << typeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
+		cerr << machineTypeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
 		file.close();
 		return false;
 	}
+	_usedStateIDs.clear();
 	_usedStateIDs.resize(maxState, false);
 	if (!loadStateOutputs(file) || !loadTransitions(file)) {
 		file.close();
@@ -126,5 +131,5 @@ bool DFA::load(string fileName) {
 }
 
 void DFA::incNumberOfOutputs(output_t byNum) {
-	cerr << typeNames[_type] << "::incNumberOfOutputs - the number of outputs cannot be increased" << endl;
+	cerr << machineTypeNames[_type] << "::incNumberOfOutputs - the number of outputs cannot be increased" << endl;
 }

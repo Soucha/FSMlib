@@ -33,7 +33,7 @@ using namespace std;
 
 typedef unsigned int machine_type_t;
 
-static const char* typeNames[] = {
+static const char* machineTypeNames[] = {
 	"Invalid",
 #define TYPE_NONE       0
 	"DFSM",

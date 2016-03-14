@@ -29,6 +29,8 @@ public:
 	Mealy() :
 		DFSM() {
 		_type = TYPE_MEALY;
+		_isOutputState = false;
+		_isOutputTransition = true;
 	}
 
 	Mealy(const Mealy& other) :
@@ -48,8 +50,10 @@ public:
 
 	//<-- STORING -->//
 
-	string save(string path);
-	string writeDOTfile(string path);
+	/// inherited
+	//string save(string path);
+	/// inherited
+	//string writeDOTfile(string path);
 
 	//<-- EDITING THE MODEL -->//
 

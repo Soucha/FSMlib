@@ -29,6 +29,8 @@ public:
 	Moore() :
 		DFSM() {
 		_type = TYPE_MOORE;
+		_isOutputState = true;
+		_isOutputTransition = false;
 	}
 	
 	Moore(const Moore& other) :
@@ -48,8 +50,10 @@ public:
 
 	//<-- STORING -->//
 
-	string save(string path);
-	string writeDOTfile(string path);
+	/// inherited
+	//string save(string path);
+	/// inherited
+	//string writeDOTfile(string path);
 
 	//<-- EDITING THE MODEL -->//
 

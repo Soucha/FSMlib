@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlib", "FSMlib\FSMlib.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlibTest", "FSMlibTest\FSMlibTest.vcxproj", "{21BF387C-7009-414F-8A91-1EF22A1B958E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMdevel", "FSMdevel\FSMdevel.vcxproj", "{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -40,6 +42,17 @@ Global
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|Win32.ActiveCfg = Release|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|Win32.Build.0 = Release|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|x64.ActiveCfg = Release|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|Win32.Build.0 = Debug|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|x64.ActiveCfg = Debug|x64
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Debug|x64.Build.0 = Debug|x64
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Win32.ActiveCfg = Release|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Win32.Build.0 = Release|Win32
+		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

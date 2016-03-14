@@ -28,7 +28,7 @@ public:
 
 	DFA() :
 		Moore() {
-		_type = TYPE_MOORE;
+		_type = TYPE_DFA;
 	}
 
 	DFA(const DFA& other) :
