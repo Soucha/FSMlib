@@ -16,41 +16,19 @@
 */
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "../../FSMlib/FSMlib.h"
+#include "../TestUtils.h"
 #include <iostream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace std;
-
-#define CHECK_CERR() \
-	if (int(strCout.tellp()) > 0) {\
-		Logger::WriteMessage(ToString(strCout.str()).c_str());\
-		strCout.str("");\
-	}
 
 namespace FSMlibTest
 {
-	streambuf * backup = cerr.rdbuf();
-	ostringstream strCout;
-	
-
-	TEST_MODULE_INITIALIZE(ModuleInitialize)
-	{
-		cerr.rdbuf(strCout.rdbuf());
-	}
-
-	TEST_MODULE_CLEANUP(ModuleCleanup)
-	{
-		cerr.rdbuf(backup);
-	}
-
+	INIT_SUITE
 
 	TEST_CLASS(IOtests)
 	{
 	public:
 		DFSM * fsm, * fsm2;
-		wchar_t message[200];
-
 
 		TEST_METHOD(TestGenerate)
 		{
@@ -74,44 +52,31 @@ namespace FSMlibTest
 		}
 
 		void tCreateSaveLoad() {
-			Logger::WriteMessage(machineTypeNames[fsm->getType()]);
+			DEBUG_MSG(machineTypeNames[fsm->getType()]);
 			fsm->create(0, 0, 0);// = create(1,1,1) is minimum
-			CHECK_CERR()
-			int n = fsm->getNumberOfStates();
-			Assert::AreEqual(n, 1, L"The number of states is not correct.", LINE_INFO());
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(1), "The number of states is not correct.");
 			tSaveLoad();
 
 			fsm->create(5, 3, 2);
-			CHECK_CERR()
-			n = fsm->getNumberOfStates();
-			Assert::AreEqual(n, 5, L"The number of states is not correct.", LINE_INFO());
-			int p = fsm->getNumberOfInputs();
-			Assert::AreEqual(p, 3, L"The number of inputs is not correct.", LINE_INFO());
-			int q = fsm->getNumberOfOutputs();
-			Assert::AreEqual(q, 2, L"The number of outputs is not correct.", LINE_INFO());
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(5), "The number of states is not correct.");
+			ARE_EQUAL(fsm->getNumberOfInputs(), input_t(3), "The number of inputs is not correct.");
+			ARE_EQUAL(fsm->getNumberOfOutputs(), output_t(2), "The number of outputs is not correct.");
 			tSaveLoad();
 		}
 
 		void tSaveLoad() {
 			string path = "../../data/tmp/";
 			string filename = fsm->save(path);
-			CHECK_CERR()
-			_swprintf(message, L"This %s cannot be saved into path '%s'.", 
-				ToString(machineTypeNames[fsm->getType()]).c_str(), ToString(path).c_str());
-			Assert::IsTrue(!filename.empty(), message, LINE_INFO());
-			_swprintf(message, L"File '%s' cannot be loaded.", ToString(filename).c_str());
-			Assert::IsTrue(fsm2->load(filename), message, LINE_INFO());
-			CHECK_CERR()
-			Logger::WriteMessage(filename.c_str());
+			ARE_EQUAL(!filename.empty(), true, "This %s cannot be saved into path '%s'.",
+				machineTypeNames[fsm->getType()], path);
+			ARE_EQUAL(fsm2->load(filename), true, "File '%s' cannot be loaded.", filename);
+			DEBUG_MSG(filename.c_str());
 			
 
 			//Assert::IsTrue(FSMmodel::areIsomorphic(fsm, fsm2), L"Save FSM and load FSM are not same.", LINE_INFO());
-			Assert::AreEqual(fsm->getNumberOfStates(), fsm2->getNumberOfStates(), 
-				L"The numbers of states are not equal.", LINE_INFO());
-			Assert::AreEqual(fsm->getNumberOfInputs(), fsm2->getNumberOfInputs(),
-				L"The numbers of inputs are not equal.", LINE_INFO());
-			Assert::AreEqual(fsm->getNumberOfOutputs(), fsm2->getNumberOfOutputs(),
-				L"The numbers of outputs are not equal.", LINE_INFO());
+			ARE_EQUAL(fsm->getNumberOfStates(), fsm2->getNumberOfStates(), "The numbers of states are not equal.");
+			ARE_EQUAL(fsm->getNumberOfInputs(), fsm2->getNumberOfInputs(), "The numbers of inputs are not equal.");
+			ARE_EQUAL(fsm->getNumberOfOutputs(), fsm2->getNumberOfOutputs(), "The numbers of outputs are not equal.");
 
 			if (fsm->getNumberOfStates() == 0) return;
 
@@ -120,30 +85,20 @@ namespace FSMlibTest
 			states.push_back(0);
 			while (stop < states.size()) {
 				if (fsm->isOutputState()) {
-					_swprintf(message, L"The outputs of state %d are different.", states[stop]);
-					Assert::AreEqual(fsm->getOutput(states[stop], STOUT_INPUT), fsm2->getOutput(states[stop], STOUT_INPUT),
-						message, LINE_INFO());
-					CHECK_CERR()
+					ARE_EQUAL(fsm->getOutput(states[stop], STOUT_INPUT), fsm2->getOutput(states[stop], STOUT_INPUT), 
+						"The outputs of state %d are different.", states[stop]);
 				}
 				for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
 					if (fsm->isOutputTransition()) {
-						_swprintf(message, L"The outputs on input %d from state %d are different.", i, states[stop]);
-						Assert::AreEqual(fsm->getOutput(states[stop], i), fsm2->getOutput(states[stop], i),
-							message, LINE_INFO());
-						CHECK_CERR()
+						ARE_EQUAL(fsm->getOutput(states[stop], i), fsm2->getOutput(states[stop], i),
+							"The outputs on input %d from state %d are different.", i, states[stop]);
 					}
 					state_t nextState = fsm->getNextState(states[stop], i);
-					CHECK_CERR()
-					_swprintf(message, L"%d", nextState);
-					//L
-					Logger::WriteMessage(message);
-					_swprintf(message, L"The next states on input %d from state %d are different.", i, states[stop]);
-					Assert::AreEqual(nextState, fsm2->getNextState(states[stop], i),
-						message, LINE_INFO());
-					CHECK_CERR()
-					_swprintf(message, L"The next state on input %d from state %d is wrong.", i, states[stop]);
-					Assert::IsTrue(nextState != WRONG_STATE,
-						message, LINE_INFO());
+					DEBUG_MSG("%d", nextState);
+					ARE_EQUAL(nextState, fsm2->getNextState(states[stop], i),
+						"The next states on input %d from state %d are different.", i, states[stop]);
+					ARE_EQUAL(nextState != WRONG_STATE, true, 
+						"The next state on input %d from state %d is wrong.", i, states[stop]);
 					if ((nextState != NULL_STATE) && (find(states.begin(), states.end(), nextState) == states.end())) {
 						states.push_back(nextState);
 					}
@@ -151,8 +106,7 @@ namespace FSMlibTest
 				stop++;
 			}
 			if (fsm->isReduced()) {
-				Assert::AreEqual(fsm->getNumberOfStates(), state_t(states.size()),
-					L"The numbers of states are not equal.", LINE_INFO());
+				ARE_EQUAL(fsm->getNumberOfStates(), state_t(states.size()), "The numbers of states are not equal.");
 			}
 		}
 	};

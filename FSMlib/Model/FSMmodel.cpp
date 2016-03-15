@@ -22,6 +22,20 @@
 
 #define SEQUENCE_SEPARATOR       ","
 
+namespace FSMlib {
+	void displayErrorMsgOnCerr(const char* errorMsg) {
+		std::cerr << errorMsg << std::endl;
+	}
+
+	void noticeListeners(const char* msg) {
+		(*FSMlib::errorMsgHandler)(msg);
+	}
+
+	void setErrorMsgHandler(void(*userErrorMsgHandler)(const char*)) {
+		FSMlib::errorMsgHandler = userErrorMsgHandler;
+	}
+}
+
 namespace Utils {
 	string hashCode(int length) {
 		string hash = "";

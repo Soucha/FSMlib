@@ -17,9 +17,6 @@
 
 #include "stdafx.h"
 
-#include <iostream>
-#include <time.h>
-
 #include "DFSM.h"
 
 // helps to generate connected state diagram
@@ -71,19 +68,19 @@ state_t DFSM::getEndPathState(state_t state, sequence_in_t path) {
 
 output_t DFSM::getOutput(state_t state, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		cerr << machineTypeNames[_type] << "::getOutput - bad state id" << endl;
+		ERROR_MESSAGE("%s::getOutput - bad state id", machineTypeNames[_type]);
 		return WRONG_OUTPUT;
 	}
 	if (input == STOUT_INPUT) {
 		return _outputState[state];
 	}
 	if (input >= _numberOfInputs) {
-		cerr << machineTypeNames[_type] << "::getOutput - bad input" << endl;
+		ERROR_MESSAGE("%s::getOutput - bad input", machineTypeNames[_type]);
 		return WRONG_OUTPUT;
 	}
 	state_t& nextState = _transition[state][input];
 	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		cerr << machineTypeNames[_type] << "::getOutput - there is no such transition" << endl;
+		ERROR_MESSAGE("%s::getOutput - there is no such transition", machineTypeNames[_type]);
 		return WRONG_OUTPUT;
 	}
 	return _outputTransition[state][input];
@@ -418,35 +415,35 @@ void DFSM::clearTransitionOutputs() {
 }
 
 void DFSM::create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
-	if (numberOfOutputs > (numberOfStates * (1 + numberOfInputs))) {
-		cerr << machineTypeNames[_type] << "::create - the number of outputs reduced to maximum of " 
-			<< (numberOfStates * (1 + numberOfInputs)) << endl;
-		numberOfOutputs = (numberOfStates * (1 + numberOfInputs));
+	if (numberOfStates == 0) {
+		ERROR_MESSAGE("%s::create - the number of states needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
+		numberOfStates = 1;
 	}
 	if (numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of inputs needs to be greater than 0 (set to 1)" << endl;
+		ERROR_MESSAGE("%s::create - the number of inputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfInputs = 1;
 	}
 	if (numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of outputs needs to be greater than 0 (set to 1)" << endl;
+		ERROR_MESSAGE("%s::create - the number of outputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfOutputs = 1;
 	}
-	if (numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of states needs to be greater than 0 (set to 1)" << endl;
-		numberOfStates = 1;
+	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
+	if (numberOfOutputs > maxOutputs) {
+		ERROR_MESSAGE("%s::create - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs); 
+		numberOfOutputs = maxOutputs;
 	}
-
+	
 	_numberOfStates = numberOfStates;
 	_numberOfInputs = numberOfInputs;
 	_numberOfOutputs = numberOfOutputs;
-	_type = TYPE_DFSM;
+	//_type is set
 	_isReduced = false;
 	_usedStateIDs.clear();
 	_usedStateIDs.resize(_numberOfStates, true);
 
 	clearTransitions();
-	clearStateOutputs();
-	clearTransitionOutputs();	
+	if (_isOutputState) clearStateOutputs();
+	if (_isOutputTransition) clearTransitionOutputs();
 }
 
 void DFSM::generateTransitions() {
@@ -581,27 +578,28 @@ void DFSM::generateTransitionOutputs(output_t nOutputs, output_t firstOutput) {
 }
 
 void DFSM::generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
+	if (numberOfStates == 0) {
+		ERROR_MESSAGE("%s::generate - the number of states needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
+		numberOfStates = 1;
+	}
 	if (numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
+		ERROR_MESSAGE("%s::generate - the number of inputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfInputs = 1;
 	}
 	if (numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of outputs needs to be greater than 0 (set to 1)" << endl;
+		ERROR_MESSAGE("%s::generate - the number of outputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfOutputs = 1;
 	}
-	if (numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of states needs to be greater than 0 (set to 1)" << endl;
-		numberOfStates = 1;
+	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
+	if (numberOfOutputs > maxOutputs) {
+		ERROR_MESSAGE("%s::generate - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs);
+		numberOfOutputs = maxOutputs;
 	}
-	if (numberOfOutputs > (numberOfStates * (1 + numberOfInputs))) {
-		cerr << machineTypeNames[_type] << "::generate - the number of outputs reduced to maximum of "
-			<< (numberOfStates * (1 + numberOfInputs)) << endl;
-		numberOfOutputs = (numberOfStates * (1 + numberOfInputs));
-	}
+
 	_numberOfStates = numberOfStates;
 	_numberOfInputs = numberOfInputs;
 	_numberOfOutputs = numberOfOutputs;
-	_type = TYPE_DFSM;
+	//_type is set
 	_isReduced = false;
 	_usedStateIDs.clear();
 	_usedStateIDs.resize(_numberOfStates, true);
@@ -611,19 +609,17 @@ void DFSM::generate(state_t numberOfStates, input_t numberOfInputs, output_t num
 	generateTransitions();
 
 	output_t stateOutputs, transitionOutputs, firstTransitionOutput;
-	if (_numberOfOutputs < _numberOfStates) {
-		stateOutputs = transitionOutputs = _numberOfOutputs;
-		firstTransitionOutput = 0;
-	}
-	else {
+	stateOutputs = transitionOutputs = _numberOfOutputs;
+	firstTransitionOutput = 0;
+	if ((_numberOfOutputs > _numberOfStates) && _isOutputState && _isOutputTransition) {
 		stateOutputs = _numberOfOutputs / (1 + _numberOfInputs);
 		if (stateOutputs < 2) stateOutputs = 1;
 		transitionOutputs = _numberOfOutputs - stateOutputs;
 		if (transitionOutputs < 2) transitionOutputs = 1;
 		firstTransitionOutput = _numberOfOutputs - transitionOutputs;
 	}
-	generateStateOutputs(stateOutputs);
-	generateTransitionOutputs(transitionOutputs, firstTransitionOutput);
+	if (_isOutputState) generateStateOutputs(stateOutputs);
+	if (_isOutputTransition) generateTransitionOutputs(transitionOutputs, firstTransitionOutput);
 }
 
 bool DFSM::loadStateOutputs(ifstream& file) {
@@ -633,14 +629,13 @@ bool DFSM::loadStateOutputs(ifstream& file) {
 	for (state_t state = 0; state < _numberOfStates; state++) {
 		file >> tmpState;
 		if ((tmpState >= _usedStateIDs.size()) || (_usedStateIDs[tmpState])) {
-			cerr << machineTypeNames[_type] << "::loadStateOutputs - bad state output line " << state << endl;
+			ERROR_MESSAGE("%s::loadStateOutputs - bad state output line %d", machineTypeNames[_type], state);
 			return false;
 		}
 		_usedStateIDs[tmpState] = true;
 		file >> output;
 		if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-			cerr << machineTypeNames[_type] << "::loadStateOutputs - bad state output line " << state 
-				<< ", output " << output << endl;
+			ERROR_MESSAGE("%s::loadStateOutputs - bad state output line %d, output %d", machineTypeNames[_type], state, output);
 			return false;
 		}
 		_outputState[tmpState] = output;
@@ -659,15 +654,15 @@ bool DFSM::loadTransitionOutputs(ifstream& file) {
 	for (state_t state = 0; state < _numberOfStates; state++) {
 		file >> tmpState;
 		if ((tmpState >= _usedStateIDs.size()) || (_usedStateIDs[tmpState])) {
-			cerr << machineTypeNames[_type] << "::loadTransitionOutputs - bad transition output line " << state << endl;
+			ERROR_MESSAGE("%s::loadTransitionOutputs - bad transition output line %d", machineTypeNames[_type], state);
 			return false;
 		}
 		_usedStateIDs[tmpState] = true;
 		for (input_t input = 0; input < _numberOfInputs; input++) {
 			file >> output;
 			if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-				cerr << machineTypeNames[_type] << "::loadTransitionOutputs - bad transition output line " << state 
-					<< ", input " << input << ", output " << output << endl;
+				ERROR_MESSAGE("%s::loadTransitionOutputs - bad transition output line %d, input %d, output %d",
+					machineTypeNames[_type], state, input, output);
 				return false;
 			}
 			_outputTransition[tmpState][input] = output;
@@ -685,14 +680,13 @@ bool DFSM::loadTransitions(ifstream& file) {
 	for (state_t state = 0; state < _numberOfStates; state++) {
 		file >> tmpState;
 		if ((tmpState >= _usedStateIDs.size()) || (!_usedStateIDs[tmpState])) {
-			cerr << machineTypeNames[_type] << "::loadTransitions - bad transition line " << state << endl;
+			ERROR_MESSAGE("%s::loadTransitions - bad transition line %d", machineTypeNames[_type], state);
 			return false;
 		}
 		for (input_t input = 0; input < _numberOfInputs; input++) {
 			file >> nextState;
 			if ((nextState != NULL_STATE) && ((nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState]))) {
-				cerr << machineTypeNames[_type] << "::loadTransitions - bad transition line " << state 
-					<< ", input " << input << endl;
+				ERROR_MESSAGE("%s::loadTransitions - bad transition line %d, input %d", machineTypeNames[_type], state, input);
 				return false;
 			}
 			_transition[tmpState][input] = nextState;
@@ -704,41 +698,54 @@ bool DFSM::loadTransitions(ifstream& file) {
 bool DFSM::load(string fileName) {
 	ifstream file(fileName.c_str());
 	if (!file.is_open()) {
-		cerr << machineTypeNames[_type] << "::load - unable to open file" << endl;
+		ERROR_MESSAGE("%s::load - unable to open file %s", machineTypeNames[_type], fileName.c_str());
 		return false;
 	}
-	state_t maxState;
-	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs >> maxState;
-	if (_type != TYPE_DFSM) {
-		cerr << machineTypeNames[_type] << "::load - bad type of FSM" << endl;
+	machine_type_t type;
+	bool isReduced;
+	state_t numberOfStates, maxState;
+	input_t numberOfInputs;
+	output_t numberOfOutputs;
+	file >> type >> isReduced >> numberOfStates >> numberOfInputs >> numberOfOutputs >> maxState;
+	if (_type != type) {
+		ERROR_MESSAGE("%s::load - bad type of FSM", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
-	if (_numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of inputs needs to be greater than 0" << endl;
+	if (numberOfStates <= 0) {
+		ERROR_MESSAGE("%s::load - the number of states needs to be greater than 0", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
-	if (_numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of outputs needs to be greater than 0" << endl;
+	if (numberOfInputs <= 0) {
+		ERROR_MESSAGE("%s::load - the number of inputs needs to be greater than 0", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
-	if (_numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of states should be greater than 0" << endl;
-	}
-	if (_numberOfOutputs > (_numberOfStates * (1 + _numberOfInputs))) {
-		cerr << machineTypeNames[_type] << "::load - the number of outputs cannot be greater than the maximum value of "
-			<< (_numberOfStates * (1 + _numberOfInputs)) << ". Consider minimization!" << endl;
-	}
-	if (maxState < _numberOfStates) {
-		cerr << machineTypeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
+	if (numberOfOutputs <= 0) {
+		ERROR_MESSAGE("%s::load - the number of outputs needs to be greater than 0", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
+	if (maxState < numberOfStates) {
+		ERROR_MESSAGE("%s::load - the number of states cannot be greater than the greatest state ID", machineTypeNames[_type]);
+		file.close();
+		return false;
+	}
+	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
+	if (numberOfOutputs > maxOutputs) {
+		ERROR_MESSAGE("%s::load - the number of outputs should not be greater than the maximum value of %d. Consider minimization!",
+			machineTypeNames[_type], maxOutputs);
+	}
+	_numberOfStates = numberOfStates;
+	_numberOfInputs = numberOfInputs;
+	_numberOfOutputs = numberOfOutputs;
+	//_type is set
+	_isReduced = isReduced;
 	_usedStateIDs.clear();
 	_usedStateIDs.resize(maxState, false);
-	if (!loadStateOutputs(file) || !loadTransitionOutputs(file) || !loadTransitions(file)) {
+	if ((_isOutputState && !loadStateOutputs(file)) || (_isOutputTransition && !loadTransitionOutputs(file))
+		|| !loadTransitions(file)) {
 		file.close();
 		return false;
 	}
@@ -799,7 +806,7 @@ string DFSM::save(string path) {
 	filename = Utils::getUniqueName(filename, "fsm", path);
 	ofstream file(filename.c_str());
 	if (!file.is_open()) {
-		cerr << machineTypeNames[_type] << "::save - unable to open file" << endl;
+		ERROR_MESSAGE("%s::save - unable to open file %s", machineTypeNames[_type], filename.c_str());
 		return "";
 	}
 	saveInfo(file);
@@ -853,7 +860,7 @@ string DFSM::writeDOTfile(string path) {
 	filename = Utils::getUniqueName(filename, "fsm", path);
 	ofstream file(filename.c_str());
 	if (!file.is_open()) {
-		cerr << machineTypeNames[_type] << "::writeDOTfile - unable to open file" << endl;
+		ERROR_MESSAGE("%s::writeDOTfile - unable to open file %s", machineTypeNames[_type], filename.c_str());
 		return "";
 	}
 	writeDotStart(file);
@@ -866,7 +873,7 @@ string DFSM::writeDOTfile(string path) {
 
 state_t DFSM::addState(output_t stateOutput) {
 	if ((stateOutput >= _numberOfOutputs) && (stateOutput != DEFAULT_OUTPUT)) {
-		cerr << machineTypeNames[_type] << "::addState - bad output (increase the number of outputs first)" << endl;
+		ERROR_MESSAGE("%s::addState - bad output (increase the number of outputs first)", machineTypeNames[_type]);
 		return NULL_STATE;
 	}
 	_isReduced = false;
@@ -890,11 +897,11 @@ state_t DFSM::addState(output_t stateOutput) {
 
 bool DFSM::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		cerr << machineTypeNames[_type] << "::setOutput - bad state" << endl;
+		ERROR_MESSAGE("%s::setOutput - bad state", machineTypeNames[_type]);
 		return false;
 	}
 	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-		cerr << machineTypeNames[_type] << "::setOutput - bad output (increase the number of outputs first)" << endl;
+		ERROR_MESSAGE("%s::setOutput - bad output (increase the number of outputs first)", machineTypeNames[_type]);
 		return false;
 	}
 	if (input == STOUT_INPUT) {
@@ -902,11 +909,11 @@ bool DFSM::setOutput(state_t state, output_t output, input_t input) {
 		return true;
 	}
 	if (input >= _numberOfInputs) {
-		cerr << machineTypeNames[_type] << "::setOutput - bad input" << endl;
+		ERROR_MESSAGE("%s::setOutput - bad input", machineTypeNames[_type]);
 		return false;
 	}
 	if (_transition[state][input] == NULL_STATE) {
-		cerr << machineTypeNames[_type] << "::setOutput - there is no such transition" << endl;
+		ERROR_MESSAGE("%s::setOutput - there is no such transition", machineTypeNames[_type]);
 		return false;
 	}
 	_outputTransition[state][input] = output;
@@ -916,23 +923,23 @@ bool DFSM::setOutput(state_t state, output_t output, input_t input) {
 
 bool DFSM::setTransition(state_t from, input_t input, state_t to, output_t output) {
 	if (input == STOUT_INPUT) {
-		cerr << machineTypeNames[_type] << "::setTransition - use setOutput to set a state output instead" << endl;
+		ERROR_MESSAGE("%s::setTransition - use setOutput() to set a state output instead", machineTypeNames[_type]);
 		return false;
 	}
 	if ((from >= _usedStateIDs.size()) || (!_usedStateIDs[from])) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad state From" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad state From", machineTypeNames[_type]);
 		return false;
 	}
 	if (input >= _numberOfInputs) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad input" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad input", machineTypeNames[_type]);
 		return false;
 	}
 	if ((to >= _usedStateIDs.size()) || (!_usedStateIDs[to])) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad state To" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad state To", machineTypeNames[_type]);
 		return false;
 	}
 	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad output (increase the number of outputs first)" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad output (increase the number of outputs first)", machineTypeNames[_type]);
 		return false;
 	}
 	_transition[from][input] = to;
@@ -943,11 +950,11 @@ bool DFSM::setTransition(state_t from, input_t input, state_t to, output_t outpu
 
 bool DFSM::removeState(state_t state) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		cerr << machineTypeNames[_type] << "::removeState - bad state" << endl;
+		ERROR_MESSAGE("%s::removeState - bad state", machineTypeNames[_type]);
 		return false;
 	}
 	if (state == 0) {
-		cerr << machineTypeNames[_type] << "::removeState - the initial state cannot be removed" << endl;
+		ERROR_MESSAGE("%s::removeState - the initial state cannot be removed", machineTypeNames[_type]);
 		return false;
 	}
 	if (_isOutputState) _outputState[state] = DEFAULT_OUTPUT;
@@ -969,22 +976,22 @@ bool DFSM::removeState(state_t state) {
 
 bool DFSM::removeTransition(state_t from, input_t input, state_t to, output_t output) {
 	if ((from >= _usedStateIDs.size()) || (!_usedStateIDs[from])) {
-		cerr << machineTypeNames[_type] << "::removeTransition - bad state From" << endl;
+		ERROR_MESSAGE("%s::removeTransition - bad state From", machineTypeNames[_type]);
 		return false;
 	}
 	if ((input >= _numberOfInputs) || (input == STOUT_INPUT)) {
-		cerr << machineTypeNames[_type] << "::removeTransition - bad input" << endl;
+		ERROR_MESSAGE("%s::removeTransition - bad input", machineTypeNames[_type]);
 		return false;
 	}
 	if (_transition[from][input] == NULL_STATE) {
-		cerr << machineTypeNames[_type] << "::removeTransition - there is no such transition" << endl;
+		ERROR_MESSAGE("%s::removeTransition - there is no such transition", machineTypeNames[_type]);
 		return false;
 	}
 	if ((to != NULL_STATE) && (_transition[from][input] != to)) {
-		cerr << machineTypeNames[_type] << "::removeTransition - state To has no effect here" << endl;
+		ERROR_MESSAGE("%s::removeTransition - state To has no effect here", machineTypeNames[_type]);
 	}
 	if (output != DEFAULT_OUTPUT) {
-		cerr << machineTypeNames[_type] << "::removeTransition - the output has no effect here" << endl;
+		ERROR_MESSAGE("%s::removeTransition - the output has no effect here", machineTypeNames[_type]);
 	}
 	_transition[from][input] = NULL_STATE;
 	if (_isOutputTransition) _outputTransition[from][input] = DEFAULT_OUTPUT;
@@ -1004,4 +1011,8 @@ void DFSM::incNumberOfInputs(input_t byNum) {
 
 void DFSM::incNumberOfOutputs(output_t byNum) {
 	_numberOfOutputs += byNum;
+}
+
+output_t DFSM::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
+	return (numberOfStates * (1 + numberOfInputs));
 }

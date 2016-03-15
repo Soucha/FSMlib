@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include <list>
 #include <map>
@@ -26,6 +27,7 @@
 #include <string>
 #include <queue>
 #include <stack>
+#include <time.h>
 
 #include "../FSMlib.h"
 

@@ -14,15 +14,27 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
+#pragma once
 
-#include "stdafx.h"
+#include "CppUnitTest.h"
+#include "../FSMlib/FSMlib.h"
 
-#include "DFA.h"
+using namespace std;
 
-void DFA::incNumberOfOutputs(output_t byNum) {
-	ERROR_MESSAGE("%s::incNumberOfOutputs - the number of outputs cannot be increased", machineTypeNames[_type]);
-}
+#define INIT_SUITE \
+	char msg[250]; \
+	void writeErrorMsg(const char* errorMsg) {\
+		Logger::WriteMessage(errorMsg);\
+	}\
+	TEST_MODULE_INITIALIZE(ModuleInitialize) {\
+		FSMlib::setErrorMsgHandler(writeErrorMsg);\
+	}
 
-output_t DFA::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
-	return 2;
-}
+#define ARE_EQUAL(expected, actual, format, ...) \
+	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
+	Assert::AreEqual(expected, actual, ToString(msg).c_str(), LINE_INFO());
+
+#define DEBUG_MSG(format, ...) \
+	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
+	Logger::WriteMessage(msg);
+

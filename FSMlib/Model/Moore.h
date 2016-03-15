@@ -44,9 +44,12 @@ public:
 
 	//<-- MODEL INITIALIZATION -->//
 
-	void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
-	void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
-	bool load(string fileName);
+	/// inherited
+	//void create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
+	/// inherited
+	//void generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs);
+	/// inherited
+	//bool load(string fileName);
 
 	//<-- STORING -->//
 
@@ -78,4 +81,8 @@ public:
 	//void makeCompact();
 	/// inherited
 	//bool mimimize();
+
+protected:
+	output_t getMaxOutputs(state_t numberOfStates, input_t numberOfInputs);
+
 };

@@ -14,6 +14,7 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
+#pragma once
 
 #ifdef FSMLIB_EXPORTS
 #define FSMLIB_API __declspec(dllexport)
@@ -22,3 +23,17 @@
 
 #include "Model\FSMmodel.h"
 #endif
+
+namespace FSMlib {
+
+#define ERROR_MESSAGE(format, ...) {\
+	char msg[250];\
+	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
+	FSMlib::noticeListeners(msg); }
+	
+	FSMLIB_API void displayErrorMsgOnCerr(const char* msg);
+	static void(*errorMsgHandler)(const char*) = displayErrorMsgOnCerr;
+	void noticeListeners(const char*);
+
+	FSMLIB_API void setErrorMsgHandler(void(*userErrorMsgHandler)(const char*));
+}

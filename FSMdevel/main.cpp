@@ -15,14 +15,30 @@
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
+#include <iostream>
+#include "../FSMlib/FSMlib.h"
 
-#include "DFA.h"
 
-void DFA::incNumberOfOutputs(output_t byNum) {
-	ERROR_MESSAGE("%s::incNumberOfOutputs - the number of outputs cannot be increased", machineTypeNames[_type]);
+DFSM * fsm, *fsm2;
+wchar_t message[200];
+
+void tCreateSaveLoad() {
+	fsm->create(0, 0, 0);// = create(1,1,1) is minimum
+	int n = fsm->getNumberOfStates();
+	printf("%d\n", n);
+
+	fsm->create(5, 3, 2);
+	n = fsm->getNumberOfStates();
+	int p = fsm->getNumberOfInputs();
+	int q = fsm->getNumberOfOutputs();
 }
 
-output_t DFA::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
-	return 2;
+int main(int argc, char** argv) {
+	DFSM dfsm, dfsm2;
+	fsm = &dfsm;
+	fsm2 = &dfsm2;
+	tCreateSaveLoad();
+	char c;
+	cin >> c;
+	return 0;
 }

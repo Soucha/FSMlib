@@ -17,175 +17,70 @@
 
 #include "stdafx.h"
 
-#include <fstream>
-#include <iostream>
-#include <time.h>
-
 #include "Moore.h"
 
 output_t Moore::getOutput(state_t state, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		cerr << machineTypeNames[_type] << "::getOutput - bad state id" << endl;
+		ERROR_MESSAGE("%s::getOutput - bad state id", machineTypeNames[_type]);
 		return WRONG_OUTPUT;
 	}
 	if (input == STOUT_INPUT) {
 		return _outputState[state];
 	}
 	if (input >= _numberOfInputs) {
-		cerr << machineTypeNames[_type] << "::getOutput - bad input" << endl;
+		ERROR_MESSAGE("%s::getOutput - bad input", machineTypeNames[_type]);
 		return WRONG_OUTPUT;
 	}
 	state_t& nextState = _transition[state][input];
 	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		cerr << machineTypeNames[_type] << "::getOutput - there is no such transition" << endl;
+		ERROR_MESSAGE("%s::getOutput - there is no such transition", machineTypeNames[_type]); 
 		return WRONG_OUTPUT;
 	}
 	return _outputState[nextState];
 }
 
-void Moore::create(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
-	if (numberOfOutputs > numberOfStates) {
-		cerr << machineTypeNames[_type] << "::create - the number of outputs reduced to maximum of " << numberOfStates << endl;
-		numberOfOutputs = numberOfStates;
-	}
-	if (numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of inputs needs to be greater than 0 (set to 1)" << endl;
-		numberOfInputs = 1;
-	}
-	if (numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of outputs needs to be greater than 0 (set to 1)" << endl;
-		numberOfOutputs = 1;
-	}
-	if (numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::create - the number of states needs to be greater than 0 (set to 1)" << endl;
-		numberOfStates = 1;
-	}
-
-	_numberOfStates = numberOfStates;
-	_numberOfInputs = numberOfInputs;
-	_numberOfOutputs = numberOfOutputs;
-	_type = TYPE_MOORE;
-	_isReduced = false;
-	_usedStateIDs.clear();
-	_usedStateIDs.resize(_numberOfStates, true);
-
-	clearTransitions();
-	clearStateOutputs();
-}
-
-void Moore::generate(state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
-	if (numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of inputs needs to be greater than 0 (set to 1)" << endl;
-		numberOfInputs = 1;
-	}
-	if (numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of outputs needs to be greater than 0 (set to 1)" << endl;
-		numberOfOutputs = 1;
-	}
-	if (numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::generate - the number of states needs to be greater than 0 (set to 1)" << endl;
-		numberOfStates = 1;
-	}
-	if (numberOfOutputs > numberOfStates) {
-		cerr << machineTypeNames[_type] << "::generate - the number of outputs reduced to maximum of " << numberOfStates << endl;
-		numberOfOutputs = numberOfStates;
-	}
-	_numberOfStates = numberOfStates;
-	_numberOfInputs = numberOfInputs;
-	_numberOfOutputs = numberOfOutputs;
-	_type = TYPE_MOORE;
-	_isReduced = false;
-	_usedStateIDs.clear();
-	_usedStateIDs.resize(_numberOfStates, true);
-
-	srand(time(NULL));
-
-	generateTransitions();
-	generateStateOutputs(_numberOfOutputs); 
-}
-
-bool Moore::load(string fileName) {
-	ifstream file(fileName.c_str());
-	if (!file.is_open()) {
-		cerr << machineTypeNames[_type] << "::load - unable to open file" << endl;
-		return false;
-	}
-	state_t maxState;
-	file >> _type >> _isReduced >> _numberOfStates >> _numberOfInputs >> _numberOfOutputs >> maxState;
-	if (_type != TYPE_MOORE) {
-		cerr << machineTypeNames[_type] << "::load - bad type of FSM" << endl;
-		file.close();
-		return false;
-	}
-	if (_numberOfInputs == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of inputs needs to be greater than 0" << endl;
-		file.close();
-		return false;
-	}
-	if (_numberOfOutputs == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of outputs needs to be greater than 0" << endl;
-		file.close();
-		return false;
-	}
-	if (_numberOfStates == 0) {
-		cerr << machineTypeNames[_type] << "::load - the number of states should be greater than 0" << endl;
-	}
-	if (_numberOfOutputs > _numberOfStates) {
-		cerr << machineTypeNames[_type] << "::load - the number of outputs cannot be greater than the maximum value of "
-			<< _numberOfStates << ". Consider minimization!" << endl;
-	}
-	if (maxState < _numberOfStates) {
-		cerr << machineTypeNames[_type] << "::load - the number of states cannot be greater than the greatest state ID" << endl;
-		file.close();
-		return false;
-	}
-	_usedStateIDs.clear();
-	_usedStateIDs.resize(maxState, false);
-	if (!loadStateOutputs(file) || !loadTransitions(file)) {
-		file.close();
-		return false;
-	}
-	file.close();
-	return true;
-}
-
 bool Moore::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		cerr << machineTypeNames[_type] << "::setOutput - bad state" << endl;
+		ERROR_MESSAGE("%s::setOutput - bad state", machineTypeNames[_type]);
 		return false;
 	}
 	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-		cerr << machineTypeNames[_type] << "::setOutput - bad output (increase the number of outputs first)" << endl;
+		ERROR_MESSAGE("%s::setOutput - bad output (increase the number of outputs first)", machineTypeNames[_type]);
 		return false;
 	}
-	if (input == STOUT_INPUT) {
-		_outputState[state] = output;
-		_isReduced = false;
-		return true;
+	if (input != STOUT_INPUT) {
+		ERROR_MESSAGE("%s::setOutput - bad input (only STOUT_INPUT allowed)", machineTypeNames[_type]);
+		return false;
 	}
-	cerr << machineTypeNames[_type] << "::setOutput - bad input (only STOUT_INPUT allowed)" << endl;
-	return false;
+	_outputState[state] = output;
+	_isReduced = false;
+	return true;	
 }
 
 bool Moore::setTransition(state_t from, input_t input, state_t to, output_t output) {
 	if ((input == STOUT_INPUT) || (output != DEFAULT_OUTPUT)) {
-		cerr << machineTypeNames[_type] << "::setTransition - use setOutput to set an output instead" << endl;
+		ERROR_MESSAGE("%s::setTransition - use setOutput() to set an output instead", machineTypeNames[_type]);
 		return false;
 	}
 	if ((from >= _usedStateIDs.size()) || (!_usedStateIDs[from])) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad state From" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad state From", machineTypeNames[_type]);
 		return false;
 	}
 	if (input >= _numberOfInputs) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad input" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad input", machineTypeNames[_type]);
 		return false;
 	}
 	if ((to >= _usedStateIDs.size()) || (!_usedStateIDs[to])) {
-		cerr << machineTypeNames[_type] << "::setTransition - bad state To" << endl;
+		ERROR_MESSAGE("%s::setTransition - bad state To", machineTypeNames[_type]);
 		return false;
 	}
 	_transition[from][input] = to;
 	_isReduced = false;
 	return true;
 }
+
+output_t Moore::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
+	return numberOfStates;
+}
+
 
