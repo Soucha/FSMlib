@@ -419,6 +419,7 @@ void DFSM::create(state_t numberOfStates, input_t numberOfInputs, output_t numbe
 		ERROR_MESSAGE("%s::create - the number of states needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfStates = 1;
 	}
+	/*
 	if (numberOfInputs == 0) {
 		ERROR_MESSAGE("%s::create - the number of inputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfInputs = 1;
@@ -427,6 +428,7 @@ void DFSM::create(state_t numberOfStates, input_t numberOfInputs, output_t numbe
 		ERROR_MESSAGE("%s::create - the number of outputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfOutputs = 1;
 	}
+	*/
 	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
 	if (numberOfOutputs > maxOutputs) {
 		ERROR_MESSAGE("%s::create - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs); 
@@ -604,7 +606,7 @@ void DFSM::generate(state_t numberOfStates, input_t numberOfInputs, output_t num
 	_usedStateIDs.clear();
 	_usedStateIDs.resize(_numberOfStates, true);
 
-	srand(time(NULL));
+	//srand(time(NULL));
 
 	generateTransitions();
 
@@ -717,13 +719,13 @@ bool DFSM::load(string fileName) {
 		file.close();
 		return false;
 	}
-	if (numberOfInputs <= 0) {
-		ERROR_MESSAGE("%s::load - the number of inputs needs to be greater than 0", machineTypeNames[_type]);
+	if (numberOfInputs < 0) {
+		ERROR_MESSAGE("%s::load - the number of inputs cannot be negative", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
-	if (numberOfOutputs <= 0) {
-		ERROR_MESSAGE("%s::load - the number of outputs needs to be greater than 0", machineTypeNames[_type]);
+	if (numberOfOutputs < 0) {
+		ERROR_MESSAGE("%s::load - the number of outputs cannot be negative", machineTypeNames[_type]);
 		file.close();
 		return false;
 	}
@@ -782,7 +784,12 @@ void DFSM::saveTransitionOutputs(ofstream& file) {
 		if (_usedStateIDs[state]) {
 			file << state;
 			for (input_t input = 0; input < _numberOfInputs; input++) {
-				file << '\t' << ((_outputTransition[state][input] == DEFAULT_OUTPUT) ? -1 : _outputTransition[state][input]);
+				if (_outputTransition[state][input] == DEFAULT_OUTPUT) {
+					file << '\t' << -1;
+				}
+				else {
+					file << '\t' << _outputTransition[state][input];
+				}
 			}
 			file << endl;
 		}
@@ -794,7 +801,12 @@ void DFSM::saveTransitions(ofstream& file) {
 		if (_usedStateIDs[state]) {
 			file << state;
 			for (input_t input = 0; input < _numberOfInputs; input++) {
-				file << '\t' << ((_transition[state][input] == NULL_STATE) ? -1 : _transition[state][input]);
+				if (_transition[state][input] == NULL_STATE) {
+					file << '\t' << -1;
+				}
+				else {
+					file << '\t' << _transition[state][input];
+				}
 			}
 			file << endl;
 		}
@@ -892,6 +904,7 @@ state_t DFSM::addState(output_t stateOutput) {
 	state_t newState = 0;
 	while (_usedStateIDs[newState]) newState++;
 	_usedStateIDs[newState] = true;
+	_numberOfStates++;
 	return newState;
 }
 
@@ -1015,4 +1028,14 @@ void DFSM::incNumberOfOutputs(output_t byNum) {
 
 output_t DFSM::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
 	return (numberOfStates * (1 + numberOfInputs));
+}
+
+vector<state_t> DFSM::getStates() {
+	vector<state_t> states;
+	for (state_t state = 0; state < _usedStateIDs.size(); state++) {
+		if (_usedStateIDs[state]) {
+			states.push_back(state);
+		}
+	}
+	return states;
 }

@@ -33,7 +33,7 @@ namespace FSMlib {
 	
 	FSMLIB_API void displayErrorMsgOnCerr(const char* msg);
 	static void(*errorMsgHandler)(const char*) = displayErrorMsgOnCerr;
-	void noticeListeners(const char*);
+	void noticeListeners(const char*);// calls errorMsgHandler with given message
 
 	FSMLIB_API void setErrorMsgHandler(void(*userErrorMsgHandler)(const char*));
 }

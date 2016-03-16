@@ -139,11 +139,16 @@ public:
 	*/
 	void makeCompact();
 
-	/*
+	/**
 	* Reduces this FSM into its minimal form.
 	* @return True on success, False if an error occurred
 	*/
 	bool mimimize();
+
+	/**
+	* @return a colection of state IDs in use
+	*/
+	vector<state_t> getStates();
 
 protected:
 	bool _isReduced;

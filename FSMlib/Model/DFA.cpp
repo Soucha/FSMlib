@@ -20,7 +20,11 @@
 #include "DFA.h"
 
 void DFA::incNumberOfOutputs(output_t byNum) {
-	ERROR_MESSAGE("%s::incNumberOfOutputs - the number of outputs cannot be increased", machineTypeNames[_type]);
+	if (_numberOfOutputs + byNum > 2) {
+		ERROR_MESSAGE("%s::incNumberOfOutputs - the number of outputs cannot be increased", machineTypeNames[_type]);
+	} else {
+		_numberOfOutputs += byNum;
+	}
 }
 
 output_t DFA::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
