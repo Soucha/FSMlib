@@ -18,23 +18,31 @@
 
 #include "CppUnitTest.h"
 #include "../FSMlib/FSMlib.h"
+#include <iostream>
 
 using namespace std;
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
+#define DATA_PATH "../../data/"
+
+/// this is needed in one <tests>.cpp file -> TestUtils.cpp
 #define INIT_SUITE \
-	char msg[250]; \
-	void writeErrorMsg(const char* errorMsg) {\
-		Logger::WriteMessage(errorMsg);\
-	}\
 	TEST_MODULE_INITIALIZE(ModuleInitialize) {\
 		FSMlib::setErrorMsgHandler(writeErrorMsg);\
 	}
-
+	
 #define ARE_EQUAL(expected, actual, format, ...) \
-	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
-	Assert::AreEqual(expected, actual, ToString(msg).c_str(), LINE_INFO());
+	_snprintf_s(FSMlibTest::msg, 250, format, ##__VA_ARGS__); \
+	Assert::AreEqual(expected, actual, ToString(FSMlibTest::msg).c_str(), LINE_INFO());
 
 #define DEBUG_MSG(format, ...) \
-	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
-	Logger::WriteMessage(msg);
+	_snprintf_s(FSMlibTest::msg, 250, format, ##__VA_ARGS__); \
+	Logger::WriteMessage(FSMlibTest::msg);
 
+namespace FSMlibTest
+{
+	static char msg[250];
+	static void writeErrorMsg(const char* errorMsg) {
+		Logger::WriteMessage(errorMsg); 
+	}
+}

@@ -59,7 +59,7 @@ namespace FSMlibTest
 			string e = EPSILON_SYMBOL;
 			e += ",1,2,";
 			e += STOUT_SYMBOL;
-			e += ",3 ";
+			e += ",3";
 			Assert::AreEqual(e, s, L"Strings are not equal");
 		}
 	};

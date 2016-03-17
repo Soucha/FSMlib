@@ -14,20 +14,19 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "stdafx.h"
+#include "../TestUtils.h"
 
-#include "DFA.h"
+namespace FSMlibTest
+{
+	TEST_CLASS(ModificationTests)
+	{
+	public:
+		
+		TEST_METHOD(TestMethod1)
+		{
+			// TODO: Your test code here
+		}
 
-void DFA::incNumberOfOutputs(output_t byNum) {
-	if (_numberOfOutputs + byNum > 2) {
-		ERROR_MESSAGE("%s::incNumberOfOutputs - the number of outputs (%d) cannot be increased over 2, (the increase %d)", 
-			machineTypeNames[_type], _numberOfOutputs, byNum);
-	} else {
-		_numberOfOutputs += byNum;
-	}
-}
-
-output_t DFA::getMaxOutputs(state_t numberOfStates, input_t numberOfInputs) {
-	return 2;
+	};
 }

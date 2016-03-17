@@ -21,19 +21,19 @@
 
 output_t Moore::getOutput(state_t state, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		ERROR_MESSAGE("%s::getOutput - bad state id", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
 		return WRONG_OUTPUT;
 	}
 	if (input == STOUT_INPUT) {
 		return _outputState[state];
 	}
 	if (input >= _numberOfInputs) {
-		ERROR_MESSAGE("%s::getOutput - bad input", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::getOutput - bad input (%d)", machineTypeNames[_type], input);
 		return WRONG_OUTPUT;
 	}
 	state_t& nextState = _transition[state][input];
 	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		ERROR_MESSAGE("%s::getOutput - there is no such transition", machineTypeNames[_type]); 
+		ERROR_MESSAGE("%s::getOutput - there is no such transition (%d, %d)", machineTypeNames[_type], state, input); 
 		return WRONG_OUTPUT;
 	}
 	return _outputState[nextState];
@@ -41,15 +41,15 @@ output_t Moore::getOutput(state_t state, input_t input) {
 
 bool Moore::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		ERROR_MESSAGE("%s::setOutput - bad state", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setOutput - bad state (%d)", machineTypeNames[_type], state);
 		return false;
 	}
 	if ((output >= _numberOfOutputs) && (output != DEFAULT_OUTPUT)) {
-		ERROR_MESSAGE("%s::setOutput - bad output (increase the number of outputs first)", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setOutput - bad output (%d) (increase the number of outputs first)", machineTypeNames[_type], output);
 		return false;
 	}
 	if (input != STOUT_INPUT) {
-		ERROR_MESSAGE("%s::setOutput - bad input (only STOUT_INPUT allowed)", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setOutput - bad input (%d) (only STOUT_INPUT allowed)", machineTypeNames[_type], input);
 		return false;
 	}
 	_outputState[state] = output;
@@ -63,15 +63,15 @@ bool Moore::setTransition(state_t from, input_t input, state_t to, output_t outp
 		return false;
 	}
 	if ((from >= _usedStateIDs.size()) || (!_usedStateIDs[from])) {
-		ERROR_MESSAGE("%s::setTransition - bad state From", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setTransition - bad state From (%d)", machineTypeNames[_type], from);
 		return false;
 	}
 	if (input >= _numberOfInputs) {
-		ERROR_MESSAGE("%s::setTransition - bad input", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setTransition - bad input (%d)", machineTypeNames[_type], input);
 		return false;
 	}
 	if ((to >= _usedStateIDs.size()) || (!_usedStateIDs[to])) {
-		ERROR_MESSAGE("%s::setTransition - bad state To", machineTypeNames[_type]);
+		ERROR_MESSAGE("%s::setTransition - bad state To (%d)", machineTypeNames[_type], to);
 		return false;
 	}
 	_transition[from][input] = to;

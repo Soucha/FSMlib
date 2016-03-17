@@ -15,20 +15,16 @@
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "stdafx.h"
-#include "CppUnitTest.h"
 #include "../TestUtils.h"
-#include <iostream>
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace FSMlibTest
 {
-	INIT_SUITE
-
 	TEST_CLASS(IOtests)
 	{
 	public:
 		DFSM * fsm, * fsm2;
+
+		//TODO writeDOTfile tests
 
 		TEST_METHOD(TestCreateSaveLoadDFSM)
 		{
@@ -152,7 +148,8 @@ namespace FSMlibTest
 		}
 
 		void tSaveLoad() {
-			string path = "../../data/tmp/";
+			string path = DATA_PATH;
+			path += "tmp/";
 			string filename = fsm->save(path);
 			ARE_EQUAL(!filename.empty(), true, "This %s cannot be saved into path '%s'.",
 				machineTypeNames[fsm->getType()], path);
@@ -202,7 +199,7 @@ namespace FSMlibTest
 				}
 			}
 			auto newState = fsm->addState();
-			DEBUG_MSG("%d", newState);
+			//DEBUG_MSG("%d", newState);
 			ARE_EQUAL(fsm->getNumberOfStates(), fsm2->getNumberOfStates() + 1, "The numbers of states are to be different by one.");
 			ARE_EQUAL(newState, fsm2->addState(), "IDs of new states are not equal.");
 			ARE_EQUAL(fsm->getNumberOfStates(), fsm2->getNumberOfStates(), "The numbers of states are not equal.");
