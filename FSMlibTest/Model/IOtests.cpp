@@ -90,6 +90,8 @@ namespace FSMlibTest
 			tGenerateSaveLoad();
 		}
 
+		/// includes tests for getNumberOfStates/Inputs/Outputs()
+		/// and confirms generate(), removeTransition(), removeState()
 		void tGenerateSaveLoad() {
 			DEBUG_MSG("Generate: %s", machineTypeNames[fsm->getType()]);
 			fsm->generate(0, 0, 0);// = create(1,1,1) is minimum
@@ -118,6 +120,8 @@ namespace FSMlibTest
 			tSaveLoad();
 		}
 
+		/// includes tests for getNumberOfStates/Inputs/Outputs()
+		/// and confirms create(), removeTransition()
 		void tCreateSaveLoad() {
 			DEBUG_MSG("Create: %s", machineTypeNames[fsm->getType()]);
 			fsm->create(0, 0, 0);// = create(1,0,0) is minimum
@@ -147,12 +151,16 @@ namespace FSMlibTest
 			tSaveLoad();
 		}
 
+		/// includes tests for getNumberOfStates/Inputs/Outputs(), getType(),
+		///		isReduced(), isOutputState/Transition(), getStates(), addState(), removeState()
+		///		save(), load()
+		/// confirms getOutput(), getNextState()
 		void tSaveLoad() {
 			string path = DATA_PATH;
 			path += "tmp/";
 			string filename = fsm->save(path);
 			ARE_EQUAL(!filename.empty(), true, "This %s cannot be saved into path '%s'.",
-				machineTypeNames[fsm->getType()], path);
+				machineTypeNames[fsm->getType()], path.c_str());
 			ARE_EQUAL(fsm2->load(filename), true, "File '%s' cannot be loaded.", filename.c_str());
 			DEBUG_MSG(filename.c_str());
 			

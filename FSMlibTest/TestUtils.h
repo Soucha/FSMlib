@@ -23,7 +23,8 @@
 using namespace std;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-#define DATA_PATH "../../data/"
+#define DATA_PATH		"../../data/"
+#define MSG_MAX_LEN		250
 
 /// this is needed in one <tests>.cpp file -> TestUtils.cpp
 #define INIT_SUITE \
@@ -32,16 +33,16 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 	}
 	
 #define ARE_EQUAL(expected, actual, format, ...) \
-	_snprintf_s(FSMlibTest::msg, 250, format, ##__VA_ARGS__); \
+	_snprintf_s(FSMlibTest::msg, MSG_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
 	Assert::AreEqual(expected, actual, ToString(FSMlibTest::msg).c_str(), LINE_INFO());
 
 #define DEBUG_MSG(format, ...) \
-	_snprintf_s(FSMlibTest::msg, 250, format, ##__VA_ARGS__); \
+	_snprintf_s(FSMlibTest::msg, MSG_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
 	Logger::WriteMessage(FSMlibTest::msg);
 
 namespace FSMlibTest
 {
-	static char msg[250];
+	static char msg[MSG_MAX_LEN];
 	static void writeErrorMsg(const char* errorMsg) {
 		Logger::WriteMessage(errorMsg); 
 	}

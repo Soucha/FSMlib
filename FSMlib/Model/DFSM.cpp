@@ -889,6 +889,10 @@ state_t DFSM::addState(output_t stateOutput) {
 		ERROR_MESSAGE("%s::addState - bad output (%d) (increase the number of outputs first)", machineTypeNames[_type], stateOutput);
 		return NULL_STATE;
 	}
+	if (!_isOutputState && (stateOutput != DEFAULT_OUTPUT)) {
+		ERROR_MESSAGE("%s::addState - set output (%d) of a state is not permitted", machineTypeNames[_type], stateOutput);
+		return NULL_STATE;
+	}
 	_isReduced = false;
 	if (_usedStateIDs.size() == _numberOfStates) {
 		_usedStateIDs.push_back(true);
@@ -905,6 +909,7 @@ state_t DFSM::addState(output_t stateOutput) {
 	state_t newState = 0;
 	while (_usedStateIDs[newState]) newState++;
 	_usedStateIDs[newState] = true;
+	if (_isOutputState) _outputState[newState] = stateOutput;
 	_numberOfStates++;
 	return newState;
 }

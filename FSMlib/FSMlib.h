@@ -25,10 +25,10 @@
 #endif
 
 namespace FSMlib {
-
+#define ERROR_MESSAGE_MAX_LEN	250
 #define ERROR_MESSAGE(format, ...) {\
-	char msg[250];\
-	_snprintf_s(msg, 250, format, ##__VA_ARGS__); \
+	char msg[ERROR_MESSAGE_MAX_LEN];\
+	_snprintf_s(msg, ERROR_MESSAGE_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
 	FSMlib::noticeListeners(msg); }
 	
 	FSMLIB_API void displayErrorMsgOnCerr(const char* msg);

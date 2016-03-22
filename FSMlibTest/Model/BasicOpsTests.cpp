@@ -24,20 +24,20 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		TEST_METHOD(TestGetNextStateDFSM)
+		TEST_METHOD(TestTransitionsDFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			create();
+			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
 		}
 
-		TEST_METHOD(TestGetOutputDFSM)
+		TEST_METHOD(TestOutputDFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			create();
+			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, STOUT_INPUT, 1, STOUT_INPUT, 0, STOUT_INPUT, 
 				2, STOUT_INPUT, 2, STOUT_INPUT, 1, STOUT_INPUT, 0, STOUT_INPUT };
@@ -45,66 +45,167 @@ namespace FSMlibTest
 			tGetOutputAlongPath(seq, expectedOut);
 		}
 
-		TEST_METHOD(TestGetNextStateMealy)
+		TEST_METHOD(TestRemoveDFSM)
+		{
+			DFSM dfsm;
+			fsm = &dfsm;
+			tRemoveState();
+			tRemoveTransition();
+		}
+
+		TEST_METHOD(TestTransitionsMealy)
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			create();
+			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
 		}
 
-		TEST_METHOD(TestGetOutputMealy)
+		TEST_METHOD(TestOutputMealy)
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			create();
+			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { 0, 1, 0, 2, 2, 1, 0 };
 			sequence_out_t expectedOut = { 1, 0, 1, 1, DEFAULT_OUTPUT, 0, 0 };
 			tGetOutputAlongPath(seq, expectedOut);
 		}
 
-		TEST_METHOD(TestGetNextStateMoore)
+		TEST_METHOD(TestRemoveMealy)
+		{
+			Mealy mealy;
+			fsm = &mealy;
+			tRemoveState();
+			tRemoveTransition();
+		}
+
+		TEST_METHOD(TestTransitionsMoore)
 		{
 			Moore moore;
 			fsm = &moore;
-			create();
+			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
 		}
 
-		TEST_METHOD(TestGetOutputMoore)
+		TEST_METHOD(TestOutputMoore)
 		{
 			Moore moore;
 			fsm = &moore;
-			create();
+			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, 1, 0, 2, 2, 1, 0 };
 			sequence_out_t expectedOut = { 0, 0, 1, DEFAULT_OUTPUT, 0, 0, 1, 0 };
 			tGetOutputAlongPath(seq, expectedOut);
 		}
 
-		TEST_METHOD(TestGetNextStateDFA)
+		TEST_METHOD(TestRemoveMoore)
+		{
+			Moore moore;
+			fsm = &moore;
+			tRemoveState();
+			tRemoveTransition();
+		}
+
+		TEST_METHOD(TestTransitionsDFA)
 		{
 			DFA dfa;
 			fsm = &dfa;
-			create();
+			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
 		}
 		
-		TEST_METHOD(TestGetOutputDFA)
+		TEST_METHOD(TestOutputDFA)
 		{
 			DFA dfa;
 			fsm = &dfa;
-			create();
+			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, 1, 0, 2, 2, 1, 0 };
 			sequence_out_t expectedOut = { 0, 0, 1, DEFAULT_OUTPUT, 0, 0, 1, 0 };
 			tGetOutputAlongPath(seq, expectedOut);
 		}
 
+		TEST_METHOD(TestRemoveDFA)
+		{
+			DFA dfa;
+			fsm = &dfa;
+			tRemoveState();
+			tRemoveTransition();
+		}
+
+		/// includes tests for incNumberOfInputs(), addState(), setTransition()
+		void tSetTransition() {
+			fsm->create(4, 2, 2);
+#define ERR_MSG_SET_TRANSITION_FAIL "Transition from %d on %d to %d was not added"
+			ARE_EQUAL(true, fsm->setTransition(0, 0, 0), ERR_MSG_SET_TRANSITION_FAIL, 0, 0, 0);
+			ARE_EQUAL(true, fsm->setTransition(0, 1, 1), ERR_MSG_SET_TRANSITION_FAIL, 0, 1, 1);
+
+			// a repeated setting without problem
+			ARE_EQUAL(true, fsm->setTransition(0, 1, 1), ERR_MSG_SET_TRANSITION_FAIL, 0, 1, 1);
+
+#define ERR_MSG_SET_TRANSITION_SHOULD_FAIL "Transition from %d on %d to %d cannot be added"			
+			// wrong input -> ERR messages:
+			/// <type>::setTransition - bad input
+			ARE_EQUAL(false, fsm->setTransition(0, 2, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, 2, 2);
+			/// <type>::setTransition - use setOutput() to set an output instead
+			ARE_EQUAL(false, fsm->setTransition(0, STOUT_INPUT, 0), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, STOUT_INPUT, 0);
+			
+			// bad state id -> 4 ERR messages:
+			/// <type>::setTransition - bad state To
+			ARE_EQUAL(false, fsm->setTransition(2, 1, 4), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 2, 1, 4);
+			ARE_EQUAL(false, fsm->setTransition(3, 0, NULL_STATE), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, NULL_STATE);
+			/// <type>::setTransition - bad state From
+			ARE_EQUAL(false, fsm->setTransition(4, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 4, 0, 2);
+			ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, NULL_STATE, 0, 2);
+		
+			fsm->incNumberOfInputs(1);
+			ARE_EQUAL(true, fsm->setTransition(0, 2, 2), ERR_MSG_SET_TRANSITION_FAIL, 0, 2, 2);
+			
+			// wrong input -> ERR messages:
+			/// <type>::setTransition - bad input
+			ARE_EQUAL(false, fsm->setTransition(0, 3, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, 3, 2);
+			/// <type>::setTransition - use setOutput() to set an output instead
+			ARE_EQUAL(false, fsm->setTransition(0, STOUT_INPUT, 0), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, STOUT_INPUT, 0);
+			// bad state id -> 4 ERR messages:
+			/// <type>::setTransition - bad state To
+			ARE_EQUAL(false, fsm->setTransition(2, 1, 4), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 2, 1, 4);
+			ARE_EQUAL(false, fsm->setTransition(3, 0, NULL_STATE), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, NULL_STATE);
+			/// <type>::setTransition - bad state From
+			ARE_EQUAL(false, fsm->setTransition(4, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 4, 0, 2);
+			ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, NULL_STATE, 0, 2);
+
+			ARE_EQUAL(true, fsm->setTransition(1, 0, 3), ERR_MSG_SET_TRANSITION_FAIL, 1, 0, 3);
+
+			ARE_EQUAL(state_t(4), fsm->addState(), "IDs of new states are not equal.");
+
+			ARE_EQUAL(true, fsm->setTransition(2, 1, 4), ERR_MSG_SET_TRANSITION_FAIL, 2, 1, 4);
+			ARE_EQUAL(true, fsm->setTransition(3, 2, 0), ERR_MSG_SET_TRANSITION_FAIL, 3, 2, 0);
+			ARE_EQUAL(true, fsm->setTransition(4, 0, 2), ERR_MSG_SET_TRANSITION_FAIL, 4, 0, 2);
+			
+			// wrong input -> ERR messages:
+			/// <type>::setTransition - bad input
+			ARE_EQUAL(false, fsm->setTransition(0, 3, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, 3, 2);
+			/// <type>::setTransition - use setOutput() to set an output instead
+			ARE_EQUAL(false, fsm->setTransition(0, STOUT_INPUT, 0), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, STOUT_INPUT, 0);
+			// bad state id -> 5 ERR messages:
+			/// <type>::setTransition - bad state To
+			ARE_EQUAL(false, fsm->setTransition(3, 0, 5), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, 5);
+			ARE_EQUAL(false, fsm->setTransition(3, 0, NULL_STATE), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, NULL_STATE);
+			/// <type>::setTransition - bad state From
+			ARE_EQUAL(false, fsm->setTransition(5, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 5, 0, 2);
+			ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, 2), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, NULL_STATE, 0, 2);
+			ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, NULL_STATE), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, NULL_STATE, 0, NULL_STATE);
+			// wrong input -> ERR messages:
+			/// <type>::setTransition - use setOutput() to set an output instead
+			ARE_EQUAL(false, fsm->setTransition(NULL_STATE, STOUT_INPUT, NULL_STATE), ERR_MSG_SET_TRANSITION_SHOULD_FAIL,
+				NULL_STATE, STOUT_INPUT, NULL_STATE);
+		}
+
+		/// includes tests for getNextState()
 		void tGetNextState() {
 #define ERR_MSG_NEXT_STATE_WRONG "Next state from %d on %d is wrong"
 			// given transitions:
@@ -153,6 +254,128 @@ namespace FSMlibTest
 			ARE_EQUAL(WRONG_STATE, fsm->getNextState(5, 3), ERR_MSG_NEXT_STATE_NOT_EXISTS, 5, 3);
 		}
 
+		/// includes tests for getEndPathState()
+		void tGetEndPathState() {
+#define ERR_MSG_END_PATH_STATE_WRONG "The last state from %d on %s is wrong"
+			sequence_in_t seq = { 0, 1, 0, 2, 2, 1, 0 };
+			ARE_EQUAL(state_t(2), fsm->getEndPathState(0, seq), ERR_MSG_END_PATH_STATE_WRONG,
+				0, FSMmodel::getInSequenceAsString(seq).c_str());
+			seq.pop_back();
+			ARE_EQUAL(state_t(4), fsm->getEndPathState(0, seq), ERR_MSG_END_PATH_STATE_WRONG,
+				0, FSMmodel::getInSequenceAsString(seq).c_str());
+			ARE_EQUAL(WRONG_STATE, fsm->getEndPathState(1, seq), ERR_MSG_END_PATH_STATE_WRONG,
+				1, FSMmodel::getInSequenceAsString(seq).c_str());
+		}
+
+		/// includes tests for incNumberOfOutputs(), addState(out), setTransition(-,-,-,out), setOutput(out)
+		void tSetOutput() {
+			fsm->create(3, 3, 1);
+
+			// wrong output -> ERR messages:
+			/// <type>::addState - bad output
+			ARE_EQUAL(NULL_STATE, fsm->addState(1), "A new states was created even with wrong output.");
+
+			ARE_EQUAL(state_t(3), fsm->addState(), "IDs of new states are not equal.");
+
+#define ERR_MSG_SET_STATE_OUTPUT_WRONG "State %d cannot have an output %d"
+#define ERR_MSG_SET_TRANSITION_OUTPUT_WRONG "Transition from %d cannot have an output %d on input %d"
+			// wrong output -> ERR messages:
+			/// <type>::setOutput - bad output
+			ARE_EQUAL(false, fsm->setOutput(0, 1), ERR_MSG_SET_STATE_OUTPUT_WRONG, 0, 1);
+			// wrong state -> ERR messages:
+			/// <type>::setOutput - bad state
+			ARE_EQUAL(false, fsm->setOutput(NULL_STATE, 0), ERR_MSG_SET_STATE_OUTPUT_WRONG, NULL_STATE, 0);
+
+			if (fsm->isOutputTransition()) {// DFSM, Mealy
+				// wrong output -> ERR messages:
+				/// <type>::setOutput/setTransition - bad output
+				ARE_EQUAL(false, fsm->setOutput(0, 1, 0), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 0, 1, 0);
+				ARE_EQUAL(false, fsm->setTransition(0, 2, 2, 1), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 0, 1, 2);
+			}
+
+			fsm->incNumberOfOutputs(1);
+
+			/// DFA::incNumberOfOutputs - the number of outputs cannot be increased over 2
+			fsm->incNumberOfOutputs(1);
+			if (fsm->getNumberOfOutputs() > 2) 
+				fsm->incNumberOfOutputs(-1);
+			//DEBUG_MSG("%d", fsm->getNumberOfOutputs());
+		
+			if (fsm->isOutputState()) {// DFSM, Moore, DFA	
+#define ERR_MSG_SET_STATE_OUTPUT "Output %d of state %d was not set"
+				ARE_EQUAL(true, fsm->setOutput(0, 0), ERR_MSG_SET_STATE_OUTPUT, 0, 0);
+				ARE_EQUAL(true, fsm->setOutput(1, 1), ERR_MSG_SET_STATE_OUTPUT, 1, 1);
+				ARE_EQUAL(true, fsm->setOutput(2, 0), ERR_MSG_SET_STATE_OUTPUT, 2, 0);
+				///fsm->setOutput(4, 1);
+				ARE_EQUAL(state_t(4), fsm->addState(1), "IDs of new states are not equal.");
+			}
+			else {// Mealy
+				// wrong output -> ERR messages:
+				/// <type>::addState - set output of a state is not permitted
+				ARE_EQUAL(NULL_STATE, fsm->addState(0), "A new states was created even with wrong output.");
+				
+				ARE_EQUAL(state_t(4), fsm->addState(), "IDs of new states are not equal.");
+			}
+			
+			if (fsm->isOutputTransition()) {// DFSM, Mealy
+				// wrong transition -> ERR messages:
+				/// <type>::setOutput - there is no such transition
+				ARE_EQUAL(false, fsm->setOutput(0, 1, 0), "Output %d set to nonexisted transition from %d on %d", 1, 0, 0);
+#define ERR_MSG_SET_TRANSITION_FAIL "Transition from %d on %d to %d was not added"
+				ARE_EQUAL(true, fsm->setTransition(0, 0, 0), ERR_MSG_SET_TRANSITION_FAIL, 0, 0, 0);
+#define ERR_MSG_SET_TRANSITION_OUTPUT "Output %d was not set to the transition from %d on %d"
+				ARE_EQUAL(true, fsm->setOutput(0, 1, 0), ERR_MSG_SET_TRANSITION_OUTPUT, 1, 0, 0);
+
+				ARE_EQUAL(true, fsm->setTransition(0, 1, 1), ERR_MSG_SET_TRANSITION_FAIL, 0, 1, 1);
+				ARE_EQUAL(true, fsm->setOutput(0, 0, 1), ERR_MSG_SET_TRANSITION_OUTPUT, 0, 0, 1);
+				ARE_EQUAL(true, fsm->setTransition(0, 2, 2), ERR_MSG_SET_TRANSITION_FAIL, 0, 2, 2);
+				//fsm->setOutput(0, 0, 2);
+				ARE_EQUAL(true, fsm->setTransition(1, 0, 3), ERR_MSG_SET_TRANSITION_FAIL, 1, 0, 3);
+				ARE_EQUAL(true, fsm->setOutput(1, 1, 0), ERR_MSG_SET_TRANSITION_OUTPUT, 1, 1, 0);
+#define ERR_MSG_SET_TRANSITION_OUTPUT_FAIL "Transition from %d on %d to %d with output %d was not added"
+				ARE_EQUAL(true, fsm->setTransition(2, 1, 4, 0), ERR_MSG_SET_TRANSITION_OUTPUT_FAIL, 2, 1, 4, 0);
+				ARE_EQUAL(true, fsm->setTransition(3, 2, 0, 1), ERR_MSG_SET_TRANSITION_OUTPUT_FAIL, 3, 2, 0, 1);
+				ARE_EQUAL(true, fsm->setTransition(4, 0, 2, 0), ERR_MSG_SET_TRANSITION_OUTPUT_FAIL, 4, 0, 2, 0);
+
+				// wrong output -> ERR messages:
+				/// <type>::setTransition - bad output
+				ARE_EQUAL(false, fsm->setTransition(0, 2, 2, 2), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 0, 2, 2);
+				// wrong input -> ERR messages:
+				/// <type>::setTransition - bad input
+				ARE_EQUAL(false, fsm->setTransition(0, 3, 2, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, 3, 2);
+				/// <type>::setTransition - use setOutput() to set an output instead/STOUT_INPUT is not allowed
+				ARE_EQUAL(false, fsm->setTransition(0, STOUT_INPUT, 0, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 0, STOUT_INPUT, 0);
+				// bad state id -> 5 ERR messages:
+				/// <type>::setTransition - bad state To
+				ARE_EQUAL(false, fsm->setTransition(3, 0, 5, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, 5);
+				ARE_EQUAL(false, fsm->setTransition(3, 0, NULL_STATE, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 3, 0, NULL_STATE);
+				/// <type>::setTransition - bad state From
+				ARE_EQUAL(false, fsm->setTransition(5, 0, 2, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, 5, 0, 2);
+				ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, 2, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL, NULL_STATE, 0, 2);
+				ARE_EQUAL(false, fsm->setTransition(NULL_STATE, 0, NULL_STATE, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL,
+					NULL_STATE, 0, NULL_STATE);
+				// wrong input -> ERR messages:
+				/// <type>::setTransition - use setOutput() to set an output instead/STOUT_INPUT is not allowed
+				ARE_EQUAL(false, fsm->setTransition(NULL_STATE, STOUT_INPUT, NULL_STATE, 1), ERR_MSG_SET_TRANSITION_SHOULD_FAIL,
+					NULL_STATE, STOUT_INPUT, NULL_STATE);
+
+				// wrong state -> ERR messages:
+				/// <type>::setOutput - bad state
+				ARE_EQUAL(false, fsm->setOutput(NULL_STATE, 0, 1), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, NULL_STATE, 0, 1);
+				// wrong output -> ERR messages:
+				/// <type>::setOutput - bad output
+				ARE_EQUAL(false, fsm->setOutput(4, 5, 0), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 4, 5, 0);
+			}
+			else {// Moore, DFA
+				// wrong input -> ERR messages:
+				/// <type>::addState - bad input
+				ARE_EQUAL(false, fsm->setOutput(0, 1, 2), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 0, 1, 2);
+				createTransitions();
+				ARE_EQUAL(false, fsm->setOutput(0, 1, 2), ERR_MSG_SET_TRANSITION_OUTPUT_WRONG, 0, 1, 2);
+			}
+		}		
+
+		/// includes tests for getOutput
 		void tGetOutput() {
 			if (fsm->isOutputState()) {
 #define ERR_MSG_OUTPUT_STATE "Wrong output of state %d"
@@ -261,36 +484,102 @@ namespace FSMlibTest
 				}
 			}
 		}
-
-		void tGetEndPathState() {
-			sequence_in_t seq = { 0, 1, 0, 2, 2, 1, 0 };
-			ARE_EQUAL(state_t(2), fsm->getEndPathState(0, seq), "The last state from %d on %s is wrong",
-				0, FSMmodel::getInSequenceAsString(seq).c_str());
-			seq.pop_back();
-			ARE_EQUAL(state_t(4), fsm->getEndPathState(0, seq), "The last state from %d on %s is wrong",
-				0, FSMmodel::getInSequenceAsString(seq).c_str());
-			ARE_EQUAL(WRONG_STATE, fsm->getEndPathState(1, seq), "The last state from %d on %s is wrong",
-				1, FSMmodel::getInSequenceAsString(seq).c_str());
-		}
-
+		
+		/// includes tests for getOutputAlongPath()
 		void tGetOutputAlongPath(sequence_in_t& seq, sequence_out_t& expectedOut) {
+#define ERR_MSG_OUTPUT_SEQUENCE "The output sequence %s from %d on %s is different from the correct one %s"
 			sequence_out_t outSeq = fsm->getOutputAlongPath(0, seq);
-			ARE_EQUAL(expectedOut == outSeq, true, "The output sequence %s from %d on %s is different from the correct one %s",
+			ARE_EQUAL(expectedOut == outSeq, true, ERR_MSG_OUTPUT_SEQUENCE,
 				FSMmodel::getOutSequenceAsString(outSeq).c_str(), 0, FSMmodel::getInSequenceAsString(seq).c_str(),
 				FSMmodel::getOutSequenceAsString(expectedOut).c_str());
 			seq.pop_back();
 			expectedOut.pop_back();
 			outSeq = fsm->getOutputAlongPath(0, seq);
-			ARE_EQUAL(expectedOut == outSeq, true, "The output sequence %s from %d on %s is different from the correct one %s",
+			ARE_EQUAL(expectedOut == outSeq, true, ERR_MSG_OUTPUT_SEQUENCE,
 				FSMmodel::getOutSequenceAsString(outSeq).c_str(), 0, FSMmodel::getInSequenceAsString(seq).c_str(),
 				FSMmodel::getOutSequenceAsString(expectedOut).c_str());
 			// seq from state 1 produces ERR:
 			/// <type>::getOutput - there is no such transition (3, 1)
 			outSeq = fsm->getOutputAlongPath(1, seq);
-			ARE_EQUAL(1, int(outSeq.size()), "The output sequence %s from %d on %s does not contaion only WRONG_OUTPUT",
+#define ERR_MSG_OUTPUT_SEQUENCE_FAIL "The output sequence %s from %d on %s does not contaion only WRONG_OUTPUT"
+			ARE_EQUAL(1, int(outSeq.size()), ERR_MSG_OUTPUT_SEQUENCE_FAIL,
 				FSMmodel::getOutSequenceAsString(outSeq).c_str(), 1, FSMmodel::getInSequenceAsString(seq).c_str());
-			ARE_EQUAL(WRONG_OUTPUT, outSeq.front(), "The output sequence %s from %d on %s does not contaion only WRONG_OUTPUT",
+			ARE_EQUAL(WRONG_OUTPUT, outSeq.front(), ERR_MSG_OUTPUT_SEQUENCE_FAIL,
 				FSMmodel::getOutSequenceAsString(outSeq).c_str(), 1, FSMmodel::getInSequenceAsString(seq).c_str());
+		}
+
+		void tRemoveState() {
+			create();
+			auto states = fsm->getStates();
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states.size()), "The numbers of states are not equal.");
+
+			/// <type>::removeState - the initial state cannot be removed
+			ARE_EQUAL(false, fsm->removeState(0), "The initial state was removed");
+			/// <type>::removeState - bad state
+			ARE_EQUAL(false, fsm->removeState(5), "Non-existent state 5 was removed");
+			ARE_EQUAL(true, fsm->removeState(3), "State 3 cannot be removed");
+
+			ARE_EQUAL(NULL_STATE, fsm->getNextState(1, 0), ERR_MSG_NEXT_STATE_NOT_EXISTS, 1, 0);
+			/// <type>::getOutput - there is no such transition
+			ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 0), ERR_MSG_OUTPUT_NO_TRANSITION, 1, 0);
+			/// <type>::getNextState - bad state id
+			ARE_EQUAL(WRONG_STATE, fsm->getNextState(3, 0), ERR_MSG_NEXT_STATE_NOT_EXISTS, 3, 0);
+			/// <type>::getOutput - bad state id
+			ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 0), ERR_MSG_OUTPUT_NO_TRANSITION, 3, 0);
+			/// <type>::getOutput - bad state id
+			ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 1), ERR_MSG_OUTPUT_NO_TRANSITION, 3, 1);
+			if (fsm->isOutputState()) {
+				/// <type>::getOutput - bad state id
+				ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, STOUT_INPUT), ERR_MSG_OUTPUT_STATE, 3);
+			}
+			auto states2 = fsm->getStates();
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states2.size()), "The numbers of states are not equal.");
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states.size() - 1), "The numbers of states do not correspond.");
+			bool present = true;
+			for each (state_t state in states)
+			{
+				if (find(states2.begin(), states2.end(), state) == states2.end()) {
+					ARE_EQUAL(state_t(3), state, "State %d was removed unintentionally", state);
+					present = false;
+				}
+			}
+			ARE_EQUAL(false, present, "State 3 was not removed");
+
+			/// <type>::removeState - bad state
+			ARE_EQUAL(false, fsm->removeState(3), "Non-existent state 3 was removed");
+
+			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states2.size()), "The numbers of states are not equal.");
+		}
+
+		void tRemoveTransition() {
+			create();
+#define ERR_MSG_WRONG_TRANSITION "Wrong transition from %d on %d was removed"
+			/// <type>::removeTransition - bad input
+			ARE_EQUAL(false, fsm->removeTransition(0, STOUT_INPUT), ERR_MSG_WRONG_TRANSITION, 0, STOUT_INPUT);
+			ARE_EQUAL(false, fsm->removeTransition(0, 3), ERR_MSG_WRONG_TRANSITION, 0, 3);
+			/// <type>::removeTransition - bad state From
+			ARE_EQUAL(false, fsm->removeTransition(NULL_STATE, STOUT_INPUT), ERR_MSG_WRONG_TRANSITION, NULL_STATE, STOUT_INPUT);
+			ARE_EQUAL(false, fsm->removeTransition(5, 1), ERR_MSG_WRONG_TRANSITION, 5, 1);
+			/// <type>::removeTransition - there is no such transition
+			ARE_EQUAL(false, fsm->removeTransition(1, 2), ERR_MSG_WRONG_TRANSITION, 1, 2);
+
+#define ERR_MSG_REMOVE_TRANSITION "Transition from %d on %d cannot be removed"
+			ARE_EQUAL(true, fsm->removeTransition(3, 2), ERR_MSG_REMOVE_TRANSITION, 3, 2);
+			ARE_EQUAL(NULL_STATE, fsm->getNextState(3, 2), ERR_MSG_NEXT_STATE_NOT_EXISTS, 3, 2);
+			if (fsm->isOutputTransition()) {
+				/// <type>::getOutput - there is no such transition
+				ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 2), ERR_MSG_OUTPUT_NO_TRANSITION, 3, 2);
+			}
+			
+			// removes the transition even the next state and output are wrong
+			/// <type>::removeTransition - state To has no effect here
+			/// <type>::removeTransition - the output has no effect here
+			ARE_EQUAL(true, fsm->removeTransition(1, 0, 5, 4), ERR_MSG_REMOVE_TRANSITION, 1, 0);
+			ARE_EQUAL(NULL_STATE, fsm->getNextState(1, 0), ERR_MSG_NEXT_STATE_NOT_EXISTS, 1, 0);
+			if (fsm->isOutputTransition()) {
+				/// <type>::getOutput - there is no such transition
+				ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 0), ERR_MSG_OUTPUT_NO_TRANSITION, 1, 0);
+			}
 		}
 
 		void create() {
@@ -309,7 +598,7 @@ namespace FSMlibTest
 			fsm->setTransition(3, 2, 0);
 			fsm->setTransition(4, 0, 2);
 		}
-		
+
 		void createStateOutputs() {
 			fsm->setOutput(0, 0);
 			fsm->setOutput(1, 1);
