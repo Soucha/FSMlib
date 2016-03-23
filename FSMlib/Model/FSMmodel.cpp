@@ -70,10 +70,10 @@ namespace Utils {
 namespace FSMmodel {
 	bool areIsomorphic(DFSM* fsm1, DFSM* fsm2) {
 		if (!fsm1->isReduced()) {
-			fsm1->mimimize();
+			fsm1->minimize();
 		}
 		if (!fsm2->isReduced()) {
-			fsm2->mimimize();
+			fsm2->minimize();
 		}
 		if ((fsm1->getNumberOfStates() != fsm2->getNumberOfStates()) ||
 			(fsm1->getNumberOfInputs() != fsm2->getNumberOfInputs()) ||

@@ -288,6 +288,9 @@ void DFSM::mergeEquivalentStates(queue< vector< state_t > >& equivalentStates) {
 					_transition[s][i] = stateEquiv[nextState];
 				}
 			}
+			if (stateEquiv[s] != s) {
+				_usedStateIDs[s] = false;
+			}
 		}
 	}
 }
@@ -329,17 +332,17 @@ void DFSM::makeCompact() {
 				(stateEquiv[nextState] != nextState)) {
 				_transition[s][i] = stateEquiv[nextState];
 			}
-			if ((nextState != NULL_STATE) && (i > greatestInput)) {
-				greatestInput = i;
+			if ((nextState != NULL_STATE) && (i + 1 > greatestInput)) {
+				greatestInput = i + 1;
 			}
 			if (_isOutputTransition && (_outputTransition[s][i] != DEFAULT_OUTPUT)
-				&& (_outputTransition[s][i] > greatestOutput)) {
-				greatestOutput = _outputTransition[s][i];
+				&& (_outputTransition[s][i] + 1 > greatestOutput)) {
+				greatestOutput = _outputTransition[s][i] + 1;
 			}
 		}
 		if (_isOutputState && (_outputState[s] != DEFAULT_OUTPUT) 
-			&& (_outputState[s] > greatestOutput)) {
-			greatestOutput = _outputState[s];
+			&& (_outputState[s] + 1 > greatestOutput)) {
+			greatestOutput = _outputState[s] + 1;
 		}
 	}
 	if (greatestInput < _numberOfInputs) {
@@ -352,14 +355,11 @@ void DFSM::makeCompact() {
 	_numberOfOutputs = greatestOutput;
 }
 
-bool DFSM::mimimize() {
+bool DFSM::minimize() {
 	if (!removeUnreachableStates()) return false;
 
 	queue< vector< state_t > > blocks;
-	vector< state_t > block;	
-	for (state_t state = 0; state < _usedStateIDs.size(); state++) {
-		if (_usedStateIDs[state]) block.push_back(state);
-	}
+	vector< state_t > block = getStates();
 	blocks.push(block);
 
 	if (_isOutputState) {
