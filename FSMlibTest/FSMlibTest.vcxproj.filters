@@ -16,6 +16,15 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{63de6f4a-5500-4222-b6f1-22235760aab8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\minimization">
+      <UniqueIdentifier>{3f0a1288-69b2-482e-bc83-f46cfde439d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\examples">
+      <UniqueIdentifier>{cc96bf25-4fb6-4593-818d-80e036973b10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\sequences">
+      <UniqueIdentifier>{419d3171-2caf-4742-b050-47a84eb8165f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -32,9 +41,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="unittest1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Model\IOtests.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
@@ -47,8 +53,191 @@
     <ClCompile Include="Model\MinimizationTests.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Model\GenerateTests.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\UtilsTests.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\tests\minimization\DFA_R4.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFA_R4_BP.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFA_R4_P.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFA_U7.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFSM_R4.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFSM_R4_BP.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFSM_R4_P.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\DFSM_U7.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Mealy_R4.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Mealy_R4_BP.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Mealy_R4_P.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Mealy_U7.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Moore_R4.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Moore_R4_BP.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Moore_R4_P.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\tests\minimization\Moore_U7.fsm">
+      <Filter>Resource Files\minimization</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R4_ADS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R4_HS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R4_PDS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R4_SCSet.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R4_SS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFA_R5_SVS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_ADS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_HS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_PDS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_SCSet.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_SS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_SVS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Mealy_R4_Zhu1993.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R4_ADS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R4_HS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R4_PDS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R4_SCSet.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R4_SS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\Moore_R5_SVS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R4_HS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R4_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R4_SS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R6_ADS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R10_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\DFA_R100_PDS_l99.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R4_HS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R4_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R4_SS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R6_ADS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R10_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R100.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R100_1.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Mealy_R100_PDS_l99.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R4_HS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R4_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R4_SS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R6_ADS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R10_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R10_PDS_E.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R100.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R100_PDS.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="..\data\tests\sequences\Moore_R100_PDS_l99.fsm">
+      <Filter>Resource Files\sequences</Filter>
+    </None>
+    <None Include="FSMlibTest.runsettings" />
   </ItemGroup>
 </Project>

@@ -106,29 +106,3 @@ struct AdaptiveDS {
 	vector<state_t> initialStates, currentStates;
 	map<output_t, AdaptiveDS*> decision;
 };
-
-namespace Utils {
-	/**
-	* Generates random sequence of alpha-numeric characters.
-	* @param length of sequence
-	* @return generated string
-	*/
-	string hashCode(int length);
-
-	/**
-	* Concatenates given name with generated hash and given suffix
-	* so that new filename will be unique in given path.
-	* @param name by which new file name begins
-	* @param suffix of new file name
-	* @param path to folder where new file will be
-	* @return new unique file name
-	*/
-	string getUniqueName(string name, string suffix, string path = "");
-
-	/**
-	* Converts number to string.
-	* @param number - integer value
-	* @return number as string
-	*/
-	string toString(int number);
-}

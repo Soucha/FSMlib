@@ -1,0 +1,1 @@
+Directory /data/tmp/ needs to exist for some tests but its content should not be synchronized.

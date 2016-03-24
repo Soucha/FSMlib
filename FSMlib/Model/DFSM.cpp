@@ -593,7 +593,7 @@ void DFSM::generate(state_t numberOfStates, input_t numberOfInputs, output_t num
 		ERROR_MESSAGE("%s::generate - the number of outputs needs to be greater than 0 (set to 1)", machineTypeNames[_type]);
 		numberOfOutputs = 1;
 	}
-	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
+	output_t maxOutputs = this->getMaxOutputs(numberOfStates, numberOfInputs);
 	if (numberOfOutputs > maxOutputs) {
 		ERROR_MESSAGE("%s::generate - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs);
 		numberOfOutputs = maxOutputs;
@@ -759,7 +759,7 @@ bool DFSM::load(string fileName) {
 string DFSM::getFilename() {
 	string filename(machineTypeNames[_type]);
 	filename += (_isReduced ? "_R" : "_U");
-	filename += Utils::toString(_numberOfStates);
+	filename += FSMlib::Utils::toString(_numberOfStates);
 	return filename;
 }
 
@@ -816,7 +816,7 @@ void DFSM::saveTransitions(ofstream& file) {
 
 string DFSM::save(string path) {
 	string filename = getFilename();
-	filename = Utils::getUniqueName(filename, "fsm", path);
+	filename = FSMlib::Utils::getUniqueName(filename, "fsm", path);
 	ofstream file(filename.c_str());
 	if (!file.is_open()) {
 		ERROR_MESSAGE("%s::save - unable to open file %s", machineTypeNames[_type], filename.c_str());
@@ -870,7 +870,7 @@ void DFSM::writeDotEnd(ofstream& file) {
 string DFSM::writeDOTfile(string path) {
 	string filename("DOT");
 	filename += getFilename();
-	filename = Utils::getUniqueName(filename, "fsm", path);
+	filename = FSMlib::Utils::getUniqueName(filename, "fsm", path);
 	ofstream file(filename.c_str());
 	if (!file.is_open()) {
 		ERROR_MESSAGE("%s::writeDOTfile - unable to open file %s", machineTypeNames[_type], filename.c_str());

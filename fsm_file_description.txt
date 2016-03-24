@@ -1,0 +1,37 @@
+File '.fsm' description
+-----------------------
+by Michal Soucha 
+
+Filename: <FSMtype>_<reduced><#states>[_hash]
+ <FSMtype> ... type of given machine ... 'DFSM', 'Mealy', 'Moore', 'DFA',...
+ <reduced> ... 'R' if the machine is reduced, 'U' otherwise
+ <#states> ... the number of states of given machine
+ hash      ... alphanumeric string of 5 symbols 
+               to make the filename unique in given folder
+               
+- examples: Moore_R5.fsm, Moore_R5_TJB5Q.fsm, Mealy_U10.fsm
+
+File's content:
+t r
+n p q
+m
+output and state-transition functions listing according to the machine type
+- all values are separated by a space
+
+t=1 DFSM
+ =2 Mealy machine
+ =3 Moore machine
+ =4 DFA
+r=0 unreduced
+ =1 reduced
+n ... the number of states
+p ... the number of inputs
+q ... the number of outputs
+m ... maximal state ID
+
+Output functions: (depends on the machine type)
+ n lines: state <output of the state>(1 value)
+ n lines: state <output on the transition for each input>(p values)
+state-transition function:
+ n lines: state <the next state for each input>(p values)
+    

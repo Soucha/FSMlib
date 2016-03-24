@@ -23,9 +23,9 @@ namespace FSMlibTest
 	{
 	public:
 #define MINIMIZATION_DIR string("tests/minimization/")
-		DFSM * fsm, * fsm2;
+#define EXAMPLES_DIR string("examples/")
 
-		// TODO: test generate(),
+		DFSM * fsm, * fsm2;
 
 		TEST_METHOD(TestRemoveUnreachableStatesDFSM)
 		{
@@ -67,6 +67,14 @@ namespace FSMlibTest
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
 			tMinimize(DATA_PATH + MINIMIZATION_DIR + "Mealy_U7.fsm", DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
+		
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SS.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_Zhu1993.fsm", DATA_PATH + EXAMPLES_DIR + "Mealy_R4_Zhu1993.fsm");
 		}
 
 		TEST_METHOD(TestRemoveUnreachableStatesMoore)
@@ -88,6 +96,13 @@ namespace FSMlibTest
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "Moore_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "Moore_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
 			tMinimize(DATA_PATH + MINIMIZATION_DIR + "Moore_U7.fsm", DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
+
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R4_HS.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R4_HS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SS.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R4_SS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm", DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestRemoveUnreachableStatesDFA)
@@ -109,6 +124,13 @@ namespace FSMlibTest
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFA_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFA_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
 			tMinimize(DATA_PATH + MINIMIZATION_DIR + "DFA_U7.fsm", DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
+		
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 		void tRemoveUnreachableStates() {

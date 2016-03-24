@@ -22,51 +22,6 @@
 
 #define SEQUENCE_SEPARATOR       ","
 
-namespace FSMlib {
-	void displayErrorMsgOnCerr(const char* errorMsg) {
-		std::cerr << errorMsg << std::endl;
-	}
-
-	void noticeListeners(const char* msg) {
-		(*FSMlib::errorMsgHandler)(msg);
-	}
-
-	void setErrorMsgHandler(void(*userErrorMsgHandler)(const char*)) {
-		FSMlib::errorMsgHandler = userErrorMsgHandler;
-	}
-}
-
-namespace Utils {
-	string hashCode(int length) {
-		string hash = "";
-		char c;
-		for (int i = 0; i < length; i++) {
-			do {
-				c = char((rand() % 75) + 48);
-			} while (!isalnum(c));
-			hash += c;
-		}
-		return hash;
-	}
-
-	string getUniqueName(string name, string suffix, string path) {
-		string newName = path + name + "." + suffix;
-		ifstream file(newName.c_str());
-		while (file.is_open()) {
-			newName = path + name + "_" + hashCode(5) + "." + suffix;
-			file.close();
-			file.open(newName.c_str());
-		}
-		return newName;
-	}
-
-	string toString(int number) {
-		ostringstream str;
-		str << number;
-		return str.str();
-	}
-}
-
 namespace FSMmodel {
 	bool areIsomorphic(DFSM* fsm1, DFSM* fsm2) {
 		if (!fsm1->isReduced()) {
@@ -131,11 +86,11 @@ namespace FSMmodel {
 	string getInSequenceAsString(sequence_in_t sequence) {
 		if (sequence.empty()) return "EMPTY";
 		string s = ((sequence.front() == STOUT_INPUT) ? STOUT_SYMBOL : 
-			((sequence.front() == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(sequence.front())));
+			((sequence.front() == EPSILON_INPUT) ? EPSILON_SYMBOL : FSMlib::Utils::toString(sequence.front())));
 		sequence_in_t::iterator inputIt = sequence.begin();
 		for (++inputIt; inputIt != sequence.end(); inputIt++) {
 			s += SEQUENCE_SEPARATOR + ((*inputIt == STOUT_INPUT) ? STOUT_SYMBOL :
-				((*inputIt == EPSILON_INPUT) ? EPSILON_SYMBOL : Utils::toString(*inputIt)));
+				((*inputIt == EPSILON_INPUT) ? EPSILON_SYMBOL : FSMlib::Utils::toString(*inputIt)));
 		}
 		return s;
 	}
@@ -143,11 +98,11 @@ namespace FSMmodel {
 	string getOutSequenceAsString(sequence_out_t sequence) {
 		if (sequence.empty()) return "EMPTY";
 		string s = ((sequence.front() == DEFAULT_OUTPUT) ? DEFAULT_OUTPUT_SYMBOL :
-			((sequence.front() == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(sequence.front())));
+			((sequence.front() == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : FSMlib::Utils::toString(sequence.front())));
 		sequence_out_t::iterator outputIt = sequence.begin();
 		for (++outputIt; outputIt != sequence.end(); outputIt++) {
 			s += SEQUENCE_SEPARATOR + ((*outputIt == DEFAULT_OUTPUT) ? DEFAULT_OUTPUT_SYMBOL :
-				((*outputIt == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : Utils::toString(*outputIt)));
+				((*outputIt == WRONG_OUTPUT) ? WRONG_OUTPUT_SYMBOL : FSMlib::Utils::toString(*outputIt)));
 		}
 		return s;
 	}

@@ -165,6 +165,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="FSMlib.cpp" />
     <ClCompile Include="Model\DFA.cpp" />
     <ClCompile Include="Model\DFSM.cpp" />
     <ClCompile Include="Model\FSMmodel.cpp" />

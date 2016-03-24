@@ -158,7 +158,7 @@ protected:
 	vector< vector< output_t > > _outputTransition;
 	vector< output_t > _outputState;
 	
-	output_t getMaxOutputs(state_t numberOfStates, input_t numberOfInputs);
+	virtual output_t getMaxOutputs(state_t numberOfStates, input_t numberOfInputs);
 
 	bool distinguishByStateOutputs(queue< vector< state_t > >& blocks);
 	bool distinguishByTransitionOutputs(queue< vector< state_t > >& blocks);

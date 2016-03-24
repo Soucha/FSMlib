@@ -31,9 +31,52 @@ namespace FSMlib {
 	_snprintf_s(msg, ERROR_MESSAGE_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
 	FSMlib::noticeListeners(msg); }
 	
+	/**
+	* Writes given error message in std::cerr stream.
+	*/
 	FSMLIB_API void displayErrorMsgOnCerr(const char* msg);
-	static void(*errorMsgHandler)(const char*) = displayErrorMsgOnCerr;
-	void noticeListeners(const char*);// calls errorMsgHandler with given message
 
+	/**
+	* Handles a function that displays error messages.
+	*/
+	static void(*errorMsgHandler)(const char*) = displayErrorMsgOnCerr;
+
+	/**
+	* Calls errorMsgHandler with given message.
+	*/
+	void noticeListeners(const char*);
+
+	/**
+	* Sets errorMsgHandler to point on arbitrary function that takes
+	* a string as an argument. The function is called with a particular
+	* error message if an error occurs.
+	*/
 	FSMLIB_API void setErrorMsgHandler(void(*userErrorMsgHandler)(const char*));
+
+	namespace Utils {
+		/**
+		* Generates random sequence of alpha-numeric characters.
+		* @param length of sequence
+		* @return generated string
+		*/
+		FSMLIB_API std::string hashCode(int length);
+
+		/**
+		* Concatenates given name with generated hash and given suffix
+		* so that new filename will be unique in given path.
+		* @param name by which new file name begins
+		* @param suffix of new file name
+		* @param path to folder where new file will be
+		* @return new unique file name
+		*/
+		FSMLIB_API std::string getUniqueName(std::string name, std::string suffix, std::string path = "");
+
+		/**
+		* Converts number to string.
+		* @param number - integer value
+		* @return number as string
+		*/
+		FSMLIB_API std::string toString(int number);
+	}
+
 }
