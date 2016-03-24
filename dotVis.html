@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+    <head>
+        <title>DOT visualizer</title>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="http://visjs.org/dist/vis.js"></script>
+        <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+
+        <style type="text/css">
+            body, html {
+                font: 10pt sans;
+                line-height: 1.5em;;
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                color: #4d4d4d;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            #header {
+                margin: 0;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            #contents {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                position: relative;
+            }
+
+            #left, #right {
+                position: absolute;
+                height: 100%;
+                margin: 0;
+                padding: 10px;
+                box-sizing: border-box;
+                display: inline-block;
+            }
+
+            #left {
+                top: 0;
+                left: 0;
+                width: 30%;
+            }
+
+            #right {
+                top: 0;
+                right: 0;
+                width: 70%;
+            }
+
+            #error {
+                color: red;
+            }
+
+            #data {
+                width: 100%;
+                height: 100%;
+                border: 1px solid #d3d3d3;
+                box-sizing: border-box;
+                resize: none;
+            }
+
+            #draw {
+                padding: 5px 15px;
+            }
+
+            #mynetwork {
+                width: 100%;
+                height: 100%;
+                border: 1px solid #d3d3d3;
+                box-sizing: border-box;
+            }
+
+            span {
+                margin-left: 5px;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div id="header">
+            <div>
+                <input type="file" id="filename">
+                <button id="draw" title="Draw the DOT graph (Ctrl+Enter)">Draw</button>
+                <span id="info">Select DOT file to show.</span>
+                <span id="error"></span>
+            </div>
+        </div>
+
+        <div id="contents">
+            <div id="left">
+                <textarea id="data">digraph G {Hello->World}</textarea>
+            </div>
+            <div id="right">
+                <div id="mynetwork"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            // create a network
+            var container = document.getElementById('mynetwork');
+            //var fileInput = document.getElementById('filename');
+            var lastMod;
+            var file;
+            var options = {
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        springLength: 200
+                    }
+                }
+            };
+            var dotSample = "digraph {\n  node [shape=circle fontsize=16]\n  edge [length=100, color=gray, fontcolor=black]\n  A -> A[label=0.5];\n  B -> B[label=1.2] -> C[label=0.7] -- A;\n  B -> D;\n  D -> {B; C}\n  D -> E[label=0.2];\n  F -> F;\n  A [\n    fontcolor=white,\n    color=red,\n  ]\n}";
+            var data = {};
+            var network = new vis.Network(container, data, options);
+
+            $('#draw').click(draw);
+
+            $(window).resize(resize);
+            $(window).load(draw);
+
+            $('#data').keydown(function (event) {
+                if (event.ctrlKey && event.keyCode === 13) { // Ctrl+Enter
+                    draw();
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            });
+
+            function resize() {
+                $('#contents').height($('body').height() - $('#header').height() - 30);
+            }
+
+            function draw() {
+                try {
+                    resize();
+                    $('#error').html('');
+
+                    if (document.getElementById('filename').files[0]) {
+                        file = document.getElementById('filename').files[0];
+                        $('#filename').replaceWith($('#filename').val('').clone(true));
+                        lastMod = file.lastModifiedDate;
+                        $('#info').html("Last modified date: " + lastMod);
+                        loadFile(file);
+                        setInterval(tick, 250);
+                    } else {
+                        // Provide a string with data in DOT language
+                        var textDot = $('#data').val().replace(/\\n/,"\n");
+                        data = vis.network.convertDot(textDot);
+
+                        network.setData(data);
+                    }
+                }
+                catch (err) {
+                    // set the cursor at the position where the error occurred
+                    var match = /\(char (.*)\)/.exec(err);
+                    if (match) {
+                        var pos = Number(match[1]);
+                        var textarea = $('#data')[0];
+                        if (textarea.setSelectionRange) {
+                            textarea.focus();
+                            textarea.setSelectionRange(pos, pos);
+                        }
+                    }
+
+                    // show an error message
+                    $('#error').html(err.toString());
+                }
+            }
+
+            function tick() {
+                if (file && lastMod && file.lastModifiedDate.getTime() !== lastMod.getTime()) {
+                    lastMod = file.lastModifiedDate;
+                    $('#info').html("File changed: " + lastMod);
+                    loadFile(file);
+                }
+            }
+
+            function loadFile(f) {
+                if (f) {
+                    var r = new FileReader();
+                    r.onload = function (e) {
+                        var contents = e.target.result;
+                        $('#data').val(contents);
+                        draw();
+                    };
+                    r.readAsText(f);
+                } else {
+                    $('#error').html("Failed to load file");
+                }
+            }
+
+            if (typeof window.FileReader !== 'function') {
+                $('#error').html("The file API isn't supported on this browser yet.");
+                $('#info').html("Copy DOT file into the textarea.");
+                $('#data').val(dotSample);
+            }
+            else if (!document.getElementById('filename').files) {
+                $('#error').html("This browser doesn't seem to support the `files` property of file inputs.");
+                $('#info').html("Copy DOT file into the textarea.");
+                $('#data').val(dotSample);
+            }
+            
+        </script>
+    </body>
+</html>

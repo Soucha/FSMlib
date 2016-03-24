@@ -24,8 +24,6 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm, * fsm2;
 
-		//TODO writeDOTfile tests
-		
 		TEST_METHOD(TestCreateSaveLoadDFSM)
 		{
 			DFSM dfsm, dfsm2;

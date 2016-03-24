@@ -83,6 +83,52 @@ namespace FSMmodel {
 		return true;
 	}
 
+	static bool createImage(string fileName, string extension) {
+		int rv = system((string("dot -T") + extension + string(" -O ") + fileName).c_str());
+		return (rv == 0);
+	}
+
+	static bool showImage(string fileName) {
+		int rv = system((string("start ") + fileName).c_str());
+		return (rv == 0);
+	}
+
+	bool createGIF(string fileName, bool show) {
+		if (!createImage(fileName, "gif")) {
+			ERROR_MESSAGE("FSMmodel::createGIF - unable to create GIF from DOT file. Check Graphviz\bin is your PATH.");
+			return false;
+		}
+		if (show && !showImage(fileName + ".gif")) {
+			ERROR_MESSAGE("FSMmodel::createGIF - unable to show GIF");
+			return false;
+		}
+		return true;
+	}
+
+	bool createJPG(string fileName, bool show) {
+		if (!createImage(fileName, "jpg")) {
+			ERROR_MESSAGE("FSMmodel::createJPG - unable to create JPG from DOT file. Check Graphviz\bin is your PATH.");
+			return false;
+		}
+		if (show && !showImage(fileName + ".jpg")) {
+			ERROR_MESSAGE("FSMmodel::createJPG - unable to show JPG");
+			return false;
+		}
+		return true;
+	}
+
+	bool createPNG(string fileName, bool show) {
+		if (!createImage(fileName, "png")) {
+			ERROR_MESSAGE("FSMmodel::createPNG - unable to create PNG from DOT file. Check Graphviz\bin is your PATH.");
+			return false;
+		}
+		if (show && !showImage(fileName + ".png")) {
+			ERROR_MESSAGE("FSMmodel::createPNG - unable to show PNG");
+			return false;
+		}
+		return true;
+	}
+
 	string getInSequenceAsString(sequence_in_t sequence) {
 		if (sequence.empty()) return "EMPTY";
 		string s = ((sequence.front() == STOUT_INPUT) ? STOUT_SYMBOL : 

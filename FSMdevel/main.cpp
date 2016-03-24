@@ -22,22 +22,14 @@
 DFSM * fsm, *fsm2;
 wchar_t message[200];
 
-void tCreateSaveLoad() {
-	fsm->create(0, 0, 0);// = create(1,1,1) is minimum
-	int n = fsm->getNumberOfStates();
-	printf("%d\n", n);
-
-	fsm->create(5, 3, 2);
-	n = fsm->getNumberOfStates();
-	int p = fsm->getNumberOfInputs();
-	int q = fsm->getNumberOfOutputs();
-}
-
 int main(int argc, char** argv) {
-	DFSM dfsm, dfsm2;
+	DFSM dfsm;
 	fsm = &dfsm;
-	fsm2 = &dfsm2;
-	tCreateSaveLoad();
+	fsm->generate(5, 3, 2);
+	auto fn = fsm->writeDOTfile("../data/");
+	cout << fn << endl;
+	int rv = system((string("dot -Tjpg") + string(" -O ") + fn).c_str());
+	cout << rv << endl;
 	char c;
 	cin >> c;
 	return 0;

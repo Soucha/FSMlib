@@ -22,6 +22,8 @@ namespace FSMlibTest
 	TEST_CLASS(UtilsTests)
 	{
 	public:
+
+		DFSM * fsm;
 		
 		TEST_METHOD(Utils_hashCode) {
 			int len = 5;
@@ -34,7 +36,7 @@ namespace FSMlibTest
 			s = FSMlib::Utils::hashCode(len);
 			ARE_EQUAL(int(s.size()), len, "Hash code %s has not the lenght of %d.", s.c_str(), len);
 		}
-
+	
 		TEST_METHOD(GetInSeqStr) {
 			sequence_in_t seq = { EPSILON_INPUT, 1, 2, STOUT_INPUT, 3 };
 			string s = FSMmodel::getInSequenceAsString(seq);
@@ -65,6 +67,42 @@ namespace FSMlibTest
 			e.pop_back();
 			e.pop_back();
 			ARE_EQUAL(e, s, "Strings are not equal");
+		}
+
+		TEST_METHOD(CreateImageDFSM) {
+			DFSM dfsm;
+			fsm = &dfsm;
+			tCreateImage();
+		}
+
+		TEST_METHOD(CreateImageMealy) {
+			Mealy mealy;
+			fsm = &mealy;
+			tCreateImage();
+		}
+
+		TEST_METHOD(CreateImageMoore) {
+			Moore moore;
+			fsm = &moore;
+			tCreateImage();
+		}
+
+		TEST_METHOD(CreateImageDFA) {
+			DFA dfa;
+			fsm = &dfa;
+			tCreateImage();
+		}
+
+		void tCreateImage() {
+			fsm->generate(5, 3, 2);
+			string path = DATA_PATH;
+			path += "tmp/";
+			auto filename = fsm->writeDOTfile(path);
+			ARE_EQUAL(true, !filename.empty(), "This %s cannot be saved into path '%s' in DOT format.",
+				machineTypeNames[fsm->getType()], path.c_str());
+			ARE_EQUAL(true, FSMmodel::createGIF(filename, true), "GIF was not created/shown for %s", filename.c_str());
+			ARE_EQUAL(true, FSMmodel::createJPG(filename, true), "JPG was not created/shown for %s", filename.c_str());
+			ARE_EQUAL(true, FSMmodel::createPNG(filename, true), "PNG was not created/shown for %s", filename.c_str());
 		}
 	};
 }

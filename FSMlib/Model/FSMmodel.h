@@ -51,26 +51,29 @@ namespace FSMmodel {
 	/**
 	* Creates GIF file from DOT file.
 	* @param fileName of DOT file
-	* @param show - set true if cygwin should show GIF file
-	* @throw Exception if system was not able to run appropriate commands.
+	* @param show - set true if system should show GIF file
+	* @return True if GIF was created (and shown). 
+	*		  System can run dot unless false is returned
 	*/
-	//void createGIF(string fileName, bool show = false);
+	FSMLIB_API bool createGIF(string fileName, bool show = false);
 
 	/**
 	* Creates JPG file from DOT file.
 	* @param fileName of DOT file
 	* @param show - set true if cygwin should show JPG file
-	* @throw Exception if system was not able to run appropriate commands.
+	* @return True if JPG was created (and shown). 
+	*		  System can run dot unless false is returned
 	*/
-	//void createJPG(string fileName, bool show = false);
+	FSMLIB_API bool createJPG(string fileName, bool show = false);
 
 	/**
 	* Creates PNG file from DOT file.
 	* @param fileName of DOT file
 	* @param show - set true if cygwin should show PNG file
-	* @throw Exception if system was not able to run appropriate commands.
+	* @return True if PNG was created (and shown). 
+	*		  System can run dot unless false is returned
 	*/
-	//void createPNG(string fileName, bool show = false);
+	FSMLIB_API bool createPNG(string fileName, bool show = false);
 
 	/**
 	* Prints given sequence into a string

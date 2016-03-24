@@ -870,7 +870,7 @@ void DFSM::writeDotEnd(ofstream& file) {
 string DFSM::writeDOTfile(string path) {
 	string filename("DOT");
 	filename += getFilename();
-	filename = FSMlib::Utils::getUniqueName(filename, "fsm", path);
+	filename = FSMlib::Utils::getUniqueName(filename, "gv", path);
 	ofstream file(filename.c_str());
 	if (!file.is_open()) {
 		ERROR_MESSAGE("%s::writeDOTfile - unable to open file %s", machineTypeNames[_type], filename.c_str());
