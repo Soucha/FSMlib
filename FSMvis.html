@@ -1,0 +1,1401 @@
+<!doctype html>
+<html>
+    <head>
+        <title>FSM visualizer</title>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="http://visjs.org/dist/vis.js"></script>
+        <link href="http://visjs.org/dist/vis.css" rel="stylesheet" type="text/css" />
+
+        <style type="text/css">
+            body, html {
+                font: 10pt sans;
+                line-height: 1.5em;;
+            }
+
+            button {
+                cursor: pointer;
+            }
+
+            #left, #middle, #right {
+                position: absolute;
+                height: 100%;
+                min-height: 320px;
+                box-sizing: border-box;
+                display: inline-block;
+            }
+
+            #left {
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 290px;
+                padding: 10px 0 10px 10px;
+                min-width: 150px;
+            }
+
+            #middle {
+                top: 0;
+                left: 300px;
+                width: 30px;
+                cursor: e-resize;
+            }
+
+            #right {
+                top: 0;
+                left: 330px;
+                right: 0;
+                padding: 10px 10px 10px 0;
+                min-width: 300px;
+            }
+
+            #choosePanel {
+                position: absolute;
+                width: 100%;
+            }
+
+            #fileType {
+                width: 60px;
+                height: 20px;
+            }
+
+            #machineType {
+                width: 80px;
+                height: 20px;
+                float: right;
+            }
+
+            #data {
+                position: absolute;
+                left: 10px;
+                bottom: 90px;
+                top: 35px;
+                width: 100%;
+                border: 1px solid #d3d3d3;
+                box-sizing: border-box;
+                resize: none;
+            }
+
+            #ioPanel {
+                height: 85px;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+
+            #info, #error {
+                position: absolute;
+                right: 0;
+                width: 100%;
+                height: 20px;
+                overflow: overlay; 
+            }
+
+            #info {
+                bottom: 40px;
+            }
+
+            #error {
+                bottom: 20px;
+            }
+
+            #saveLink, #filename {
+                display: none;
+            }
+
+            #error {
+                color: red;
+            }
+
+            #controlPanel {
+                position: absolute;
+                top: 20%;
+                cursor: auto;
+            }
+
+            #draw, #store {
+                height: 80px;
+                width: 24px;
+                margin: 5px 3px 5px 3px;
+            }
+
+            #mynetwork {
+                width: 100%;
+                height: 100%;
+                border: 1px solid #d3d3d3;
+                box-sizing: border-box;
+            }
+
+            #operation {
+                font-size: 24px;
+            }
+
+            table {
+                padding: 10px;
+            }
+
+            td > input {
+                width: 100px;
+                text-align: center;
+            }
+
+            #editNodeIdKey {
+                min-width: 45px;
+            }
+
+            #networkPopUp {
+                /*display:none;*/
+                position:absolute;
+                min-width: 180px;
+                min-height: 144px;
+                top: 40%;
+                left: 35%;
+                z-index:299;
+                background-color: #f9f9f9;
+                border-style:solid;
+                border-width:3px;
+                border-color: #5394ed;
+                border-radius: 30px;
+                padding: 12px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="left">
+            <div id="choosePanel">
+                <select id="fileType" title="Choose file type">
+                    <option value="dot">dot</option>
+                    <option value="fsm">.fsm</option>
+                    <option id="unknownFileType" value="unknown" style="display: none;">???</option>
+                </select>
+                <select id="machineType" title="Choose machine type">
+                    <option id="unknownMachineType" value="unknown" style="display: none;">Unknown</option>
+                    <option value="DFSM" selected>DFSM</option>
+                    <option value="Mealy">Mealy</option>
+                    <option value="Moore">Moore</option>
+                    <option value="DFA">DFA</option>
+                </select>
+            </div>
+            <textarea id="data"></textarea>
+            <div id="ioPanel">
+                <button id="load" title="Load machine from a file">Load</button>
+                <button id="save" title="Save machine to a file">Save</button>
+                <button id="track" title="Choose file with an evolving machine">Track</button>
+                <span id="info">Select DOT file to show.</span>
+                <span id="error"></span>
+                <input type="file" id="filename">
+                <a href="#" id="saveLink"></a>
+            </div>
+        </div>
+        <div id="middle">
+            <div id="controlPanel">
+                <button id="draw" title="Visualize (Ctrl+Enter)">></button>
+                <button id="store" title="Store graph"><</button>
+            </div>
+        </div>
+        <div id="right">
+            <div id="networkPopUp">
+                <span id="operation"></span>
+                <table>
+                    <tr>
+                        <td id="editNodeIdKey">From</td><td id="editNodeId"></td>
+                    </tr>
+                    <tr>
+                        <td id="editInputKey">id</td><td><input id="editInput" value="new value" /></td>
+                    </tr>
+                    <tr id="editRowOutput">
+                        <td>Output</td><td><input id="editOutput" value="new value" /></td>
+                    </tr>
+                    <tr id="editRowTo">
+                        <td>To</td><td id="editToId"></td>
+                    </tr>
+                </table>
+                <button id="saveButton">Save</button>
+                <button id="cancelButton">Cancel</button>
+            </div>
+            <div id="mynetwork"></div>
+        </div>
+
+        <script type="text/javascript">
+            // create a network
+            var lastMod;
+            var file;
+            var trackingTimer;
+            var dotSample = 'digraph { rankdir=LR;\n0 [label="A\nHello"];\n1 [label="B\nWorld"];\n0 -> 1 [label="a / to"];\n}';
+            $('#data').val(dotSample);
+
+            if (typeof window.FileReader !== 'function') {
+                $('#error').html("The file API is not supported on this browser yet.");
+                $('#info').html("Copy DOT file into the textarea.");
+            } else if (!document.getElementById('filename').files) {
+                $('#error').html("This browser does not seem to support the `files` property of file inputs.");
+                $('#info').html("Copy DOT file into the textarea.");
+            }
+
+// visjs
+            var options = {
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        springLength: 200
+                    }
+                },
+                edges: {
+                    arrows: {to: true}
+                },
+                manipulation: {
+                    addNode: function (data, callback) {
+                        showNodePopUp("Add Node", data, callback, this, true);
+                    },
+                    editNode: function (data, callback) {
+                        showNodePopUp("Edit Node", data, callback, this, false);
+                    },
+                    addEdge: function (data, callback) {
+                        showEdgePopUp("Add Edge", data, callback, this, true);
+                    },
+                    editEdge: function (data, callback) {
+                        showEdgePopUp("Edit Edge", data, callback, this, false);
+                    },
+                    deleteNode: function (data, callback) {
+                        deleteSelectedData(data);
+                        callback(data);
+                    },
+                    deleteEdge: function (data, callback) {
+                        deleteSelectedData(data);
+                        callback(data);
+                    }
+                }
+            };
+            var fsm = {};
+            var DEFAULT_OUTPUT = -1;
+            var DEFAULT_OUTPUT_SYMBOL = '-';
+            var network = new vis.Network(document.getElementById('mynetwork'), fsm, options);
+
+            function clearFSMdata() {
+                fsm = {
+                    nodes: [], // node = {id: int, labelId: string, used: bool, label: string, output: int};
+                    edges: [], // edge = {id: int, from: int, input: int, to: int, used: bool, label: string, output: int};
+                    inputs: [], // input = {label: string, counter: int};
+                    outputs: [], // output = {label: string, stateCount: int, transitionCount: int};
+                    numStates: 0,
+                    numInputs: 0,
+                    numOutputs: 0,
+                    numEdges: 0,
+                    type: 0,
+                    isOutputState: false,
+                    isOutputTransition: false,
+                    isReduced: false
+                };
+                fsm.type = document.getElementById('machineType').selectedIndex;
+            }
+
+            function showNodePopUp(label, data, callback, target, isNew) {
+                document.getElementById('operation').innerHTML = label;
+                document.getElementById('editNodeIdKey').innerHTML = 'ID';
+                document.getElementById('editInputKey').innerHTML = 'Label';
+                if (isNew) {
+                    if (fsm.numStates !== fsm.nodes.length) {
+                        data.id = 0;
+                        while (fsm.nodes[data.id].used)
+                            data.id++;
+                    } else {
+                        data.id = fsm.numStates;
+                    }
+                    document.getElementById('editInput').value = data.id;
+                } else {
+                    document.getElementById('editInput').value = fsm.nodes[data.id].labelId;
+                }
+                document.getElementById('editNodeId').innerHTML = data.id;
+                var output;
+                document.getElementById('editOutput').title = 'Enter an output of the state';
+                if (!fsm.isOutputState) {
+                    output = 'Not allowed';
+                    document.getElementById('editOutput').title = 'Change machine type to enable state outputs';
+                } else if (isNew) {
+                    output = DEFAULT_OUTPUT_SYMBOL;
+                } else if (fsm.nodes[data.id].output === DEFAULT_OUTPUT) {
+                    output = DEFAULT_OUTPUT_SYMBOL;
+                } else {
+                    output = fsm.outputs[fsm.nodes[data.id].output].label;
+                }
+                document.getElementById('editOutput').disabled = !fsm.isOutputState;
+                document.getElementById('editOutput').value = output;
+                document.getElementById('editRowTo').style.display = 'none';
+                document.getElementById('saveButton').onclick = saveNodeData.bind(target, data, callback);
+                document.getElementById('cancelButton').onclick = cancelEdit.bind(target, callback);
+                document.getElementById('networkPopUp').style.display = 'block';
+                document.getElementById('saveButton').focus();
+            }
+
+            function showEdgePopUp(label, data, callback, target, isNew) {
+                console.log(data);
+                document.getElementById('operation').innerHTML = label;
+                document.getElementById('editNodeIdKey').innerHTML = 'From';
+                document.getElementById('editNodeId').innerHTML = fsm.nodes[data.from].labelId + ' (' + data.from + ')';
+                document.getElementById('editInputKey').innerHTML = 'Input';
+                if (isNew) {
+                    if (fsm.numEdges !== fsm.edges.length) {
+                        data.id = 0;
+                        while (fsm.edges[data.id].used)
+                            data.id++;
+                    } else {
+                        data.id = fsm.numEdges;
+                    }
+                    document.getElementById('editInput').value = 0;
+                } else {
+                    document.getElementById('editInput').value = fsm.inputs[fsm.edges[data.id].input].label;
+                }
+                var output;
+                document.getElementById('editOutput').title = 'Enter an output of the transition';
+                if (!fsm.isOutputTransition) {
+                    output = 'Not allowed';
+                    document.getElementById('editOutput').title = 'Change machine type to enable transition outputs';
+                } else if (isNew) {
+                    output = DEFAULT_OUTPUT_SYMBOL;
+                } else if (fsm.edges[data.id].output === DEFAULT_OUTPUT) {
+                    output = DEFAULT_OUTPUT_SYMBOL;
+                } else {
+                    output = fsm.outputs[fsm.edges[data.id].output].label;
+                }
+                document.getElementById('editOutput').disabled = !fsm.isOutputTransition;
+                document.getElementById('editOutput').value = output;
+                document.getElementById('editRowTo').style.display = 'table-row';
+                document.getElementById('editToId').innerHTML = fsm.nodes[data.to].labelId + ' (' + data.to + ')';
+                document.getElementById('saveButton').onclick = saveEdgeData.bind(target, data, callback);
+                document.getElementById('cancelButton').onclick = cancelEdit.bind(target, callback);
+                document.getElementById('networkPopUp').style.display = 'block';
+                document.getElementById('saveButton').focus();
+            }
+
+            function clearPopUp() {
+                document.getElementById('saveButton').onclick = null;
+                document.getElementById('cancelButton').onclick = null;
+                document.getElementById('networkPopUp').style.display = 'none';
+            }
+
+            function cancelEdit(callback) {
+                clearPopUp();
+                callback(null);
+            }
+
+            function saveNodeData(data, callback) {
+                var output = document.getElementById('editOutput').value;
+                console.log(output, fsm.outputs);
+                fsm.outputs.findIndex(function (o) {
+                    console.log(o.label, output, o.label === output, o.label == output);
+                    return o.label === output;
+                });
+                if ((fsm.type === 4) && (fsm.numOutputs === 2) && (output !== DEFAULT_OUTPUT_SYMBOL) &&
+                        (fsm.outputs.findIndex(function (o) {
+                            return o.label === output;
+                        }) === -1)) {
+                    alert('DFA can have two outputs at most!');
+                    cancelEdit(callback);
+                    return;
+                }
+                if (data.id === fsm.nodes.length) {
+                    fsm.numStates++;
+                    fsm.nodes.push({id: data.id, used: true, output: DEFAULT_OUTPUT});
+                } else if (!fsm.nodes[data.id].used) {
+                    fsm.nodes[data.id].used = true;
+                    fsm.nodes[data.id].output = DEFAULT_OUTPUT;
+                    fsm.numStates++;
+                }
+                fsm.nodes[data.id].labelId = document.getElementById('editInput').value;
+                if (fsm.isOutputState) {
+                    if (fsm.nodes[data.id].output === DEFAULT_OUTPUT) {
+                        fsm.nodes[data.id].output = updateOutputs(output, true);
+                    } else if (fsm.outputs[fsm.nodes[data.id].output].label !== output) {
+                        delOutput(fsm.nodes[data.id].output, true);
+                        fsm.nodes[data.id].output = updateOutputs(output, true);
+                    }
+                    fsm.nodes[data.id].label = data.label = fsm.nodes[data.id].labelId + '\n' + output;
+                } else {
+                    fsm.nodes[data.id].label = data.label = fsm.nodes[data.id].labelId;
+                }
+                fsm.isReduced = false;
+                clearPopUp();
+                callback(data);
+            }
+
+            function saveEdgeData(data, callback) {
+                var input = document.getElementById('editInput').value;
+                if (data.id === fsm.edges.length) {
+                    fsm.numEdges++;
+                    fsm.edges.push({id: data.id, used: true, output: DEFAULT_OUTPUT});
+                    fsm.edges[data.id].input = updateInputs(input);
+                } else if (!fsm.edges[data.id].used) {
+                    fsm.edges[data.id].used = true;
+                    fsm.edges[data.id].output = DEFAULT_OUTPUT;
+                    fsm.numEdges++;
+                    fsm.edges[data.id].input = updateInputs(input);
+                } else if (fsm.inputs[fsm.edges[data.id].input].label !== input) {
+                    delInput(fsm.edges[data.id].input);
+                    fsm.edges[data.id].input = updateInputs(input);
+                }
+                fsm.edges[data.id].from = data.from;
+                fsm.edges[data.id].to = data.to;
+                if (fsm.isOutputTransition) {
+                    var output = document.getElementById('editOutput').value;
+                    if (fsm.edges[data.id].output === DEFAULT_OUTPUT) {
+                        fsm.edges[data.id].output = updateOutputs(output, false);
+                    } else if (fsm.outputs[fsm.edges[data.id].output].label !== output) {
+                        delOutput(fsm.edges[data.id].output, false);
+                        fsm.edges[data.id].output = updateOutputs(output, false);
+                    }
+                    fsm.edges[data.id].label = data.label = input + ' / ' + output;
+                } else {
+                    fsm.edges[data.id].label = data.label = input;
+                }
+                fsm.isReduced = false;
+                clearPopUp();
+                callback(data);
+            }
+
+            function deleteSelectedData(data) {
+                console.log(data);
+                for (var i = 0; i < data.nodes.length; i++) {
+                    fsm.nodes[data.nodes[i]].used = false;
+                    fsm.numStates--;
+                    if (fsm.nodes[data.nodes[i]].output !== DEFAULT_OUTPUT) {
+                        delOutput(fsm.nodes[data.nodes[i]].output, true);
+                    }
+                }
+                for (var i = 0; i < data.edges.length; i++) {
+                    fsm.edges[data.edges[i]].used = false;
+                    fsm.numEdges--;
+                    if (fsm.edges[data.edges[i]].output !== DEFAULT_OUTPUT) {
+                        delOutput(fsm.edges[data.edges[i]].output, false);
+                    }
+                    delInput(fsm.edges[data.edges[i]].input);
+                }
+            }
+
+            function delOutput(output, isStateOutput) {
+                if (isStateOutput)
+                    fsm.outputs[output].stateCount--;
+                else
+                    fsm.outputs[output].transitionCount--;
+                if (fsm.outputs[output].stateCount + fsm.outputs[output].transitionCount === 0) {
+                    fsm.numOutputs--;
+                }
+            }
+
+            function updateOutputs(label, isStateOutput) {
+                if (label === DEFAULT_OUTPUT_SYMBOL) {
+                    return DEFAULT_OUTPUT;
+                }
+                var idx = fsm.outputs.findIndex(function (output) {
+                    return output.label === label;
+                });
+                if (idx !== -1) {
+                    if (isStateOutput)
+                        fsm.outputs[idx].stateCount++;
+                    else
+                        fsm.outputs[idx].transitionCount++;
+                } else if (fsm.numOutputs === fsm.outputs.length) {
+                    idx = fsm.outputs.length;
+                    if (isStateOutput)
+                        fsm.outputs.push({label: label, stateCount: 1, transitionCount: 0});
+                    else
+                        fsm.outputs.push({label: label, stateCount: 0, transitionCount: 1});
+                    fsm.numOutputs++;
+                } else {
+                    idx = 0;
+                    while (fsm.outputs[idx].stateCount + fsm.outputs[idx].transitionCount > 0)
+                        idx++;
+                    if (isStateOutput)
+                        fsm.outputs[idx].stateCount++;
+                    else
+                        fsm.outputs[idx].transitionCount++;
+                    fsm.outputs[idx].label = label;
+                    fsm.numOutputs++;
+                }
+                return idx;
+            }
+
+            function delInput(input) {
+                fsm.inputs[input].counter--;
+                if (fsm.inputs[input].counter === 0) {
+                    fsm.numInputs--;
+                }
+            }
+
+            function updateInputs(label) {
+                var idx = fsm.inputs.findIndex(function (input) {
+                    return input.label === label;
+                });
+                if (idx !== -1) {
+                    fsm.inputs[idx].counter++;
+                } else if (fsm.numInputs === fsm.inputs.length) {
+                    idx = fsm.inputs.length;
+                    fsm.inputs.push({label: label, counter: 1});
+                    fsm.numInputs++;
+                } else {
+                    idx = 0;
+                    while (fsm.inputs[idx].counter > 0)
+                        idx++;
+                    fsm.inputs[idx].counter++;
+                    fsm.inputs[idx].label = label;
+                    fsm.numInputs++;
+                }
+                return idx;
+            }
+
+            function parseDotData(data) {
+                var maxStateId = 0;
+                data.nodes.forEach(function (node) {
+                    var id = Number(node.id);
+                    if (isNaN(id) || !Number.isInteger(id) || id < 0)
+                        throw 'Expected nonnegative numerical state ID! (State ' + node.id + ')';
+                    node.id = id;
+                    if (maxStateId < id + 1)
+                        maxStateId = id + 1;
+                });
+                fsm.nodes = [];
+                for (var i = 0; i < maxStateId; i++) {
+                    fsm.nodes[i] = {
+                        id: i,
+                        labelId: i,
+                        used: false,
+                        label: '' + i,
+                        output: DEFAULT_OUTPUT
+                    };
+                }
+                fsm.numStates = data.nodes.length;
+                for (var idx = 0; idx < fsm.numStates; idx++) {
+                    var i = data.nodes[idx].id;
+                    if (fsm.nodes[i].used)
+                        throw 'Two states cannot have the same ID! (State ' + fsm.nodes[i].id + ')';
+                    fsm.nodes[i].label = data.nodes[idx].label;
+                    var strs = fsm.nodes[i].label.split('\n');
+                    fsm.nodes[i].labelId = strs[0];
+                    fsm.nodes[i].used = true;
+                    if (strs.length > 1) {
+                        if (strs.length !== 2)
+                            throw 'Expected the maximum of 2 lines in state label! (State ' + fsm.nodes[i].id + ')';
+                        fsm.isOutputState = true;
+                        fsm.nodes[i].output = updateOutputs(strs[1], true);
+                    }
+                }
+                fsm.edges = data.edges;
+                fsm.numEdges = fsm.edges.length;
+                for (var i = 0; i < fsm.numEdges; i++) {
+                    var strs = fsm.edges[i].label.split(' ');
+                    fsm.edges[i].id = i;
+                    fsm.edges[i].input = updateInputs(strs[0]);
+                    fsm.edges[i].used = true;
+                    if (strs.length > 1) {
+                        if (strs.length !== 3)
+                            throw 'Expected transition label in format \'input / output\' or \'input\' only!' +
+                                    ' (Transition ' + fsm.edges[i].from + ' -> ' + fsm.edges[i].to + ')';
+                        fsm.isOutputTransition = true;
+                        fsm.edges[i].output = updateOutputs(strs[2], false);
+                    } else {
+                        fsm.edges[i].output = DEFAULT_OUTPUT;
+                    }
+                }
+                fsm.numInputs = fsm.inputs.length;
+                fsm.numOutputs = fsm.outputs.length;
+                if (fsm.isOutputTransition) {
+                    if (fsm.isOutputState) {
+                        fsm.type = 1;//DFSM
+                    } else {
+                        fsm.type = 2;//Mealy
+                    }
+                } else if (fsm.isOutputState) {
+                    if (fsm.outputs.length <= 2) {
+                        fsm.type = 4;//DFA
+                    } else {
+                        fsm.type = 3;//Moore
+                    }
+                } else {// what is this machine???
+                    fsm.type = 4;//DFA
+                }
+                setMachineType();
+                data.edges = fsm.edges;
+                return data;
+            }
+
+            function parseFsmData(data) {
+                var lines = data.split('\n');
+                if (lines.length < 3)
+                    throw 'Expected 3 info lines (char ' + data.length + ')';
+                var words = lines[0].split(' ');
+                if ((words.length !== 2) || (words[0].length === 0) || (words[1].length === 0))
+                    throw 'Expected 2 numbers on line 1 (char ' + lines[0].length + ')';
+                fsm.type = Number(words[0]);
+                if (isNaN(fsm.type) || !Number.isInteger(fsm.type) || fsm.type < 1 || fsm.type > 4)
+                    throw 'Bad machine type (char ' + words[0].length + ')';
+                fsm.isReduced = Number(words[1]);
+                if (isNaN(fsm.isReduced) || !Number.isInteger(fsm.isReduced) || fsm.isReduced < 0 || fsm.isReduced > 1)
+                    throw 'Expected 0 or 1 as reduction state (char ' + lines[0].length + ')';
+                var charCounter = lines[0].length;
+                words = lines[1].split(' ');
+                if ((words.length !== 3) || (words[0].length === 0) || (words[1].length === 0) || (words[2].length === 0))
+                    throw 'Expected 3 numbers on line 2 (char ' + (charCounter + lines[1].length + 1) + ')';
+                fsm.numStates = Number(words[0]);
+                charCounter += words[0].length + 1;
+                if (isNaN(fsm.numStates) || !Number.isInteger(fsm.numStates) || fsm.numStates < 0)
+                    throw 'Bad number of states (char ' + charCounter + ')';
+                fsm.numInputs = Number(words[1]);
+                charCounter += words[1].length + 1;
+                if (isNaN(fsm.numInputs) || !Number.isInteger(fsm.numInputs) || fsm.numInputs < 0)
+                    throw 'Bad number of inputs (char ' + charCounter + ')';
+                fsm.numOutputs = Number(words[2]);
+                charCounter += words[2].length + 1;
+                if (isNaN(fsm.numOutputs) || !Number.isInteger(fsm.numOutputs) || fsm.numOutputs < 0)
+                    throw 'Bad number of outputs (char ' + charCounter + ')';
+                var maxStateId = Number(lines[2]);
+                charCounter += lines[2].length + 1;
+                if (isNaN(maxStateId) || !Number.isInteger(maxStateId) || maxStateId < 0 || (lines[2].length === 0))
+                    throw 'Expected a maximal state ID on line 3 (char ' + charCounter + ')';
+                if (maxStateId < fsm.numStates)
+                    throw 'The number of states cannot be greater than the maximal state ID (char ' + charCounter + ')';
+                setMachineType();
+                var k = 0;
+                for (var i = 0; i < maxStateId; i++) {
+                    fsm.nodes[i] = {
+                        id: i,
+                        labelId: '' + i,
+                        used: false,
+                        label: '' + i,
+                        output: DEFAULT_OUTPUT
+                    };
+                    for (var j = 0; j < fsm.numInputs; j++, k++) {
+                        fsm.edges[k] = {
+                            id: k,
+                            from: i,
+                            input: j,
+                            used: false,
+                            label: '' + j,
+                            arrows: "to",
+                            output: DEFAULT_OUTPUT
+                        };
+                    }
+                }
+                for (var j = 0; j < fsm.numInputs; j++) {
+                    fsm.inputs[j] = {
+                        label: '' + j,
+                        counter: 0
+                    };
+                }
+                for (var j = 0; j < fsm.numOutputs; j++) {
+                    fsm.outputs[j] = {
+                        label: '' + j,
+                        stateCount: 0,
+                        transitionCount: 0
+                    };
+                }
+                var lineIdx = 3;
+                if (fsm.isOutputState) {
+                    if (lines.length < lineIdx + fsm.numStates)
+                        throw 'Expected ' + fsm.numStates + ' state output lines (char ' + data.length + ')';
+                    for (var i = 0; i < fsm.numStates; i++, lineIdx++) {
+                        words = lines[lineIdx].split(' ');
+                        if ((words.length !== 2) || (words[0].length === 0) || (words[1].length === 0))
+                            throw 'Expected 2 numbers on line ' + lineIdx +
+                                    ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                        var state = Number(words[0]);
+                        charCounter += words[0].length + 1;
+                        if (isNaN(state) || !Number.isInteger(state) || state < 0 ||
+                                state >= maxStateId || fsm.nodes[state].used)
+                            throw 'Expected a correct state ID (char ' + charCounter + ')';
+                        fsm.nodes[state].used = true;
+                        fsm.nodes[state].output = Number(words[1]);
+                        charCounter += words[1].length + 1;
+                        if (isNaN(fsm.nodes[state].output) || !Number.isInteger(fsm.nodes[state].output) ||
+                                fsm.nodes[state].output < DEFAULT_OUTPUT || fsm.nodes[state].output >= fsm.numOutputs)
+                            throw 'Expected an output symbol (number) (char ' + charCounter + ')';
+                        if (fsm.nodes[state].output !== DEFAULT_OUTPUT) {
+                            fsm.outputs[fsm.nodes[state].output].stateCount++;
+                            fsm.nodes[state].label = fsm.nodes[state].labelId + '\n' + fsm.nodes[state].output;
+                        } else {
+                            fsm.nodes[state].label = fsm.nodes[state].labelId + '\n' + DEFAULT_OUTPUT_SYMBOL;
+                        }
+                    }
+                }
+                if (fsm.isOutputTransition) {
+                    if (lines.length < lineIdx + fsm.numStates)
+                        throw 'Expected ' + fsm.numStates + ' transition output lines (char ' + data.length + ')';
+                    for (var i = 0; i < fsm.numStates; i++, lineIdx++) {
+                        words = lines[lineIdx].split('\t');
+                        if ((words.length !== fsm.numInputs + 1) || (words[0].length === 0))
+                            throw 'Expected ' + (fsm.numInputs + 1) + ' numbers on line ' + lineIdx
+                                    + ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                        var state = Number(words[0]);
+                        charCounter += words[0].length + 1;
+                        if (isNaN(state) || !Number.isInteger(state) || state < 0 ||
+                                state >= maxStateId || (fsm.isOutputState !== fsm.nodes[state].used))
+                            throw 'Expected a correct state ID (char ' + charCounter + ')';
+                        fsm.nodes[state].used = true;
+                        k = state * fsm.numInputs;
+                        for (var j = 1; j <= fsm.numInputs; j++, k++) {
+                            var output = Number(words[j]);
+                            charCounter += words[j].length + 1;
+                            if (isNaN(output) || !Number.isInteger(output) ||
+                                    output < DEFAULT_OUTPUT || output >= fsm.numOutputs || (words[j].length === 0))
+                                throw 'Expected an output symbol (number) (char ' + charCounter + ')';
+                            fsm.edges[k].output = output;
+                            if (output !== DEFAULT_OUTPUT) {
+                                fsm.outputs[output].transitionCount++;
+                                fsm.edges[k].label = fsm.edges[k].input + ' / ' + fsm.edges[k].output;
+                            } else {
+                                fsm.edges[k].label = fsm.edges[k].input + ' / ' + DEFAULT_OUTPUT_SYMBOL;
+                            }
+                        }
+                    }
+                }
+                if (lines.length < lineIdx + fsm.numStates)
+                    throw 'Expected ' + fsm.numStates + ' transition lines (char ' + data.length + ')';
+                for (var i = 0; i < fsm.numStates; i++, lineIdx++) {
+                    words = lines[lineIdx].split('\t');
+                    if ((words.length !== fsm.numInputs + 1) || (words[0].length === 0))
+                        throw 'Expected ' + (fsm.numInputs + 1) + ' numbers on line ' + lineIdx
+                                + ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                    var state = Number(words[0]);
+                    charCounter += words[0].length + 1;
+                    if (isNaN(state) || !Number.isInteger(state) || state < 0 ||
+                            state >= maxStateId || (!fsm.nodes[state].used))
+                        throw 'Expected a correct state ID (char ' + charCounter + ')';
+                    k = state * fsm.numInputs;
+                    for (var j = 1; j <= fsm.numInputs; j++, k++) {
+                        var nextState = Number(words[j]);
+                        charCounter += words[j].length + 1;
+                        if (isNaN(nextState) || !Number.isInteger(nextState) ||
+                                nextState < -1 || nextState >= maxStateId ||
+                                (nextState !== -1 && !fsm.nodes[state].used) || (words[j].length === 0))
+                            throw 'Expected a correct next state ID (char ' + charCounter + ')';
+                        if (nextState === -1) {
+                            if (fsm.isOutputTransition && (fsm.edges[k].output !== -1))
+                                throw 'Transition needs to exist if its output is defined (char ' + charCounter + ')';
+                        } else {
+                            fsm.inputs[j - 1].counter++;
+                            fsm.edges[k].to = nextState;
+                            fsm.edges[k].used = true;
+                            fsm.numEdges++;
+                        }
+                    }
+                }
+                // labels
+                if (lineIdx + 1 < lines.length) {// states
+                    words = lines[lineIdx].split(' ');
+                    var numLabels = Number(words[0]);
+                    charCounter += words[0].length + 1;
+                    if (isNaN(numLabels) || !Number.isInteger(numLabels) || numLabels < 0 ||
+                            numLabels > maxStateId || (words[0].length === 0))
+                        throw 'Expected a number of state labels (char ' + charCounter + ')';
+                    charCounter -= words[0].length;
+                    charCounter += lines[lineIdx].length;
+                    lineIdx++;
+                    for (var i = 0; i < numLabels; i++, lineIdx++) {
+                        words = lines[lineIdx].split(' ');
+                        if ((words.length !== 2) || (words[0].length === 0))
+                            throw 'Expected state ID and its label (a word) on line ' + lineIdx
+                                    + ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                        var state = Number(words[0]);
+                        charCounter += words[0].length + 1;
+                        if (isNaN(state) || !Number.isInteger(state) || state < 0 ||
+                                state >= maxStateId || (!fsm.nodes[state].used))
+                            throw 'Expected a correct state ID (char ' + charCounter + ')';
+                        fsm.nodes[state].labelId = words[1];
+                    }
+                    if (lineIdx + 1 < lines.length) {// inputs
+                        words = lines[lineIdx].split(' ');
+                        var numLabels = Number(words[0]);
+                        charCounter += words[0].length + 1;
+                        if (isNaN(numLabels) || !Number.isInteger(numLabels) || numLabels < 0 ||
+                                numLabels > fsm.numInputs || (words[0].length === 0))
+                            throw 'Expected a number of input labels (char ' + charCounter + ')';
+                        charCounter -= words[0].length;
+                        charCounter += lines[lineIdx].length;
+                        lineIdx++;
+                        for (var i = 0; i < numLabels; i++, lineIdx++) {
+                            words = lines[lineIdx].split(' ');
+                            if ((words.length !== 2) || (words[0].length === 0))
+                                throw 'Expected input ID and its label (a word) on line ' + lineIdx
+                                        + ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                            var input = Number(words[0]);
+                            charCounter += words[0].length + 1;
+                            if (isNaN(input) || !Number.isInteger(input) ||
+                                    input < 0 || input >= fsm.numInputs)
+                                throw 'Expected a correct input ID (char ' + charCounter + ')';
+                            fsm.inputs[input].label = words[1];
+                        }
+                        if (lineIdx + 1 < lines.length) {// outputs
+                            words = lines[lineIdx].split(' ');
+                            var numLabels = Number(words[0]);
+                            charCounter += words[0].length + 1;
+                            if (isNaN(numLabels) || !Number.isInteger(numLabels) || numLabels < 0 ||
+                                    numLabels > fsm.numOutputs || (words[0].length === 0))
+                                throw 'Expected a number of output labels (char ' + charCounter + ')';
+                            charCounter -= words[0].length;
+                            charCounter += lines[lineIdx].length;
+                            lineIdx++;
+                            for (var i = 0; i < numLabels; i++, lineIdx++) {
+                                words = lines[lineIdx].split(' ');
+                                if ((words.length !== 2) || (words[0].length === 0))
+                                    throw 'Expected output ID and its label (a word) on line ' + lineIdx
+                                            + ' (char ' + (charCounter + lines[lineIdx].length + 1) + ')';
+                                var output = Number(words[0]);
+                                charCounter += words[0].length + 1;
+                                if (isNaN(output) || !Number.isInteger(output) ||
+                                        output < 0 || output >= fsm.numOutputs)
+                                    throw 'Expected a correct output ID (char ' + charCounter + ')';
+                                fsm.outputs[output].label = words[1];
+                            }
+                        }
+                        // update labels
+                        for (var i in fsm.edges) {
+                            if (fsm.edges[i].used) {
+                                fsm.edges[i].label = fsm.inputs[fsm.edges[i].input].label;
+                                if (fsm.isOutputTransition) {
+                                    if (fsm.edges[i].output === DEFAULT_OUTPUT) {
+                                        fsm.edges[i].label += ' / ' + DEFAULT_OUTPUT_SYMBOL;
+                                    } else {
+                                        fsm.edges[i].label += ' / ' + fsm.outputs[fsm.edges[i].output].label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (var i in fsm.nodes) {
+                        if (fsm.nodes[i].used) {
+                            fsm.nodes[i].label = fsm.nodes[i].labelId;
+                            if (fsm.isOutputState) {
+                                if (fsm.nodes[i].output === DEFAULT_OUTPUT) {
+                                    fsm.nodes[i].label += '\n' + DEFAULT_OUTPUT_SYMBOL;
+                                } else {
+                                    fsm.nodes[i].label += '\n' + fsm.outputs[fsm.nodes[i].output].label;
+                                }
+                            }
+                        }
+                    }
+                }
+                // update the number of inputs and outputs
+                fsm.inputs.forEach(function (input) {
+                    if (input.counter === 0)
+                        fsm.numInputs--;
+                });
+                fsm.outputs.forEach(function (output) {
+                    if (output.stateCount + output.transitionCount === 0)
+                        fsm.numOutputs--;
+                });
+
+                var visData = {};
+                // delete unused states and edges;
+                visData.nodes = fsm.nodes.filter(function (node) {
+                    return node.used;
+                });
+                visData.edges = fsm.edges.filter(function (edge) {
+                    return edge.used;
+                });
+                return visData;
+            }
+
+            function clearStateOutputs() {
+                fsm.nodes.forEach(function (node) {
+                    if (node.used && (node.output !== DEFAULT_OUTPUT)) {
+                        delOutput(node.output, true);
+                        node.output = DEFAULT_OUTPUT;
+                    }
+                });
+            }
+
+            function clearTransitionOutputs() {
+                fsm.edges.forEach(function (edge) {
+                    if (edge.used && (edge.output !== DEFAULT_OUTPUT)) {
+                        delOutput(edge.output, false);
+                        edge.output = DEFAULT_OUTPUT;
+                    }
+                });
+            }
+
+// machine type
+            function setMachineType() {
+                switch (fsm.type) {
+                    case 1:
+                        document.getElementById('machineType').value = 'DFSM';
+                        fsm.isOutputState = true;
+                        fsm.isOutputTransition = true;
+                        break;
+                    case 2:
+                        document.getElementById('machineType').value = 'Mealy';
+                        fsm.isOutputState = false;
+                        fsm.isOutputTransition = true;
+                        break;
+                    case 3:
+                        document.getElementById('machineType').value = 'Moore';
+                        fsm.isOutputState = true;
+                        fsm.isOutputTransition = false;
+                        break;
+                    case 4:
+                        document.getElementById('machineType').value = 'DFA';
+                        fsm.isOutputState = true;
+                        fsm.isOutputTransition = false;
+                        break;
+                }
+            }
+
+            function getStateOutputCount() {
+                var counter = 0;
+                fsm.outputs.forEach(function (output) {
+                    if (output.stateCount > 0)
+                        counter++;
+                });
+                return counter;
+            }
+
+            $('#machineType').change(function () {
+                var newType = document.getElementById('machineType').selectedIndex;
+                if (newType === 0) {
+                    alert('Please specify valid machine type.');
+                    return;
+                }
+                if (fsm.type === newType)
+                    return;
+                switch (newType) {
+                    case 1:
+                        fsm.type = newType;
+                        break;
+                    case 2:
+                        if (fsm.isOutputState) {
+                            if (confirm('Choice of Mealy machine removes all state outputs!\n\n' +
+                                    'Do you really want to use the type of Mealy machine?')) {
+                                clearStateOutputs();
+                                fsm.type = newType;
+                            }
+                        } else {// unknown -> Mealy
+                            fsm.type = newType;
+                        }
+                        break;
+                    case 3:
+                        if (fsm.isOutputTransition) {
+                            if (confirm('Choice of Moore machine removes all transition outputs!\n\n' +
+                                    'Do you really want to use the type of Moore machine?')) {
+                                clearTransitionOutputs();
+                                fsm.type = newType;
+                            }
+                        } else {// DFA/unknown -> Moore
+                            fsm.type = newType;
+                        }
+                        break;
+                    case 4:
+                        if (getStateOutputCount() > 2) {
+                            alert('It is not possible to convert the machine type to DFA because' +
+                                    ' there are more than two state outputs.');
+                        } else if (fsm.isOutputTransition) {
+                            if (confirm('Choice of DFA removes all transition outputs!\n\n' +
+                                    'Do you really want to use the type of DFA?')) {
+                                clearTransitionOutputs();
+                                fsm.type = newType;
+                            }
+                        } else {// Moore/unknown -> DFA
+                            fsm.type = newType;
+                        }
+                        break;
+                }
+                setMachineType();
+                if (fsm.type === newType) {
+                    for (var i in fsm.edges) {
+                        if (fsm.edges[i].used) {
+                            fsm.edges[i].label = fsm.inputs[fsm.edges[i].input].label;
+                            if (fsm.isOutputTransition) {
+                                if (fsm.edges[i].output === DEFAULT_OUTPUT) {
+                                    fsm.edges[i].label += ' / ' + DEFAULT_OUTPUT_SYMBOL;
+                                } else {
+                                    fsm.edges[i].label += ' / ' + fsm.outputs[fsm.edges[i].output].label;
+                                }
+                            }
+                        }
+                    }
+                    for (var i in fsm.nodes) {
+                        if (fsm.nodes[i].used) {
+                            fsm.nodes[i].label = fsm.nodes[i].labelId;
+                            if (fsm.isOutputState) {
+                                if (fsm.nodes[i].output === DEFAULT_OUTPUT) {
+                                    fsm.nodes[i].label += '\n' + DEFAULT_OUTPUT_SYMBOL;
+                                } else {
+                                    fsm.nodes[i].label += '\n' + fsm.outputs[fsm.nodes[i].output].label;
+                                }
+                            }
+                        }
+                    }
+
+                    var visData = {};
+                    // delete unused states and edges;
+                    visData.nodes = fsm.nodes.filter(function (node) {
+                        return node.used;
+                    });
+                    visData.edges = fsm.edges.filter(function (edge) {
+                        return edge.used;
+                    });
+                    network.setData(visData);
+                }
+            });
+
+// Draw
+            $(window).load(draw);
+            $('#draw').click(draw);
+            $('#data').keydown(function (event) {
+                if (event.ctrlKey && event.keyCode === 13) { // Ctrl+Enter
+                    draw();
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            });
+
+            function draw() {
+                $('#error').html('');
+                try {
+                    clearFSMdata();
+                    var data;
+                    if (document.getElementById('fileType').value === 'dot') {
+                        // Provide a string with data in DOT language
+                        var textDot = $('#data').val().replace(/\\n/, "\n");
+                        data = vis.network.convertDot(textDot);
+                        data = parseDotData(data);
+                    } else if (document.getElementById('fileType').value === 'fsm') {
+                        data = parseFsmData($('#data').val());
+                    } else {
+                        alert('Please specify the file type first.');
+                        return;
+                    }
+                    network.setData(data);
+                } catch (err) {
+                    // set the cursor at the position where the error occurred
+                    var match = /\(char (.*)\)/.exec(err);
+                    if (match) {
+                        var pos = Number(match[1]);
+                        var textarea = $('#data')[0];
+                        if (textarea.setSelectionRange) {
+                            textarea.focus();
+                            textarea.setSelectionRange(pos, pos);
+                        }
+                    }
+                    // show an error message
+                    $('#error').html(err.toString());
+                    document.getElementById('machineType').value = 'unknown';
+                    clearFSMdata();
+                    network.setData(fsm);
+                }
+            }
+
+// Store
+            $('#store').click(store);
+            function store() {
+                $('#error').html('');
+                $('#info').html('');
+                clearInterval(trackingTimer);
+                if (document.getElementById('machineType').selectedIndex === 0) {
+                    alert('Please choose a valid machine type first.');
+                    return;
+                }
+                if (document.getElementById('fileType').value === 'dot') {
+                    writeDOT();
+                } else if (document.getElementById('fileType').value === 'fsm') {
+                    writeFSMdata();
+                } else {
+                    alert('Please specify the type of description first.');
+                    return;
+                }
+                $('#info').html('Machine stored');
+            }
+
+            function writeDOT() {
+                var dotStr = 'digraph { rankdir=LR;\n';
+                for (var i in fsm.nodes) {
+                    if (fsm.nodes[i].used)
+                        dotStr += fsm.nodes[i].id + ' [label="' + fsm.nodes[i].label + '"];\n';
+                }
+                for (var i in fsm.edges) {
+                    if (fsm.edges[i].used)
+                        dotStr += fsm.edges[i].from + ' -> ' + fsm.edges[i].to +
+                                ' [label="' + fsm.edges[i].label + '"];\n';
+                }
+                dotStr += '}';
+                $('#data').val(dotStr);
+            }
+
+            function makeCompact() {
+                console.log(fsm);
+                var inputChange = false, outputChange = false;
+                if ((fsm.numInputs !== fsm.inputs.length) && (fsm.numInputs !== 0)) {
+                    var oldIdx = fsm.inputs.length - 1;
+                    var newIdx = 0;
+                    while (fsm.inputs[oldIdx].counter === 0)
+                        oldIdx--;
+                    while (fsm.inputs[newIdx].counter > 0)
+                        newIdx++;
+                    while (newIdx < oldIdx) {
+                        fsm.inputs[newIdx].label = fsm.inputs[oldIdx].label;
+                        fsm.inputs[oldIdx].counter = 0;
+                        while (fsm.inputs[oldIdx].counter === 0)
+                            oldIdx--;
+                        while (fsm.inputs[newIdx].counter > 0)
+                            newIdx++;
+                        inputChange = true;
+                    }
+                }
+                if ((fsm.numOutputs !== fsm.outputs.length) && (fsm.numOutputs !== 0)) {
+                    var oldIdx = fsm.outputs.length - 1;
+                    var newIdx = 0;
+                    while (fsm.outputs[oldIdx].stateCount + fsm.outputs[oldIdx].transitionCount === 0)
+                        oldIdx--;
+                    while (fsm.outputs[newIdx].stateCount + fsm.outputs[newIdx].transitionCount > 0)
+                        newIdx++;
+                    while (newIdx < oldIdx) {
+                        fsm.outputs[newIdx].label = fsm.outputs[oldIdx].label;
+                        fsm.outputs[oldIdx].stateCount = 0;
+                        fsm.outputs[oldIdx].transitionCount = 0;
+                        while (fsm.outputs[oldIdx].stateCount + fsm.outputs[oldIdx].transitionCount === 0)
+                            oldIdx--;
+                        while (fsm.outputs[newIdx].stateCount + fsm.outputs[newIdx].transitionCount > 0)
+                            newIdx++;
+                        outputChange = true;
+                    }
+                    if (outputChange) {
+                        fsm.nodes.forEach(function (node) {
+                            if (node.used && node.output >= fsm.numOutputs)
+                                node.output = updateOutputs(fsm.outputs[node.output].label, true);
+                        });
+                    }
+                }
+                if (inputChange || outputChange) {
+                    fsm.edges.forEach(function (edge) {
+                        if (edge.used) {
+                            if (inputChange && edge.input >= fsm.numInputs)
+                                edge.input = updateInputs(fsm.inputs[edge.input].label);
+                            if (outputChange && edge.output >= fsm.numOutputs)
+                                edge.output = updateOutputs(fsm.outputs[edge.output].label, false);
+                        }
+                    });
+                    for (var i = fsm.numInputs; i < fsm.inputs.length; i++) {
+                        fsm.inputs[i].label = '';
+                    }
+                    for (var i = fsm.numOutputs; i < fsm.outputs.length; i++) {
+                        fsm.outputs[i].label = '';
+                    }
+                }
+            }
+
+            function writeFSMdata() {
+                makeCompact();
+                var fsmStr = fsm.type + ' ' + (fsm.isReduced ? 1 : 0) + '\n';
+                fsmStr += fsm.numStates + ' ' + fsm.numInputs + ' ' + fsm.numOutputs + '\n';
+                fsmStr += fsm.nodes.length + '\n';
+                if (fsm.isOutputState) {
+                    for (i in fsm.nodes) {
+                        if (fsm.nodes[i].used)
+                            fsmStr += fsm.nodes[i].id + ' ' + fsm.nodes[i].output + '\n';
+                    }
+                }
+                var transition = [];
+                var outputTransition = [];
+                for (var i = 0; i < fsm.nodes.length; i++) {
+                    transition[i] = [];
+                    if (fsm.isOutputTransition)
+                        outputTransition[i] = [];
+                    for (var j = 0; j < fsm.numInputs; j++) {
+                        transition[i][j] = -1;
+                        if (fsm.isOutputTransition)
+                            outputTransition[i][j] = -1;
+                    }
+                }
+                for (var i in fsm.edges) {
+                    if (fsm.edges[i].used) {
+                        if (transition[fsm.edges[i].from][fsm.edges[i].input] !== -1) {
+                            alert('Multiple transitions are not allowed!\nTransition from ' +
+                                    fsm.nodes[fsm.edges[i].from].labelId + ' (' + fsm.edges[i].from +
+                                    ') on ' + fsm.edges[i].input);
+                            return;
+                        }
+                        transition[fsm.edges[i].from][fsm.edges[i].input] = fsm.edges[i].to;
+                        if (fsm.isOutputTransition)
+                            outputTransition[fsm.edges[i].from][fsm.edges[i].input] = fsm.edges[i].output;
+                    }
+                }
+                if (fsm.isOutputTransition) {
+                    for (var i = 0; i < fsm.nodes.length; i++) {
+                        if (fsm.nodes[i].used) {
+                            fsmStr += fsm.nodes[i].id;
+                            for (var j = 0; j < fsm.numInputs; j++) {
+                                fsmStr += '\t' + outputTransition[fsm.nodes[i].id][j];
+                            }
+                            fsmStr += '\n';
+                        }
+                    }
+                }
+                // transition
+                for (var i = 0; i < fsm.nodes.length; i++) {
+                    if (fsm.nodes[i].used) {
+                        fsmStr += fsm.nodes[i].id;
+                        for (var j = 0; j < fsm.numInputs; j++) {
+                            fsmStr += '\t' + transition[fsm.nodes[i].id][j];
+                        }
+                        fsmStr += '\n';
+                    }
+                }
+                // labels
+                fsmStr += fsm.numStates + ' state labels\n';
+                for (var i in fsm.nodes) {
+                    if (fsm.nodes[i].used)
+                        fsmStr += fsm.nodes[i].id + ' ' + fsm.nodes[i].labelId + '\n';
+                }
+                fsmStr += fsm.numInputs + ' input labels\n';
+                for (var i = 0; i < fsm.numInputs; i++) {
+                    fsmStr += i + ' ' + fsm.inputs[i].label + '\n';
+                }
+                fsmStr += fsm.numOutputs + ' output labels\n';
+                for (var i = 0; i < fsm.numOutputs; i++) {
+                    fsmStr += i + ' ' + fsm.outputs[i].label + '\n';
+                }
+                $('#data').val(fsmStr);
+            }
+
+// Load
+            $('#load').click(function () {
+                file = null;
+                $('#error').html('');
+                $('#info').html('');
+                clearInterval(trackingTimer);
+                document.getElementById('filename').click();
+            });
+            $('#filename').change(function () {
+                if (document.getElementById('filename').files[0]) {
+                    file = document.getElementById('filename').files[0];
+                    lastMod = file.lastModifiedDate;
+                    loadFile(file);
+                }
+            });
+            function setFileType() {
+                var suffix = file.name.slice(file.name.lastIndexOf('.') + 1, file.name.length);
+                if (suffix === 'gv') {
+                    document.getElementById('fileType').value = 'dot';
+                } else if (suffix === 'fsm') {
+                    document.getElementById('fileType').value = 'fsm';
+                } else {
+                    document.getElementById('fileType').value = 'unknown';
+                }
+                console.log(suffix);
+            }
+
+            function loadFile(f) {
+                if (f) {
+                    setFileType();
+                    var r = new FileReader();
+                    r.onload = function (e) {
+                        var contents = e.target.result;
+                        $('#data').val(contents);
+                        draw();
+                        $('#info').html(f.name + " loaded");
+                    };
+                    r.readAsText(f);
+                } else {
+                    $('#error').html("Failed to load" + f.name);
+                }
+            }
+
+// Save
+            $('#save').click(saveFile);
+            function saveFile() {
+                file = null;
+                $('#error').html('');
+                $('#info').html('');
+                clearInterval(trackingTimer);
+                if (document.getElementById('machineType').selectedIndex === 0) {
+                    alert('Please specify the machine type first.');
+                    return;
+                }
+                var fsmData;
+                var filename = document.getElementById('machineType').value + '_' + fsm.numStates;
+                if (document.getElementById('fileType').value === 'dot') {
+                    fsmData = 'data:application/gv;charset=utf-8,';
+                    filename = 'Dot' + filename + '.gv';
+                } else if (document.getElementById('fileType').value === 'fsm') {
+                    fsmData = 'data:application/fsm;charset=utf-8,';
+                    filename += '.fsm';
+                } else {
+                    alert('Please specify the file type first.');
+                    return;
+                }
+                // Data URI
+                fsmData += encodeURIComponent($('#data').val());
+                $('#saveLink').attr({
+                    'href': fsmData,
+                    'target': '_blank',
+                    'download': filename
+                });
+                document.getElementById('saveLink').click();
+                $('#info').html(filename + " saved");
+            }
+
+// Track
+            $('#track').click(function () {
+                $('#error').html('');
+                $('#info').html('');
+                document.getElementById('filename').click();
+                trackingTimer = setInterval(tick, 250);
+                //        $('#filename').replaceWith($('#filename').val('').clone(true)); 
+            });
+
+            function tick() {
+                if (file && lastMod && file.lastModifiedDate.getTime() !== lastMod.getTime()) {
+                    lastMod = file.lastModifiedDate;
+                    $('#info').html(file.name + " changed");
+                    loadFile(file);
+                } else if (file) {
+                    $('#info').html("Tracking " + file.name);
+                }
+            }
+
+// GUI
+            var dragging = false;
+            var xStart;
+            var leftWidth = 290;
+            $(window).resize(resize);
+            $(window).load(resize);
+            function resize() {
+                updatePopUpPosition();
+            }
+
+            function updatePopUpPosition() {
+                var pX = (window.innerWidth - leftWidth - 50);
+                if (pX < 300) pX = 300;
+                pX = pX / 2 - 105;
+                $('#networkPopUp').css("left", pX + "px");
+                var pY = (window.innerHeight - 20);
+                if (pY < 300) pY = 300;
+                pY = pY / 2 - 77;
+                $('#networkPopUp').css("top", pY + "px");
+            }
+
+            $('#middle').mousedown(function (e) {
+                if ((e.which === 1) && (e.target.id === 'middle')) {
+                    e.preventDefault();
+                    dragging = true;
+                    xStart = e.pageX - leftWidth;
+                    $(document).mousemove(function (e) {
+                        leftWidth = e.pageX - xStart;
+                        if (leftWidth < 150)
+                            leftWidth = 150;
+                        if (leftWidth > window.innerWidth - 350)
+                            leftWidth = window.innerWidth - 350;
+                        $('#left').css("width", leftWidth + "px");
+                        $('#middle').css("left", (leftWidth + 10) + "px");
+                        $('#right').css("left", (leftWidth + 40) + "px");
+                        updatePopUpPosition();
+                    });
+                }
+            });
+
+            $(document).mouseup(function (e) {
+                if (dragging) {
+                    $(document).unbind('mousemove');
+                    dragging = false;
+                }
+            });
+        </script>
+    </body>
+</html>

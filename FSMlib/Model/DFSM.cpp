@@ -652,11 +652,10 @@ bool DFSM::loadTransitionOutputs(ifstream& file) {
 	_outputTransition.resize(_usedStateIDs.size());
 	for (state_t state = 0; state < _usedStateIDs.size(); state++) {
 		_outputTransition[state].resize(_numberOfInputs); 
-		_usedStateIDs[state] = false;
 	}
 	for (state_t state = 0; state < _numberOfStates; state++) {
 		file >> tmpState;
-		if ((tmpState >= _usedStateIDs.size()) || (_usedStateIDs[tmpState])) {
+		if ((tmpState >= _usedStateIDs.size()) || (_isOutputState != _usedStateIDs[tmpState])) {
 			ERROR_MESSAGE("%s::loadTransitionOutputs - bad transition output line %d", machineTypeNames[_type], state);
 			return false;
 		}
