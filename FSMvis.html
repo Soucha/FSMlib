@@ -144,8 +144,8 @@
             }
 
             #networkPopUp {
-                /*display:none;*/
-                position:absolute;
+                display: none;
+                position: absolute;
                 min-width: 180px;
                 min-height: 144px;
                 top: 40%;
@@ -1362,11 +1362,13 @@
 
             function updatePopUpPosition() {
                 var pX = (window.innerWidth - leftWidth - 50);
-                if (pX < 300) pX = 300;
+                if (pX < 300)
+                    pX = 300;
                 pX = pX / 2 - 105;
                 $('#networkPopUp').css("left", pX + "px");
                 var pY = (window.innerHeight - 20);
-                if (pY < 300) pY = 300;
+                if (pY < 300)
+                    pY = 300;
                 pY = pY / 2 - 77;
                 $('#networkPopUp').css("top", pY + "px");
             }
