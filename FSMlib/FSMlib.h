@@ -22,6 +22,7 @@
 #define FSMLIB_API __declspec(dllimport)
 
 #include "Model\FSMmodel.h"
+#include "Sequences\FSMsequence.h"
 #endif
 
 namespace FSMlib {

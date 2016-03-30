@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <list>
 #include <map>
@@ -81,6 +82,8 @@ typedef unsigned int output_t;
 typedef list<input_t> sequence_in_t;
 typedef list<output_t> sequence_out_t;
 
+//<-- FSMsequence -->
+
 struct seqcomp {
 	/**
 	* Compares two input sequences firstly by their length,
@@ -105,4 +108,9 @@ struct AdaptiveDS {
 	sequence_in_t input;
 	vector<state_t> initialStates, currentStates;
 	map<output_t, AdaptiveDS*> decision;
+};
+
+struct LinkCell {
+	int minLen = -1;
+	vector<state_t> next;
 };

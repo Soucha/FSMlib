@@ -62,6 +62,13 @@ public:
 	}
 
 	/**
+	* @return The greatest state ID increased by 1
+	*/
+	state_t getGreatestStateId() const {
+		return _usedStateIDs.size();
+	}
+
+	/**
 	* @return The number of inputs
 	*/
 	input_t getNumberOfInputs() const {

@@ -23,8 +23,11 @@
 using namespace std;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-#define DATA_PATH		"../../data/"
-#define MSG_MAX_LEN		250
+#define DATA_PATH			"../../data/"
+#define MINIMIZATION_DIR	string("tests/minimization/")
+#define SEQUENCES_DIR		string("tests/sequences/")
+#define EXAMPLES_DIR		string("examples/")
+#define MSG_MAX_LEN			500
 
 /// this is needed in one <tests>.cpp file -> TestUtils.cpp
 #define INIT_SUITE \

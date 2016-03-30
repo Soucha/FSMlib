@@ -22,10 +22,9 @@ namespace FSMlibTest
 	TEST_CLASS(MinimizationTests)
 	{
 	public:
-#define MINIMIZATION_DIR string("tests/minimization/")
-#define EXAMPLES_DIR string("examples/")
-
 		DFSM * fsm, * fsm2;
+
+		// TODO: test incomplete machines
 
 		TEST_METHOD(TestRemoveUnreachableStatesDFSM)
 		{

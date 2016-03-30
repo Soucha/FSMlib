@@ -161,6 +161,9 @@
     <ClCompile Include="Model\IOtests.cpp" />
     <ClCompile Include="Model\MinimizationTests.cpp" />
     <ClCompile Include="Model\UtilsTests.cpp" />
+    <ClCompile Include="Sequences\ADS.cpp" />
+    <ClCompile Include="Sequences\CoverTests.cpp" />
+    <ClCompile Include="Sequences\PDS.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

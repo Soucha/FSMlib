@@ -19,6 +19,12 @@
     <Filter Include="Header Files\Model">
       <UniqueIdentifier>{268b26ae-517e-480c-af1a-65cd4e08e4d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Sequences">
+      <UniqueIdentifier>{ddcfba2e-55a6-48e2-b025-39598fd25bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sequences">
+      <UniqueIdentifier>{1c06fd94-5f87-48f7-9927-36ac4af32c0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -54,6 +60,9 @@
     <ClInclude Include="Model\Mealy.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Sequences\FSMsequence.h">
+      <Filter>Header Files\Sequences</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -80,8 +89,20 @@
     <ClCompile Include="FSMlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sequences\FSMcovers.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\DistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\dotVis.html" />
+    <None Include="..\FSMvis.html" />
   </ItemGroup>
 </Project>

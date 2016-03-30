@@ -70,7 +70,8 @@ public:
 	* Gets identification of next state after applying given input from given state.
 	* @param state
 	* @param input
-	* @return Next state or WRONG_STATE if given state or input is not valid
+	* @return Next state, NULL_STATE if there is no transition from state on input,
+	* or WRONG_STATE if given state or input is not valid
 	*/
 	virtual state_t getNextState(state_t state, input_t input);
 
@@ -88,7 +89,7 @@ public:
 	* Gets output observed after applying given input from given state.
 	* @param state
 	* @param input
-	* @return Output or WRONG_OUTPUT if given state or input is not valid
+	* @return Output (including DEFAULT_OUTPUT) or WRONG_OUTPUT if given state or input is not valid
 	*/
 	virtual output_t getOutput(state_t state, input_t input);
 

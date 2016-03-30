@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\sequences">
       <UniqueIdentifier>{419d3171-2caf-4742-b050-47a84eb8165f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Sequences">
+      <UniqueIdentifier>{dd9d32e6-71ae-4192-a3f7-84fee67018c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -58,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="Model\UtilsTests.cpp">
       <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\CoverTests.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\PDS.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\ADS.cpp">
+      <Filter>Source Files\Sequences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
