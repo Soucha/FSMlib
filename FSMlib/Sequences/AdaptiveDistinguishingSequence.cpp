@@ -43,7 +43,7 @@ namespace FSMsequence {
 		/**
 		* compares two pairs by sequence lenght saved in first element
 		*/
-		bool operator() (const pair<state_t, state_t>& lp, const pair<state_t, state_t>& rp) const {
+		bool operator() (const pair<seq_len_t, state_t>& lp, const pair<seq_len_t, state_t>& rp) const {
 			return lp.first < rp.first;
 		}
 	};
@@ -56,9 +56,10 @@ namespace FSMsequence {
 	}
 
 	bool getAdaptiveDistinguishingSequence(DFSM * fsm, AdaptiveDS* & outADS) {
+		outADS = NULL;
 		state_t N = fsm->getGreatestStateId(), idx;
 		priority_queue<st_node_t*, vector<st_node_t*>, blockcomp> partition;
-		priority_queue<pair<state_t, state_t>, vector<pair<state_t, state_t> >, lencomp> bfsqueue;
+		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t> >, lencomp> bfsqueue;
 		st_node_t* rootST = new st_node_t, *node, *next, *bestNext;
 		vector<st_node_t*> curNode(N, rootST), distinguished(((N - 1) * N) / 2), dependent;
 		set<state_t> used;
@@ -171,7 +172,7 @@ namespace FSMsequence {
 							node->succ.pop_back();
 						}
 						if (size != outCounter) {
-							for (int i = node->succ.size() - 1; i >= size; i--) {
+							for (long i = long(node->succ.size() - 1); i >= long(size); i--) {
 								delete node->succ[i].second;
 								node->succ.pop_back();
 							}
@@ -186,7 +187,7 @@ namespace FSMsequence {
 					}
 				}
 				else {// invalid input -> delete allocated space
-					for (int i = node->succ.size() - 1; i >= (long)outCounter; i--) {
+					for (long i = long(node->succ.size() - 1); i >= long(outCounter); i--) {
 						delete node->succ[i].second;
 						node->succ.pop_back();
 					}
@@ -276,11 +277,11 @@ namespace FSMsequence {
 						}
 					}
 					if (bestNext != NULL) {
-						bfsqueue.push(make_pair(bestNext->sequence.size(), dI));
+						bfsqueue.push(make_pair(seq_len_t(bestNext->sequence.size()), dI));
 						node->succ.push_back(make_pair(bestInput, bestNext));
 					}
 				}
-				state_t distCounter = dependent.size();
+				state_t distCounter = state_t(dependent.size());
 				while (!bfsqueue.empty()) {
 					state_t dI = bfsqueue.top().second;
 					node = dependent[dI];
@@ -295,7 +296,7 @@ namespace FSMsequence {
 						node->nextStates = node->succ[node->succ.back().first].second->nextStates;
 						// prepare succ
 						node->succ.pop_back(); // link to next
-						for (int i = node->succ.size() - 1; i >= (long)next->succ.size(); i--) {
+						for (long i = long(node->succ.size() - 1); i >= long(next->succ.size()); i--) {
 							delete node->succ[i].second;
 							node->succ.pop_back();
 						}
@@ -324,7 +325,7 @@ namespace FSMsequence {
 							}
 						}
 						// remove unused output
-						for (int i = node->succ.size() - 1; i >= 0; i--) {
+						for (long i = long(node->succ.size() - 1); i >= 0; i--) {
 							if (node->succ[i].second->block.empty()) {
 								delete node->succ[i].second;
 								node->succ[i] = node->succ.back();
@@ -359,13 +360,13 @@ namespace FSMsequence {
 							if (next->nextStates.size() == 1) {// still unresolved
 								if (next->sequence.size() == next->succ.size()) {
 									next->succ.push_back(make_pair(link[dI][i].first, node));
-									bfsqueue.push(make_pair(node->sequence.size(), next->nextStates[0]));
+									bfsqueue.push(make_pair(seq_len_t(node->sequence.size()), next->nextStates[0]));
 								}
 								else if (next->succ.back().second->sequence.size() >
 									node->sequence.size()) {
 									next->succ.back().first = link[dI][i].first;
 									next->succ.back().second = node;
-									bfsqueue.push(make_pair(node->sequence.size(), next->nextStates[0]));
+									bfsqueue.push(make_pair(seq_len_t(node->sequence.size()), next->nextStates[0]));
 								}
 							}
 						}

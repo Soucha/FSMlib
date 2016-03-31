@@ -93,8 +93,8 @@ namespace FSMlibTest
 			fsm->load(filename);
 			sequence_in_t pDS;
 			if (getPresetDistinguishingSequence(fsm, pDS)) {
-				ARE_EQUAL(true, hasDS, "FSM has not preset DS but it was found.");
 				DEBUG_MSG("Preset DS of %s: %s\n", filename.c_str(), FSMmodel::getInSequenceAsString(pDS).c_str());
+				ARE_EQUAL(true, hasDS, "FSM has not preset DS but it was found.");
 				vector<pair<state_t, state_t> > actBlock;
 				vector<vector<pair<state_t, state_t> > > sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 				vector<output_t> outputUsed;
@@ -106,7 +106,9 @@ namespace FSMlibTest
 				}
 				fifo.push(actBlock);
 				for (sequence_in_t::iterator sIt = pDS.begin(); sIt != pDS.end(); sIt++) {
-					blocksCount = fifo.size();
+					ARE_EQUAL(true, ((*sIt < fsm->getNumberOfInputs()) || (*sIt == STOUT_INPUT)),
+						"Input %d is invalid", *sIt);
+					blocksCount = int(fifo.size());
 					if (blocksCount == 0) {
 						sequence_in_t endDS(sIt, pDS.end());
 						ARE_EQUAL(true, false, "Suffix %s is extra", FSMmodel::getInSequenceAsString(endDS).c_str());
@@ -143,7 +145,7 @@ namespace FSMlibTest
 					}
 				}
 				if (!fifo.empty()) {
-					int blocks = fifo.size();
+					int blocks = int(fifo.size());
 					while (!fifo.empty()) {
 						actBlock = fifo.front();
 						fifo.pop();
@@ -158,6 +160,8 @@ namespace FSMlibTest
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has preset DS but it was not found.");
+				ARE_EQUAL(true, pDS.empty(), "FSM has not preset DS but sequence %s was returned.",
+					FSMmodel::getInSequenceAsString(pDS).c_str());
 			}
 		}
 	};

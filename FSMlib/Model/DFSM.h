@@ -155,6 +155,7 @@ protected:
 	bool _isReduced;
 	bool _isOutputState;
 	bool _isOutputTransition;
+#pragma warning (disable : 4251)
 	vector< vector< state_t > > _transition;
 	vector< vector< output_t > > _outputTransition;
 	vector< output_t > _outputState;

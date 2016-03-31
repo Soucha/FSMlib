@@ -140,7 +140,7 @@ namespace FSMsequence {
 	* @param outHS
 	* @return true if FSM has HS, false otherwise
 	*/
-	FSMLIB_API bool getHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
+	FSMLIB_API bool getPresetHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
 
 	/**
 	* Fills given seq table with the shortest possible sequences

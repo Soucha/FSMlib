@@ -157,7 +157,7 @@ bool DFSM::distinguishByStateOutputs(queue< vector< state_t > >& blocks) {
 bool DFSM::distinguishByTransitionOutputs(queue< vector< state_t > >& blocks) {
 	state_t stop, counter;
 	vector< vector< state_t > > sameOutput(_numberOfOutputs + 2);
-	stop = blocks.size();
+	stop = state_t(blocks.size());
 	for (input_t input = 0; input < _numberOfInputs; input++) {
 		counter = 0;
 		do {
@@ -195,7 +195,7 @@ bool DFSM::distinguishByTransitions(queue< vector< state_t > >& blocks) {
 	set<state_t> outputGroups;
 	state_t counter, stop, nextStateGroup, group;
 	input_t input, inputStop;
-	stop = blocks.size();
+	stop = state_t(blocks.size());
 	for (counter = 0; counter < stop; counter++) {
 		auto block = blocks.front();
 		blocks.pop();
@@ -204,7 +204,7 @@ bool DFSM::distinguishByTransitions(queue< vector< state_t > >& blocks) {
 		}
 		if (block.size() > 1) blocks.push(block);
 	}
-	stop = blocks.size() + 1;// +1 due to the stop condition (--stop)
+	stop = state_t(blocks.size() + 1);// +1 due to the stop condition (--stop)
 	group = counter;
 	counter = 0;// the number of blocks for the next round
 	
@@ -274,7 +274,7 @@ void DFSM::mergeEquivalentStates(queue< vector< state_t > >& equivalentStates) {
 			stateEquiv[block[state]] = block[0];
 			if (_isOutputState) _outputState[block[state]] = DEFAULT_OUTPUT;
 		}
-		_numberOfStates -= (block.size() - 1);
+		_numberOfStates -= state_t(block.size() - 1);
 	}
 	for (state_t s = 0; s < _usedStateIDs.size(); s++) {
 		if (_usedStateIDs[s]) {
@@ -302,7 +302,7 @@ void DFSM::makeCompact() {
 	for (state_t state = 0; state < stateEquiv.size(); state++) {
 		stateEquiv[state] = state;
 	}
-	state_t oldState = _usedStateIDs.size()-1, newState = 0;
+	state_t oldState = state_t(_usedStateIDs.size()-1), newState = 0;
 	while (_usedStateIDs[newState]) newState++;
 	while (!_usedStateIDs[oldState]) oldState--;
 	while (newState < oldState) {

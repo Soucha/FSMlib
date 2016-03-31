@@ -22,20 +22,15 @@ namespace FSMsequence {
 	typedef set<state_t> block_t;
 	typedef set<block_t> partition_t;
 
-	struct pds_node_t {
+	struct hs_node_t {
 		partition_t partition;
-		sequence_in_t ds;
+		sequence_in_t hs;
 
-		pds_node_t(partition_t partition, sequence_in_t ds) {
+		hs_node_t(partition_t partition, sequence_in_t hs) {
 			this->partition = partition;
-			this->ds = ds;
+			this->hs = hs;
 		}
 	};
-
-	extern int MAX_CLOSED;
-#if SEQUENCES_PERFORMANCE_TEST
-	extern string testOut;
-#endif // SEQUENCES_PERFORMANCE_TEST
 
 	static const int getSetId(const block_t & block) {
 		int sum = 0;
@@ -47,8 +42,8 @@ namespace FSMsequence {
 	}
 
 	static bool isSubsetPartition(partition_t::iterator subsetFirstIt, partition_t::iterator subsetLastIt,
-		partition_t::iterator partitionFirstIt, partition_t::iterator partitionLastIt) {
-		while ((subsetFirstIt != subsetLastIt) && (partitionFirstIt != partitionLastIt)) {
+		partition_t::iterator partitionFirstIt, partition_t::iterator partitioLastIt) {
+		while ((subsetFirstIt != subsetLastIt) && (partitionFirstIt != partitioLastIt)) {
 			if (*subsetFirstIt == *partitionFirstIt) {
 				subsetFirstIt++;
 				partitionFirstIt++;
@@ -63,12 +58,12 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	bool getPresetDistinguishingSequence(DFSM * fsm, sequence_in_t & outPDS) {
+	bool getPresetHomingSequence(DFSM * fsm, sequence_in_t & outHS) {
+		partition_t partition;
+		sequence_in_t s;
 		block_t block;
 		vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 		set<output_t> actOutputs;
-		partition_t partition;
-		sequence_in_t s;
 		output_t output;
 		partition.clear();
 		if (fsm->isOutputState()) {
@@ -90,14 +85,10 @@ namespace FSMsequence {
 				sameOutput[*out].clear();
 			}
 			actOutputs.clear();
-			// are all blocks singletons?
+			// all blocks are singletons
 			if (partition.empty()) {
-				outPDS.clear();
-				outPDS.push_back(STOUT_INPUT);
-#if SEQUENCES_PERFORMANCE_TEST
-				testOut += "1;0;0;";
-				//printf("1;0;0;");
-#endif // SEQUENCES_PERFORMANCE_TEST
+				outHS.clear();
+				outHS.push_back(STOUT_INPUT);
 				return true;
 			}
 		}
@@ -108,16 +99,15 @@ namespace FSMsequence {
 			}
 			partition.insert(block);
 		}
-		queue<pds_node_t*> fifo;
-		multimap<int, pds_node_t*> used;// <id, node>, id = getSetId(node) = sum of state IDs in the first block of node's partition
-		pair <multimap<int, pds_node_t*>::iterator, multimap<int, pds_node_t*>::iterator> usedIt;
-		pds_node_t* act, *succ;
+		queue<hs_node_t*> fifo;
+		multimap<int, hs_node_t*> used;// <id, node>, id = getSetId(node) = sum of state IDs in the first block of node's partition
+		pair <multimap<int, hs_node_t*>::iterator, multimap<int, hs_node_t*>::iterator> usedIt;
+		hs_node_t* act, *succ;
 		bool stop, stoutUsed = false;
-
-		act = new pds_node_t(partition, s);
+		act = new hs_node_t(partition, s);
 		fifo.push(act);
 		used.insert(make_pair(getSetId(*partition.begin()), act));
-		while (!fifo.empty() && used.size() < MAX_CLOSED) {
+		while (!fifo.empty()) {
 			act = fifo.front();
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
@@ -125,35 +115,25 @@ namespace FSMsequence {
 				partition.clear();
 				// go through all blocks in current partition
 				for (partition_t::iterator pIt = act->partition.begin(); pIt != act->partition.end(); pIt++) {
-					bool noTransition = false;
 					// go through all states in current block
 					for (block_t::iterator blockIt = (*pIt).begin(); blockIt != (*pIt).end(); blockIt++) {
 						output = fsm->getOutput(*blockIt, input);
 						if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 						if (output == WRONG_OUTPUT) {
-							// one state can be distinguished by this input but no two
-							if (noTransition) {
-								// two states have no transition under this input
-								stop = true;
-								break;
-							}
-							noTransition = true;
-						} else {
-							if (!sameOutput[output].insert(fsm->getNextState(*blockIt, input)).second) {
-								// two states are indistinguishable under this input
-								stop = true;
-								break;
-							}
-							actOutputs.insert(output);
+							// there is no transition so next state is uncertain
+							stop = true;
+							break;
 						}
+						sameOutput[output].insert(fsm->getNextState(*blockIt, input));
+						actOutputs.insert(output);
 					}
-					// save block with more then one state or clear sameOutput if stop
+					// save block with more then one state
 					for (set<output_t>::iterator out = actOutputs.begin(); out != actOutputs.end(); out++) {
 						if (!stop && (sameOutput[*out].size() > 1)) {
 							block_t b(sameOutput[*out]);
 							partition.insert(b);
 						}
-						sameOutput[*out].clear();				
+						sameOutput[*out].clear();
 					}
 					actOutputs.clear();
 					if (stop) break;
@@ -189,16 +169,10 @@ namespace FSMsequence {
 				}
 				// all blocks are singletons
 				if (partition.empty()) {
-					outPDS = act->ds;
-					outPDS.push_back(input);
-					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
-#if SEQUENCES_PERFORMANCE_TEST
-					ostringstream ss;
-					ss << outPDS.size() << ';' << (used.size() - fifo.size()) << ';' << fifo.size() << ';';
-					testOut += ss.str();
-					//printf("%d;%d;%d;", outPDS.size(), used.size()-fifo.size(), fifo.size());
-#endif // SEQUENCES_PERFORMANCE_TEST
-					for (multimap<int, pds_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
+					outHS = act->hs;
+					outHS.push_back(input);
+					if (stoutUsed) outHS.push_back(STOUT_INPUT);
+					for (multimap<int, hs_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
 						delete it->second;
 					}
 					used.clear();
@@ -207,7 +181,7 @@ namespace FSMsequence {
 				// go through all blocks in new partition
 				for (partition_t::iterator pIt = partition.begin(); pIt != partition.end(); pIt++) {
 					usedIt = used.equal_range(getSetId(*pIt));
-					for (multimap<int, pds_node_t*>::iterator it = usedIt.first; it != usedIt.second; it++) {
+					for (multimap<int, hs_node_t*>::iterator it = usedIt.first; it != usedIt.second; it++) {
 						if (isSubsetPartition(it->second->partition.begin(), it->second->partition.end(),
 							pIt, partition.end())) {
 							stop = true;
@@ -218,22 +192,15 @@ namespace FSMsequence {
 				}
 				// create new node
 				if (!stop) {
-					s = act->ds;
+					s = act->hs;
 					s.push_back(input);
-					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
-					succ = new pds_node_t(partition, s);
+					succ = new hs_node_t(partition, s);
 					fifo.push(succ);
 					used.insert(make_pair(getSetId(*partition.begin()), succ));
 				}
 			}
 		}
-#if SEQUENCES_PERFORMANCE_TEST
-		ostringstream ss;
-		ss << ((fifo.empty()) ? -1 : -2) << ';' << (used.size() - fifo.size()) << ';' << fifo.size() << ';';
-		testOut += ss.str();
-		//printf("%d;%d;%d;", ((fifo.empty()) ? -1 : -2), used.size()-fifo.size(), fifo.size());		
-#endif // SEQUENCES_PERFORMANCE_TEST
-		for (multimap<int, pds_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
+		for (multimap<int, hs_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
 			delete it->second;
 		}
 		used.clear();

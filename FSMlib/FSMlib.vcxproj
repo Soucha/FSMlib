@@ -175,7 +175,10 @@
     <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp" />
     <ClCompile Include="Sequences\DistinguishingSequence.cpp" />
     <ClCompile Include="Sequences\FSMcovers.cpp" />
+    <ClCompile Include="Sequences\HomingSequence.cpp" />
     <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp" />
+    <ClCompile Include="Sequences\StateVerifyingSequence.cpp" />
+    <ClCompile Include="Sequences\SynchronizingSequence.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

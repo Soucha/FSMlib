@@ -65,7 +65,7 @@ public:
 	* @return The greatest state ID increased by 1
 	*/
 	state_t getGreatestStateId() const {
-		return _usedStateIDs.size();
+		return state_t(_usedStateIDs.size());
 	}
 
 	/**
@@ -201,6 +201,7 @@ protected:
 	state_t _numberOfStates;
 	output_t _numberOfOutputs;
 	machine_type_t _type;
+#pragma warning (disable : 4251)
 	vector<bool> _usedStateIDs;
 };
 

@@ -101,6 +101,15 @@
     <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="Sequences\StateVerifyingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\SynchronizingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\HomingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

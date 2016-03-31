@@ -19,6 +19,7 @@
 #include "CppUnitTest.h"
 #include "../FSMlib/FSMlib.h"
 #include <iostream>
+#include <stdarg.h>
 
 using namespace std;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

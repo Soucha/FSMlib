@@ -103,13 +103,21 @@ namespace FSMlibTest
 			}
 		}
 
+		void checkInputValidity(sequence_in_t& seq) {
+			for (auto i : seq) {
+				ARE_EQUAL(true, ((i < fsm->getNumberOfInputs()) || (i == STOUT_INPUT)),
+					"Node with input %s contains invalid input %d.",
+					FSMmodel::getInSequenceAsString(seq).c_str(), i); 
+			}
+		}
+
 		void testGetAdaptiveDS(string filename, bool hasDS = true) {
 			fsm->load(filename);
 			AdaptiveDS* ads;
 			if (getAdaptiveDistinguishingSequence(fsm, ads)) {
-				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but it was found.");
 				DEBUG_MSG("Adaptive DS of %s:\n", filename.c_str());
 				printADS(ads);
+				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but it was found.");
 				set<state_t> states;
 				vector<bool> dist(fsm->getNumberOfStates(), false);
 				// check initial and current states of root
@@ -128,6 +136,7 @@ namespace FSMlibTest
 						"Root node of ADS has state %d in the initial states set more times.", ads->currentStates[i]);
 				}
 
+				//checkInputValidity(ads->input);
 				queue<AdaptiveDS*> fifo;
 				fifo.push(ads);
 				while (!fifo.empty()) {
@@ -136,6 +145,7 @@ namespace FSMlibTest
 					if (ads->currentStates.size() == 1) continue;
 					states.clear();
 					for (map<output_t, AdaptiveDS*>::iterator it = ads->decision.begin(); it != ads->decision.end(); it++) {
+						//checkInputValidity(it->second->input);
 						it->second->input.insert(it->second->input.begin(),	ads->input.begin(), ads->input.end());
 						ARE_EQUAL(it->second->currentStates.size(), it->second->initialStates.size(),
 							"Node with entire input %s has current and initial sets of different size.",
@@ -176,6 +186,10 @@ namespace FSMlibTest
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS but it was not found.");
+				if (ads) {
+					printADS(ads);
+					ARE_EQUAL(false, true, "FSM has not adaptive DS but it was found.");
+				}
 			}
 		}
 

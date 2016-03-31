@@ -402,32 +402,32 @@ namespace FSMlibTest
 					ARE_EQUAL(output_t(0), fsm->getOutput(3, 2), ERR_MSG_OUTPUT_NEXT_STATE, 3, 2);
 					ARE_EQUAL(output_t(0), fsm->getOutput(4, 0), ERR_MSG_OUTPUT_NEXT_STATE, 4, 0);
 
-#define ERR_MSG_OUTPUT_NO_TRANSITION "There is output after undefined transition from %d on %d"
+#define ERR_MSG_OUTPUT_AFTER_NO_TRANSITION "There is output after undefined transition from %d on %d"
 					// the others should not exist -> ERRs:
 					/// <type>::getOutput - there is no such transition
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 1), ERR_MSG_OUTPUT_NO_TRANSITION, 1, 1);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 2), ERR_MSG_OUTPUT_NO_TRANSITION, 1, 2);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 0), ERR_MSG_OUTPUT_NO_TRANSITION, 2, 0);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 2), ERR_MSG_OUTPUT_NO_TRANSITION, 2, 2);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 0), ERR_MSG_OUTPUT_NO_TRANSITION, 3, 0);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 1), ERR_MSG_OUTPUT_NO_TRANSITION, 3, 1);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(4, 1), ERR_MSG_OUTPUT_NO_TRANSITION, 4, 1);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(4, 2), ERR_MSG_OUTPUT_NO_TRANSITION, 4, 2);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 1), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 1, 1);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, 2), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 1, 2);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 0), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 2, 0);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 2), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 2, 2);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 0), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 3, 0);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(3, 1), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 3, 1);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(4, 1), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 4, 1);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(4, 2), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 4, 2);
 
 					// wrong state -> ERR messages:
 					/// <type>::getOutput - bad state id
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(NULL_STATE, 0), ERR_MSG_OUTPUT_NO_TRANSITION, NULL_STATE, 0);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(-2, 1), ERR_MSG_OUTPUT_NO_TRANSITION, -2, 1);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(5, 2), ERR_MSG_OUTPUT_NO_TRANSITION, 5, 2);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(NULL_STATE, 0), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, NULL_STATE, 0);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(-2, 1), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, -2, 1);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(5, 2), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 5, 2);
 					// wrong input -> ERR messages:
 					/// <type>::getOutput - bad input
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, -2), ERR_MSG_OUTPUT_NO_TRANSITION, 1, -2);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 3), ERR_MSG_OUTPUT_NO_TRANSITION, 2, 3);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(1, -2), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 1, -2);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(2, 3), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 2, 3);
 					// wrong state and input -> ERR messages:
 					/// <type>::getOutput - bad state id
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(NULL_STATE, 3), ERR_MSG_OUTPUT_NO_TRANSITION, NULL_STATE, 3);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(-2, 3), ERR_MSG_OUTPUT_NO_TRANSITION, -2, 3);
-					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(5, 3), ERR_MSG_OUTPUT_NO_TRANSITION, 5, 3);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(NULL_STATE, 3), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, NULL_STATE, 3);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(-2, 3), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, -2, 3);
+					ARE_EQUAL(WRONG_OUTPUT, fsm->getOutput(5, 3), ERR_MSG_OUTPUT_AFTER_NO_TRANSITION, 5, 3);
 				}
 			}
 			if (fsm->isOutputTransition()) {

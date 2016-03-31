@@ -78,6 +78,7 @@ static const char* machineTypeNames[] = {
 typedef unsigned int state_t;
 typedef unsigned int input_t;
 typedef unsigned int output_t;
+typedef unsigned int seq_len_t;
 
 typedef list<input_t> sequence_in_t;
 typedef list<output_t> sequence_out_t;
