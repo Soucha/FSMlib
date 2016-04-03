@@ -22,14 +22,45 @@
 DFSM * fsm, *fsm2;
 wchar_t message[200];
 
+using namespace FSMsequence;
+
+static void printSeqSet(sequence_set_t& seqSet) {
+	for (auto seq : seqSet) {
+		cout << FSMmodel::getInSequenceAsString(seq) << endl;
+	}
+	cout << endl;
+}
+
 int main(int argc, char** argv) {
-	DFSM dfsm;
-	fsm = &dfsm;
-	fsm->generate(5, 3, 2);
-	auto fn = fsm->writeDOTfile("../data/");
-	cout << fn << endl;
-	int rv = system((string("dot -Tjpg") + string(" -O ") + fn).c_str());
-	cout << rv << endl;
+	Moore moore;
+	fsm = &moore;
+	if (!fsm->load("../data/tests/sequences/Moore_R6_ADS.fsm")) return 1;
+	sequence_set_t outCSet;
+	cout << "filter prefix: YES, no reduction" << endl;
+	getCharacterizingSet(fsm, outCSet);
+	printSeqSet(outCSet);
+	outCSet.clear();
+	cout << "filter prefix: NO, no reduction" << endl; 
+	getCharacterizingSet(fsm, outCSet, false);
+	printSeqSet(outCSet);
+	outCSet.clear();
+	cout << "filter prefix: YES, LS_SL" << endl; 
+	getCharacterizingSet(fsm, outCSet, true, reduceCSet_LS_SL);
+	printSeqSet(outCSet);
+	outCSet.clear();
+	cout << "filter prefix: NO, LS_SL" << endl; 
+	getCharacterizingSet(fsm, outCSet, false, reduceCSet_LS_SL);
+	printSeqSet(outCSet);
+	outCSet.clear();
+	cout << "filter prefix: YES, EqualLength" << endl; 
+	getCharacterizingSet(fsm, outCSet, true, reduceCSet_EqualLength);
+	printSeqSet(outCSet);
+	outCSet.clear();
+	cout << "filter prefix: NO, EqualLength" << endl; 
+	getCharacterizingSet(fsm, outCSet, false, reduceCSet_EqualLength);
+	printSeqSet(outCSet);
+	outCSet.clear();
+
 	char c;
 	cin >> c;
 	return 0;

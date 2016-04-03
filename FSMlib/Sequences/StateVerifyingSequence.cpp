@@ -40,6 +40,8 @@ namespace FSMsequence {
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
 	bool getStateVerifyingSequence(DFSM * fsm, state_t state, sequence_in_t & outSVS) {
+		outSVS.clear();
+		
 		block_t states;
 		output_t output;
 		states.clear();
@@ -53,7 +55,6 @@ namespace FSMsequence {
 			}
 			// has state unique output?
 			if (states.size() == 1) {
-				outSVS.clear();
 				outSVS.push_back(STOUT_INPUT);
 				return true;
 			}

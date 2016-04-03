@@ -63,6 +63,9 @@
     <ClInclude Include="Sequences\FSMsequence.h">
       <Filter>Header Files\Sequences</Filter>
     </ClInclude>
+    <ClInclude Include="PrefixSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -109,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="Sequences\HomingSequence.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\CharacterizingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefixSet.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

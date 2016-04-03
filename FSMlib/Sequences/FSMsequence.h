@@ -78,7 +78,8 @@ namespace FSMsequence {
 	/**
 	* Finds state verifying sequences for all states of FSM.<br>
 	* If some state has not SVS,
-	* input sequence in output vector will be empty.<br><br>
+	* input sequence in output vector will be empty.<br>
+	* Sequence outVSet[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).<br>
 	* Applying SVS distinguishes related state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param outVSet
@@ -92,27 +93,42 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @param state
 	* @param outSCSet
+	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true
+	* @param reduceFunc - a pointer to function that can reduce the size of resulted SCSet additionally,
+	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
+	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getStateCharacterizingSet(DFSM * dfsm, state_t state, sequence_set_t & outSCSet);
+	FSMLIB_API void getStateCharacterizingSet(DFSM * dfsm, state_t state, sequence_set_t & outSCSet, bool filterPrefixes = true,
+		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds state characterizing sets for all states of FSM.<br>
-	* Output vector will have length of number of states.
+	* Output vector will have length of the number of states.<br>
+	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param outSCSets
+	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
+	* @param reduceFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
+	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
+	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getStatesCharacterizingSets(DFSM * dfsm, vector<sequence_set_t> & outSCSets);
+	FSMLIB_API void getStatesCharacterizingSets(DFSM * dfsm, vector<sequence_set_t> & outSCSets, bool filterPrefixes = true,
+		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds state characterizing sets for all states of FSM<br>
 	* such that each pair of sets contains <br>
 	* same separating sequence of related states.<br>
 	* Result is thus a family of harmonized state identifiers.
-	* Output vector will have length of the number of states.
+	* Output vector will have length of the number of states.<br>
+	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param outHarmSCSets
+	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
+	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
 	*/
-	FSMLIB_API void getHarmonizedStateIdentifiers(DFSM * dfsm, vector<sequence_set_t> & outSCSets);
+	FSMLIB_API void getHarmonizedStateIdentifiers(DFSM * dfsm, vector<sequence_set_t> & outSCSets, bool filterPrefixes = true,
+		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds characterizing set for FSM.<br>
@@ -120,8 +136,13 @@ namespace FSMsequence {
 	* Applying all of sequences distinguishes each state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param outCSet
+	* @param filterPrefixes - no sequence of resulted CSet is a prefix of another one if true
+	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally,
+	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
+	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getCharacterizingSet(DFSM * dfsm, sequence_set_t & outCSet);
+	FSMLIB_API void getCharacterizingSet(DFSM * dfsm, sequence_set_t & outCSet, bool filterPrefixes = true,
+		void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
 
 	/**
 	* Finds synchronizing sequence of FSM if exists.<br><br>
@@ -146,15 +167,16 @@ namespace FSMsequence {
 	* Fills given seq table with the shortest possible sequences
 	* that distinguish related pairs of states.\n
 	*
-	* Pair (i,j) has index in seq derived from:\n
-	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2\n
-	* &nbsp; (1,2) => N-1,...\n
-	* &nbsp; N is number of states and for each (i,j): i<j\n
+	* Pair (i,j) has index in seq derived from:
+	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
+	* &nbsp; (1,2) => N-1,...
+	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
+	* &nbsp; N is number of states and for each (i,j): i<j
 	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
 	* @param dfsm - Deterministic FSM
 	* @param seq
 	*/
-	FSMLIB_API void getStatePairsDistinguishingSequence(DFSM * dfsm, vector<sequence_in_t> & seq);
+	FSMLIB_API void getStatePairsShortestSeparatingSequences(DFSM * dfsm, vector<sequence_in_t> & seq);
 
 	/**
 	* Fills given Characterizing table with all possible distinguishing
@@ -173,9 +195,11 @@ namespace FSMsequence {
 	* @param outPDS - it is filled only if PDS_FOUND is returned
 	* @param outADS - it is filled when PDS_FOUND or ADS_FOUND is returned
 	* @param outVSet - it is filled with sequences for all states when
-	* PDS_FOUND, ADS_FOUND or SVS_FOUND is returned. However, if state has
-	* SVS, then it is set in the outVSet although only CSet_FOUND is returned
+	*   PDS_FOUND, ADS_FOUND or SVS_FOUND is returned. However, if a state has
+	*   SVS, then it is set in the outVSet although only CSet_FOUND is returned.
+	*   Sequence outVSet[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param outSCSets - it is always filled
+	*   Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param outCSet - it is always filled
 	* @return type of the strongest found sequence, i.e. PDS_FOUND,
 	* ADS_FOUND, SVS_FOUND or CSet_FOUND
@@ -183,4 +207,84 @@ namespace FSMsequence {
 	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, AdaptiveDS* & outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet);
 
+	/**
+	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).
+	* @param states = fsm->getStates()
+	* @param stateId that is in states
+	* @return index of stateId in states, or NULL_STATE if missing
+	*/
+	FSMLIB_API state_t getIdx(vector<state_t>& states, state_t stateId);
+
+	/**
+	* Reduces the number of sequences in given Characterizing set.
+	* At first, it goes from longer sequences to shorter ones
+	* and removes unused ones (that don't distinguish any yet undistinguished pair of states).
+	* Next it goes from shorter to longer sequences in the set
+	* and again removes unused ones, or some distinguishable sequences could be shortened
+	* so it truncates these sequences as much as possible.
+	* @param dfsm
+	* @param outCSet
+	*/
+	FSMLIB_API void reduceCSet_LS_SL(DFSM * dfsm, sequence_set_t & outCSet);
+	
+	/**
+	* Reduces the number of sequence in given Characterizing set.
+	* It chooses gradually a sequence of equally long sequences that
+	* distinguishes most state pairs with the last symbol.
+	* Sequences that do not distinguish any yet undistinguished pair of states are removed.
+	*
+	* CSet is expected to be sorted by length of sequences, and
+	* no sequence should begin with STOUT_INPUT besides the first one
+	* that contains only STOUT_INPUT and fsm->isOutputState() holds.
+	*
+	* For each state pair, CSet needs to contain a sequence that particular state pair in the last symbol
+	* because this function does not truncate given characterizing sequences.
+	* @param dfsm
+	* @param outCSet - CSet of given state to reduce (output set as well)
+	*/
+	FSMLIB_API void reduceCSet_EqualLength(DFSM* dfsm, sequence_set_t & outCSet);
+	
+	/**
+	* Reduces the number of sequences in given State Characterizing set.
+	* It goes from longer sequences to shorter ones
+	* and removes unused ones (that don't distinguish any yet undistinguished pair of states).
+	* @param dfsm
+	* @param stateIdx - index of state in fsm->getStates()
+	* @param outSCSet - SCSet of given state to reduce (output set as well)
+	*/
+	FSMLIB_API void reduceSCSet_LS(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	
+	/**
+	* Reduces the number of sequences in given State Characterizing set.
+	* At first, it goes from longer sequences to shorter one
+	* and removes unused ones
+	* (that don't distinguish any yet undistinguished pair of states).
+	* Next it goes from shorter to longer sequences in set
+	* and again removes unused or some distinguishable sequence could be shortened
+	* so it truncated these sequences as much as possible.
+	* @param dfsm
+	* @param stateIdx - index of state in fsm->getStates()
+	* @param outSCSet - SCSet of given state to reduce (output set as well)
+	*/
+	FSMLIB_API void reduceSCSet_LS_SL(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	
+	/**
+	* Reduces the number of sequence in given State Characterizing set.
+	* It chooses gradually a sequence of equally long sequences that
+	* distinguishes most state pairs with the last symbol.
+	* Sequences that do not distinguish any yet undistinguished pair of states are removed.
+	*
+	* SCSet is expected to be sorted by length of sequences, and
+	* no sequence should begin with STOUT_INPUT besides the first one
+	* that contains only STOUT_INPUT and fsm->isOutputState() holds.
+	* 
+	* For each state pair, SCSet needs to contain a sequence that particular state pair in the last symbol
+	* because this function does not truncate given characterizing sequences.
+	* @param dfsm
+	* @param stateIdx - index of state in fsm->getStates()
+	* @param outSCSet - SCSet of given state to reduce (output set as well)
+	*/
+	FSMLIB_API void reduceSCSet_EqualLength(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	
+	
 }

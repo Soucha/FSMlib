@@ -91,6 +91,20 @@ struct seqcomp {
 	* shorter fisrt, then lexigraphically by their content
 	*/
 	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
+		if (ls.front() == STOUT_INPUT)
+			if (rs.front() == STOUT_INPUT)
+				if (ls.size() != rs.size()) return ls.size() < rs.size();
+				else return ls < rs;
+			else if (ls.size() - 1 != rs.size()) return (ls.size() - 1) < rs.size();
+			else return true;// TODO: like ls.pop_front() and return ls < rs;
+		else if (rs.front() == STOUT_INPUT)
+			if (ls.size() != rs.size() - 1) return ls.size() < (rs.size() - 1);
+			else return false;// TODO: like rs.pop_front() and return ls < rs;
+		else if (ls.size() != rs.size()) return ls.size() < rs.size();
+		else return ls < rs;
+	}
+	/* the first version
+	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
 		if (ls.size() != rs.size()) return ls.size() < rs.size();
 		if (ls.front() == STOUT_INPUT)
 			if (rs.front() == STOUT_INPUT)
@@ -100,6 +114,7 @@ struct seqcomp {
 			return false;
 		else return ls < rs;
 	}
+	*/
 };
 
 typedef vector<sequence_in_t> sequence_vec_t;

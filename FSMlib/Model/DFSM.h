@@ -147,7 +147,7 @@ public:
 	bool minimize();
 
 	/**
-	* @return a colection of state IDs in use
+	* @return a sorted colection of state IDs in use
 	*/
 	vector<state_t> getStates();
 

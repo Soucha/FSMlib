@@ -80,6 +80,12 @@
     <ClCompile Include="Sequences\HS.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="PrefixSetTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\SCSet.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

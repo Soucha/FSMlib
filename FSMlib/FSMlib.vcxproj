@@ -147,6 +147,7 @@
     <ClInclude Include="Model\FSMtypes.h" />
     <ClInclude Include="Model\Mealy.h" />
     <ClInclude Include="Model\Moore.h" />
+    <ClInclude Include="PrefixSet.h" />
     <ClInclude Include="Sequences\FSMsequence.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -172,7 +173,9 @@
     <ClCompile Include="Model\FSMmodel.cpp" />
     <ClCompile Include="Model\Mealy.cpp" />
     <ClCompile Include="Model\Moore.cpp" />
+    <ClCompile Include="PrefixSet.cpp" />
     <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp" />
+    <ClCompile Include="Sequences\CharacterizingSequences.cpp" />
     <ClCompile Include="Sequences\DistinguishingSequence.cpp" />
     <ClCompile Include="Sequences\FSMcovers.cpp" />
     <ClCompile Include="Sequences\HomingSequence.cpp" />

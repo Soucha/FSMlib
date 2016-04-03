@@ -23,6 +23,8 @@
 
 #include "Model\FSMmodel.h"
 #include "Sequences\FSMsequence.h"
+
+#include "PrefixSet.h"
 #endif
 
 namespace FSMlib {
