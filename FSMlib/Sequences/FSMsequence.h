@@ -18,6 +18,58 @@
 
 #include "../Model/FSMmodel.h"
 
+struct seqcomp {
+	/**
+	* Compares two input sequences firstly by their length,
+	* shorter fisrt, then lexigraphically by their content
+	*/
+	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
+		if (ls.empty() || rs.empty()) return ls.size() < rs.size();
+		if (ls.front() == STOUT_INPUT)
+			if (rs.front() == STOUT_INPUT)
+				if (ls.size() != rs.size()) return ls.size() < rs.size();
+				else return ls < rs;
+			else if (ls.size() - 1 != rs.size()) return (ls.size() - 1) < rs.size();
+			else return true;// TODO: like ls.pop_front() and return ls < rs;
+		else if (rs.front() == STOUT_INPUT)
+			if (ls.size() != rs.size() - 1) return ls.size() < (rs.size() - 1);
+			else return false;// TODO: like rs.pop_front() and return ls < rs;
+		else if (ls.size() != rs.size()) return ls.size() < rs.size();
+		else return ls < rs;
+	}
+	/* the first version
+	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
+	if (ls.size() != rs.size()) return ls.size() < rs.size();
+	if (ls.front() == STOUT_INPUT)
+	if (rs.front() == STOUT_INPUT)
+	return ls < rs;
+	else return true;
+	else if (rs.front() == STOUT_INPUT)
+	return false;
+	else return ls < rs;
+	}
+	*/
+};
+
+typedef vector<sequence_in_t> sequence_vec_t;
+typedef set<sequence_in_t, seqcomp> sequence_set_t;
+
+struct AdaptiveDS {
+	sequence_in_t input;
+	vector<state_t> initialStates, currentStates;
+	map<output_t, AdaptiveDS*> decision;
+};
+
+struct LinkCell {
+	int minLen = -1;
+	vector<state_t> next;
+};
+
+#define PDS_FOUND       1
+#define ADS_FOUND       2
+#define SVS_FOUND       3
+#define CSet_FOUND      4
+
 namespace FSMsequence {
 	/**
 	* Fills given set with input sequences that cover states.
@@ -160,6 +212,8 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @param state
 	* @param outSCSet
+	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
+	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
@@ -175,6 +229,8 @@ namespace FSMsequence {
 	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param outSCSets
+	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
+	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
@@ -193,6 +249,8 @@ namespace FSMsequence {
 	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param outHarmSCSets
+	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
+	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
 	*/
@@ -206,6 +264,8 @@ namespace FSMsequence {
 	* Applying all of sequences distinguishes each state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param outCSet
+	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
+	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted CSet is a prefix of another one if true
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
@@ -234,11 +294,6 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API bool getPresetHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
 
-#define PDS_FOUND       1
-#define ADS_FOUND       2
-#define SVS_FOUND       3
-#define CSet_FOUND      4
-
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>
 	* PDS and ADS don't be the shortest.<br><br>
@@ -253,13 +308,22 @@ namespace FSMsequence {
 	* @param outSCSets - it is always filled
 	*   Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param outCSet - it is always filled
-	* @return type of the strongest found sequence, i.e. PDS_FOUND,
-	* ADS_FOUND, SVS_FOUND or CSet_FOUND
+	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
+	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true, same for CSet
+	* @param reduceSCSetFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
+	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
+	*			- NOTE that some require not to filter prefixes
+	* @param reduceCSetFunc - a pointer to function that can reduce the size of resulted CSet additionally,
+	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
+	*			- NOTE that some require not to filter prefixes
+	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND
 	*/
 	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, AdaptiveDS* & outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true);
+		bool filterPrefixes = true, void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL,
+		void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).

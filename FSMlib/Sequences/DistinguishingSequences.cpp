@@ -42,7 +42,7 @@ namespace FSMsequence {
 
 	struct block_node_t {
 		block_t states;
-		seq_len_t h; // min input symbol to distinguish states
+		seq_len_t h; // min length of input sequence to distinguish states
 		vector<in_out_bn_ref_t> succ;
 	};
 
@@ -75,7 +75,7 @@ namespace FSMsequence {
 
 	struct node_svs_t {
 		block_t states;
-		seq_len_t h; // min input symbol to distinguish states
+		seq_len_t h; // min length of input sequence to distinguish states
 		state_t actState;
 		sequence_in_t svs;
 	};
@@ -121,7 +121,7 @@ namespace FSMsequence {
 			for (j++; j != node->states.end(); j++) {
 				idx = *i * N + *j - 1 - (*i * (*i + 3)) / 2;
 				if (node->h < seq[idx].size()) {
-					node->h = seq[idx].size();
+					node->h = seq_len_t(seq[idx].size());
 				}
 			}
 		}
@@ -134,13 +134,13 @@ namespace FSMsequence {
 			if (*i < state) {
 				idx = *i * N + state - 1 - (*i * (*i + 3)) / 2;
 				if (node->h < seq[idx].size()) {
-					node->h = seq[idx].size();
+					node->h = seq_len_t(seq[idx].size());
 				}
 			}
 			else if (*i > state) {
 				idx = state * N + *i - 1 - (state * (state + 3)) / 2;
 				if (node->h < seq[idx].size()) {
-					node->h = seq[idx].size();
+					node->h = seq_len_t(seq[idx].size());
 				}
 			}
 		}
@@ -148,7 +148,7 @@ namespace FSMsequence {
 
 	static inline void setHeuristic(node_pds_t* node) {
 		node->value *= WEIGHT;
-		node->value += node->ds.size();
+		node->value += seq_len_t(node->ds.size());
 	}
 
 	static void printState(state_t state) {
@@ -177,8 +177,10 @@ namespace FSMsequence {
 		sequence_set_t & outSCSet, bool filterPrefixes = false);
 
 	int getDistinguishingSequences(DFSM * fsm, sequence_in_t& outPDS, AdaptiveDS*& outADS,
-		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq), bool filterPrefixes) {
+			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
+			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq), bool filterPrefixes,
+			void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet),
+			void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet)) {
 		state_t M, N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
 		M = ((N - 1) * N) / 2;
@@ -200,6 +202,8 @@ namespace FSMsequence {
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
 			getSCSet(seq, i, N, outSCSets[i], filterPrefixes);
+			if (*reduceSCSetFunc != NULL)
+				(*reduceSCSetFunc)(fsm, i, outSCSets[i]);
 		}
 		
 		// CSet
@@ -216,6 +220,8 @@ namespace FSMsequence {
 				outCSet.insert(seq[i]);
 			}
 		}
+		if (*reduceCSetFunc != NULL)
+			(*reduceCSetFunc)(fsm, outCSet);
 
 		// ADS
 		bool hasADS = getAdaptiveDistinguishingSequence(fsm, outADS);
@@ -240,7 +246,7 @@ namespace FSMsequence {
 			rootBN->h = 0;
 			for (state_t i = 0; i < seq.size(); i++) {
 				if (rootBN->h < seq[i].size()) {// maximal length of separating sequences
-					rootBN->h = seq[i].size();
+					rootBN->h = seq_len_t(seq[i].size());
 				}
 			}
 			allBN.insert(rootBN);
@@ -391,7 +397,7 @@ namespace FSMsequence {
 						break;
 					}
 					else if (minValidInput > (*pIt)->succ.size()) {
-						minValidInput = (*pIt)->succ.size();
+						minValidInput = input_t((*pIt)->succ.size());
 						hookBN = *pIt;
 					}
 				}

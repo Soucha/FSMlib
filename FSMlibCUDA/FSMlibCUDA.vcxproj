@@ -193,7 +193,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClCompile Include="..\FSMlib\PrefixSet.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\AdaptiveDistinguishingSequence.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\CharacterizingSequences.cpp" />
-    <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequence.cpp" />
+    <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequences.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\FSMcovers.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\HomingSequence.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\PresetDistinguishingSequence.cpp" />

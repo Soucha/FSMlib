@@ -103,9 +103,6 @@
     <ClCompile Include="..\FSMlib\Sequences\CharacterizingSequences.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
-    <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequence.cpp">
-      <Filter>Source Files\Sequences</Filter>
-    </ClCompile>
     <ClCompile Include="..\FSMlib\Sequences\FSMcovers.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
@@ -119,6 +116,9 @@
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
     <ClCompile Include="..\FSMlib\Sequences\SynchronizingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequences.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
   </ItemGroup>
