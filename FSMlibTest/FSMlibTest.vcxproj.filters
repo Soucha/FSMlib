@@ -86,6 +86,9 @@
     <ClCompile Include="Sequences\SCSet.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="Sequences\SeparatingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

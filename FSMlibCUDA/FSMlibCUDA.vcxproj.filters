@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="..\FSMlib\Sequences\SeparatingSequences_Parallel.cu">
+      <Filter>Source Files\Sequences</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\FSMlib\prescan.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ad08d99d-fed8-4410-ab34-9eb5f24f99b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{6318247b-9f53-40db-84f2-82a3a3a5d9f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sequences">
+      <UniqueIdentifier>{685a5630-b423-4fb7-b343-9f0f90acb1a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{3e570a06-b02f-47d3-9aa5-e0f7d16cb166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b4f8c1e2-1eca-4a3e-bf65-2528daa57f1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{3cedec78-04a8-4dcb-adc3-60147b45218e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sequences">
+      <UniqueIdentifier>{68ea5792-e7c0-410b-a035-912ce7fe9948}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\FSMlib\FSMlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\PrefixSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\DFA.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\DFSM.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\FSM.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\FSMmodel.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\FSMtypes.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\Mealy.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Model\Moore.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Sequences\FSMsequence.h">
+      <Filter>Header Files\Sequences</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\FSMlib\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\FSMlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\PrefixSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Model\DFA.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Model\DFSM.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Model\FSMmodel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Model\Mealy.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Model\Moore.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\AdaptiveDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\CharacterizingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\FSMcovers.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\HomingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\PresetDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\StateVerifyingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\SynchronizingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\FSMvis.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\FSMlib\ReadMe.txt" />
+  </ItemGroup>
+</Project>

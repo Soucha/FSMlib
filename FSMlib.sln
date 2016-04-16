@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlibTest", "FSMlibTest\FS
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMdevel", "FSMdevel\FSMdevel.vcxproj", "{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlibCUDA", "FSMlibCUDA\FSMlibCUDA.vcxproj", "{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -53,6 +55,18 @@ Global
 		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Win32.ActiveCfg = Release|Win32
 		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|Win32.Build.0 = Release|Win32
 		{C8DF8184-74AF-4257-AF9E-507FAF10EBA7}.Release|x64.ActiveCfg = Release|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|Win32.Build.0 = Debug|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|x64.ActiveCfg = Debug|x64
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Debug|x64.Build.0 = Debug|x64
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|Win32.ActiveCfg = Release|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|Win32.Build.0 = Release|Win32
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|x64.ActiveCfg = Release|x64
+		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

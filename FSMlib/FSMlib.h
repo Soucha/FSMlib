@@ -21,6 +21,10 @@
 #else
 #define FSMLIB_API __declspec(dllimport)
 
+#ifdef __CUDA_ARCH__
+#define PARALLEL_COMPUTING
+#endif
+
 #include "Model\FSMmodel.h"
 #include "Sequences\FSMsequence.h"
 

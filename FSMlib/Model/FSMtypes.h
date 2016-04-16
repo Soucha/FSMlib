@@ -91,6 +91,7 @@ struct seqcomp {
 	* shorter fisrt, then lexigraphically by their content
 	*/
 	bool operator() (const sequence_in_t& ls, const sequence_in_t& rs) const {
+		if (ls.empty() || rs.empty()) return ls.size() < rs.size();
 		if (ls.front() == STOUT_INPUT)
 			if (rs.front() == STOUT_INPUT)
 				if (ls.size() != rs.size()) return ls.size() < rs.size();

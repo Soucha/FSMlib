@@ -16,10 +16,15 @@
 */
 #pragma once
 
-#include "CppUnitTest.h"
-#include "../FSMlib/FSMlib.h"
 #include <iostream>
 #include <stdarg.h>
+#include "CppUnitTest.h"
+
+#ifndef PARALLEL_COMPUTING
+#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
+#endif // !PARALLEL_COMPUTING
+
+#include "../FSMlib/FSMlib.h"
 
 using namespace std;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

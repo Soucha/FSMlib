@@ -178,6 +178,11 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API void getStatePairsShortestSeparatingSequences(DFSM * dfsm, vector<sequence_in_t> & seq);
 
+#ifdef PARALLEL_COMPUTING
+	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * dfsm, vector<sequence_in_t> & seq);
+	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * dfsm, vector<sequence_in_t> & seq);
+#endif
+
 	/**
 	* Fills given Characterizing table with all possible distinguishing
 	* inputs for each state pair. A distinguishing input points to successive
