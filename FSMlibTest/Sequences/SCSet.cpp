@@ -39,7 +39,7 @@ namespace FSMlibTest
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			//*
+			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm");
@@ -48,7 +48,7 @@ namespace FSMlibTest
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_PDS.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_SS.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm");
-			//*/
+			/*/
 			groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
@@ -62,7 +62,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
-			//*
+			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");
@@ -91,10 +91,10 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
-			testGetStatesCharacterizingSets("");
-			testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
-			testGetHarmonizedStateIdentifiers("");
-			testGetSeparatingSequences("");
+			//testGetStatesCharacterizingSets("");
+			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
+			//testGetHarmonizedStateIdentifiers("");
+			//testGetSeparatingSequences("");
 		}
 
 		void testSCSet(state_t stateIdx, sequence_set_t& sCSet) {
@@ -141,14 +141,14 @@ namespace FSMlibTest
 			if (!filename.empty()) fsm->load(filename);
 			sequence_set_t sCSet;
 			vector<state_t> states = fsm->getStates();
-			getStateCharacterizingSet(fsm, states[stateIdx], sCSet, false, reduceSCSet_EqualLength);
+			getStateCharacterizingSet(fsm, states[stateIdx], sCSet, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 			testSCSet(stateIdx, sCSet);
 		}
 
 		void testGetStatesCharacterizingSets(string filename) {
 			if (!filename.empty()) fsm->load(filename);
 			vector<sequence_set_t> sCSets;
-			getStatesCharacterizingSets(fsm, sCSets, false, reduceSCSet_EqualLength);
+			getStatesCharacterizingSets(fsm, sCSets, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 			for (state_t i = 0; i < fsm->getNumberOfStates(); i++) {
 				testSCSet(i, sCSets[i]);
 			}
@@ -157,7 +157,7 @@ namespace FSMlibTest
 		void testGetCharacterizingSet(string filename) {
 			if (!filename.empty()) fsm->load(filename);
 			sequence_set_t CSet;
-			getCharacterizingSet(fsm, CSet, false, reduceCSet_LS_SL);
+			getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences_ParallelQueue, false, reduceCSet_LS_SL);
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
 			vector<state_t> states = fsm->getStates();

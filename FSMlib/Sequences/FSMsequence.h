@@ -87,6 +87,73 @@ namespace FSMsequence {
 	FSMLIB_API void getVerifyingSet(DFSM * dfsm, sequence_vec_t & outVSet);
 
 	/**
+	* Fills given seq table with the shortest possible sequences
+	* that distinguish related pairs of states.\n
+	*
+	* State pair (i,j) has index in seq derived from:
+	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
+	* &nbsp; (1,2) => N-1,...
+	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
+	* &nbsp; N is number of states and for each (i,j): i<j
+	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	*
+	* @param dfsm - Deterministic FSM
+	* @param seq - a collection of shortest separating sequences for each state pair
+	*/
+	FSMLIB_API void getStatePairsShortestSeparatingSequences(DFSM * dfsm, vector<sequence_in_t> & seq);
+
+#ifdef PARALLEL_COMPUTING
+	/**
+	* Fills given seq table with the shortest possible sequences
+	* that distinguish related pairs of states.\n
+	*
+	* State pair (i,j) has index in seq derived from:
+	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
+	* &nbsp; (1,2) => N-1,...
+	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
+	* &nbsp; N is number of states and for each (i,j): i<j
+	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	*
+	* A thread distinguishes one state pair by a different output on a common input in the first run
+	* or in a consecutive run if its next states' pair is distinguished.
+	*
+	* @param dfsm - Deterministic FSM
+	* @param seq - a collection of shortest separating sequences for each state pair, or empty collection if there is an error
+	*/
+	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * dfsm, vector<sequence_in_t> & seq);
+
+	/**
+	* Fills given seq table with the shortest possible sequences
+	* that distinguish related pairs of states.\n
+	*
+	* State pair (i,j) has index in seq derived from:
+	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
+	* &nbsp; (1,2) => N-1,...
+	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
+	* &nbsp; N is number of states and for each (i,j): i<j
+	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	*
+	* At first, a thread distinguishes one state pair if it produces different outputs on an input.
+	* Otherwise, a link from next states' pair is created.
+	* Links are stored in memory in the third run after prescan counts required space.
+	* Finally, a queue of distinguished pairs distinguishes previous state pairs, again a thread per state pair.
+	*
+	* @param dfsm - Deterministic FSM
+	* @param seq - a collection of shortest separating sequences for each state pair, or empty collection if there is an error
+	*/
+	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * dfsm, vector<sequence_in_t> & seq);
+#endif
+
+	/**
+	* Fills given Characterizing table with all possible distinguishing
+	* inputs for each state pair. A distinguishing input points to successive
+	* state pair.
+	* @param dfsm - Deterministic FSM
+	* @param seq
+	*/
+	FSMLIB_API void getSeparatingSequences(DFSM * dfsm, vector<LinkCell*> & seq);
+
+	/**
 	* Finds state characterizing set for given state.<br>
 	* Such a set always exists!<br><br>
 	* Applying all of sequences distinguishes state from the others.
@@ -98,8 +165,9 @@ namespace FSMsequence {
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getStateCharacterizingSet(DFSM * dfsm, state_t state, sequence_set_t & outSCSet, bool filterPrefixes = true,
-		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+	FSMLIB_API void getStateCharacterizingSet(DFSM * dfsm, state_t state, sequence_set_t & outSCSet, 
+		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds state characterizing sets for all states of FSM.<br>
@@ -112,8 +180,9 @@ namespace FSMsequence {
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getStatesCharacterizingSets(DFSM * dfsm, vector<sequence_set_t> & outSCSets, bool filterPrefixes = true,
-		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+	FSMLIB_API void getStatesCharacterizingSets(DFSM * dfsm, vector<sequence_set_t> & outSCSets, 
+		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds state characterizing sets for all states of FSM<br>
@@ -127,8 +196,9 @@ namespace FSMsequence {
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
 	*/
-	FSMLIB_API void getHarmonizedStateIdentifiers(DFSM * dfsm, vector<sequence_set_t> & outSCSets, bool filterPrefixes = true,
-		void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+	FSMLIB_API void getHarmonizedStateIdentifiers(DFSM * dfsm, vector<sequence_set_t> & outSCSets, 
+		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
 
 	/**
 	* Finds characterizing set for FSM.<br>
@@ -141,8 +211,9 @@ namespace FSMsequence {
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	*/
-	FSMLIB_API void getCharacterizingSet(DFSM * dfsm, sequence_set_t & outCSet, bool filterPrefixes = true,
-		void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
+	FSMLIB_API void getCharacterizingSet(DFSM * dfsm, sequence_set_t & outCSet, 
+		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
 
 	/**
 	* Finds synchronizing sequence of FSM if exists.<br><br>
@@ -162,35 +233,6 @@ namespace FSMsequence {
 	* @return true if FSM has HS, false otherwise
 	*/
 	FSMLIB_API bool getPresetHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
-
-	/**
-	* Fills given seq table with the shortest possible sequences
-	* that distinguish related pairs of states.\n
-	*
-	* Pair (i,j) has index in seq derived from:
-	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
-	* &nbsp; (1,2) => N-1,...
-	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
-	* &nbsp; N is number of states and for each (i,j): i<j
-	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
-	* @param dfsm - Deterministic FSM
-	* @param seq
-	*/
-	FSMLIB_API void getStatePairsShortestSeparatingSequences(DFSM * dfsm, vector<sequence_in_t> & seq);
-
-#ifdef PARALLEL_COMPUTING
-	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * dfsm, vector<sequence_in_t> & seq);
-	FSMLIB_API void getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * dfsm, vector<sequence_in_t> & seq);
-#endif
-
-	/**
-	* Fills given Characterizing table with all possible distinguishing
-	* inputs for each state pair. A distinguishing input points to successive
-	* state pair.
-	* @param dfsm - Deterministic FSM
-	* @param seq
-	*/
-	FSMLIB_API void getSeparatingSequences(DFSM * dfsm, vector<LinkCell*> & seq);
 
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>

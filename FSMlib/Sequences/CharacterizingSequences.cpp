@@ -415,10 +415,11 @@ namespace FSMsequence {
 		}
 	}
 
-	void getCharacterizingSet(DFSM * fsm, sequence_set_t & outCSet, bool filterPrefixes, 
-			void(*reduceFunc)(DFSM * fsm, sequence_set_t & outCSet)) {
+	void getCharacterizingSet(DFSM * fsm, sequence_set_t & outCSet, 
+			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq),
+			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, sequence_set_t & outCSet)) {
 		vector<sequence_in_t> seq;
-		getStatePairsShortestSeparatingSequences(fsm, seq);
+		(*getSeparatingSequences)(fsm, seq);
 		outCSet.clear();
 		if (filterPrefixes) {
 			FSMlib::PrefixSet pset;
@@ -619,10 +620,11 @@ namespace FSMsequence {
 			pset.getMaximalSequences(outSCSet);
 	}
 
-	void getStateCharacterizingSet(DFSM * fsm, state_t state, sequence_set_t & outSCSet, bool filterPrefixes,
-			void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	void getStateCharacterizingSet(DFSM * fsm, state_t state, sequence_set_t & outSCSet,
+			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq),
+			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		vector<sequence_in_t> seq;
-		getStatePairsShortestSeparatingSequences(fsm, seq);
+		(*getSeparatingSequences)(fsm, seq);
 		state_t stateIdx = getIdx(fsm->getStates(), state);
 		getSCSet(seq, stateIdx, fsm->getNumberOfStates(), outSCSet, filterPrefixes);
 		// try to reduce count of seqeunces
@@ -630,11 +632,12 @@ namespace FSMsequence {
 			(*reduceFunc)(fsm, stateIdx, outSCSet);
 	}
 
-	void getStatesCharacterizingSets(DFSM * fsm, vector<sequence_set_t> & outSCSets, bool filterPrefixes,
-			void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	void getStatesCharacterizingSets(DFSM * fsm, vector<sequence_set_t> & outSCSets,
+			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq),
+			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		vector<sequence_in_t> seq;
-		getStatePairsShortestSeparatingSequences(fsm, seq);
+		(*getSeparatingSequences)(fsm, seq);
 		outSCSets.clear();
 		outSCSets.resize(N);
 		// grab sequence from table seq incident with stateIdx i
@@ -646,11 +649,12 @@ namespace FSMsequence {
 		}
 	}
 
-	void getHarmonizedStateIdentifiers(DFSM * fsm, vector<sequence_set_t>& outSCSets, bool filterPrefixes,
-			void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	void getHarmonizedStateIdentifiers(DFSM * fsm, vector<sequence_set_t>& outSCSets, 
+			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq),
+			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		vector<sequence_in_t> seq;
-		getStatePairsShortestSeparatingSequences(fsm, seq);
+		(*getSeparatingSequences)(fsm, seq);
 		outSCSets.clear();
 		outSCSets.resize(N);
 		// grab sequence from table seq incident with state i
