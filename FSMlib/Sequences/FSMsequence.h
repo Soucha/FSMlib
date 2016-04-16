@@ -234,6 +234,11 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API bool getPresetHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
 
+#define PDS_FOUND       1
+#define ADS_FOUND       2
+#define SVS_FOUND       3
+#define CSet_FOUND      4
+
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>
 	* PDS and ADS don't be the shortest.<br><br>
@@ -252,7 +257,9 @@ namespace FSMsequence {
 	* ADS_FOUND, SVS_FOUND or CSet_FOUND
 	*/
 	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, AdaptiveDS* & outADS,
-		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet);
+		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
+		void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).

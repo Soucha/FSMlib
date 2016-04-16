@@ -5,6 +5,7 @@
 *.opensdf
 *.suo
 *.sdf
+*.pdb
 Debug
 Release
 

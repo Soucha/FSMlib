@@ -98,9 +98,6 @@
     <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
-    <ClCompile Include="Sequences\DistinguishingSequence.cpp">
-      <Filter>Source Files\Sequences</Filter>
-    </ClCompile>
     <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
@@ -118,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="PrefixSet.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\DistinguishingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

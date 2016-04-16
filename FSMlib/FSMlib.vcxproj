@@ -176,7 +176,7 @@
     <ClCompile Include="PrefixSet.cpp" />
     <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp" />
     <ClCompile Include="Sequences\CharacterizingSequences.cpp" />
-    <ClCompile Include="Sequences\DistinguishingSequence.cpp" />
+    <ClCompile Include="Sequences\DistinguishingSequences.cpp" />
     <ClCompile Include="Sequences\FSMcovers.cpp" />
     <ClCompile Include="Sequences\HomingSequence.cpp" />
     <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp" />

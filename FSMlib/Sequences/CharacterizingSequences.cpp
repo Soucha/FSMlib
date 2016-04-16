@@ -596,7 +596,7 @@ namespace FSMsequence {
 		}
 	}
 
-	static void getSCSet(vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N,
+	void getSCSet(vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N,
 		sequence_set_t & outSCSet, bool filterPrefixes = false) {
 		state_t idx;
 		outSCSet.clear();
