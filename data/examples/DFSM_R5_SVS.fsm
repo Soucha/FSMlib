@@ -1,0 +1,47 @@
+1 1
+5 2 2
+5
+0 0
+1 0
+2 0
+3 0
+4 1
+0	0	0
+1	0	0
+2	1	0
+3	1	0
+4	1	0
+0	2	4
+1	2	0
+2	4	1
+3	0	1
+4	3	3     
+
+PDS: NO
+
+ADS: NO
+
+State Verifying Set:
+0: S,1,S
+1: S,1,S,1,S
+2: S,0,S
+3: S,0,S
+4: S
+
+Characterizing Set:
+S,0,S
+1,S
+
+State Characterizing Sets:
+0: 1,S
+1: 0
+ 1,S
+2: 0,S
+3: S,0,S
+4: S
+
+HS:
+S,0,S
+
+SS:
+1,0,1,0,1

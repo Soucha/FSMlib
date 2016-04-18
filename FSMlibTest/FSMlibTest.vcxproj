@@ -197,6 +197,10 @@
     <None Include="..\data\examples\DFA_R4_SCSet.fsm" />
     <None Include="..\data\examples\DFA_R4_SS.fsm" />
     <None Include="..\data\examples\DFA_R5_SVS.fsm" />
+    <None Include="..\data\examples\DFSM_R4_ADS.fsm" />
+    <None Include="..\data\examples\DFSM_R4_SCSet.fsm" />
+    <None Include="..\data\examples\DFSM_R5_PDS.fsm" />
+    <None Include="..\data\examples\DFSM_R5_SVS.fsm" />
     <None Include="..\data\examples\Mealy_R4_ADS.fsm" />
     <None Include="..\data\examples\Mealy_R4_HS.fsm" />
     <None Include="..\data\examples\Mealy_R4_PDS.fsm" />

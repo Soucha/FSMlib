@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestSCSet_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestSCSet_Mealy)
@@ -86,15 +89,20 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
-			//testGetStatesCharacterizingSets("");
-			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
-			//testGetHarmonizedStateIdentifiers("");
-			//testGetSeparatingSequences("");
+			testGetStatesCharacterizingSets("");
+			testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
+			testGetHarmonizedStateIdentifiers("");
+			testGetSeparatingSequences("");
 		}
 
 		void testSCSet(state_t stateIdx, sequence_set_t& sCSet) {
@@ -157,7 +165,7 @@ namespace FSMlibTest
 		void testGetCharacterizingSet(string filename) {
 			if (!filename.empty()) fsm->load(filename);
 			sequence_set_t CSet;
-			getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences_ParallelQueue, false, reduceCSet_LS_SL);
+			getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
 			vector<state_t> states = fsm->getStates();

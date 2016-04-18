@@ -272,5 +272,17 @@
       <Filter>Resource Files\sequences</Filter>
     </None>
     <None Include="FSMlibTest.runsettings" />
+    <None Include="..\data\examples\DFSM_R4_SCSet.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFSM_R5_SVS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFSM_R4_ADS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\examples\DFSM_R5_PDS.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
   </ItemGroup>
 </Project>

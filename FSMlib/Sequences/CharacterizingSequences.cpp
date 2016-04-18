@@ -125,6 +125,7 @@ namespace FSMsequence {
 				idx = i * N + j - 1 - (i * (i + 3)) / 2;
 				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
 					seq[idx]->minLen = 1;// to correspond that STOUT_INPUT needs to be applied
+					unchecked.push(idx);
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
@@ -137,7 +138,7 @@ namespace FSMsequence {
 					else {
 						nextStateI = fsm->getNextState(states[i], input);
 						nextStateJ = fsm->getNextState(states[j], input);
-						// there are no transition -> same next state = NULL_STATE
+						// there are no transitions -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
 							nextStateI = getIdx(states, nextStateI);

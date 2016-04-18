@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestSVS_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", 1, 0);
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestSVS_Mealy)
@@ -86,7 +89,12 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", 1, 0);
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			testGetVerifyingSet(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 		void testGetStateVerifyingS(state_t state, sequence_in_t& sVS, bool hasVS = true) {

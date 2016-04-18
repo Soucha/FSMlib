@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestHS_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestHS_Mealy)
@@ -86,7 +89,12 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 		void testGetPresetHomingS(string filename, bool hasHS = true) {
@@ -158,6 +166,7 @@ namespace FSMlibTest
 				ARE_EQUAL(false, hasHS, "FSM has preset DS but it was not found.");
 				ARE_EQUAL(true, pHS.empty(), "FSM has not preset DS but sequence %s was returned.",
 					FSMmodel::getInSequenceAsString(pHS).c_str());
+				DEBUG_MSG("HS of %s: NO\n", filename.c_str());
 			}
 		}
 	};

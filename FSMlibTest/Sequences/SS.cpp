@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestSS_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestSS_Mealy)
@@ -86,7 +89,13 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm", false);
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
+
 		}
 
 		void testGetSynchronizingS(string filename, bool hasSS = true) {
@@ -131,6 +140,7 @@ namespace FSMlibTest
 				ARE_EQUAL(false, hasSS, "FSM has SS but it was not found.");
 				ARE_EQUAL(true, sS.empty(), "FSM has not SS but sequence %s was returned.",
 					FSMmodel::getInSequenceAsString(sS).c_str());
+				DEBUG_MSG("SS of %s: NO\n", filename.c_str());
 			}
 		}
 

@@ -187,7 +187,7 @@ namespace FSMsequence {
 		vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// + 1 for DEFAULT_OUTPUT
 		output_t output;
 		list<output_t> actOutputs;
-		bool stop;
+		bool stop, stoutUsed;
 		vector<state_t> states = fsm->getStates();
 		vector<sequence_in_t> seq(M);
 
@@ -243,6 +243,7 @@ namespace FSMsequence {
 			for (state_t i = 0; i < N; i++) {
 				rootBN->states.insert(i);
 			}
+			// like initH(rootBN, seq, N);
 			rootBN->h = 0;
 			for (state_t i = 0; i < seq.size(); i++) {
 				if (rootBN->h < seq[i].size()) {// maximal length of separating sequences
@@ -356,7 +357,7 @@ namespace FSMsequence {
 							}
 							if (!actOutputs.empty()) {
 								outOnIn.clear();
-								// save block with more then one state or clear sameOutput if stop
+								// save block with more then one state
 								for (list<output_t>::iterator outIt = actOutputs.begin(); outIt != actOutputs.end(); outIt++) {
 									if (!sameOutput[*outIt].empty()) {
 										succBN = new block_node_t;
@@ -380,6 +381,43 @@ namespace FSMsequence {
 										FSMutils::getInSequenceAsString(outVSet[*sameOutput[*outIt].begin()]).c_str());
 										}*/
 										sameOutput[*outIt].clear();
+
+										if (fsm->isOutputState() && succBN->succ.empty() && (succBN->states.size() > 1)) {
+											// TODO some block could be checked several times
+											vector<out_bn_ref_t> outOnSTOUT;
+											for (state_t i : succBN->states) {
+												stop = false;
+												output = fsm->getOutput(states[i], STOUT_INPUT);
+												for (output_t outIdx = 0; outIdx < outOnSTOUT.size(); outIdx++) {
+													if (output == outOnSTOUT[outIdx].first) {
+														outOnSTOUT[outIdx].second->states.insert(i);
+														stop = true;
+														break;
+													}
+												}
+												if (!stop) {
+													block_node_t * tmpBN = new block_node_t;
+													tmpBN->states.insert(i);
+													outOnSTOUT.push_back(make_pair(output, tmpBN));
+												}
+											}
+											if (outOnSTOUT.size() > 1) {// distinguished by STOUT
+												for (output_t outIdx = 0; outIdx < outOnSTOUT.size(); outIdx++) {
+													if ((allBNit = allBN.find(outOnSTOUT[outIdx].second)) != allBN.end()) {
+														delete outOnSTOUT[outIdx].second;
+														outOnSTOUT[outIdx].second = *allBNit;
+													}
+													else {
+														initH(outOnSTOUT[outIdx].second, seq, N);
+														allBN.insert(outOnSTOUT[outIdx].second);
+													}
+												}
+												succBN->succ.push_back(make_pair(STOUT_INPUT, outOnSTOUT));
+											}
+											else {
+												delete outOnSTOUT[0].second;
+											}
+										}
 									}
 								}
 								(*pIt)->succ.push_back(make_pair(input, outOnIn));
@@ -388,11 +426,10 @@ namespace FSMsequence {
 						}
 						if ((*pIt)->succ.empty()) {// undistinguishable set of states
 							outOnIn.clear();
-							(*pIt)->succ.push_back(make_pair(STOUT_INPUT, outOnIn));
+							(*pIt)->succ.push_back(make_pair(STOUT_INPUT, outOnIn));// could be arbitrary input
 						}
-						stop = false;
 					}
-					if ((*pIt)->succ[0].first == STOUT_INPUT) {
+					if ((*pIt)->succ[0].second.empty()) {// undistinguishable set of states
 						minValidInput = 0;
 						break;
 					}
@@ -408,10 +445,11 @@ namespace FSMsequence {
 				}
 				for (input_t i = 0; i < minValidInput; i++) {
 					stop = false;
+					stoutUsed = false;
 					succPDS = new node_pds_t;
 					succPDS->value = 0;
-					for (partition_t::iterator pIt = actPDS->partition.begin();
-						pIt != actPDS->partition.end(); pIt++) {
+					for (partition_t::iterator pIt = actPDS->partition.begin(); pIt != actPDS->partition.end(); pIt++) {
+						// find common input
 						ioRefBNit = lower_bound((*pIt)->succ.begin(), (*pIt)->succ.end(),
 							hookBN->succ[i].first, succInComp);
 						if ((ioRefBNit == (*pIt)->succ.end()) || (ioRefBNit->first != hookBN->succ[i].first)) {
@@ -419,15 +457,43 @@ namespace FSMsequence {
 							delete succPDS;
 							break;
 						}
-						else {
+						else {// succBN on given input found
 							for (output_t j = 0; j < ioRefBNit->second.size(); j++) {
 								if (ioRefBNit->second[j].second->states.size() > 1) {
-									succPDS->partition.insert(ioRefBNit->second[j].second);
-									if (succPDS->value < ioRefBNit->second[j].second->h) {
-										succPDS->value = ioRefBNit->second[j].second->h;
+									succBN = ioRefBNit->second[j].second;
+									if ((succBN->succ.size() == 1) && (succBN->succ[0].first == STOUT_INPUT)) {
+										if (succBN->succ[0].second.empty()) {// no way to distinguish such a block
+											stop = true;
+											delete succPDS;
+											break;
+										}
+										if (fsm->isOutputState()) {
+											for (auto out_bn : succBN->succ[0].second) {
+												if (out_bn.second->states.size() > 1) {
+													succPDS->partition.insert(out_bn.second);
+													if (succPDS->value < out_bn.second->h) {
+														succPDS->value = out_bn.second->h;
+													}
+												}
+											}
+											stoutUsed = true;
+										}
+										else {
+											succPDS->partition.insert(succBN);
+											if (succPDS->value < succBN->h) {
+												succPDS->value = succBN->h;
+											}
+										}
+									}
+									else {
+										succPDS->partition.insert(succBN);
+										if (succPDS->value < succBN->h) {
+											succPDS->value = succBN->h;
+										}
 									}
 								}
 							}
+							if (stop) break;
 						}
 					}
 					if (stop) continue;
@@ -435,6 +501,7 @@ namespace FSMsequence {
 						outPDS.clear();
 						outPDS.insert(outPDS.end(), actPDS->ds.begin(), actPDS->ds.end());
 						outPDS.push_back(hookBN->succ[i].first);
+						if (stoutUsed) outPDS.push_back(STOUT_INPUT);
 						retVal = PDS_FOUND;
 						delete succPDS;
 						break;
@@ -445,6 +512,7 @@ namespace FSMsequence {
 					}
 					succPDS->ds.insert(succPDS->ds.end(), actPDS->ds.begin(), actPDS->ds.end());
 					succPDS->ds.push_back(hookBN->succ[i].first);
+					if (stoutUsed) succPDS->ds.push_back(STOUT_INPUT);
 					setHeuristic(succPDS);
 					//printPDS(succPDS);
 					openPDS.push(succPDS);
@@ -556,10 +624,26 @@ namespace FSMsequence {
 					if (sameOutput[output].empty()) {
 						continue;
 					}
+					stoutUsed = false;
+					if (fsm->isOutputState() && (sameOutput[output].size() > 1)) {
+						block_t tmp;
+						output_t outputNS = fsm->getOutput(nextState, STOUT_INPUT);
+						for (state_t i : sameOutput[output]) {
+							if (fsm->getOutput(states[i], STOUT_INPUT) == outputNS) {
+								tmp.insert(i);
+							}
+						}
+						// is reference state distinguished by appending STOUT_INPUT?
+						if (tmp.size() != sameOutput[output].size()) {
+							sameOutput[output] = tmp;
+							stoutUsed = true;
+						}
+					}
 					if (sameOutput[output].size() == 1) {// SVS found
 						outVSet[refState].clear();
 						outVSet[refState].insert(outVSet[refState].end(), actSVS->svs.begin(), actSVS->svs.end());
 						outVSet[refState].push_back(input);
+						if (stoutUsed) outVSet[refState].push_back(STOUT_INPUT);
 						stop = true;
 						sameOutput[output].clear();
 						break;
@@ -573,6 +657,7 @@ namespace FSMsequence {
 						initSVS_H(succSVS, seq, N);
 						succSVS->svs.insert(succSVS->svs.begin(), actSVS->svs.begin(), actSVS->svs.end());
 						succSVS->svs.push_back(input);
+						if (stoutUsed) succSVS->svs.push_back(STOUT_INPUT);
 						openSVS.push(succSVS);
 						//printSVS(succSVS);
 					}

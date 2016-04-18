@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestSepSeq_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
 		TEST_METHOD(TestSepSeq_Mealy)
@@ -86,7 +89,12 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 #define PTRandSTR(f) f, #f

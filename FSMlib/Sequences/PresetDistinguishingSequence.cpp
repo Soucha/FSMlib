@@ -184,7 +184,6 @@ namespace FSMsequence {
 					}
 					if (stoutUsed) {
 						partition = tmp;
-						// TODO check
 					}
 				}
 				// all blocks are singletons
@@ -220,7 +219,7 @@ namespace FSMsequence {
 				if (!stop) {
 					s = act->ds;
 					s.push_back(input);
-					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
+					if (stoutUsed) s.push_back(STOUT_INPUT);
 					succ = new pds_node_t(partition, s);
 					fifo.push(succ);
 					used.insert(make_pair(getSetId(*partition.begin()), succ));

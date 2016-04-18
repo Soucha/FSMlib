@@ -73,7 +73,7 @@ namespace FSMsequence {
 		set< pair<block_t, state_t> > used;
 		svs_node_t *act, *succ;
 		state_t nextState;
-		bool badInput;
+		bool badInput, stoutUsed = false;
 
 		act = new svs_node_t(states, s, state);
 		fifo.push(act);
@@ -103,10 +103,26 @@ namespace FSMsequence {
 				if (badInput) {
 					continue;
 				}
+				stoutUsed = false;
+				if (fsm->isOutputState() && (states.size() > 1)) {
+					block_t tmp;
+					output = fsm->getOutput(nextState, STOUT_INPUT);
+					for (state_t i : states) {
+						if (fsm->getOutput(i, STOUT_INPUT) == output) {
+							tmp.insert(i);
+						}
+					}
+					// is reference state distinguished by appending STOUT_INPUT?
+					if (tmp.size() != states.size()) {
+						states = tmp;
+						stoutUsed = true;
+					}
+				}
 				// is SVS found?
 				if (states.size() == 1) {
 					outSVS = act->svs;
 					outSVS.push_back(input);
+					if (stoutUsed) outSVS.push_back(STOUT_INPUT);
 #if SEQUENCES_PERFORMANCE_TEST
 					openCount += fifo.size();
 					closedCount += used.size();
@@ -122,6 +138,7 @@ namespace FSMsequence {
 				if (used.find(make_pair(states, nextState)) == used.end()) {
 					s = act->svs;
 					s.push_back(input);
+					if (stoutUsed) s.push_back(STOUT_INPUT);
 					succ = new svs_node_t(states, s, nextState);
 					fifo.push(succ);
 					used.insert(make_pair(states, nextState));

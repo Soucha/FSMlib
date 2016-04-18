@@ -58,6 +58,12 @@ struct AdaptiveDS {
 	sequence_in_t input;
 	vector<state_t> initialStates, currentStates;
 	map<output_t, AdaptiveDS*> decision;
+
+	~AdaptiveDS() {
+		for (auto succ : decision) {
+			delete succ.second;
+		}
+	}
 };
 
 struct LinkCell {

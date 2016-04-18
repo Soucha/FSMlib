@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestDS_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm", ADS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", CSet_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm", PDS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm", SVS_FOUND);
 		}
 
 		TEST_METHOD(TestDS_Mealy)
@@ -48,7 +51,7 @@ namespace FSMlibTest
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_PDS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_SS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm", ADS_FOUND);
-			/*/
+			//*/
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm", ADS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm", SVS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm", PDS_FOUND);
@@ -62,7 +65,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
-			/*
+			//*
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", CSet_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", PDS_FOUND);
@@ -72,7 +75,7 @@ namespace FSMlibTest
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R4_PDS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R4_SS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm", ADS_FOUND);
-			/*/
+			//*/
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm", ADS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Moore_R4_HS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm", PDS_FOUND);
@@ -86,7 +89,12 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm", ADS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm", PDS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm", PDS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", CSet_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm", PDS_FOUND);
+			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm", SVS_FOUND);
 		}
 
 		void testPDS(sequence_in_t& pDS) {
@@ -235,6 +243,7 @@ namespace FSMlibTest
 			for (state_t i : fsm->getStates()) {
 				ARE_EQUAL(true, bool(dist[i]), "State %d was not distinguished", i);
 			}
+			delete ads;
 		}
 
 		void testSVS(state_t state, sequence_in_t& sVS, bool hasVS = true) {

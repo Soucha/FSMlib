@@ -437,7 +437,7 @@ namespace FSMsequence {
 			//getchar();
 		}
 
-		if (!getSequences(fsm, seq)) return;
+		if (!getSequences(fsm, seq)) seq.clear();
 	}
 
 	void getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * fsm, vector<sequence_in_t> & seq) {
@@ -492,6 +492,10 @@ namespace FSMsequence {
 			getchar();
 #endif
 			devPrevIdxLen = prescan(M + 1, devPrevIdx);
+			if (devPrevIdxLen == NULL) {
+				freeCuda();
+				return;
+			}
 #if DEBUG
 			cudaMemcpy(tmp, devPrevIdxLen, (M + 1)*sizeof(state_t), cudaMemcpyDeviceToHost);
 			for (int i = 0; i <= M; i++) {
@@ -544,6 +548,6 @@ namespace FSMsequence {
 #endif
 		}
 
-		if (!getSequences(fsm, seq)) return;
+		if (!getSequences(fsm, seq)) seq.clear();
 	}
 }

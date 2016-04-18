@@ -26,13 +26,16 @@ namespace FSMlibTest
 	public:
 		DFSM * fsm;
 
-		// TODO: DFSM, DFA tests, incomplete machines
+		// TODO: incomplete machines
 
 		TEST_METHOD(TestPDS_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			ARE_EQUAL(true, false, "No tests for DFSM");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm", false);
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", false);
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm", false);
 		}
 
 		TEST_METHOD(TestPDS_Mealy)
@@ -86,7 +89,12 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
-			ARE_EQUAL(true, false, "No tests for DFA");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm", false);
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", false);
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");
+			testGetPresetDS(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm", false);
 		}
 
 		void testGetPresetDS(string filename, bool hasDS = true) {
@@ -162,6 +170,7 @@ namespace FSMlibTest
 				ARE_EQUAL(false, hasDS, "FSM has preset DS but it was not found.");
 				ARE_EQUAL(true, pDS.empty(), "FSM has not preset DS but sequence %s was returned.",
 					FSMmodel::getInSequenceAsString(pDS).c_str());
+				DEBUG_MSG("PDS of %s: NO\n", filename.c_str());
 			}
 		}
 	};
