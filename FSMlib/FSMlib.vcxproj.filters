@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Sequences">
       <UniqueIdentifier>{1c06fd94-5f87-48f7-9927-36ac4af32c0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Testing">
+      <UniqueIdentifier>{11ed4c6a-3abc-46cc-aef0-7647c3cdfeac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Testing">
+      <UniqueIdentifier>{b2d46ebd-51ab-4c12-93cb-0ec7eb1b66ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -65,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="PrefixSet.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\Testing.h">
+      <Filter>Header Files\Testing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="Sequences\DistinguishingSequences.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\PDS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Sequences">
       <UniqueIdentifier>{dd9d32e6-71ae-4192-a3f7-84fee67018c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Testing">
+      <UniqueIdentifier>{b4082bf1-be64-4e73-b4d0-76198b38767e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -91,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="Sequences\DS.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\PDS-methodTests.cpp">
+      <Filter>Source Files\Testing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

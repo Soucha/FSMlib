@@ -27,6 +27,7 @@
 
 #include "Model\FSMmodel.h"
 #include "Sequences\FSMsequence.h"
+#include "Testing\Testing.h"
 
 #include "PrefixSet.h"
 #endif

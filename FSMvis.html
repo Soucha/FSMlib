@@ -779,7 +779,7 @@
                     }
                 }
                 // labels
-                if (lineIdx + 1 < lines.length) {// states
+                if ((lineIdx + 1 < lines.length) && (lines[lineIdx].length !== 0)) {// states
                     words = lines[lineIdx].split(' ');
                     var numLabels = Number(words[0]);
                     charCounter += words[0].length + 1;
@@ -801,7 +801,7 @@
                             throw 'Expected a correct state ID (char ' + charCounter + ')';
                         fsm.nodes[state].labelId = words[1];
                     }
-                    if (lineIdx + 1 < lines.length) {// inputs
+                    if ((lineIdx + 1 < lines.length) && (lines[lineIdx].length !== 0)) {// inputs
                         words = lines[lineIdx].split(' ');
                         var numLabels = Number(words[0]);
                         charCounter += words[0].length + 1;
@@ -823,7 +823,7 @@
                                 throw 'Expected a correct input ID (char ' + charCounter + ')';
                             fsm.inputs[input].label = words[1];
                         }
-                        if (lineIdx + 1 < lines.length) {// outputs
+                        if ((lineIdx + 1 < lines.length) && (lines[lineIdx].length !== 0)) {// outputs
                             words = lines[lineIdx].split(' ');
                             var numLabels = Number(words[0]);
                             charCounter += words[0].length + 1;

@@ -95,7 +95,7 @@ void groupTest(string filename) {
 #endif
 }
 
-int main(int argc, char** argv) {
+void testSepSeqs() {
 	Mealy mealy;
 	fsm = &mealy;
 
@@ -105,8 +105,34 @@ int main(int argc, char** argv) {
 	groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");
 	groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SS.fsm");
 	groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
+}
+
+int main(int argc, char** argv) {
 
 
+	sequence_in_t DS;
+	DS.push_back(STOUT_INPUT);
+	DS.push_back(0);
+	//DS.push_back(STOUT_INPUT);
+	DS.push_back(1);
+	DS.push_back(0);
+	DS.push_back(0);
+
+	sequence_in_t origDS = DS;
+
+		auto DSit = DS.begin();
+		for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
+			if (*it == STOUT_INPUT) continue;
+			it++;
+			if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
+				DS.insert(++DSit, STOUT_INPUT);
+				DSit--;
+			}
+			it--;
+		}
+		if (DS.front() == STOUT_INPUT) DS.pop_front();
+	
+		printf("%s\n", FSMmodel::getInSequenceAsString(DS).c_str());
 	char c;
 	cin >> c;
 	return 0;

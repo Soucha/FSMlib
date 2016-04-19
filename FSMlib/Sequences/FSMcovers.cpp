@@ -19,7 +19,7 @@
 #include "FSMsequence.h"
 
 namespace FSMsequence {
-	void getStateCover(DFSM * dfsm, sequence_set_t & stateCover) {
+	void getStateCover(DFSM * dfsm, sequence_set_t & stateCover, bool stoutInterleaved) {
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
 		pair<state_t, sequence_in_t> current;
@@ -41,6 +41,7 @@ namespace FSMsequence {
 					covered[nextState] = true;
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
+					if (stoutInterleaved) newPath.push_back(STOUT_INPUT);
 					stateCover.insert(newPath);
 					fifo.push(make_pair(nextState, newPath));
 				}
@@ -48,7 +49,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover) {
+	void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover, bool stoutInterleaved) {
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
 		pair<state_t, sequence_in_t> current;
@@ -69,6 +70,7 @@ namespace FSMsequence {
 				if (nextState != NULL_STATE) {
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
+					if (stoutInterleaved) newPath.push_back(STOUT_INPUT);
 					transitionCover.insert(newPath);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
@@ -79,7 +81,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void getTraversalSet(DFSM * dfsm, sequence_set_t& traversalSet, int depth) {
+	void getTraversalSet(DFSM * dfsm, sequence_set_t& traversalSet, int depth, bool stoutInterleaved) {
 		traversalSet.clear();
 		if (depth <= 0) return;
 		queue<sequence_in_t> fifo;
@@ -91,6 +93,7 @@ namespace FSMsequence {
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				sequence_in_t extSeq(seq);
 				extSeq.push_back(input);
+				if (stoutInterleaved) extSeq.push_back(STOUT_INPUT);
 				traversalSet.insert(extSeq);
 				if (extSeq.size() < depth) fifo.push(extSeq);
 			}

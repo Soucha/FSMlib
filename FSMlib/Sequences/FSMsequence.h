@@ -84,7 +84,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @param stateCover
 	*/
-	FSMLIB_API void getStateCover(DFSM * dfsm, sequence_set_t & stateCover);
+	FSMLIB_API void getStateCover(DFSM * dfsm, sequence_set_t & stateCover, bool stoutInterleaved = false);
 
 	/**
 	* Fills given set with input sequences that cover all transitions.
@@ -94,7 +94,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @param transitionCover
 	*/
-	FSMLIB_API void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover);
+	FSMLIB_API void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover, bool stoutInterleaved = false);
 
 	/**
 	* Fills given set with all input sequences of the lenght up to depth.
@@ -102,7 +102,7 @@ namespace FSMsequence {
 	* @param traversalSet
 	* @param depth
 	*/
-	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, int depth);
+	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, int depth, bool stoutInterleaved = false);
 
 	/**
 	* Finds preset distinguishing sequence if FSM has it.<br><br>
@@ -408,7 +408,5 @@ namespace FSMsequence {
 	* @param stateIdx - index of state in fsm->getStates()
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_EqualLength(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
-	
-	
+	FSMLIB_API void reduceSCSet_EqualLength(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);	
 }
