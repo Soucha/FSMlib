@@ -22,12 +22,15 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
-		sequence_in_t DS;
+	bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+		AdaptiveDS* ADS;
 		TS.clear();
-		if ((extraStates < 0) || !getPresetDistinguishingSequence(fsm, DS)) {
+		if ((extraStates < 0) || !getAdaptiveDistinguishingSequence(fsm, ADS)) {
 			return false;
 		}
+		auto states = fsm->getStates();
+		sequence_vec_t ADSet;
+		getADSet(fsm, ADS, ADSet);
 
 		sequence_set_t transitionCover, traversalSet;
 		getTransitionCover(fsm, transitionCover, fsm->isOutputState());
@@ -35,17 +38,19 @@ namespace FSMtesting {
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {
-			startWithStout = (DS.front() == STOUT_INPUT);
-			auto origDS = DS;
-			auto DSit = DS.begin();
-			for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-				if (*it == STOUT_INPUT) continue;
-				it++;
-				if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-					DS.insert(++DSit, STOUT_INPUT);
-					DSit--;
+			startWithStout = (ADSet[0].front() == STOUT_INPUT);
+			for (state_t i = 0; i < ADSet.size(); i++) {
+				auto origDS = ADSet[i];
+				auto DSit = ADSet[i].begin();
+				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
+					if (*it == STOUT_INPUT) continue;
+					it++;
+					if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
+						ADSet[i].insert(++DSit, STOUT_INPUT);
+						DSit--;
+					}
+					it--;
 				}
-				it--;
 			}
 		}
 
@@ -56,7 +61,8 @@ namespace FSMtesting {
 				testSeq.push_front(STOUT_INPUT);
 				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 			}
-			testSeq.insert(testSeq.end(), DS.begin(), DS.end());
+			state_t state = getIdx(states, fsm->getEndPathState(0, testSeq));
+			testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
 			pset.insert(testSeq);
 			for (sequence_in_t extSeq : traversalSet) {
 				sequence_in_t testSeq(trSeq);
@@ -65,7 +71,8 @@ namespace FSMtesting {
 					testSeq.push_front(STOUT_INPUT);
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 				}
-				testSeq.insert(testSeq.end(), DS.begin(), DS.end());
+				state_t state = getIdx(states, fsm->getEndPathState(0, testSeq));
+				testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
 				pset.insert(testSeq);
 			}
 		}
