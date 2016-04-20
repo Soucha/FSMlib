@@ -84,6 +84,9 @@ namespace FSMtesting {
 			for (sequence_in_t extSeq : traversalSet) {
 				sequence_in_t transferSeq(trSeq);
 				transferSeq.insert(transferSeq.end(), extSeq.begin(), extSeq.end());
+				state_t state = fsm->getEndPathState(0, transferSeq);
+				if (state == WRONG_STATE) continue;
+				state = getIdx(states, state);
 				for (sequence_set_t SCSet : SCSets) {// i.e. VSet
 					for (sequence_in_t cSeq : SCSet) {// usually only one seq = SVS
 						sequence_in_t testSeq(transferSeq);
@@ -96,11 +99,13 @@ namespace FSMtesting {
 					}
 				}
 				if (extSeq.size() == extraStates) {// check outcoming transitions
-					state_t state = getIdx(states, fsm->getEndPathState(0, transferSeq));
+					//state_t state = getIdx(states, fsm->getEndPathState(0, transferSeq));
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 						// usually only one seq = SVS is sufficient for transition verification
 						//printf("%d-%d ", fsm->getNextState(state, input), SCSets[fsm->getNextState(state, input)].size());
-						state_t nextState = getIdx(states, fsm->getNextState(state, input));
+						state_t nextState = fsm->getNextState(state, input);
+						if (nextState == NULL_STATE) continue;
+						nextState = getIdx(states, nextState);
 						for (sequence_in_t cSeq : SCSets[nextState]) {
 							sequence_in_t testSeq(transferSeq);
 							testSeq.push_back(input);

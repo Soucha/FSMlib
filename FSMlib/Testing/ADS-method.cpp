@@ -57,21 +57,25 @@ namespace FSMtesting {
 		FSMlib::PrefixSet pset;
 		for (sequence_in_t trSeq : transitionCover) {
 			sequence_in_t testSeq(trSeq);
+			state_t state = fsm->getEndPathState(0, testSeq);
+			if (state == WRONG_STATE) continue;
+			state = getIdx(states, state);
 			if (startWithStout && !testSeq.empty()) {
 				testSeq.push_front(STOUT_INPUT);
 				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 			}
-			state_t state = getIdx(states, fsm->getEndPathState(0, testSeq));
 			testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
 			pset.insert(testSeq);
 			for (sequence_in_t extSeq : traversalSet) {
 				sequence_in_t testSeq(trSeq);
 				testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
+				state_t state = fsm->getEndPathState(0, testSeq);
+				if (state == WRONG_STATE) continue;
+				state = getIdx(states, state);
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 				}
-				state_t state = getIdx(states, fsm->getEndPathState(0, testSeq));
 				testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
 				pset.insert(testSeq);
 			}
