@@ -178,6 +178,7 @@
     </ClCompile>
     <ClCompile Include="Testing\ADS-methodTests.cpp" />
     <ClCompile Include="Testing\PDS-methodTests.cpp" />
+    <ClCompile Include="Testing\SVS-methodTests.cpp" />
     <ClCompile Include="TestUtils.cpp" />
   </ItemGroup>
   <ItemGroup>

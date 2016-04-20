@@ -72,7 +72,7 @@
     <ClInclude Include="PrefixSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Testing\Testing.h">
+    <ClInclude Include="Testing\FSMtesting.h">
       <Filter>Header Files\Testing</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,6 +132,9 @@
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
     <ClCompile Include="Testing\ADS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\SVS-method.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
   </ItemGroup>

@@ -16,7 +16,7 @@
 */
 #include "stdafx.h"
 
-#include "Testing.h"
+#include "FSMtesting.h"
 #include "../PrefixSet.h"
 
 using namespace FSMsequence;

@@ -33,8 +33,30 @@ namespace FSMtesting {
 	*/
 	FSMLIB_API bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 
+	/**
+	* Designs a test suite in which all transitions are confirmed
+	* using appended Adaptive Distinguishing Sequence.
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	* @return true if a test suite is designed, false if there is no ADS or negative extraStates
+	*/
 	FSMLIB_API bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
-	FSMLIB_API int SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	
+	/**
+	* Designs a test suite in which all transitions are confirmed
+	* using appended State Verifying Sequence of the end state, or
+	* using its State Characterizing Set if the state has no SVS.
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	* @return the number of states without SVS
+	*/
+	FSMLIB_API state_t SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void W_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void Wp_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void HSI_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
