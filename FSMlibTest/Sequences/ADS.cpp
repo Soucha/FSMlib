@@ -42,7 +42,7 @@ namespace FSMlibTest
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			//*
+			/*
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm", false);
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm");
@@ -65,7 +65,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
-			//*
+			/*
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", false);
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm"); 
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");

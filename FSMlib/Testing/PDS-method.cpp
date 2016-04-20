@@ -25,7 +25,7 @@ namespace FSMtesting {
 	bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
 		sequence_in_t DS;
 		TS.clear();
-		if (!getPresetDistinguishingSequence(fsm, DS)) {
+		if ((extraStates < 0) || !getPresetDistinguishingSequence(fsm, DS)) {
 			return false;
 		}
 

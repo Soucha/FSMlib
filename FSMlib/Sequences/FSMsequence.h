@@ -124,6 +124,15 @@ namespace FSMsequence {
 	FSMLIB_API bool getAdaptiveDistinguishingSequence(DFSM * dfsm, AdaptiveDS* & outADS);
 
 	/**
+	* Fills given collection with a distinguishing sequence that is included in given
+	* Adaptive Distinguishing Sequence for each state.
+	* @param dfsm - Deterministic FSM
+	* @param ads - Adaptive Distinguishing Sequence
+	* @param ADSet - a collection of distinguishing sequences for each state index
+	*/
+	FSMLIB_API void getADSet(DFSM * dfsm, AdaptiveDS* ads, sequence_vec_t& ADSet);
+
+	/**
 	* Finds state verifying sequence for given state.<br><br>
 	* Applying SVS distinguishes given state from the others.
 	* @param dfsm - Deterministic FSM

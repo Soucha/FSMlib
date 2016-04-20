@@ -23,6 +23,12 @@ namespace FSMsequence {
 		vector<state_t> block, nextStates;
 		sequence_in_t sequence;
 		vector< pair<output_t, st_node_t* > > succ;
+
+		~st_node_t() {
+			for (auto succPair : succ) {
+				delete succPair.second;
+			}
+		}
 	};
 
 	struct blockcomp {
@@ -48,11 +54,24 @@ namespace FSMsequence {
 		}
 	};
 
-	static void cleanup(st_node_t* node) {
-		for (output_t i = 0; i < node->succ.size(); i++) {
-			cleanup(node->succ[i].second);
+	void getADSet(DFSM * fsm, AdaptiveDS* ads, sequence_vec_t& ADSet) {
+		stack< pair<AdaptiveDS*, sequence_in_t> > lifo;
+		sequence_in_t seq;
+		lifo.push(make_pair(ads, seq));
+		ADSet.resize(fsm->getNumberOfStates());
+		auto states = fsm->getStates();
+		while (!lifo.empty()) {
+			auto p = lifo.top();
+			lifo.pop();
+			for (auto pNext : p.first->decision) {
+				seq = p.second;
+				seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
+				lifo.push(make_pair(pNext.second, seq));
+			}
+			if (p.first->decision.empty()) {
+				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
+			}
 		}
-		delete node;
 	}
 
 	bool getAdaptiveDistinguishingSequence(DFSM * fsm, AdaptiveDS* & outADS) {
@@ -194,7 +213,7 @@ namespace FSMsequence {
 				}
 			}
 			if (node->succ.empty()) {// no valid input - possible only by root
-				cleanup(rootST);
+				delete rootST;
 				return false;
 			}
 			if (!node->nextStates.empty()) {// block is distinguished by input
@@ -375,7 +394,7 @@ namespace FSMsequence {
 				}
 				// check that all dependent was divided
 				if (distCounter != 0) {
-					cleanup(rootST);
+					delete rootST;
 					return false;
 				}
 				dependent.clear();
@@ -430,7 +449,7 @@ namespace FSMsequence {
 				}
 			}
 		}
-		cleanup(rootST);
+		delete rootST;
 		return true;
 	}
 }

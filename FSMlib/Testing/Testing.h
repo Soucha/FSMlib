@@ -21,7 +21,18 @@
 namespace FSMtesting {
 	//<-- Resettable machines -->// 
 
+	/**
+	* Designs a test suite in which all transitions are confirmed
+	* using appended Preset Distinguishing Sequence.
+	* 
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	* @return true if a test suite is designed, false if there is no PDS or negative extraStates
+	*/
 	FSMLIB_API bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+
 	FSMLIB_API bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API int SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void W_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);

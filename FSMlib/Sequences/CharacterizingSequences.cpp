@@ -34,6 +34,7 @@ namespace FSMsequence {
 	};
 
 	state_t getIdx(vector<state_t>& states, state_t stateId) {
+		if ((stateId < states.size()) && (states[stateId] == stateId)) return stateId;
 		auto lower = std::lower_bound(states.begin(), states.end(), stateId);
 		if (lower != states.end() && *lower == stateId) {
 			return state_t(std::distance(states.begin(), lower));
