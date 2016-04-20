@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{21BF387C-7009-414F-8A91-1EF22A1B958E}</ProjectGuid>
+    <ProjectGuid>{ECA7500D-6F20-4184-9FE1-254DBC11B119}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>FSMlibTest</RootNamespace>
+    <RootNamespace>FSMlibTestCUDA</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -156,101 +156,19 @@
     <ClInclude Include="TestUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Model\BasicOpsTests.cpp" />
-    <ClCompile Include="Model\GenerateTests.cpp" />
-    <ClCompile Include="Model\IOtests.cpp" />
-    <ClCompile Include="Model\MinimizationTests.cpp" />
-    <ClCompile Include="Model\UtilsTests.cpp" />
-    <ClCompile Include="PrefixSetTests.cpp" />
-    <ClCompile Include="Sequences\ADS.cpp" />
-    <ClCompile Include="Sequences\CoverTests.cpp" />
-    <ClCompile Include="Sequences\DS.cpp" />
-    <ClCompile Include="Sequences\HS.cpp" />
-    <ClCompile Include="Sequences\PDS.cpp" />
-    <ClCompile Include="Sequences\SCSet.cpp" />
-    <ClCompile Include="Sequences\SS.cpp" />
-    <ClCompile Include="Sequences\SVS.cpp" />
+    <ClCompile Include="Sequences\SeparatingSequences.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Testing\PDS-methodTests.cpp" />
     <ClCompile Include="TestUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSMlib\FSMlib.vcxproj">
-      <Project>{fa692283-399a-49fc-aa5d-3a21995bd370}</Project>
+    <ProjectReference Include="..\FSMlibCUDA\FSMlibCUDA.vcxproj">
+      <Project>{1acf8588-3c30-49d4-8ce2-a63a20940af7}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\data\examples\DFA_R4_ADS.fsm" />
-    <None Include="..\data\examples\DFA_R4_HS.fsm" />
-    <None Include="..\data\examples\DFA_R4_PDS.fsm" />
-    <None Include="..\data\examples\DFA_R4_SCSet.fsm" />
-    <None Include="..\data\examples\DFA_R4_SS.fsm" />
-    <None Include="..\data\examples\DFA_R5_SVS.fsm" />
-    <None Include="..\data\examples\DFSM_R4_ADS.fsm" />
-    <None Include="..\data\examples\DFSM_R4_SCSet.fsm" />
-    <None Include="..\data\examples\DFSM_R5_PDS.fsm" />
-    <None Include="..\data\examples\DFSM_R5_SVS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_ADS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_HS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_PDS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_SCSet.fsm" />
-    <None Include="..\data\examples\Mealy_R4_SS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_SVS.fsm" />
-    <None Include="..\data\examples\Mealy_R4_Zhu1993.fsm" />
-    <None Include="..\data\examples\Moore_R4_ADS.fsm" />
-    <None Include="..\data\examples\Moore_R4_HS.fsm" />
-    <None Include="..\data\examples\Moore_R4_PDS.fsm" />
-    <None Include="..\data\examples\Moore_R4_SCSet.fsm" />
-    <None Include="..\data\examples\Moore_R4_SS.fsm" />
-    <None Include="..\data\examples\Moore_R5_SVS.fsm" />
-    <None Include="..\data\tests\minimization\DFA_R4.fsm" />
-    <None Include="..\data\tests\minimization\DFA_R4_BP.fsm" />
-    <None Include="..\data\tests\minimization\DFA_R4_P.fsm" />
-    <None Include="..\data\tests\minimization\DFA_U7.fsm" />
-    <None Include="..\data\tests\minimization\DFSM_R4.fsm" />
-    <None Include="..\data\tests\minimization\DFSM_R4_BP.fsm" />
-    <None Include="..\data\tests\minimization\DFSM_R4_P.fsm" />
-    <None Include="..\data\tests\minimization\DFSM_U7.fsm" />
-    <None Include="..\data\tests\minimization\Mealy_R4.fsm" />
-    <None Include="..\data\tests\minimization\Mealy_R4_BP.fsm" />
-    <None Include="..\data\tests\minimization\Mealy_R4_P.fsm" />
-    <None Include="..\data\tests\minimization\Mealy_U7.fsm" />
-    <None Include="..\data\tests\minimization\Moore_R4.fsm" />
-    <None Include="..\data\tests\minimization\Moore_R4_BP.fsm" />
-    <None Include="..\data\tests\minimization\Moore_R4_P.fsm" />
-    <None Include="..\data\tests\minimization\Moore_U7.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R100_PDS_l99.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R10_PDS.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R4_HS.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R4_PDS.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R4_SS.fsm" />
-    <None Include="..\data\tests\sequences\DFA_R6_ADS.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R100.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R100_1.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R100_PDS_l99.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R10_PDS.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R4_HS.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R4_PDS.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R4_SS.fsm" />
-    <None Include="..\data\tests\sequences\Mealy_R6_ADS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R100.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R100_PDS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R100_PDS_l99.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R10_PDS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R10_PDS_E.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R4_HS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R4_PDS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R4_SS.fsm" />
-    <None Include="..\data\tests\sequences\Moore_R6_ADS.fsm" />
-    <None Include="FSMlibTest.runsettings" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

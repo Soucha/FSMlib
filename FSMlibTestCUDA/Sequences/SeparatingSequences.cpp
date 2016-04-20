@@ -19,7 +19,7 @@
 
 using namespace FSMsequence;
 
-namespace FSMlibTest
+namespace FSMlibTestCUDA
 {
 	TEST_CLASS(SepSeq)
 	{

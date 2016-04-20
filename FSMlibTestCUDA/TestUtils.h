@@ -21,7 +21,7 @@
 #include "CppUnitTest.h"
 
 #ifndef PARALLEL_COMPUTING
-//#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
+#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
 #endif // !PARALLEL_COMPUTING
 
 #include "../FSMlib/FSMlib.h"

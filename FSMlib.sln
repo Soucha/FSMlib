@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMdevel", "FSMdevel\FSMdev
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlibCUDA", "FSMlibCUDA\FSMlibCUDA.vcxproj", "{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FSMlibTestCUDA", "FSMlibTestCUDA\FSMlibTestCUDA.vcxproj", "{ECA7500D-6F20-4184-9FE1-254DBC11B119}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -38,7 +40,6 @@ Global
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Debug|Win32.ActiveCfg = Debug|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Debug|Win32.Build.0 = Debug|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Debug|x64.ActiveCfg = Debug|x64
-		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Debug|x64.Build.0 = Debug|x64
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{21BF387C-7009-414F-8A91-1EF22A1B958E}.Release|Win32.ActiveCfg = Release|Win32
@@ -67,6 +68,16 @@ Global
 		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|Win32.Build.0 = Release|Win32
 		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|x64.ActiveCfg = Release|x64
 		{1ACF8588-3C30-49D4-8CE2-A63A20940AF7}.Release|x64.Build.0 = Release|x64
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Debug|Win32.Build.0 = Debug|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Debug|x64.ActiveCfg = Debug|x64
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Release|Win32.ActiveCfg = Release|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Release|Win32.Build.0 = Release|Win32
+		{ECA7500D-6F20-4184-9FE1-254DBC11B119}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
