@@ -182,6 +182,7 @@
     <ClCompile Include="Testing\PDS-methodTests.cpp" />
     <ClCompile Include="Testing\SPY-methodTests.cpp" />
     <ClCompile Include="Testing\SVS-methodTests.cpp" />
+    <ClCompile Include="Testing\TS_comp.cpp" />
     <ClCompile Include="Testing\W-methodTests.cpp" />
     <ClCompile Include="Testing\Wp-methodTests.cpp" />
     <ClCompile Include="TestUtils.cpp" />

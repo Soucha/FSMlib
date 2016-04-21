@@ -46,6 +46,14 @@ namespace FSMtesting {
 	static DFSM* specification;
 	static vector<state_t> states;
 
+	static void cleanup() {
+		delete coreNodes[0];
+		coreNodes.clear();
+		uncoveredTransitions.clear();
+		coveredTransitions.clear();
+		confirmedNodes.clear();
+	}
+
 	static void printTStree(TestNode* node, string prefix = "") {
 		printf("%s%d/%d <- %d (conf%d)\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput, int(node->isConfirmed));
 		for (auto it : node->next) {
@@ -287,6 +295,6 @@ namespace FSMtesting {
 		//printTStree(coreNodes[0]);
 		getSequences(coreNodes[0], TS);
 
-		delete coreNodes[0];
+		cleanup();
 	}
 }

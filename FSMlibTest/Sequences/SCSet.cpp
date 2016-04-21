@@ -99,9 +99,9 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
-			testGetStatesCharacterizingSets("");
-			testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
-			testGetHarmonizedStateIdentifiers("");
+			//testGetStatesCharacterizingSets("");
+			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
+			//testGetHarmonizedStateIdentifiers("");
 			testGetSeparatingSequences("");
 		}
 

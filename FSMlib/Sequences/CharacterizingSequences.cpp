@@ -116,6 +116,7 @@ namespace FSMsequence {
 		vector< vector< pair<state_t, input_t> > > link(M);
 
 		// init seq
+		seq.clear();
 		seq.resize(M);
 		for (state_t i = 0; i < M; i++) {
 			seq[i].next.resize(fsm->getNumberOfInputs(), NULL_STATE);
