@@ -177,6 +177,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Testing\ADS-methodTests.cpp" />
+    <ClCompile Include="Testing\HSI-methodTests.cpp" />
     <ClCompile Include="Testing\PDS-methodTests.cpp" />
     <ClCompile Include="Testing\SVS-methodTests.cpp" />
     <ClCompile Include="Testing\W-methodTests.cpp" />

@@ -107,6 +107,9 @@
     <ClCompile Include="Testing\Wp-methodTests.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
+    <ClCompile Include="Testing\HSI-methodTests.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
