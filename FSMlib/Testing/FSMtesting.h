@@ -117,6 +117,23 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0
 	*/
 	FSMLIB_API void H_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+
+	/**
+	* Designs a test suite in which all states and transitions are confirmed
+	* using Harmonized State Identifiers that are appended to already confirmed states
+	*
+	* Source:
+	* Article (simao2012reducing)
+	* Simao, A.; Petrenko, A. & Yevtushenko, N.
+	* On reducing test length for fsms with extra states 
+	* Software Testing, Verification and Reliability, Wiley Online Library, 2012, 22, 435-454
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences,
+	*		 TS will be empty if extraStates is negative
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	*/
 	FSMLIB_API void SPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/// TODO
@@ -125,8 +142,8 @@ namespace FSMtesting {
 	//FSMLIB_API void P_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/// Attempts
-	FSMLIB_API void GSPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
-	FSMLIB_API void SPYH_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void GSPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void SPYH_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
 	FSMLIB_API bool Mra_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API bool Mrstar_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0, std::string fileName = "");
 	FSMLIB_API bool Mrg_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
@@ -146,7 +163,7 @@ namespace FSMtesting {
 	//FSMLIB_API bool K_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 
 	// Attempts
-	FSMLIB_API void MHSI_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void MHSI_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);// is it correct?
 	FSMLIB_API bool Ma_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	FSMLIB_API bool Mstar_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0, std::string fileName = "");
 	FSMLIB_API bool Mg_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);

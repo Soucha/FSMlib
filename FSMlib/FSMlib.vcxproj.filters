@@ -149,6 +149,9 @@
     <ClCompile Include="Testing\H-method.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
+    <ClCompile Include="Testing\SPY-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />
