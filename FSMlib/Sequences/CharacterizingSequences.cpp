@@ -107,7 +107,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void getSeparatingSequences(DFSM * fsm, vector<LinkCell*> & seq) {
+	void getSeparatingSequences(DFSM * fsm, vector<LinkCell> & seq) {
 		state_t M, N = fsm->getNumberOfStates();
 		state_t nextStateI, nextStateJ, nextIdx, idx;
 		queue<state_t> unchecked;
@@ -118,21 +118,20 @@ namespace FSMsequence {
 		// init seq
 		seq.resize(M);
 		for (state_t i = 0; i < M; i++) {
-			seq[i] = new LinkCell;
-			seq[i]->next.resize(fsm->getNumberOfInputs(), NULL_STATE);
+			seq[i].next.resize(fsm->getNumberOfInputs(), NULL_STATE);
 		}
 		for (state_t i = 0; i < N - 1; i++) {
 			for (state_t j = i + 1; j < N; j++) {
 				idx = i * N + j - 1 - (i * (i + 3)) / 2;
 				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
-					seq[idx]->minLen = 1;// to correspond that STOUT_INPUT needs to be applied
+					seq[idx].minLen = 1;// to correspond that STOUT_INPUT needs to be applied
 					unchecked.push(idx);
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
-						seq[idx]->next[input] = idx;
-						if (seq[idx]->minLen == -1) {
-							seq[idx]->minLen = 1;
+						seq[idx].next[input] = idx;
+						if (seq[idx].minLen == 0) {
+							seq[idx].minLen = 1;
 							unchecked.push(idx);
 						}
 					}
@@ -148,7 +147,7 @@ namespace FSMsequence {
 								(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
 								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 							if (nextIdx != idx) {
-								seq[idx]->next[input] = nextIdx;
+								seq[idx].next[input] = nextIdx;
 								link[nextIdx].push_back(make_pair(idx, input));
 							}// TODO what about swap 
 						}
@@ -162,8 +161,8 @@ namespace FSMsequence {
 			unchecked.pop();
 			for (state_t k = 0; k < link[nextIdx].size(); k++) {
 				idx = link[nextIdx][k].first;
-				if (seq[idx]->minLen == -1) {
-					seq[idx]->minLen = seq[nextIdx]->minLen + 1;
+				if (seq[idx].minLen == 0) {
+					seq[idx].minLen = seq[nextIdx].minLen + 1;
 					unchecked.push(idx);
 				}
 			}

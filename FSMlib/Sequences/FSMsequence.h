@@ -67,7 +67,7 @@ struct AdaptiveDS {
 };
 
 struct LinkCell {
-	int minLen = -1;
+	seq_len_t minLen = 0;
 	vector<state_t> next;
 };
 
@@ -218,7 +218,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @param seq
 	*/
-	FSMLIB_API void getSeparatingSequences(DFSM * dfsm, vector<LinkCell*> & seq);
+	FSMLIB_API void getSeparatingSequences(DFSM * dfsm, vector<LinkCell> & seq);
 
 	/**
 	* Finds state characterizing set for given state.<br>

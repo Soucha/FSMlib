@@ -41,7 +41,7 @@ namespace FSMtesting {
 
 	static vector<TestNode*> coreNodes, extNodes; // stores SC, TC-SC respectively
 	static DFSM * specification;
-	static vector<LinkCell*> sepSeq;
+	static vector<LinkCell> sepSeq;
 	static vector<state_t> states;
 
 	static void printTStree(TestNode* node, string prefix = "") {
@@ -118,10 +118,10 @@ namespace FSMtesting {
 
 	static int getEstimate(TestNode* n1, TestNode* n2, input_t input) {
 		state_t idx = getPairIdx(n1->state, n2->state);
-		state_t nextIdx = sepSeq[idx]->next[input];
+		state_t nextIdx = sepSeq[idx].next[input];
 		if (nextIdx == NULL_STATE) return -1;
 		if (nextIdx == idx) return 1;
-		return 2 * sepSeq[nextIdx]->minLen + 1;
+		return 2 * sepSeq[nextIdx].minLen + 1;
 	}
 
 	static int getMinLenToDistinguish(TestNode* n1, TestNode* n2) {
@@ -172,9 +172,9 @@ namespace FSMtesting {
 		state_t idx = getPairIdx(n1->state, n2->state), nextIdx;
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
-			nextIdx = sepSeq[idx]->next[i];
+			nextIdx = sepSeq[idx].next[i];
 			if (nextIdx == NULL_STATE) continue;
-			if ((nextIdx == idx) || (sepSeq[nextIdx]->minLen == sepSeq[idx]->minLen - 1)) {
+			if ((nextIdx == idx) || (sepSeq[nextIdx].minLen == sepSeq[idx].minLen - 1)) {
 				if (n1->next.find(i) != n1->next.end()) {
 					input = i;
 					break;
