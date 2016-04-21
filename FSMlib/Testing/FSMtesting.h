@@ -98,6 +98,24 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0
 	*/
 	FSMLIB_API void HSI_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+
+	/**
+	* Designs a test suite in which all state pairs are distinguished and thus confirmed
+	* using a separating sequence that is chosen adaptively to minimize the length of TS.
+	* Transitions are confirmed in the same manner, i.e. end states are distinguished from all states.
+	*
+	* Source:
+	* InCollection (dorofeeva2005improved)
+	* Dorofeeva, R.; El-Fakih, K. & Yevtushenko, N. 
+	* An improved conformance testing method 
+	* Formal Techniques for Networked and Distributed Systems-FORTE 2005, Springer, 2005, 204-218
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences,
+	*		 TS will be empty if extraStates is negative
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	*/
 	FSMLIB_API void H_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void SPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 
