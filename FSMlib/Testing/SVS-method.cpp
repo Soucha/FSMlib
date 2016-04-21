@@ -24,6 +24,7 @@ using namespace FSMsequence;
 namespace FSMtesting {
 	state_t SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
+		if (extraStates < 0) return NULL_STATE;
 		auto states = fsm->getStates();
 		sequence_vec_t VSet;
 		sequence_set_t stateCover, traversalSet;
@@ -92,7 +93,7 @@ namespace FSMtesting {
 						sequence_in_t testSeq(transferSeq);
 						if (startWithStout) {
 							testSeq.push_front(STOUT_INPUT);
-							testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
+							testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 						}
 						testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
 						pset.insert(testSeq);

@@ -46,19 +46,57 @@ namespace FSMtesting {
 	FSMLIB_API bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
-	* Designs a test suite in which all transitions are confirmed
+	* Designs a test suite in which all states are confirmed
+	* using Verifying Set of State Verifying Sequences of each state
+	* and all last transitions are confirmed
 	* using appended State Verifying Sequence of the end state, or
 	* using its State Characterizing Set if the state has no SVS.
+	* SCSet is also in place of SVS in VSet if such SVS does not exist.
 	*
 	* @param fsm - Deterministic FSM
 	* @param TS - Test Suite to fill up with test sequences
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return the number of states without SVS
+	* @return the number of states without SVS, or NULL_STATE if extraStates is negative
 	*/
 	FSMLIB_API state_t SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	
+	/**
+	* Designs a test suite in which all states and transitions are confirmed
+	* using appended Characterizing Set.
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences, 
+	*		 TS will be empty if extraStates is negative
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	*/
 	FSMLIB_API void W_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	
+	/**
+	* Designs a test suite in which all transitions are confirmed
+	* using appended State Characterizing Set of the end state
+	* and all states are confirmed using Characterizing Set
+	* that consists of all used SCSets.
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences,
+	*		 TS will be empty if extraStates is negative
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	*/
 	FSMLIB_API void Wp_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	
+	/**
+	* Designs a test suite in which all states and transitions are confirmed
+	* using appended Harmonized State Identifier of the related state.
+	*
+	* @param fsm - Deterministic FSM
+	* @param TS - Test Suite to fill up with test sequences,
+	*		 TS will be empty if extraStates is negative
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	*/
 	FSMLIB_API void HSI_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void H_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	FSMLIB_API void SPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);

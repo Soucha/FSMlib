@@ -41,6 +41,7 @@ namespace FSMlibTest
 		{
 			Mealy mealy;
 			fsm = &mealy;
+			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", false);
 		}
@@ -49,6 +50,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
+			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", false);
 		}
@@ -57,6 +59,7 @@ namespace FSMlibTest
 		{
 			DFA dfa;
 			fsm = &dfa;
+			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", false);
 		}

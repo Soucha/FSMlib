@@ -22,65 +22,72 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
-		AdaptiveDS* ADS;
+	void W_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
-		if ((extraStates < 0) || !getAdaptiveDistinguishingSequence(fsm, ADS)) {
-			return false;
+		if (extraStates < 0) {
+			return;
 		}
-		auto states = fsm->getStates();
-		sequence_vec_t ADSet;
-		getADSet(fsm, ADS, ADSet);
 
-		sequence_set_t transitionCover, traversalSet;
+		sequence_set_t CSet, transitionCover, traversalSet;
 		getTransitionCover(fsm, transitionCover, fsm->isOutputState());
 		getTraversalSet(fsm, traversalSet, extraStates, fsm->isOutputState());
+		getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {
-			startWithStout = (ADSet[0].front() == STOUT_INPUT);
-			for (state_t i = 0; i < ADSet.size(); i++) {
-				auto origDS = ADSet[i];
-				auto DSit = ADSet[i].begin();
+			for (auto seq : CSet) {
+				if (seq.front() == STOUT_INPUT) {
+					startWithStout = true;
+					break;
+				}
+			}
+			sequence_set_t tmp;
+			for (auto origDS : CSet) {
+				sequence_in_t seq = origDS;
+				auto DSit = seq.begin();
 				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
 					if (*it == STOUT_INPUT) continue;
 					it++;
 					if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-						ADSet[i].insert(++DSit, STOUT_INPUT);
+						seq.insert(++DSit, STOUT_INPUT);
 						DSit--;
 					}
 					it--;
 				}
+				if (startWithStout) {
+					if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
+				}
+				tmp.insert(seq);
 			}
+			CSet = tmp;
 		}
 
 		FSMlib::PrefixSet pset;
 		for (sequence_in_t trSeq : transitionCover) {
-			sequence_in_t testSeq(trSeq);
-			state_t state = fsm->getEndPathState(0, testSeq);
-			if (state == WRONG_STATE) continue;
-			state = getIdx(states, state);
-			if (startWithStout) {
-				testSeq.push_front(STOUT_INPUT);
-				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
-			}
-			testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
-			pset.insert(testSeq);
-			for (sequence_in_t extSeq : traversalSet) {
+			if (fsm->getEndPathState(0, trSeq) == WRONG_STATE) continue;
+			for (sequence_in_t cSeq : CSet) {
 				sequence_in_t testSeq(trSeq);
-				testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
-				state_t state = fsm->getEndPathState(0, testSeq);
-				if (state == WRONG_STATE) continue;
-				state = getIdx(states, state);
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
-					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
+					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 				}
-				testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
+				testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
 				pset.insert(testSeq);
+			}
+			for (sequence_in_t extSeq : traversalSet) {
+				for (sequence_in_t cSeq : CSet) {
+					sequence_in_t testSeq(trSeq);
+					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
+					if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
+					if (startWithStout) {
+						testSeq.push_front(STOUT_INPUT);
+						testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
+					}
+					testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
+					pset.insert(testSeq);
+				}
 			}
 		}
 		pset.getMaximalSequences(TS);
-		return true;
 	}
 }

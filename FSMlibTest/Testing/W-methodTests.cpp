@@ -21,51 +21,51 @@ using namespace FSMtesting;
 
 namespace FSMlibTest
 {
-	TEST_CLASS(SVSmethod)
+	TEST_CLASS(Wmethod)
 	{
 	public:
 		DFSM * fsm;
 
 		// TODO: incomplete machines
 
-		TEST_METHOD(TestSVSmethod_DFSM)
+		TEST_METHOD(TestWmethod_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", 1);
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSVSmethod_Mealy)
+		TEST_METHOD(TestWmethod_Mealy)
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", 1);
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSVSmethod_Moore)
+		TEST_METHOD(TestWmethod_Moore)
 		{
 			Moore moore;
 			fsm = &moore;
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm"); 
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", 1);
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSVSmethod_DFA)
+		TEST_METHOD(TestWmethod_DFA)
 		{
 			DFA dfa;
 			fsm = &dfa;
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
-			testSVSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", 1);
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
+			testWmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
 		}
 
 		void printTS(sequence_set_t & TS, string filename) {
@@ -75,11 +75,11 @@ namespace FSMlibTest
 			}
 		}
 
-		void testSVSmethod(string filename, state_t statesWithoutSVS = 0) {
+		void testWmethod(string filename) {
 			fsm->load(filename);
 			sequence_set_t TS;
 			int extraStates = 0;
-			ARE_EQUAL(statesWithoutSVS, SVS_method(fsm, TS, extraStates), "The number of states without SVS differ.");
+			W_method(fsm, TS, extraStates);
 			printTS(TS, filename);
 			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
 		}

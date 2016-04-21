@@ -53,9 +53,9 @@ namespace FSMtesting {
 		for (sequence_in_t trSeq : transitionCover) {
 			sequence_in_t testSeq(trSeq);
 			if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
-			if (startWithStout && !testSeq.empty()) {
+			if (startWithStout) {
 				testSeq.push_front(STOUT_INPUT);
-				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
+				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended PDS)
 			}
 			testSeq.insert(testSeq.end(), DS.begin(), DS.end());
 			pset.insert(testSeq);
@@ -65,7 +65,7 @@ namespace FSMtesting {
 				if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
-					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
+					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended PDS)
 				}
 				testSeq.insert(testSeq.end(), DS.begin(), DS.end());
 				pset.insert(testSeq);
