@@ -470,7 +470,40 @@ namespace FSMtesting {
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
 	FSMLIB_API bool Ma_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	
+	/**
+	* Designs a checking sequence by appending an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	*
+	* Source:
+	* MastersThesis (soucha2015checking)
+	* Soucha, M.
+	* Checking Experiment Design Methods
+	* Czech Technical Univerzity in Prague, 2015
+	*
+	* @param fsm - Deterministic FSM
+	* @param CS - Checking Sequence if given DFSM has a ADS
+	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0)
+	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	*/
 	FSMLIB_API bool Mstar_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0, std::string fileName = "");
+	
+	/**
+	* Designs a checking sequence by appending an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	*
+	* Source:
+	* MastersThesis (soucha2015checking)
+	* Soucha, M.
+	* Checking Experiment Design Methods
+	* Czech Technical Univerzity in Prague, 2015
+	*
+	* @param fsm - Deterministic FSM
+	* @param CS - Checking Sequence if given DFSM has a ADS
+	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0)
+	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	*/
 	FSMLIB_API bool Mg_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
-	FSMLIB_API bool MgGA_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 }

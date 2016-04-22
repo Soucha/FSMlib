@@ -152,6 +152,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Testing\FSMtesting.h" />
+    <ClInclude Include="UnionFind.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -199,6 +200,7 @@
     <ClCompile Include="Testing\SVS-method.cpp" />
     <ClCompile Include="Testing\W-method.cpp" />
     <ClCompile Include="Testing\Wp-method.cpp" />
+    <ClCompile Include="UnionFind.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />
