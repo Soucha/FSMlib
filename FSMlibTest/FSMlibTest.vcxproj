@@ -180,6 +180,7 @@
     <ClCompile Include="Testing\C-methodTests.cpp" />
     <ClCompile Include="Testing\H-methodTests.cpp" />
     <ClCompile Include="Testing\HSI-methodTests.cpp" />
+    <ClCompile Include="Testing\Ma-methodTests.cpp" />
     <ClCompile Include="Testing\PDS-methodTests.cpp" />
     <ClCompile Include="Testing\SPY-methodTests.cpp" />
     <ClCompile Include="Testing\SVS-methodTests.cpp" />
