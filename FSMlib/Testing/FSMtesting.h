@@ -159,6 +159,27 @@ namespace FSMtesting {
 	//FSMLIB_API void DWp_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	//FSMLIB_API int UIO_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	//FSMLIB_API bool CSP_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+
+	/**
+	*
+	*
+	* Sources:
+	* InCollection (simao2008generating)
+	* Simão, A. & Petrenko, A.
+	* Generating checking sequences for partial reduced finite state machines
+	* Testing of Software and Communicating Systems, Springer, 2008, 153-168
+	*
+	* InProceedings (simao2009checking)
+	* Simão, A. & Petrenko, A.
+	* Checking sequence generation using state distinguishing subsequences
+	* Software Testing, Verification and Validation Workshops, 2009. ICSTW'09. International Conference on, 2009, 48-56
+	*
+	* @param fsm - Deterministic FSM
+	* @param CS - Checking Sequence if given DFSM has a ADS
+	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0)
+	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	*/
 	FSMLIB_API bool C_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	//FSMLIB_API bool K_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 

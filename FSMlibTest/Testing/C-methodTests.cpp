@@ -21,47 +21,47 @@ using namespace FSMtesting;
 
 namespace FSMlibTest
 {
-	TEST_CLASS(ADSmethod)
+	TEST_CLASS(Cmethod)
 	{
 	public:
 		DFSM * fsm;
 
 		// TODO: incomplete machines
 
-		TEST_METHOD(TestADSmethod_DFSM)
+		TEST_METHOD(TestCmethod_DFSM)
 		{
 			DFSM dfsm;
 			fsm = &dfsm;
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", false);
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", false);
 		}
 
-		TEST_METHOD(TestADSmethod_Mealy)
+		TEST_METHOD(TestCmethod_Mealy)
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", false);
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", false);
 		}
 
-		TEST_METHOD(TestADSmethod_Moore)
+		TEST_METHOD(TestCmethod_Moore)
 		{
 			Moore moore;
 			fsm = &moore;
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", false);
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", false);
 		}
 
-		TEST_METHOD(TestADSmethod_DFA)
+		TEST_METHOD(TestCmethod_DFA)
 		{
 			DFA dfa;
 			fsm = &dfa;
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
-			testADSmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", false);
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
+			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", false);
 		}
 
 		void printTS(sequence_set_t & TS, string filename) {
@@ -71,20 +71,22 @@ namespace FSMlibTest
 			}
 		}
 
-		void testADSmethod(string filename, bool hasDS = true) {
+		void testCmethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
 			sequence_set_t TS;
+			sequence_in_t CS;
 			int extraStates = 0;
-			if (ADS_method(fsm, TS, extraStates)) {
+			if (C_method(fsm, CS, extraStates)) {
+				TS.insert(CS);
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
-				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+				ARE_EQUAL(false, CS.empty(), "Obtained TS is empty.");
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");
 				if (!TS.empty()) printTS(TS, filename);
 				else {
-					DEBUG_MSG("ADS-method on %s: no ADS, no TS\n", filename.c_str());
+					DEBUG_MSG("C-method on %s: no ADS, no TS\n", filename.c_str());
 				}
 				ARE_EQUAL(true, TS.empty(), "FSM has not adaptive DS but obtained TS has %d sequences.",
 					TS.size());
