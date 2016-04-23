@@ -35,13 +35,6 @@ namespace FSMmodel {
 	FSMLIB_API bool areIsomorphic(DFSM * dfsm1, DFSM * dfsm2);
 
 	/**
-	* Transform given FSM into its minimal (reduced) form.
-	* @param dfsm for minimization
-	* @return True if given machine was minimized
-	*/
-	//FSMLIB_API bool minimize(DFSM * dfsm);
-
-	/**
 	* Checks if each state is reacheable from each other.
 	* @param dfsm
 	* @return true if the given DFSM is strongly connected
@@ -88,4 +81,28 @@ namespace FSMmodel {
 	* @return sequence as string
 	*/
 	FSMLIB_API string getOutSequenceAsString(sequence_out_t sequence);
+
+	/**
+	* Creates a table of shortest paths between all states.
+	* 
+	* @param fsm - Deterministic FSM
+	* @param shortestPaths - resulting table 
+	*/
+	FSMLIB_API void createAllShortestPaths(DFSM * fsm, shortest_paths_t & shortestPaths);
+	
+	/**
+	* Designs a shortest path from given start state to given end state
+	* based on given shortest paths table.
+	*
+	* @param fsm - Deterministic FSM
+	* @param from - start state
+	* @param to - end state
+	* @param shortestPaths - the result of call createAllShortestPaths
+	* @param shortestPath - a shortest path from given start to end state
+	* @param stoutInterleaved - each input is followed with STOUT_INPUT in resulting sequences, if true
+	* @return true if there is a path from start state to end state, false otherwise
+	*/
+	FSMLIB_API bool getShortestPath(DFSM * fsm, state_t from, state_t to,
+		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath, bool stoutInterleaved = false);
+
 }

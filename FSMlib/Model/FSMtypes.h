@@ -82,3 +82,5 @@ typedef unsigned int seq_len_t;
 
 typedef list<input_t> sequence_in_t;
 typedef list<output_t> sequence_out_t;
+
+typedef vector<vector<pair<unsigned int, input_t> > > shortest_paths_t;
