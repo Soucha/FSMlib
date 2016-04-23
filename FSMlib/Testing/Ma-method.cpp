@@ -46,6 +46,7 @@ namespace FSMtesting {
 			getStateCover(fsm, stateCover, fsm->isOutputState());
 
 		getADSet(fsm, ADS, E);
+		delete ADS;
 		/* // Example from simao2009checking
 		E[0].push_back(0);
 		E[0].push_back(1);

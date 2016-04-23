@@ -110,10 +110,10 @@ namespace FSMlibTest
 			}
 		}
 
-		int printInfo(sequence_set_t & TS, string method, int extraStates = 0, bool printSeq = false) {
-			int len = 0;
+		seq_len_t printInfo(sequence_set_t & TS, string method, int extraStates = 0, bool printSeq = false) {
+			seq_len_t len = 0;
 			for (sequence_in_t seq : TS) {
-				len += seq.size();
+				len += seq_len_t(seq.size());
 			}
 			vector<DFSM*> indistinguishable;
 			//fcChecker->getFSMs(TS, indistinguishable, extraStates);
@@ -124,14 +124,14 @@ namespace FSMlibTest
 			return len;
 		}
 
-		int printInfo(sequence_in_t & CS, string method, int extraStates = 0, bool printSeq = false) {
+		seq_len_t printInfo(sequence_in_t & CS, string method, int extraStates = 0, bool printSeq = false) {
 			vector<FSM*> indistinguishable;
 			//fcChecker->getFSMs(CS, indistinguishable, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), int(!CS.empty()), CS.size(), indistinguishable.size());
 			ARE_EQUAL(0, int(indistinguishable.size()), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
 				method.c_str(), indistinguishable.size());
 			if (printSeq) DEBUG_MSG("%s\n", FSMmodel::getInSequenceAsString(CS).c_str());
-			return CS.size();
+			return seq_len_t(CS.size());
 		}
 
 		void comp2methods(int len1, int len2, string met1, string met2, string comp) {
@@ -169,7 +169,7 @@ namespace FSMlibTest
 			if (!filename.empty()) fsm->load(filename);
 
 			sequence_set_t TS_W, TS_Wp, TS_HSI, TS_PDS, TS_SVS, TS_H, TS_SPY, TS_ADS;
-			int len_W, len_Wp, len_HSI, len_PDS, len_SVS, len_H, len_SPY, len_ADS;
+			seq_len_t len_W, len_Wp, len_HSI, len_PDS, len_SVS, len_H, len_SPY, len_ADS;
 
 			//fcChecker = new FaultCoverageChecker(fsm);
 

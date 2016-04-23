@@ -31,6 +31,7 @@ namespace FSMtesting {
 		auto states = fsm->getStates();
 		sequence_vec_t ADSet;
 		getADSet(fsm, ADS, ADSet);
+		delete ADS;
 
 		sequence_set_t transitionCover, traversalSet;
 		getTransitionCover(fsm, transitionCover, fsm->isOutputState());

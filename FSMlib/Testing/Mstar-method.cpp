@@ -16,12 +16,18 @@
 */
 #include "stdafx.h"
 
+#include <sys/stat.h>
+#include <direct.h>
 #include "FSMtesting.h"
 #include "../UnionFind.h"
 
 using namespace FSMsequence;
 
 namespace FSMtesting {
+
+#define GUROBI_SOLVER string("/bin/gurobi_cl")
+#define LP_FOLDER "lp"
+
 	struct pq_entry_t {
 		int from, to, len;
 
@@ -48,9 +54,116 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool process_Mg(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
-		AdaptiveDS* ADS;
+	static void printCosts(vector<vector<seq_len_t> >& costs) {
+		int Tsize = costs.size();
+		printf("\t");
+		for (int i = 0; i < Tsize; i++) {
+			printf("%d\t", i);
+		}
+		printf("\n");
+		for (int i = 0; i < Tsize; i++) {
+			printf("%d\t", i);
+			for (int j = 0; j < Tsize; j++) {
+				printf("%d\t", costs[i][j]);
+			}
+			printf("\n");
+		}
+	}
+
+	static bool writeLP(vector<vector<seq_len_t> >& costs, string fileName) {
+		FILE * file = NULL;
+		if (!(file = fopen(fileName.c_str(), "w"))) {
+			ERROR_MESSAGE("Mstar-method: Unable to create a file for LP.");
+			return false;
+		}
+		int numTests = costs.size();
+		fprintf(file, "Minimize\n\t");
+		for (int i = 0; i < numTests - 1; i++) {
+			for (int j = 0; j < numTests; j++) {
+				fprintf(file, "%d x_%d_%d + ", costs[i][j], i, j);
+			}
+			fprintf(file, "\n\t");
+		}
+		for (int j = 0; j < numTests - 1; j++) {
+			fprintf(file, "%d x_%d_%d + ", costs[numTests - 1][j], numTests - 1, j);
+		}
+		fprintf(file, "%d x_%d_%d\n", costs[numTests - 1][numTests - 1], numTests - 1, numTests - 1);
+
+		fprintf(file, "Subject To\n\t");
+		//enter once
+		for (int j = 0; j < numTests; j++) {
+			for (int i = 0; i < numTests - 1; i++) {
+				fprintf(file, "x_%d_%d + ", i, j);
+			}
+			fprintf(file, "x_%d_%d = 1\n\t", numTests - 1, j);
+		}
+		//leave once
+		for (int i = 0; i < numTests; i++) {
+			for (int j = 0; j < numTests - 1; j++) {
+				fprintf(file, "x_%d_%d + ", i, j);
+			}
+			fprintf(file, "x_%d_%d = 1\n\t", i, numTests - 1);
+		}
+		// cycle indivisibility
+		for (int i = 0; i < numTests; i++) {
+			for (int j = 0; j < numTests - 1; j++) {
+				fprintf(file, "o_%d - o_%d - %d x_%d_%d >= %d\n\t", j, i, 2 * numTests, i, j, (1 - 2 * numTests));
+			}
+		}
+		//fprintf(file, "o_%d = 1\n", numTests - 1);
+
+		fprintf(file, "Binaries\n\t");
+		for (int i = 0; i < numTests; i++) {
+			for (int j = 0; j < numTests; j++) {
+				fprintf(file, "x_%d_%d ", i, j);
+			}
+		}
+		fprintf(file, "\nEnd\n");
+		fflush(file);
+		fclose(file);
+		return true;
+	}
+
+	static void getSolution(vector<state_t> & order, string fileName) {
+		//sleep(1);
+		struct stat buffer;
+		while (stat(fileName.c_str(), &buffer) != 0) {
+			Sleep(1);
+		}
+		ifstream fin(fileName);
+		string s;
+		int numTests = order.size(), pos;
+		getline(fin, s);
+		for (int i = 0; i < numTests; i++) {
+			for (int j = 0; j < numTests; j++) {
+				fin >> s >> pos;
+				if (pos) {
+					order[i] = j;
+				}
+			}
+		}
+		/*
+		for (int i = 0; i < numTests*numTests; i++) getline(fin, s);
+		for (int i = 0; i < numTests; i++) {
+		fin >> s >> pos;
+		if ((pos < 0) || (pos >= numTests)) {
+		throw("Unable to read solution "+ s);
+		}
+		order[pos] = i;
+		//printf("%s %d\n",s.c_str(),pos);
+		}*/
+	}
+
+	static bool process_Mstar(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
 		TS.clear();
+		char* gurobiPath;
+		gurobiPath = getenv("GUROBI_HOME");
+		if (gurobiPath == NULL) {
+			ERROR_MESSAGE("Mstar-method needs Gurobi solver to run and GUROBI_HOME is not a system variable!");
+			return false;
+		}
+		
+		AdaptiveDS* ADS;
 		if (!getAdaptiveDistinguishingSequence(fsm, ADS)) {
 			return false;
 		}
@@ -209,22 +322,23 @@ namespace FSMtesting {
 			}
 		}
 
-		// create route
-		vector<state_t> prev(Tsize, NULL_STATE), next(Tsize, NULL_STATE);
-		FSMlib::UnionFind uf(Tsize);
-		while (!edges.empty()) {
-			auto e = edges.top();
-			edges.pop();
-			//printf("%d %d->%d %d n%d p%d %d %d\n",counter,e.from,e.to,e.len,
-			//      next[e.from],prev[e.to],uf.doFind(e.from),uf.doFind(e.to));
-			if (((counter > 0) && (uf.doFind(e.from) != uf.doFind(e.to))) &&
-					(next[e.from] == NULL_STATE) && (prev[e.to] == NULL_STATE)) {
-				uf.doUnion(e.from, e.to);
-				next[e.from] = e.to;
-				prev[e.to] = e.from;
-				counter--;
-			}
+		// write LP
+		mkdir(LP_FOLDER);
+		string fileName = fsm->getFilename();
+		fileName = FSMlib::Utils::getUniqueName(fileName, "lp", string(LP_FOLDER)+"/");
+
+		if (!writeLP(costs, fileName)) return false;
+		string call = "start " + string(gurobiPath) + GUROBI_SOLVER + " ResultFile=" + fileName + ".sol " + fileName;
+		//printf(call.c_str());
+		int rv = system(call.c_str());
+		if (rv != 0) {
+			ERROR_MESSAGE("Mstar-method: Fail in solving LP.\n");
+			return false;
 		}
+
+		// obtain solution of LP
+		vector<state_t> next(Tsize);
+		getSolution(next, fileName + ".sol");
 
 		// create CS
 		idx = Tsize - 1;
@@ -265,16 +379,16 @@ namespace FSMtesting {
 		return true;
 	}
 
-	bool Mg_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
+	bool Mstar_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
 		sequence_set_t TS;
 		CS.clear();
-		if (!process_Mg(fsm, TS, extraStates, false)) return false;
+		if (!process_Mstar(fsm, TS, extraStates, false)) return false;
 		CS.insert(CS.end(), TS.begin()->begin(), TS.begin()->end());
 		return true;
 	}
 
-	bool Mrg_method(DFSM* fsm, sequence_set_t& TS, int extraStates) {
-		return process_Mg(fsm, TS, extraStates, true);
+	bool Mrstar_method(DFSM* fsm, sequence_set_t& TS, int extraStates) {
+		return process_Mstar(fsm, TS, extraStates, true);
 	}
 
 }

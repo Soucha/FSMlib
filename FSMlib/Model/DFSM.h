@@ -151,6 +151,10 @@ public:
 	*/
 	vector<state_t> getStates();
 
+	/**
+	* @return a standard file name of this machine
+	*/
+	string getFilename();
 protected:
 	bool _isReduced;
 	bool _isOutputState;
@@ -180,7 +184,6 @@ protected:
 	bool loadTransitionOutputs(ifstream& file);
 	bool loadTransitions(ifstream& file);
 	
-	string getFilename();
 	void saveInfo(ofstream& file);
 	void saveStateOutputs(ofstream& file);
 	void saveTransitionOutputs(ofstream& file);

@@ -274,7 +274,7 @@ namespace FSMlibTest
 							dist = true;
 						}
 					}
-					int minVal = fsm->getNumberOfStates();
+					seq_len_t minVal = fsm->getNumberOfStates();
 					input_t minIn = STOUT_INPUT;
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 						DEBUG_MSG("  %d -> %d\n", input, seq[idx].next[input]);

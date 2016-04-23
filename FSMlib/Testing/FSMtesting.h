@@ -263,9 +263,18 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API bool Mrstar_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0, std::string fileName = "");
+	FSMLIB_API bool Mrstar_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
+	* Designs a checking sequence using an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Possible overlapping is calculated for each pair of test segments and
+	* according to these costs test segments are connected to create a sequence.
+	* Therefore, the length of CS is optimized globally.
+	* In the process of connecting test segment, reset can be applied
+	* if the reacheable sequence is shorter than the shortest sequence
+	* from end state of the first test segment to start state of the second segment.
 	*
 	* Source:
 	* MastersThesis (soucha2015checking)
@@ -487,11 +496,15 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	FSMLIB_API bool Mstar_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0, std::string fileName = "");
+	FSMLIB_API bool Mstar_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
-	* Designs a checking sequence by appending an adaptive distinguishing sequence
+	* Designs a checking sequence using an adaptive distinguishing sequence
 	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Possible overlapping is calculated for each pair of test segments and
+	* according to these costs test segments are connected to create a sequence.
+	* Therefore, the length of CS is optimized globally.
 	*
 	* Source:
 	* MastersThesis (soucha2015checking)
