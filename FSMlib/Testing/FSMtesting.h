@@ -250,6 +250,13 @@ namespace FSMtesting {
 	FSMLIB_API bool Mra_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
+	* Designs a checking sequence using an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
+	* using GUROBI solver. A test segment corresponds to a node in TSP and
+	* a cost of edge is possible overlapping of two related test segments.
+	* If two consecutive segments do not overlap, reset can be used if a shorter CS is produced.
 	*
 	* Source:
 	* MastersThesis (soucha2015checking)
@@ -481,8 +488,12 @@ namespace FSMtesting {
 	FSMLIB_API bool Ma_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
-	* Designs a checking sequence by appending an adaptive distinguishing sequence
+	* Designs a checking sequence using an adaptive distinguishing sequence
 	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
+	* using GUROBI solver. A test segment corresponds to a node in TSP and
+	* a cost of edge is possible overlapping of two related test segments.
 	*
 	* Source:
 	* MastersThesis (soucha2015checking)

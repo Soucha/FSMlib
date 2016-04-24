@@ -23,6 +23,51 @@
 #define SEQUENCE_SEPARATOR       ","
 
 namespace FSMmodel {
+	FSM * createFSM(machine_type_t machineType, state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
+		FSM * fsm = NULL;
+		switch (machineType)
+		{
+		case TYPE_DFSM:
+			fsm = new DFSM();
+			break;
+		case TYPE_MEALY:
+			fsm = new Mealy();
+			break;
+		case TYPE_MOORE:
+			fsm = new Moore();
+			break;
+		case TYPE_DFA:
+			fsm = new DFA();
+			break;
+		default:
+			return fsm;
+		}
+		fsm->create(numberOfStates, numberOfInputs, numberOfOutputs);
+		return fsm;
+	}
+
+	FSM * duplicateFSM(FSM * origFSM) {
+		FSM * fsm = NULL;
+		switch (origFSM->getType())
+		{
+		case TYPE_DFSM:
+			fsm = new DFSM(*((DFSM*)origFSM));
+			break;
+		case TYPE_MEALY:
+			fsm = new Mealy(*((Mealy*)origFSM));
+			break;
+		case TYPE_MOORE:
+			fsm = new Moore(*((Moore*)origFSM));
+			break;
+		case TYPE_DFA:
+			fsm = new DFA(*((DFA*)origFSM));
+			break;
+		default:
+			return fsm;
+		}
+		return fsm;
+	}
+
 	bool areIsomorphic(DFSM* fsm1, DFSM* fsm2) {
 		if (!fsm1->isReduced()) {
 			fsm1->minimize();

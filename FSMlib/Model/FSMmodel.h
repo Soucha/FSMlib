@@ -24,6 +24,25 @@
 
 namespace FSMmodel {
 	/**
+	* Creates a finite state machine of give type.
+	*
+	* @param machineType
+	* @param numberOfStates
+	* @param numberOfInputs
+	* @param numberOfOutputs
+	* @return a pointer to a new FSM
+	*/
+	FSMLIB_API FSM * createFSM(machine_type_t machineType, state_t numberOfStates = 1, input_t numberOfInputs = 0, output_t numberOfOutputs = 0);
+
+	/**
+	* Creates a copy of provided finite state machine.
+	*
+	* @param fsm
+	* @return a pointer to the copy of given FSM
+	*/
+	FSMLIB_API FSM * duplicateFSM(FSM * fsm);
+
+	/**
 	* Compares two DFSMs with same input and output alphabet and initial state 0.
 	* FSMs are isomorphic only if they differ in permutation of states.
 	*

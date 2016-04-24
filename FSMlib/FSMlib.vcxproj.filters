@@ -78,6 +78,9 @@
     <ClInclude Include="UnionFind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Testing\FaultCoverageChecker.h">
+      <Filter>Header Files\Testing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -168,6 +171,9 @@
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
     <ClCompile Include="Testing\Mstar-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\FaultCoverageChecker.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
   </ItemGroup>

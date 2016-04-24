@@ -28,6 +28,7 @@
 #include "Model\FSMmodel.h"
 #include "Sequences\FSMsequence.h"
 #include "Testing\FSMtesting.h"
+#include "Testing\FaultCoverageChecker.h"
 
 #include "PrefixSet.h"
 #endif

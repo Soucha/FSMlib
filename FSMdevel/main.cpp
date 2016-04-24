@@ -31,6 +31,7 @@ DFSM * fsm, *fsm2;
 wchar_t message[200];
 
 using namespace FSMsequence;
+using namespace FSMtesting;
 
 static void printSeqSet(sequence_set_t& seqSet) {
 	for (auto seq : seqSet) {
@@ -90,7 +91,7 @@ void testGetSeparatingSequences(string filename, void(*getSepSeq)(DFSM * dfsm, v
 void groupTest(string filename) {
 	testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences));
 #ifdef PARALLEL_COMPUTING
-	//testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences_ParallelSF));
+	testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences_ParallelSF));
 	testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences_ParallelQueue));
 #endif
 }
@@ -107,32 +108,41 @@ void testSepSeqs() {
 	groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
 }
 
+static void testAllMethod(string filename) {
+	sequence_vec_t hint;
+	sequence_in_t CS;
+	sequence_set_t TS;
+	int len;
+	vector<DFSM*> indist;
+	int extraStates = 0;
+	
+	fsm->load(filename);
+	printf("%d;%d;%d;%d;%d;1;%d;", fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(),
+		fsm->getType(), (int)fsm->isReduced(), extraStates);
+
+	SPY_method(fsm, TS, extraStates);
+	len = 0;
+	for (sequence_in_t seq : TS) len += seq.size() + 1;
+	FaultCoverageChecker::getFSMs(fsm, TS, indist, extraStates);
+	printf("%d;%d;", len, indist.size());
+	for (auto f : indist) delete f;
+	indist.clear();
+}
+
 int main(int argc, char** argv) {
 
+	Mealy mealy;
+	fsm = &mealy;
 
-	sequence_in_t DS;
-	DS.push_back(STOUT_INPUT);
-	DS.push_back(0);
-	//DS.push_back(STOUT_INPUT);
-	DS.push_back(1);
-	DS.push_back(0);
-	DS.push_back(0);
+	testAllMethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
+	Moore moore;
+	fsm = &moore;
+	testAllMethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
 
-	sequence_in_t origDS = DS;
+	DFSM dfsm;
+	fsm = &dfsm;
+	testAllMethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 
-		auto DSit = DS.begin();
-		for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-			if (*it == STOUT_INPUT) continue;
-			it++;
-			if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-				DS.insert(++DSit, STOUT_INPUT);
-				DSit--;
-			}
-			it--;
-		}
-		if (DS.front() == STOUT_INPUT) DS.pop_front();
-	
-		printf("%s\n", FSMmodel::getInSequenceAsString(DS).c_str());
 	char c;
 	cin >> c;
 	return 0;
