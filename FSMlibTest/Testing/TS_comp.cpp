@@ -100,6 +100,7 @@ namespace FSMlibTest
 		void groupTest(string filename) {
 			testingTSmethodComp(filename);
 			//testingTSmethodComp("", 1);
+			testingCSmethodComp("");
 		}
 
 		void printTS(sequence_set_t & TS) {
@@ -117,7 +118,7 @@ namespace FSMlibTest
 			vector<DFSM*> indistinguishable;
 			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), TS.size(), len, indistinguishable.size());
-			ARE_EQUAL(true, indistinguishable.size() <= 1, "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
+			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
 				method.c_str(), indistinguishable.size());
 			for (auto f : indistinguishable) delete f;
 			if (printSeq) printTS(TS);
@@ -126,9 +127,9 @@ namespace FSMlibTest
 
 		seq_len_t printInfo(sequence_in_t & CS, string method, int extraStates = 0, bool printSeq = false) {
 			vector<DFSM*> indistinguishable;
-			FaultCoverageChecker::getFSMs(fsm, CS, indistinguishable, extraStates);
+			FaultCoverageChecker::getFSMs(fsm, CS, indistinguishable, extraStates);	
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), int(!CS.empty()), CS.size(), indistinguishable.size());
-			ARE_EQUAL(true, indistinguishable.size() <= 1, "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
+			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
 				method.c_str(), indistinguishable.size());
 			for (auto f : indistinguishable) delete f;
 			if (printSeq) DEBUG_MSG("%s\n", FSMmodel::getInSequenceAsString(CS).c_str());

@@ -41,13 +41,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 		FSMlib::setErrorMsgHandler(writeErrorMsg);\
 	}
 	
-#define ARE_EQUAL(expected, actual, format, ...) \
+#define ARE_EQUAL(expected, actual, format, ...) {\
 	_snprintf_s(FSMlibTest::msg, MSG_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
-	Assert::AreEqual(expected, actual, ToString(FSMlibTest::msg).c_str(), LINE_INFO());
+	Assert::AreEqual(expected, actual, ToString(FSMlibTest::msg).c_str(), LINE_INFO()); }
 
-#define DEBUG_MSG(format, ...) \
+#define DEBUG_MSG(format, ...) {\
 	_snprintf_s(FSMlibTest::msg, MSG_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
-	Logger::WriteMessage(FSMlibTest::msg);
+	Logger::WriteMessage(FSMlibTest::msg); }
 
 namespace FSMlibTest
 {

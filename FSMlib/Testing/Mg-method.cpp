@@ -23,9 +23,10 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	struct pq_entry_t {
-		int from, to, len;
+		state_t from, to;
+		seq_len_t len;
 
-		pq_entry_t(int from, int to, int len) :
+		pq_entry_t(state_t from, state_t to, seq_len_t len) :
 			from(from), len(len), to(to) {
 		}
 	};
@@ -114,8 +115,6 @@ namespace FSMtesting {
 				seq.push_front(input);
 				tests.push_back(seq);
 				counter++;
-				//printf("%d-%d idx%d len%d %d %s\n", state, input, tests.size() - 1, seq.size(), fsm->getEndPathState(state,seq),
-				//    FSMutils::getInSequenceAsString(seq).c_str());
 			}
 		}
 		tests.push_back(d[0]);
@@ -134,7 +133,6 @@ namespace FSMtesting {
 				auto actState = fsm->getNextState(states[state], input);
 				if (actState == NULL_STATE) continue;
 				actState = getIdx(states, actState);
-				//printf("%d %d %s\n", state, input, FSMutils::getInSequenceAsString(tests[idx]).c_str());
 				auto it = tests[idx].begin();
 				seq_len_t cost = 1;
 				for (++it; it != tests[idx].end(); it++, cost++) {
@@ -143,14 +141,11 @@ namespace FSMtesting {
 						if (it == tests[idx].end()) break;
 					}
 					state_t nextIdx = actState * P + (*it);
-					//printf("%d-%d %di%d %dx%d c%d %s\n", state, actState, input, *it, idx, nextIdx, costs[idx][nextIdx],
-					//       FSMutils::getInSequenceAsString(tests[nextIdx]).c_str());
 					if ((costs[idx][nextIdx] == maxCost) && (nextIdx != idx) && !tests[nextIdx].empty()) {
 						if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 							costs[idx][nextIdx] = cost;
 							pq_entry_t en(idx, nextIdx, cost);
 							edges.push(en);
-							//printf("%dx%d %d\n", idx,nextIdx, cost);
 						}
 					}
 					actState = fsm->getNextState(actState, *it);
@@ -170,7 +165,6 @@ namespace FSMtesting {
 						}
 						pq_entry_t en(idx, i, costs[idx][i]);
 						edges.push(en);
-						//printf("%dx%d %d %d-%d %d\n", idx, i, costs[idx][i], actState, i / P, sp[actState][i / P].first);
 					}
 				}
 			}
@@ -205,7 +199,6 @@ namespace FSMtesting {
 				}
 				pq_entry_t en(idx, i, costs[idx][i]);
 				edges.push(en);
-				//printf("%d %d %d-%d %d %d\n", idx, i, actState, i / P, sp[actState][i / P].first, tests[idx].size());
 			}
 		}
 
@@ -215,8 +208,6 @@ namespace FSMtesting {
 		while (!edges.empty()) {
 			auto e = edges.top();
 			edges.pop();
-			//printf("%d %d->%d %d n%d p%d %d %d\n",counter,e.from,e.to,e.len,
-			//      next[e.from],prev[e.to],uf.doFind(e.from),uf.doFind(e.to));
 			if (((counter > 0) && (uf.doFind(e.from) != uf.doFind(e.to))) &&
 					(next[e.from] == NULL_STATE) && (prev[e.to] == NULL_STATE)) {
 				uf.doUnion(e.from, e.to);
@@ -229,7 +220,6 @@ namespace FSMtesting {
 		// create CS
 		idx = Tsize - 1;
 		for (state_t i = 0; i < Tsize - 1; i++) {
-			//printf("%d %d %d %d %d\n", idx, next[idx], costs[idx][next[idx]], tests[idx].size(), CS.size());
 			if (costs[idx][next[idx]] >= tests[idx].size()) {
 				CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
 				state_t from = fsm->getEndPathState((idx == Tsize - 1) ? 0 : idx / P, tests[idx]);
@@ -243,7 +233,6 @@ namespace FSMtesting {
 					else {
 						sequence_in_t shortestPath;
 						FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp, shortestPath, fsm->isOutputState());
-						//printf(" %d\n", shortestPath.size());
 						CS.insert(CS.end(), shortestPath.begin(), shortestPath.end());
 					}
 				}
@@ -258,9 +247,7 @@ namespace FSMtesting {
 			}
 			idx = next[idx];
 		}
-		//printf("%d %d %d %d %d\n", idx, next[idx], costs[idx][next[idx]], tests[idx].size(), CS.size());
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
-		//printf("%d %d\n", idx, CS.size());
 		TS.insert(CS);
 		return true;
 	}

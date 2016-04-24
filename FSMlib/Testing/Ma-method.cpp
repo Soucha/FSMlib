@@ -191,7 +191,6 @@ namespace FSMtesting {
 							currState = nextState;
 							currInput = CS.end();
 							fifo.clear();
-							//printf("3\n");
 							break;
 						}
 						if (!covered[nextState]) {

@@ -96,11 +96,11 @@ namespace FSMtesting {
 		static state_t MaxStates;
 
 		struct StateVariable {
-			int varIdx, tmp;
+			state_t varIdx, tmp;
 			state_t instance = NULL_STATE, state;
-			set<int> different;
+			set<state_t> different;
 			dynamic_bitset domain;
-			int prev;
+			state_t prev;
 			input_t prevInput;
 			bool isRefState = false;
 
@@ -137,13 +137,13 @@ namespace FSMtesting {
 
 		static DFSM * partial;
 		static vector<StateVariable*> var;
-		static vector<vector<int>> refStates;
-		static stack<int> instantiated;
+		static vector<vector<state_t>> refStates;
+		static stack<state_t> instantiated;
 		static vector<DFSM*> indistinguishable;
 		static stack<LogItemFC*> log;
 		static int level = -1;
 		
-		static void cleanLevel(int rootIdx) {
+		static void cleanLevel(state_t rootIdx) {
 			while (var.size() > rootIdx) {
 				if (var.back() != NULL) {
 					delete var.back();
@@ -174,10 +174,6 @@ namespace FSMtesting {
 				delete partial;
 				level--;
 			}
-
-			//for (FSM* fsm : indistinguishable) {
-			//  delete fsm;
-			//}
 			indistinguishable.clear();
 		}
 
@@ -201,7 +197,8 @@ namespace FSMtesting {
 					nextState = fsm->getNextState(states[actStateVar->state], input);
 					outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 					nextState = FSMsequence::getIdx(states, nextState);
-					actStateVar->transitionOutput[input] = (fsm->isOutputTransition()) ? fsm->getOutput(states[actStateVar->state], input) : DEFAULT_OUTPUT;
+					actStateVar->transitionOutput[input] = (fsm->isOutputTransition()) ?
+						fsm->getOutput(states[actStateVar->state], input) : DEFAULT_OUTPUT;
 					actStateVar->next[input] = new StateVariable(input, nextState, outputState);
 					actStateVar = actStateVar->next[input];		
 				}
@@ -213,7 +210,7 @@ namespace FSMtesting {
 				actStateVar = fifo.front();
 				fifo.pop();
 
-				actStateVar->varIdx = var.size();
+				actStateVar->varIdx = state_t(var.size());
 				var.push_back(actStateVar);
 				for (input_t input = 0; input < P; input++) {
 					if (actStateVar->next[input] != NULL) {
@@ -272,7 +269,7 @@ namespace FSMtesting {
 					if (isUniqueNode(sv)) {
 						sv->domain.reset();
 						sv->domain.set(refStates[level].size(), true);
-						sv->instance = refStates[level].size();
+						sv->instance = state_t(refStates[level].size());
 						sv->isRefState = true;
 						refStates[level].push_back(sv->varIdx);
 					}
@@ -281,7 +278,7 @@ namespace FSMtesting {
 		}
 
 		static bool instantiate(StateVariable* node) {
-			int idx = node->varIdx;
+			state_t idx = node->varIdx;
 			if (var[idx]->domain.none()) return false;
 			var[idx]->instance = state_t(var[idx]->domain.find_first());
 			if (var[idx]->instance >= refStates[level].size()) {
@@ -306,7 +303,7 @@ namespace FSMtesting {
 		}
 
 		static bool reduceDomains() {
-			for (int i = 0; i < var.size(); i++) {
+			for (state_t i = 0; i < var.size(); i++) {
 				if (var[i]->instance != NULL_STATE) continue; // a ref state
 				bool unique = isUniqueNode(var[i]);
 				if ((unique) || (var[i]->domain.count() == 1)) {
@@ -314,7 +311,7 @@ namespace FSMtesting {
 						// assign unused state to the var
 						var[i]->domain.reset();
 						var[i]->domain.set(refStates[level].size(), true);
-						var[i]->instance = refStates[level].size();
+						var[i]->instance = state_t(refStates[level].size());
 						var[i]->isRefState = true;
 						refStates[level].push_back(i);
 					}
@@ -322,7 +319,7 @@ namespace FSMtesting {
 						var[i]->instance = state_t(var[i]->domain.find_first());
 						instantiated.push(i);
 					}
-					for (int j = 0; j < i; j++) {
+					for (state_t j = 0; j < i; j++) {
 						if (var[j]->instance == NULL_STATE && // not a reference state
 							areNodesDifferent(var[i], var[j])) {
 							var[j]->domain.set(var[i]->instance, false);
@@ -334,7 +331,7 @@ namespace FSMtesting {
 					}
 				}
 				else {
-					for (int j = 0; j < i; j++) {
+					for (state_t j = 0; j < i; j++) {
 						if (!var[j]->isRefState && // not a reference state
 							areNodesDifferent(var[i], var[j])) {
 							if (var[j]->instance != NULL_STATE) {
@@ -408,7 +405,7 @@ namespace FSMtesting {
 		static bool processInstantiated() {
 			bool consistent = true;
 			while (!instantiated.empty()) {
-				int i = instantiated.top();
+				state_t i = instantiated.top();
 				instantiated.pop();
 				if (!consistent || (var[i] == NULL) || (var[i]->isRefState)) continue;
 				
@@ -419,29 +416,29 @@ namespace FSMtesting {
 			return consistent;
 		}
 
-		static int isSolved(int rootIdx) {
+		static state_t isSolved(state_t rootIdx) {
 			state_t minDom = MaxStates;
-			int minIdx = -1;
-			for (int i = rootIdx; i < var.size(); i++) {
+			state_t minIdx = NULL_STATE;
+			for (state_t i = rootIdx; i < var.size(); i++) {
 				if (var[i] != NULL) {
 					auto & node = var[i];
 					if (node->domain.count() != 1) {
-						for (int state = node->domain.find_first();
-							((state != node->domain.npos) && (state < refStates[level].size()));
-							state = node->domain.find_next(state)) {
+						for (state_t state = state_t(node->domain.find_first());
+							((state != state_t(node->domain.npos)) && (state < state_t(refStates[level].size())));
+							state = state_t(node->domain.find_next(state))) {
 							if (areNodesDifferent(node, var[refStates[level][state]], true)) {
 								node->domain.set(state, false);
 								if (node->domain.count() == 1) {
 									if (!instantiate(node))
-										return -2;
+										return WRONG_STATE;
 								}
 								else if (node->domain.none()) {
-									return -2;
+									return WRONG_STATE;
 								}
 							}
 						}
 						if (minDom > node->domain.count()) {
-							minDom = node->domain.count();
+							minDom = state_t(node->domain.count());
 							minIdx = node->varIdx;
 						}
 					}
@@ -539,14 +536,14 @@ namespace FSMtesting {
 			indistinguishable.push_back(accurate);
 		}
 
-		static void copyVar(int rootIdx, int newRootIdx) {
-			for (int i = rootIdx; i < newRootIdx; i++) {
+		static void copyVar(state_t rootIdx, state_t newRootIdx) {
+			for (state_t i = rootIdx; i < newRootIdx; i++) {
 				if (var[i] != NULL) {
-					var[i]->tmp = var.size();
+					var[i]->tmp = state_t(var.size());
 					var.push_back(new StateVariable(*(var[i])));
 				}
 			}
-			for (int i = newRootIdx; i < var.size(); i++) {
+			for (state_t i = newRootIdx; i < var.size(); i++) {
 				for (auto dn : var[var[i]->varIdx]->different) {
 					if (var[dn] != NULL) {
 						var[i]->different.insert(var[dn]->tmp);
@@ -560,21 +557,21 @@ namespace FSMtesting {
 				var[i]->varIdx = i;
 				var[i]->prev = var[var[i]->prev]->tmp;
 			}
-			vector<int> rs;
+			vector<state_t> rs;
 			refStates.push_back(rs);
 			for (auto i : refStates[level - 1]) {
 				refStates[level].push_back(var[i]->tmp);
 			}
 		}
 
-		static void search(int idx, int rootIdx) {
+		static void search(state_t idx, state_t rootIdx) {
 			level++;
 			//printf("search: %d %d %d\n", level, rootIdx, idx);
 			bool fail;
-			int newRootIdx = var.size(), newIdx;
-			for (int state = var[idx]->domain.find_first();
-					((state != var[idx]->domain.npos) && (state <= refStates[level - 1].size())); // it can be new ref state
-					state = var[idx]->domain.find_next(state)) {
+			state_t newRootIdx = state_t(var.size()), newIdx;
+			for (state_t state = state_t(var[idx]->domain.find_first());
+					((state != state_t(var[idx]->domain.npos)) && (state <= state_t(refStates[level - 1].size()))); // it can be new ref state
+					state = state_t(var[idx]->domain.find_next(state))) {
 				fail = false;
 				copyVar(rootIdx, newRootIdx);
 				var[var[idx]->tmp]->domain.reset();
@@ -636,7 +633,7 @@ namespace FSMtesting {
 			MaxStates = fsm->getNumberOfStates() + extraStates;
 
 			level = 0;
-			vector<int> rs;
+			vector<state_t> rs;
 			refStates.push_back(rs);
 			initVar(fsm, TS);
 			if (fsm->isOutputState()) {
@@ -644,14 +641,14 @@ namespace FSMtesting {
 			}
 
 			initRefStates(var[0], hint);
-			int idx;
-			if (!reduceDomains() || !processInstantiated() || ((idx = isSolved(0)) == -2)) {
+			state_t idx;
+			if (!reduceDomains() || !processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
 				cleanup();
 				return;
 			}
 			while (!instantiated.empty()) {
-				if (!processInstantiated() || ((idx = isSolved(0)) == -2)) {
+				if (!processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
 					ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
 					cleanup();
 					return;
@@ -663,7 +660,7 @@ namespace FSMtesting {
 				cleanup();
 				return;
 			}
-			if (idx == -1) {
+			if (idx == NULL_STATE) {
 				checkSolution();
 			}
 			else {

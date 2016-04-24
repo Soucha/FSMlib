@@ -29,9 +29,10 @@ namespace FSMtesting {
 #define LP_FOLDER "lp"
 
 	struct pq_entry_t {
-		int from, to, len;
+		state_t from, to;
+		seq_len_t len;
 
-		pq_entry_t(int from, int to, int len) :
+		pq_entry_t(state_t from, state_t to, seq_len_t len) :
 			from(from), len(len), to(to) {
 		}
 	};
@@ -55,16 +56,16 @@ namespace FSMtesting {
 	}
 
 	static void printCosts(vector<vector<seq_len_t> >& costs) {
-		int Tsize = costs.size();
+		state_t Tsize = state_t(costs.size());
 		printf("\t");
-		for (int i = 0; i < Tsize; i++) {
-			printf("%d\t", i);
+		for (state_t i = 0; i < Tsize; i++) {
+			printf("%u\t", i);
 		}
 		printf("\n");
-		for (int i = 0; i < Tsize; i++) {
-			printf("%d\t", i);
-			for (int j = 0; j < Tsize; j++) {
-				printf("%d\t", costs[i][j]);
+		for (state_t i = 0; i < Tsize; i++) {
+			printf("%u\t", i);
+			for (state_t j = 0; j < Tsize; j++) {
+				printf("%u\t", costs[i][j]);
 			}
 			printf("\n");
 		}
@@ -76,46 +77,46 @@ namespace FSMtesting {
 			ERROR_MESSAGE("Mstar-method: Unable to create a file for LP.");
 			return false;
 		}
-		int numTests = costs.size();
+		state_t numTests = state_t(costs.size());
 		fprintf(file, "Minimize\n\t");
-		for (int i = 0; i < numTests - 1; i++) {
-			for (int j = 0; j < numTests; j++) {
-				fprintf(file, "%d x_%d_%d + ", costs[i][j], i, j);
+		for (state_t i = 0; i < numTests - 1; i++) {
+			for (state_t j = 0; j < numTests; j++) {
+				fprintf(file, "%u x_%u_%u + ", costs[i][j], i, j);
 			}
 			fprintf(file, "\n\t");
 		}
-		for (int j = 0; j < numTests - 1; j++) {
-			fprintf(file, "%d x_%d_%d + ", costs[numTests - 1][j], numTests - 1, j);
+		for (state_t j = 0; j < numTests - 1; j++) {
+			fprintf(file, "%u x_%u_%u + ", costs[numTests - 1][j], numTests - 1, j);
 		}
-		fprintf(file, "%d x_%d_%d\n", costs[numTests - 1][numTests - 1], numTests - 1, numTests - 1);
+		fprintf(file, "%u x_%u_%u\n", costs[numTests - 1][numTests - 1], numTests - 1, numTests - 1);
 
 		fprintf(file, "Subject To\n\t");
 		//enter once
-		for (int j = 0; j < numTests; j++) {
-			for (int i = 0; i < numTests - 1; i++) {
-				fprintf(file, "x_%d_%d + ", i, j);
+		for (state_t j = 0; j < numTests; j++) {
+			for (state_t i = 0; i < numTests - 1; i++) {
+				fprintf(file, "x_%u_%u + ", i, j);
 			}
-			fprintf(file, "x_%d_%d = 1\n\t", numTests - 1, j);
+			fprintf(file, "x_%u_%u = 1\n\t", numTests - 1, j);
 		}
 		//leave once
-		for (int i = 0; i < numTests; i++) {
-			for (int j = 0; j < numTests - 1; j++) {
-				fprintf(file, "x_%d_%d + ", i, j);
+		for (state_t i = 0; i < numTests; i++) {
+			for (state_t j = 0; j < numTests - 1; j++) {
+				fprintf(file, "x_%u_%u + ", i, j);
 			}
-			fprintf(file, "x_%d_%d = 1\n\t", i, numTests - 1);
+			fprintf(file, "x_%u_%u = 1\n\t", i, numTests - 1);
 		}
 		// cycle indivisibility
-		for (int i = 0; i < numTests; i++) {
-			for (int j = 0; j < numTests - 1; j++) {
-				fprintf(file, "o_%d - o_%d - %d x_%d_%d >= %d\n\t", j, i, 2 * numTests, i, j, (1 - 2 * numTests));
+		for (state_t i = 0; i < numTests; i++) {
+			for (state_t j = 0; j < numTests - 1; j++) {
+				fprintf(file, "o_%u - o_%u - %u x_%u_%u >= %d\n\t", j, i, 2 * numTests, i, j, (1 - 2 * numTests));
 			}
 		}
 		//fprintf(file, "o_%d = 1\n", numTests - 1);
 
 		fprintf(file, "Binaries\n\t");
-		for (int i = 0; i < numTests; i++) {
-			for (int j = 0; j < numTests; j++) {
-				fprintf(file, "x_%d_%d ", i, j);
+		for (state_t i = 0; i < numTests; i++) {
+			for (state_t j = 0; j < numTests; j++) {
+				fprintf(file, "x_%u_%u ", i, j);
 			}
 		}
 		fprintf(file, "\nEnd\n");
@@ -132,26 +133,17 @@ namespace FSMtesting {
 		}
 		ifstream fin(fileName);
 		string s;
-		int numTests = order.size(), pos;
+		state_t numTests = state_t(order.size());
+		int pos;
 		getline(fin, s);
-		for (int i = 0; i < numTests; i++) {
-			for (int j = 0; j < numTests; j++) {
+		for (state_t i = 0; i < numTests; i++) {
+			for (state_t j = 0; j < numTests; j++) {
 				fin >> s >> pos;
 				if (pos) {
 					order[i] = j;
 				}
 			}
 		}
-		/*
-		for (int i = 0; i < numTests*numTests; i++) getline(fin, s);
-		for (int i = 0; i < numTests; i++) {
-		fin >> s >> pos;
-		if ((pos < 0) || (pos >= numTests)) {
-		throw("Unable to read solution "+ s);
-		}
-		order[pos] = i;
-		//printf("%s %d\n",s.c_str(),pos);
-		}*/
 	}
 
 	static bool process_Mstar(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
@@ -227,8 +219,6 @@ namespace FSMtesting {
 				seq.push_front(input);
 				tests.push_back(seq);
 				counter++;
-				//printf("%d-%d idx%d len%d %d %s\n", state, input, tests.size() - 1, seq.size(), fsm->getEndPathState(state,seq),
-				//    FSMutils::getInSequenceAsString(seq).c_str());
 			}
 		}
 		tests.push_back(d[0]);
@@ -247,7 +237,6 @@ namespace FSMtesting {
 				auto actState = fsm->getNextState(states[state], input);
 				if (actState == NULL_STATE) continue;
 				actState = getIdx(states, actState);
-				//printf("%d %d %s\n", state, input, FSMutils::getInSequenceAsString(tests[idx]).c_str());
 				auto it = tests[idx].begin();
 				seq_len_t cost = 1;
 				for (++it; it != tests[idx].end(); it++, cost++) {
@@ -256,14 +245,11 @@ namespace FSMtesting {
 						if (it == tests[idx].end()) break;
 					}
 					state_t nextIdx = actState * P + (*it);
-					//printf("%d-%d %di%d %dx%d c%d %s\n", state, actState, input, *it, idx, nextIdx, costs[idx][nextIdx],
-					//       FSMutils::getInSequenceAsString(tests[nextIdx]).c_str());
 					if ((costs[idx][nextIdx] == maxCost) && (nextIdx != idx) && !tests[nextIdx].empty()) {
 						if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 							costs[idx][nextIdx] = cost;
 							pq_entry_t en(idx, nextIdx, cost);
 							edges.push(en);
-							//printf("%dx%d %d\n", idx,nextIdx, cost);
 						}
 					}
 					actState = fsm->getNextState(actState, *it);
@@ -283,7 +269,6 @@ namespace FSMtesting {
 						}
 						pq_entry_t en(idx, i, costs[idx][i]);
 						edges.push(en);
-						//printf("%dx%d %d %d-%d %d\n", idx, i, costs[idx][i], actState, i / P, sp[actState][i / P].first);
 					}
 				}
 			}
@@ -318,7 +303,6 @@ namespace FSMtesting {
 				}
 				pq_entry_t en(idx, i, costs[idx][i]);
 				edges.push(en);
-				//printf("%d %d %d-%d %d %d\n", idx, i, actState, i / P, sp[actState][i / P].first, tests[idx].size());
 			}
 		}
 
@@ -329,7 +313,6 @@ namespace FSMtesting {
 
 		if (!writeLP(costs, fileName)) return false;
 		string call = "start " + string(gurobiPath) + GUROBI_SOLVER + " ResultFile=" + fileName + ".sol " + fileName;
-		//printf(call.c_str());
 		int rv = system(call.c_str());
 		if (rv != 0) {
 			ERROR_MESSAGE("Mstar-method: Fail in solving LP.\n");
@@ -343,7 +326,6 @@ namespace FSMtesting {
 		// create CS
 		idx = Tsize - 1;
 		for (state_t i = 0; i < Tsize - 1; i++) {
-			//printf("%d %d %d %d %d\n", idx, next[idx], costs[idx][next[idx]], tests[idx].size(), CS.size());
 			if (costs[idx][next[idx]] >= tests[idx].size()) {
 				CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
 				state_t from = fsm->getEndPathState((idx == Tsize - 1) ? 0 : idx / P, tests[idx]);
@@ -357,7 +339,6 @@ namespace FSMtesting {
 					else {
 						sequence_in_t shortestPath;
 						FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp, shortestPath, fsm->isOutputState());
-						//printf(" %d\n", shortestPath.size());
 						CS.insert(CS.end(), shortestPath.begin(), shortestPath.end());
 					}
 				}
@@ -372,9 +353,7 @@ namespace FSMtesting {
 			}
 			idx = next[idx];
 		}
-		//printf("%d %d %d %d %d\n", idx, next[idx], costs[idx][next[idx]], tests[idx].size(), CS.size());
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
-		//printf("%d %d\n", idx, CS.size());
 		TS.insert(CS);
 		return true;
 	}
