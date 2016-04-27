@@ -105,8 +105,15 @@ namespace FSMsequence {
 	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, seq_len_t depth);
 
 	/**
-	* Finds preset distinguishing sequence if FSM has it.<br><br>
+	* Finds a shortest preset distinguishing sequence if FSM has it.<br><br>
 	* Applying PDS distinguishes each state from the others.
+	* 
+	* Source:
+	* InProceedings (deshmukh1994algorithm) 
+	* Deshmukh, R. & Hawat, G. 
+	* An algorithm to determine shortest length distinguishing, homing, and synchronizing sequences for sequential machines 
+	* Southcon/94. Conference Record, 1994, 496-501 
+	*
 	* @param dfsm - Deterministic FSM
 	* @param outPDS
 	* @return true if FSM has PDS, false otherwise
@@ -115,8 +122,18 @@ namespace FSMsequence {
 	FSMLIB_API bool getPresetDistinguishingSequence(DFSM * dfsm, sequence_in_t & outPDS);
 
 	/**
-	* Finds adaptive distinguishing sequence if FSM has it.<br><br>
+	* Finds an adaptive distinguishing sequence if FSM has it.<br><br>
 	* Applying ADS distinguishes each state from the others.
+	*
+	* Found ADS does not have to be the shortest one but search runs
+	* in polynomial time of the number of states.
+	*
+	* Source:
+	* Article (lee1994testing) 
+	* Lee, D. & Yannakakis, M. 
+	* Testing finite-state machines: State identification and verification 
+	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
+	*
 	* @param dfsm - Deterministic FSM
 	* @param outADS
 	* @return true if FSM has ADS, false otherwise
@@ -293,6 +310,13 @@ namespace FSMsequence {
 	/**
 	* Finds synchronizing sequence of FSM if exists.<br><br>
 	* SS brings FSM to one unique state regardless on output.
+	* 
+	* Source:
+	* InProceedings (deshmukh1994algorithm) 
+	* Deshmukh, R. & Hawat, G. 
+	* An algorithm to determine shortest length distinguishing, homing, and synchronizing sequences for sequential machines 
+	* Southcon/94. Conference Record, 1994, 496-501 
+	*
 	* @param dfsm - Deterministic FSM
 	* @param outSS
 	* @return true if FSM has SS, false otherwise
@@ -303,6 +327,13 @@ namespace FSMsequence {
 	* Finds homing sequence of FSM if exists.<br><br>
 	* HS brings FSM to some specific states
 	* which can be uniquely determined by output.
+	* 
+	* Source:
+	* InProceedings (deshmukh1994algorithm) 
+	* Deshmukh, R. & Hawat, G. 
+	* An algorithm to determine shortest length distinguishing, homing, and synchronizing sequences for sequential machines 
+	* Southcon/94. Conference Record, 1994, 496-501 
+	*
 	* @param dfsm - Deterministic FSM
 	* @param outHS
 	* @return true if FSM has HS, false otherwise
@@ -312,6 +343,12 @@ namespace FSMsequence {
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>
 	* PDS and ADS don't be the shortest.<br><br>
+	*
+	* Source:
+	* Bachelor Thesis (soucha2014finite) 
+	* Soucha, M. 
+	* Finite-State Machine State Identification Sequences
+	* Czech Technical Univerzity in Prague, 2014
 	*
 	* @param dfsm - Deterministic FSM
 	* @param outPDS - it is filled only if PDS_FOUND is returned

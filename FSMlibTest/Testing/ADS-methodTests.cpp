@@ -74,23 +74,25 @@ namespace FSMlibTest
 		void testADSmethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
 			sequence_set_t TS;
-			int extraStates = 2;
-			if (ADS_method(fsm, TS, extraStates)) {
-				printTS(TS, filename);
-				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
-				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
-				vector<DFSM*> indist;
-				FaultCoverageChecker::getFSMs(fsm, TS, indist, extraStates);
-				DEBUG_MSG("Indistinguishable machines: %d\n", indist.size());
-			}
-			else {
-				ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");
-				if (!TS.empty()) printTS(TS, filename);
-				else {
-					DEBUG_MSG("ADS-method on %s: no ADS, no TS\n", filename.c_str());
+			for (int extraStates = 0; extraStates < 3; extraStates++) {
+				if (ADS_method(fsm, TS, extraStates)) {
+					printTS(TS, filename);
+					ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
+					ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+					vector<DFSM*> indistinguishable;
+					FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+					ARE_EQUAL(1, int(indistinguishable.size()), "The ADS-method (%d extra states) has not complete fault coverage,"
+						" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
 				}
-				ARE_EQUAL(true, TS.empty(), "FSM has not adaptive DS but obtained TS has %d sequences.",
-					TS.size());
+				else {
+					ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");
+					if (!TS.empty()) printTS(TS, filename);
+					else {
+						DEBUG_MSG("ADS-method on %s: no ADS, no TS\n", filename.c_str());
+					}
+					ARE_EQUAL(true, TS.empty(), "FSM has not adaptive DS but obtained TS has %d sequences.",
+						TS.size());
+				}
 			}
 		}
 	};

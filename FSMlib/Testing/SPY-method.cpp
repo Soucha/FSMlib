@@ -118,7 +118,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static void appendSequence(TestNodeSPY* node, sequence_in_t seq) {
+	static void appendSequence(TestNodeSPY* node, const sequence_in_t& seq) {
 		for (auto input : seq) {
 			state_t state = specification->getNextState(states[node->state], input);
 			output_t outputState = (specification->isOutputState()) ? specification->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
@@ -137,7 +137,7 @@ namespace FSMtesting {
 		//printTStree(coreNodes[0]);
 	}
 
-	static void addSeparatingSequence(state_t state, sequence_in_t seq) {
+	static void addSeparatingSequence(state_t state, const sequence_in_t& seq) {
 		int maxPref = -1;
 		TestNodeSPY* finNode;
 		sequence_in_t finSeq;

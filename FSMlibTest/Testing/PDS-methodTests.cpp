@@ -70,20 +70,25 @@ namespace FSMlibTest
 		void testPDSmethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
 			sequence_set_t TS;
-			int extraStates = 0;
-			if (PDS_method(fsm, TS, extraStates)) {
-				printTS(TS, filename);
-				ARE_EQUAL(true, hasDS, "FSM has not preset DS but a TS was obtained.");
-				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
-			}
-			else {
-				ARE_EQUAL(false, hasDS, "FSM has preset DS so a TS can be created but it was not obtained.");
-				if (!TS.empty()) printTS(TS, filename);
-				else {
-					DEBUG_MSG("PDS-method on %s: no PDS, no TS\n", filename.c_str());
+			for (int extraStates = 0; extraStates < 3; extraStates++) {
+				if (PDS_method(fsm, TS, extraStates)) {
+					printTS(TS, filename);
+					ARE_EQUAL(true, hasDS, "FSM has not preset DS but a TS was obtained.");
+					ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+					vector<DFSM*> indistinguishable;
+					FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+					ARE_EQUAL(1, int(indistinguishable.size()), "The PDS-method (%d extra states) has not complete fault coverage,"
+						" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
 				}
-				ARE_EQUAL(true, TS.empty(), "FSM has not preset DS but obtained TS has %d sequences.",
-					TS.size());
+				else {
+					ARE_EQUAL(false, hasDS, "FSM has preset DS so a TS can be created but it was not obtained.");
+					if (!TS.empty()) printTS(TS, filename);
+					else {
+						DEBUG_MSG("PDS-method on %s: no PDS, no TS\n", filename.c_str());
+					}
+					ARE_EQUAL(true, TS.empty(), "FSM has not preset DS but obtained TS has %d sequences.",
+						TS.size());
+				}
 			}
 		}
 	};

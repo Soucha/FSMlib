@@ -178,6 +178,7 @@
     </ClCompile>
     <ClCompile Include="Testing\ADS-methodTests.cpp" />
     <ClCompile Include="Testing\C-methodTests.cpp" />
+    <ClCompile Include="Testing\FCC.cpp" />
     <ClCompile Include="Testing\H-methodTests.cpp" />
     <ClCompile Include="Testing\HSI-methodTests.cpp" />
     <ClCompile Include="Testing\Ma-methodTests.cpp" />
@@ -190,6 +191,7 @@
     <ClCompile Include="Testing\W-methodTests.cpp" />
     <ClCompile Include="Testing\Wp-methodTests.cpp" />
     <ClCompile Include="TestUtils.cpp" />
+    <ClCompile Include="UnionFindTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSMlib\FSMlib.vcxproj">

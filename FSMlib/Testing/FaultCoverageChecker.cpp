@@ -417,7 +417,7 @@ namespace FSMtesting {
 		}
 
 		static state_t isSolved(state_t rootIdx) {
-			state_t minDom = MaxStates;
+			state_t minDom = MaxStates + 1;
 			state_t minIdx = NULL_STATE;
 			for (state_t i = rootIdx; i < var.size(); i++) {
 				if (var[i] != NULL) {

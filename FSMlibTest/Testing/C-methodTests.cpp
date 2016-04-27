@@ -81,6 +81,10 @@ namespace FSMlibTest
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
 				ARE_EQUAL(false, CS.empty(), "Obtained TS is empty.");
+				vector<DFSM*> indistinguishable;
+				FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+				ARE_EQUAL(1, int(indistinguishable.size()), "The C-method (%d extra states) has not complete fault coverage,"
+					" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");

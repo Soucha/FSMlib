@@ -99,8 +99,8 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testingTSmethodComp(filename);
-			testingTSmethodComp("", 2);
-			//testingCSmethodComp("");
+			testingTSmethodComp("", 1);
+			testingCSmethodComp("");
 		}
 
 		void printTS(sequence_set_t & TS) {

@@ -31,6 +31,7 @@
 #include "Testing\FaultCoverageChecker.h"
 
 #include "PrefixSet.h"
+#include "UnionFind.h"
 #endif
 
 namespace FSMlib {

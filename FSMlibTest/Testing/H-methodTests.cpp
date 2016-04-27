@@ -78,10 +78,15 @@ namespace FSMlibTest
 		void testHmethod(string filename) {
 			fsm->load(filename);
 			sequence_set_t TS;
-			int extraStates = 0;
-			H_method(fsm, TS, extraStates);
-			printTS(TS, filename);
-			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+			for (int extraStates = 0; extraStates < 3; extraStates++) {
+				H_method(fsm, TS, extraStates);
+				printTS(TS, filename);
+				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+				vector<DFSM*> indistinguishable;
+				FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+				ARE_EQUAL(1, int(indistinguishable.size()), "The H-method (%d extra states) has not complete fault coverage,"
+					" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
+			}
 		}
 	};
 }
