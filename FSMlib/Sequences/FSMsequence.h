@@ -83,9 +83,8 @@ namespace FSMsequence {
 	* Sequences are sorted by lenght and then lexicographically from the shortest.
 	* @param dfsm - Deterministic FSM
 	* @param stateCover
-	* @param stoutInterleaved - each input is followed with STOUT_INPUT in resulting sequences, if true
 	*/
-	FSMLIB_API void getStateCover(DFSM * dfsm, sequence_set_t & stateCover, bool stoutInterleaved = false);
+	FSMLIB_API void getStateCover(DFSM * dfsm, sequence_set_t & stateCover);
 
 	/**
 	* Fills given set with input sequences that cover all transitions.
@@ -94,18 +93,16 @@ namespace FSMsequence {
 	* State 0 is start state for all sequences.
 	* @param dfsm - Deterministic FSM
 	* @param transitionCover
-	* @param stoutInterleaved - each input is followed with STOUT_INPUT in resulting sequences, if true
 	*/
-	FSMLIB_API void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover, bool stoutInterleaved = false);
+	FSMLIB_API void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover);
 
 	/**
 	* Fills given set with all input sequences of the lenght up to depth.
 	* @param dfsm - Deterministic FSM
 	* @param traversalSet
 	* @param depth
-	* @param stoutInterleaved - each input is followed with STOUT_INPUT in resulting sequences, if true
 	*/
-	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, int depth, bool stoutInterleaved = false);
+	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, seq_len_t depth);
 
 	/**
 	* Finds preset distinguishing sequence if FSM has it.<br><br>

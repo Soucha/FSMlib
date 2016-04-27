@@ -31,8 +31,8 @@ namespace FSMtesting {
 		vector<sequence_set_t> SCSets;
 		bool startWithStout = false;
 
-		getStateCover(fsm, stateCover, fsm->isOutputState());
-		getTraversalSet(fsm, traversalSet, extraStates, fsm->isOutputState());
+		getStateCover(fsm, stateCover);
+		getTraversalSet(fsm, traversalSet, extraStates);
 		sequence_in_t emptySeq;
 		traversalSet.insert(emptySeq);
 		getVerifyingSet(fsm, VSet);

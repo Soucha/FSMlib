@@ -99,7 +99,7 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testingTSmethodComp(filename);
-			//testingTSmethodComp("", 1);
+			testingTSmethodComp("", 1);
 			testingCSmethodComp("");
 		}
 

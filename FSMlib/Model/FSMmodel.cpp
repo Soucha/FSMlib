@@ -260,14 +260,14 @@ namespace FSMmodel {
 	}
 
 	bool getShortestPath(DFSM * fsm, state_t from, state_t to,
-		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath, bool stoutInterleaved) {
+		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath) {
 		shortestPath.clear();
 		if ((from == to) || (shortestPaths[from][to].second == STOUT_INPUT)) {// empty sequence or there is no shortest path
 			return (from == to);
 		}
 		do {
 			shortestPath.push_back(shortestPaths[from][to].second);
-			if (stoutInterleaved) shortestPath.push_back(STOUT_INPUT);
+			if (fsm->isOutputState()) shortestPath.push_back(STOUT_INPUT);
 			from = fsm->getNextState(from, shortestPaths[from][to].second);
 		} while (from != to);
 		return true;

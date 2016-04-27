@@ -30,8 +30,8 @@ namespace FSMtesting {
 		auto states = fsm->getStates();
 		vector<sequence_set_t> H;
 		sequence_set_t transitionCover, traversalSet;
-		getTransitionCover(fsm, transitionCover, fsm->isOutputState());
-		getTraversalSet(fsm, traversalSet, extraStates, fsm->isOutputState());
+		getTransitionCover(fsm, transitionCover);
+		getTraversalSet(fsm, traversalSet, extraStates);
 		getHarmonizedStateIdentifiers(fsm, H);
 		bool startWithStout = false;
 

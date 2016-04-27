@@ -197,7 +197,7 @@ namespace FSMtesting {
 		sequence_vec_t trSeq(N);
 		if (resetEnabled) {
 			sequence_set_t sc;
-			getStateCover(fsm, sc, fsm->isOutputState());
+			getStateCover(fsm, sc);
 			for (auto seq : sc) {
 				trSeq[fsm->getEndPathState(0, seq)] = seq;
 			}
@@ -338,7 +338,7 @@ namespace FSMtesting {
 					}
 					else {
 						sequence_in_t shortestPath;
-						FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp, shortestPath, fsm->isOutputState());
+						FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp, shortestPath);
 						CS.insert(CS.end(), shortestPath.begin(), shortestPath.end());
 					}
 				}

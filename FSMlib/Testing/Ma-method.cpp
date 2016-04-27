@@ -43,7 +43,7 @@ namespace FSMtesting {
 		sequence_in_t CS;
 		sequence_set_t stateCover;
 		if (resetEnabled)
-			getStateCover(fsm, stateCover, fsm->isOutputState());
+			getStateCover(fsm, stateCover);
 
 		getADSet(fsm, ADS, E);
 		delete ADS;

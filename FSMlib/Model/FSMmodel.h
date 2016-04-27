@@ -118,10 +118,9 @@ namespace FSMmodel {
 	* @param to - end state
 	* @param shortestPaths - the result of call createAllShortestPaths
 	* @param shortestPath - a shortest path from given start to end state
-	* @param stoutInterleaved - each input is followed with STOUT_INPUT in resulting sequences, if true
 	* @return true if there is a path from start state to end state, false otherwise
 	*/
 	FSMLIB_API bool getShortestPath(DFSM * fsm, state_t from, state_t to,
-		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath, bool stoutInterleaved = false);
+		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath);
 
 }

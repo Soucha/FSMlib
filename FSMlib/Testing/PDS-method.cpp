@@ -30,8 +30,8 @@ namespace FSMtesting {
 		}
 
 		sequence_set_t transitionCover, traversalSet;
-		getTransitionCover(fsm, transitionCover, fsm->isOutputState());
-		getTraversalSet(fsm, traversalSet, extraStates, fsm->isOutputState());
+		getTransitionCover(fsm, transitionCover);
+		getTraversalSet(fsm, traversalSet, extraStates);
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {

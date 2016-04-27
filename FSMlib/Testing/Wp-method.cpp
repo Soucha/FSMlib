@@ -30,8 +30,8 @@ namespace FSMtesting {
 		auto states = fsm->getStates();
 		sequence_set_t CSet, stateCover, traversalSet;
 		vector<sequence_set_t> SCSets;
-		getStateCover(fsm, stateCover, fsm->isOutputState());
-		getTraversalSet(fsm, traversalSet, extraStates, fsm->isOutputState());
+		getStateCover(fsm, stateCover);
+		getTraversalSet(fsm, traversalSet, extraStates);
 		sequence_in_t emptySeq;
 		traversalSet.insert(emptySeq);
 		getStatesCharacterizingSets(fsm, SCSets, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
