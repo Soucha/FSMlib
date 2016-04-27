@@ -31,14 +31,14 @@ namespace FSMtesting {
 		}
 	};
 
-	struct TestNode {
+	struct TestNodeC {
 		bool confirmed = false;
 		state_t state;
 		output_t stateOutput;
 		output_t output;
 		input_t input;
 
-		TestNode(input_t input, output_t output, state_t state, output_t stateOutput) :
+		TestNodeC(input_t input, output_t output, state_t state, output_t stateOutput) :
 			input(input), output(output), state(state), stateOutput(stateOutput) {
 		}
 	};
@@ -47,7 +47,7 @@ namespace FSMtesting {
 	static vector<int> verifiedState;
 	static vector<vector<int>> confirmedNodes;
 	static vector<ver_seq_t*> verSeq;
-	static vector<TestNode*> cs;
+	static vector<TestNodeC*> cs;
 	static queue<int> newlyConfirmed;
 	static seq_len_t counter, currIdx, lastConfIdx;
 	
@@ -232,7 +232,7 @@ namespace FSMtesting {
 		}
 		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
 		output_t outputTransition;
-		TestNode* node = new TestNode(STOUT_INPUT, DEFAULT_OUTPUT, 0, outputState);
+		TestNodeC* node = new TestNodeC(STOUT_INPUT, DEFAULT_OUTPUT, 0, outputState);
 		cs.clear();
 		cs.push_back(node);
 		currState = 0;
@@ -240,7 +240,7 @@ namespace FSMtesting {
 			nextState = fsm->getNextState(currState, input);
 			outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 			outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
-			node = new TestNode(input, outputTransition, getIdx(states, nextState), outputState);
+			node = new TestNodeC(input, outputTransition, getIdx(states, nextState), outputState);
 			cs.push_back(node);
 			currState = nextState;
 		}
@@ -267,7 +267,7 @@ namespace FSMtesting {
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], *nextInput) : DEFAULT_OUTPUT;
 							nextState = getIdx(states, nextState);
-							node = new TestNode(*nextInput, outputTransition, nextState, outputState);
+							node = new TestNodeC(*nextInput, outputTransition, nextState, outputState);
 							cs.push_back(node);
 							currState = nextState;
 						}
@@ -290,7 +290,7 @@ namespace FSMtesting {
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
 						nextState = getIdx(states, nextState);
-						node = new TestNode(input, outputTransition, nextState, outputState);
+						node = new TestNodeC(input, outputTransition, nextState, outputState);
 						node->confirmed = true;
 						cs.push_back(node);
 						newlyConfirmed.push(currIdx); //cs.size()-1
@@ -366,7 +366,7 @@ namespace FSMtesting {
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
 							nextState = getIdx(states, nextState);
-							node = new TestNode(input, outputTransition, nextState, outputState);
+							node = new TestNodeC(input, outputTransition, nextState, outputState);
 							cs.push_back(node);
 							currState = nextState;
 						}
@@ -396,7 +396,7 @@ namespace FSMtesting {
 								outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 								outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], *nextInput) : DEFAULT_OUTPUT;
 								nextState = getIdx(states, nextState);
-								node = new TestNode(*nextInput, outputTransition, nextState, outputState);
+								node = new TestNodeC(*nextInput, outputTransition, nextState, outputState);
 								node->confirmed = true;
 								cs.push_back(node);
 								currState = nextState;
@@ -405,7 +405,7 @@ namespace FSMtesting {
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
 							nextState = getIdx(states, nextState);
-							node = new TestNode(input, outputTransition, nextState, outputState);
+							node = new TestNodeC(input, outputTransition, nextState, outputState);
 							node->confirmed = true;
 							lastConfIdx = seq_len_t(cs.size());
 							cs.push_back(node);

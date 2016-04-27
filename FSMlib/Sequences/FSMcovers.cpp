@@ -87,6 +87,7 @@ namespace FSMsequence {
 		queue<sequence_in_t> fifo;
 		sequence_in_t seq;
 		fifo.push(seq);
+		if (dfsm->isOutputState()) depth *= 2; // STOUT_INPUT follows each input
 		while (!fifo.empty()) {
 			seq = fifo.front();
 			fifo.pop();

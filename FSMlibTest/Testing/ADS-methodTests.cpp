@@ -74,11 +74,14 @@ namespace FSMlibTest
 		void testADSmethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
 			sequence_set_t TS;
-			int extraStates = 0;
+			int extraStates = 2;
 			if (ADS_method(fsm, TS, extraStates)) {
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+				vector<DFSM*> indist;
+				FaultCoverageChecker::getFSMs(fsm, TS, indist, extraStates);
+				DEBUG_MSG("Indistinguishable machines: %d\n", indist.size());
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");

@@ -21,25 +21,25 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	struct TestNode {
+	struct TestNodeH {
 		output_t incomingOutput;
 		output_t stateOutput;
 		state_t state;
 		input_t distinguishingInput = STOUT_INPUT;
-		map<input_t, TestNode*> next;
+		map<input_t, TestNodeH*> next;
 
-		TestNode(state_t state, output_t stateOutput, output_t inOutput) :
+		TestNodeH(state_t state, output_t stateOutput, output_t inOutput) :
 			incomingOutput(inOutput), stateOutput(stateOutput), state(state) {
 		}
 
-		~TestNode() {
+		~TestNodeH() {
 			for (auto n : next) {
 				delete n.second;
 			}
 		}
 	};
 
-	static vector<TestNode*> coreNodes, extNodes; // stores SC, TC-SC respectively
+	static vector<TestNodeH*> coreNodes, extNodes; // stores SC, TC-SC respectively
 	static DFSM * specification;
 	static vector<LinkCell> sepSeq;
 	static vector<state_t> states;
@@ -51,7 +51,7 @@ namespace FSMtesting {
 		sepSeq.clear();
 	}
 
-	static void printTStree(TestNode* node, string prefix = "") {
+	static void printTStree(TestNodeH* node, string prefix = "") {
 		printf("%s%d/%d <- %d (in%d)\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput, node->distinguishingInput);
 		for (auto it : node->next) {
 			printf("%s - %d ->\n", prefix.c_str(), it.first);
@@ -75,7 +75,7 @@ namespace FSMtesting {
 
 		// root
 		outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		TestNode* node = new TestNode(0, outputState, DEFAULT_OUTPUT);
+		TestNodeH* node = new TestNodeH(0, outputState, DEFAULT_OUTPUT);
 		coreNodes.push_back(node);
 		covered[0] = true;
 		for (state_t idx = 0; idx != coreNodes.size(); idx++) {
@@ -85,7 +85,7 @@ namespace FSMtesting {
 				outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 				outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[coreNodes[idx]->state], input) : DEFAULT_OUTPUT;
 				state = getIdx(states, state);
-				node = new TestNode(state, outputState, outputTransition);
+				node = new TestNodeH(state, outputState, outputTransition);
 				coreNodes[idx]->next[input] = node;
 				if (covered[state]) {
 					extNodes.push_back(node);
@@ -98,7 +98,7 @@ namespace FSMtesting {
 		}
 		// extNodes now contains TC-SC, coreNodes = SC
 		if (extraStates > 0) {
-			stack<TestNode*> lifo;
+			stack<TestNodeH*> lifo;
 			for (auto n : extNodes) {
 				n->distinguishingInput = extraStates; // distinguishingInput is used here as a counter
 				lifo.push(n);
@@ -111,7 +111,7 @@ namespace FSMtesting {
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[actNode->state], input) : DEFAULT_OUTPUT;
 						state = getIdx(states, state);
-						node = new TestNode(state, outputState, outputTransition);
+						node = new TestNodeH(state, outputState, outputTransition);
 						actNode->next[input] = node;
 						if (actNode->distinguishingInput > 1) {
 							node->distinguishingInput = actNode->distinguishingInput - 1;
@@ -123,7 +123,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static int getEstimate(TestNode* n1, TestNode* n2, input_t input) {
+	static int getEstimate(TestNodeH* n1, TestNodeH* n2, input_t input) {
 		state_t idx = getPairIdx(n1->state, n2->state);
 		state_t nextIdx = sepSeq[idx].next[input];
 		if (nextIdx == NULL_STATE) return -1;
@@ -131,8 +131,8 @@ namespace FSMtesting {
 		return 2 * sepSeq[nextIdx].minLen + 1;
 	}
 
-	static int getMinLenToDistinguish(TestNode* n1, TestNode* n2) {
-		map<input_t, TestNode*>::iterator sIt1, sIt2;
+	static int getMinLenToDistinguish(TestNodeH* n1, TestNodeH* n2) {
+		map<input_t, TestNodeH*>::iterator sIt1, sIt2;
 		int minVal = specification->getNumberOfStates();
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
@@ -175,7 +175,7 @@ namespace FSMtesting {
 		return minVal;
 	}
 
-	static void appendSeparatingSequence(TestNode* n1, TestNode* n2) {
+	static void appendSeparatingSequence(TestNodeH* n1, TestNodeH* n2) {
 		state_t idx = getPairIdx(n1->state, n2->state), nextIdx;
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
@@ -199,7 +199,7 @@ namespace FSMtesting {
 			outputTransition1 = (specification->isOutputTransition()) ? 
 				specification->getOutput(states[n1->state], input) : DEFAULT_OUTPUT;
 			state = getIdx(states, state);
-			TestNode* node = new TestNode(state, outputState1, outputTransition1);
+			TestNodeH* node = new TestNodeH(state, outputState1, outputTransition1);
 			n1->next[input] = node;
 		}
 		else {
@@ -213,7 +213,7 @@ namespace FSMtesting {
 			outputTransition2 = (specification->isOutputTransition()) ?
 				specification->getOutput(states[n2->state], input) : DEFAULT_OUTPUT;
 			state = getIdx(states, state);
-			TestNode* node = new TestNode(state, outputState2, outputTransition2);
+			TestNodeH* node = new TestNodeH(state, outputState2, outputTransition2);
 			n2->next[input] = node;
 		}
 		else {
@@ -227,7 +227,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static void addSeparatingSequence(TestNode* n1, TestNode* n2) {
+	static void addSeparatingSequence(TestNodeH* n1, TestNodeH* n2) {
 		auto fIt = n1->next.find(n1->distinguishingInput);
 		if (fIt == n1->next.end()) {
 			appendSeparatingSequence(n2, n1);
@@ -241,13 +241,13 @@ namespace FSMtesting {
 		addSeparatingSequence(fIt->second, sIt->second);
 	}
 
-	static void distinguish(TestNode* n1, TestNode* n2) {
+	static void distinguish(TestNodeH* n1, TestNodeH* n2) {
 		if ((n1->state == n2->state) || (n1->stateOutput != n2->stateOutput)
 			|| (getMinLenToDistinguish(n1, n2) == 0)) return;
 		addSeparatingSequence(n1, n2);
 	}
 
-	static void distinguish(vector<TestNode*>& nodes, TestNode* currNode, int depth, bool extend = false) {
+	static void distinguish(vector<TestNodeH*>& nodes, TestNodeH* currNode, int depth, bool extend = false) {
 		if (depth > 0) {
 			if (extend) nodes.push_back(currNode);
 			for (auto pNext : currNode->next) {
@@ -260,8 +260,8 @@ namespace FSMtesting {
 		}
 	}
 
-	static void getSequences(TestNode* node, sequence_set_t& TS) {
-		stack< pair<TestNode*, sequence_in_t> > lifo;
+	static void getSequences(TestNodeH* node, sequence_set_t& TS) {
+		stack< pair<TestNodeH*, sequence_in_t> > lifo;
 		sequence_in_t seq;
 		if (specification->isOutputState()) seq.push_back(STOUT_INPUT);
 		lifo.push(make_pair(node, seq));
@@ -310,7 +310,7 @@ namespace FSMtesting {
 
 		// 4. step
 		if (extraStates > 0) {
-			vector<TestNode*> tmp;
+			vector<TestNodeH*> tmp;
 			for (auto n1it = extNodes.begin(); n1it != extNodes.end(); n1it++) {
 				distinguish(tmp, *n1it, extraStates, true);
 			}

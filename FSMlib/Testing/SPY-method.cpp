@@ -21,28 +21,28 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	struct TestNode {
+	struct TestNodeSPY {
 		output_t incomingOutput;
 		output_t stateOutput;
 		state_t state;
-		bool isConfirmed = false;
-		map<input_t, TestNode*> next;
+		bool isConfirmed;
+		map<input_t, TestNodeSPY*> next;
 
-		TestNode(state_t state, output_t stateOutput, output_t inOutput) :
-			incomingOutput(inOutput), stateOutput(stateOutput), state(state) {
+		TestNodeSPY(state_t state, output_t stateOutput, output_t inOutput) :
+			incomingOutput(inOutput), stateOutput(stateOutput), state(state), isConfirmed(false) {
 		}
 
-		~TestNode() {
+		~TestNodeSPY() {
 			for (auto n : next) {
 				delete n.second;
 			}
 		}
 	};
 
-	static vector<TestNode*> coreNodes; // stores SC
+	static vector<TestNodeSPY*> coreNodes; // stores SC
 	static vector<pair<state_t, input_t>> uncoveredTransitions;
 	static vector<vector<bool>> coveredTransitions;
-	static vector<vector<TestNode*>> confirmedNodes;
+	static vector<vector<TestNodeSPY*>> confirmedNodes;
 	static DFSM* specification;
 	static vector<state_t> states;
 
@@ -54,7 +54,7 @@ namespace FSMtesting {
 		confirmedNodes.clear();
 	}
 
-	static void printTStree(TestNode* node, string prefix = "") {
+	static void printTStree(TestNodeSPY* node, string prefix = "") {
 		printf("%s%d/%d <- %d (conf%d)\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput, int(node->isConfirmed));
 		for (auto it : node->next) {
 			printf("%s - %d ->\n", prefix.c_str(), it.first);
@@ -72,7 +72,7 @@ namespace FSMtesting {
 
 		// root
 		outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		TestNode* node = new TestNode(0, outputState, DEFAULT_OUTPUT);
+		TestNodeSPY* node = new TestNodeSPY(0, outputState, DEFAULT_OUTPUT);
 		coreNodes.push_back(node);
 		covered[0] = true;
 		for (state_t idx = 0; idx != coreNodes.size(); idx++) {
@@ -89,7 +89,7 @@ namespace FSMtesting {
 					outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 					outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[coreNodes[idx]->state], input) : DEFAULT_OUTPUT;
 					state = getIdx(states, state);
-					node = new TestNode(state, outputState, outputTransition);
+					node = new TestNodeSPY(state, outputState, outputTransition);
 					coreNodes[idx]->next[input] = node;
 					coreNodes.push_back(node);
 					covered[state] = true;
@@ -106,7 +106,7 @@ namespace FSMtesting {
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[node->state], input) : DEFAULT_OUTPUT;
 						state = getIdx(states, state);
-						TestNode* nextNode = new TestNode(state, outputState, outputTransition);
+						TestNodeSPY* nextNode = new TestNodeSPY(state, outputState, outputTransition);
 						node->next[input] = nextNode;
 						node = nextNode;
 					}
@@ -118,13 +118,13 @@ namespace FSMtesting {
 		}
 	}
 
-	static void appendSequence(TestNode* node, sequence_in_t seq) {
+	static void appendSequence(TestNodeSPY* node, sequence_in_t seq) {
 		for (auto input : seq) {
 			state_t state = specification->getNextState(states[node->state], input);
 			output_t outputState = (specification->isOutputState()) ? specification->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 			output_t outputTransition = (specification->isOutputTransition()) ? specification->getOutput(states[node->state], input) : DEFAULT_OUTPUT;
 			state = getIdx(states, state);
-			TestNode* nextNode = new TestNode(state, outputState, outputTransition);
+			TestNodeSPY* nextNode = new TestNodeSPY(state, outputState, outputTransition);
 			node->next[input] = nextNode;
 			if (node->isConfirmed) {
 				if (coveredTransitions[node->state][input]) {
@@ -139,7 +139,7 @@ namespace FSMtesting {
 
 	static void addSeparatingSequence(state_t state, sequence_in_t seq) {
 		int maxPref = -1;
-		TestNode* finNode;
+		TestNodeSPY* finNode;
 		sequence_in_t finSeq;
 		for (auto n : confirmedNodes[state]) {
 			auto node = n;
@@ -180,7 +180,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static void closure(TestNode* node) {
+	static void closure(TestNodeSPY* node) {
 		node->isConfirmed = true;
 		confirmedNodes[node->state].push_back(node);
 		for (auto nextIt : node->next) {
@@ -200,8 +200,8 @@ namespace FSMtesting {
 		}
 	}
 
-	static void getSequences(TestNode* node, sequence_set_t& TS) {
-		stack< pair<TestNode*, sequence_in_t> > lifo;
+	static void getSequences(TestNodeSPY* node, sequence_set_t& TS) {
+		stack< pair<TestNodeSPY*, sequence_in_t> > lifo;
 		sequence_in_t seq;
 		if (specification->isOutputState()) seq.push_back(STOUT_INPUT);
 		lifo.push(make_pair(node, seq));

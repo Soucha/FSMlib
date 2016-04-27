@@ -78,7 +78,7 @@ namespace FSMlibTest
 		void testSPYmethod(string filename) {
 			fsm->load(filename);
 			sequence_set_t TS;
-			int extraStates = 0;
+			int extraStates = 1;
 			SPY_method(fsm, TS, extraStates);
 			printTS(TS, filename);
 			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");

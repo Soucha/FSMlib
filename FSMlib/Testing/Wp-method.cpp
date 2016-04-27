@@ -69,6 +69,7 @@ namespace FSMtesting {
 				}
 				SCSets[i] = tmp;
 			}
+			extraStates *= 2; // STOUT_INPUT follows each input in traversalSet
 		}
 		else {
 			// CSet design
