@@ -99,8 +99,8 @@ namespace FSMlibTest
 
 		void testGetPresetHomingS(string filename, bool hasHS = true) {
 			fsm->load(filename);
-			sequence_in_t pHS;
-			if (getPresetHomingSequence(fsm, pHS)) {
+			auto pHS = getPresetHomingSequence(fsm);
+			if (!pHS.empty()) {
 				DEBUG_MSG("HS of %s: %s\n", filename.c_str(), FSMmodel::getInSequenceAsString(pHS).c_str());
 				ARE_EQUAL(true, hasHS, "FSM has not preset HS but it was found.");
 				

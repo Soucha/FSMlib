@@ -63,7 +63,8 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	bool getPresetDistinguishingSequence(DFSM * fsm, sequence_in_t & outPDS) {
+	sequence_in_t getPresetDistinguishingSequence(DFSM * fsm) {
+		sequence_in_t outPDS;
 		block_t block;
 		vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 		set<output_t> actOutputs;
@@ -92,13 +93,12 @@ namespace FSMsequence {
 			actOutputs.clear();
 			// are all blocks singletons?
 			if (partition.empty()) {
-				outPDS.clear();
 				outPDS.push_back(STOUT_INPUT);
 #if SEQUENCES_PERFORMANCE_TEST
 				testOut += "1;0;0;";
 				//printf("1;0;0;");
 #endif // SEQUENCES_PERFORMANCE_TEST
-				return true;
+				return outPDS;
 			}
 		}
 		else {
@@ -201,7 +201,7 @@ namespace FSMsequence {
 						delete it->second;
 					}
 					used.clear();
-					return true;
+					return outPDS;
 				}
 				// go through all blocks in new partition
 				for (partition_t::iterator pIt = partition.begin(); pIt != partition.end(); pIt++) {
@@ -236,6 +236,6 @@ namespace FSMsequence {
 			delete it->second;
 		}
 		used.clear();
-		return false;
+		return outPDS;
 	}
 }

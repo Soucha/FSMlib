@@ -115,11 +115,9 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @param outPDS
-	* @return true if FSM has PDS, false otherwise
-	* @throw Exception if FSM is not properly defined
+	* @return a shortest preset distinguishing sequence, or empty sequence if there is no SS
 	*/
-	FSMLIB_API bool getPresetDistinguishingSequence(DFSM * dfsm, sequence_in_t & outPDS);
+	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(DFSM * dfsm);
 
 	/**
 	* Finds an adaptive distinguishing sequence if FSM has it.<br><br>
@@ -318,10 +316,9 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @param outSS
-	* @return true if FSM has SS, false otherwise
+	* @return a synchronizing sequence, or empty sequence if there is no SS
 	*/
-	FSMLIB_API bool getSynchronizingSequence(DFSM * dfsm, sequence_in_t & outSS);
+	FSMLIB_API sequence_in_t getSynchronizingSequence(DFSM * dfsm);
 
 	/**
 	* Finds homing sequence of FSM if exists.<br><br>
@@ -335,10 +332,9 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @param outHS
-	* @return true if FSM has HS, false otherwise
+	* @return a homing sequence, or empty sequence if there is no HS
 	*/
-	FSMLIB_API bool getPresetHomingSequence(DFSM * dfsm, sequence_in_t & outHS);
+	FSMLIB_API sequence_in_t getPresetHomingSequence(DFSM * dfsm);
 
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>

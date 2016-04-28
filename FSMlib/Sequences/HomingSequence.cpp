@@ -58,7 +58,8 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	bool getPresetHomingSequence(DFSM * fsm, sequence_in_t & outHS) {
+	sequence_in_t getPresetHomingSequence(DFSM * fsm) {
+		sequence_in_t outHS;
 		partition_t partition;
 		sequence_in_t s;
 		block_t block;
@@ -87,9 +88,8 @@ namespace FSMsequence {
 			actOutputs.clear();
 			// all blocks are singletons
 			if (partition.empty()) {
-				outHS.clear();
 				outHS.push_back(STOUT_INPUT);
-				return true;
+				return outHS;
 			}
 		}
 		else {
@@ -175,7 +175,7 @@ namespace FSMsequence {
 						delete it->second;
 					}
 					used.clear();
-					return true;
+					return outHS;
 				}
 				// go through all blocks in new partition
 				for (partition_t::iterator pIt = partition.begin(); pIt != partition.end(); pIt++) {
@@ -204,6 +204,6 @@ namespace FSMsequence {
 			delete it->second;
 		}
 		used.clear();
-		return false;
+		return outHS;
 	}
 }

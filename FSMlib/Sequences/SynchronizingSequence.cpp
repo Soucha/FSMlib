@@ -31,7 +31,8 @@ namespace FSMsequence {
 		}
 	};
 
-	bool getSynchronizingSequence(DFSM * fsm, sequence_in_t & outSS) {
+	sequence_in_t getSynchronizingSequence(DFSM * fsm) {
+		sequence_in_t outSS;
 		queue<ss_node_t*> fifo;
 		set<block_t> used;
 		ss_node_t* act, *succ;
@@ -71,7 +72,7 @@ namespace FSMsequence {
 						delete fifo.front();
 						fifo.pop();
 					}
-					return true;
+					return outSS;
 				}
 				if (used.find(states) == used.end()) {
 					s = act->ss;
@@ -83,6 +84,6 @@ namespace FSMsequence {
 			}
 			delete act;
 		}
-		return false;
+		return outSS;
 	}
 }

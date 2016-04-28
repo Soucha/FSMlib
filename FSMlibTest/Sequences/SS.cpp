@@ -100,8 +100,8 @@ namespace FSMlibTest
 
 		void testGetSynchronizingS(string filename, bool hasSS = true) {
 			fsm->load(filename);
-			sequence_in_t sS;
-			if (getSynchronizingSequence(fsm, sS)) {
+			auto sS = getSynchronizingSequence(fsm);
+			if (!sS.empty()) {
 				DEBUG_MSG("SS of %s: %s\n", filename.c_str(), FSMmodel::getInSequenceAsString(sS).c_str());
 				ARE_EQUAL(true, hasSS, "FSM has not SS but it was found.");
 
