@@ -148,25 +148,24 @@ namespace FSMsequence {
 	FSMLIB_API void getADSet(DFSM * dfsm, AdaptiveDS* ads, sequence_vec_t& ADSet);
 
 	/**
-	* Finds state verifying sequence for given state.<br><br>
+	* Finds a shortest state verifying sequence for given state.<br><br>
 	* Applying SVS distinguishes given state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param state
-	* @param outSVS
-	* @return true if given state of FSM has SVS, false otherwise
+	* @return a shortest state verifying sequence, or empty sequence if there is no SVS
 	*/
-	FSMLIB_API bool getStateVerifyingSequence(DFSM * dfsm, state_t state, sequence_in_t & outSVS);
+	FSMLIB_API sequence_in_t getStateVerifyingSequence(DFSM * dfsm, state_t state);
 
 	/**
 	* Finds state verifying sequences for all states of FSM.<br>
 	* If some state has not SVS,
 	* input sequence in output vector will be empty.<br>
-	* Sequence outVSet[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).<br>
+	* Sequence VSet[i] of resulting collection belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).<br>
 	* Applying SVS distinguishes related state from the others.
 	* @param dfsm - Deterministic FSM
-	* @param outVSet
+	* @return Verifying Set of SVSs
 	*/
-	FSMLIB_API void getVerifyingSet(DFSM * dfsm, sequence_vec_t & outVSet);
+	FSMLIB_API sequence_vec_t getVerifyingSet(DFSM * dfsm);
 
 	/**
 	* Fills given seq table with the shortest possible sequences

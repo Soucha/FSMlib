@@ -39,8 +39,8 @@ namespace FSMsequence {
 	extern int closedCount, openCount;
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
-	bool getStateVerifyingSequence(DFSM * fsm, state_t state, sequence_in_t & outSVS) {
-		outSVS.clear();
+	sequence_in_t getStateVerifyingSequence(DFSM * fsm, state_t state) {
+		sequence_in_t outSVS;
 		
 		block_t states;
 		output_t output;
@@ -56,7 +56,7 @@ namespace FSMsequence {
 			// has state unique output?
 			if (states.size() == 1) {
 				outSVS.push_back(STOUT_INPUT);
-				return true;
+				return outSVS;
 			}
 			// some states may be filtered by eps
 			if (states.size() < fsm->getNumberOfStates()) {
@@ -132,7 +132,7 @@ namespace FSMsequence {
 						delete fifo.front();
 						fifo.pop();
 					}
-					return true;
+					return outSVS;
 				}
 				// has already the same group of states analysed?
 				if (used.find(make_pair(states, nextState)) == used.end()) {
@@ -150,17 +150,16 @@ namespace FSMsequence {
 		openCount += fifo.size();
 		closedCount += used.size();
 #endif // SEQUENCES_PERFORMANCE_TEST
-		return false;
+		return outSVS;
 	}
 
-	void getVerifyingSet(DFSM * fsm, sequence_vec_t & outVSet) {
-		outVSet.clear();
+	sequence_vec_t getVerifyingSet(DFSM * fsm) {
+		sequence_vec_t outVSet;
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;
 #endif // SEQUENCES_PERFORMANCE_TEST
 		for (state_t state : fsm->getStates()) {
-			sequence_in_t sVS;
-			getStateVerifyingSequence(fsm, state, sVS);
+			auto sVS = getStateVerifyingSequence(fsm, state);
 			outVSet.push_back(sVS);
 		}
 #if SEQUENCES_PERFORMANCE_TEST
@@ -169,5 +168,6 @@ namespace FSMsequence {
 		testOut += ss.str();
 		//printf("%d;%d;", closedCount, openCount);
 #endif // SEQUENCES_PERFORMANCE_TEST
+		return outVSet;
 	}
 }

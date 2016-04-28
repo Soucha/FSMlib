@@ -26,7 +26,6 @@ namespace FSMtesting {
 		TS.clear();
 		if (extraStates < 0) return NULL_STATE;
 		auto states = fsm->getStates();
-		sequence_vec_t VSet;
 		vector<sequence_set_t> SCSets;
 		bool startWithStout = false;
 
@@ -34,7 +33,7 @@ namespace FSMtesting {
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		sequence_in_t emptySeq;
 		traversalSet.insert(emptySeq);
-		getVerifyingSet(fsm, VSet);
+		auto VSet = getVerifyingSet(fsm);
 		getStatesCharacterizingSets(fsm, SCSets, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 		
 		state_t counter = 0;

@@ -101,7 +101,8 @@ namespace FSMlibTest
 			DEBUG_MSG("%d: %s\n", state, FSMmodel::getInSequenceAsString(sVS).c_str());
 			if (sVS.empty()) {
 				ARE_EQUAL(false, hasVS, "FSM has State Verifying Sequence of state %d but it was not found.", state);
-				ARE_EQUAL(false, getStateVerifyingSequence(fsm, state, sVS), 
+				auto sVS = getStateVerifyingSequence(fsm, state);
+				ARE_EQUAL(true, sVS.empty(), 
 					"FSM has State Verifying Sequence %s of state %d but it was not found.", 
 					FSMmodel::getInSequenceAsString(sVS).c_str(), state);
 				return;
@@ -148,8 +149,7 @@ namespace FSMlibTest
 
 		void testGetVerifyingSet(string filename, int n = 0, ...) {
 			fsm->load(filename);
-			vector<sequence_in_t> sVSet;
-			getVerifyingSet(fsm, sVSet);
+			auto sVSet = getVerifyingSet(fsm);
 			DEBUG_MSG("Verifying Set of %s:\n", filename.c_str());
 			ARE_EQUAL(state_t(sVSet.size()), fsm->getNumberOfStates(),
 				"FSM has %d states but only %d sequences were received.",
