@@ -143,9 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSMlibCUDA\FSMlibCUDA.vcxproj">
-      <Project>{1acf8588-3c30-49d4-8ce2-a63a20940af7}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\FSMlib\FSMlib.vcxproj">
       <Project>{fa692283-399a-49fc-aa5d-3a21995bd370}</Project>
     </ProjectReference>

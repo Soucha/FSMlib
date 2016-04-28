@@ -287,7 +287,7 @@ namespace FSMtesting {
 		}
 
 		// write LP
-		mkdir(LP_FOLDER);
+		_mkdir(LP_FOLDER);
 		string fileName = fsm->getFilename();
 		fileName = FSMlib::Utils::getUniqueName(fileName, "lp", string(LP_FOLDER)+"/");
 

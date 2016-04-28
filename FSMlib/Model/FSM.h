@@ -36,21 +36,15 @@
 class FSMLIB_API FSM {
 public:
 
-	FSM() {
-		_numberOfStates = 0;
-		_numberOfInputs = 0;
-		_numberOfOutputs = 0;
-		_type = TYPE_NONE;
+	FSM() :
+		_numberOfStates(0),
+		_numberOfInputs(0),
+		_numberOfOutputs(0),
+		_type(TYPE_NONE) {
 		_usedStateIDs.clear();
 	}
 
-	FSM(const FSM& other) :
-		_numberOfInputs(other._numberOfInputs),
-		_numberOfStates(other._numberOfStates),
-		_numberOfOutputs(other._numberOfOutputs),
-		_type(other._type),
-		_usedStateIDs(other._usedStateIDs) {
-	}
+	// implicit copy and move constructors and assignment operators
 
 	//<-- GENERAL INFORMATION -->//
 
@@ -197,8 +191,8 @@ public:
 	virtual void incNumberOfOutputs(output_t byNum) = 0;
 
 protected:
-	input_t _numberOfInputs;
 	state_t _numberOfStates;
+	input_t _numberOfInputs;
 	output_t _numberOfOutputs;
 	machine_type_t _type;
 #pragma warning (disable : 4251)

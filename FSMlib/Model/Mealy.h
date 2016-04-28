@@ -33,14 +33,12 @@ public:
 		_isOutputTransition = true;
 	}
 
-	Mealy(const Mealy& other) :
-		DFSM(other) {
-	}
+	// implicit copy and move constructors and assignment operators
 
 	/// inherited
 	//state_t getNextState(state_t state, input_t input);
-
-	output_t getOutput(state_t state, input_t input);
+	/// inherited
+	//output_t getOutput(state_t state, input_t input);
 
 	//<-- MODEL INITIALIZATION -->//
 

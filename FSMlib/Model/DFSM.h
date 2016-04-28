@@ -27,21 +27,17 @@ class FSMLIB_API DFSM : public FSM {
 public:
 
 	DFSM() :
-		FSM() {
-		_isReduced = false;
+		FSM(), 
+		_isReduced(false),
+		_isOutputState(true),
+		_isOutputTransition(true) {
 		_type = TYPE_DFSM;
 		_transition.clear();
 		_outputState.clear();
 		_outputTransition.clear();
-		_isOutputState = true;
-		_isOutputTransition = true;
 	}
 
-	DFSM(const DFSM& other) :
-		FSM(other), _isReduced(other._isReduced), _transition(other._transition),
-		_isOutputState(other._isOutputState), _isOutputTransition(other._isOutputTransition),
-		_outputTransition(other._outputTransition), _outputState(other._outputState) {
-	}
+	// implicit copy and move constructors and assignment operators
 
 	/**
 	* @return True if this FSM is in minimal form
@@ -73,7 +69,7 @@ public:
 	* @return Next state, NULL_STATE if there is no transition from state on input,
 	* or WRONG_STATE if given state or input is not valid
 	*/
-	virtual state_t getNextState(state_t state, input_t input);
+	state_t getNextState(state_t state, input_t input);
 
 	/**
 	* Gets identification of last state after applying given input sequence from given state.
@@ -91,7 +87,7 @@ public:
 	* @param input
 	* @return Output (including DEFAULT_OUTPUT) or WRONG_OUTPUT if given state or input is not valid
 	*/
-	virtual output_t getOutput(state_t state, input_t input);
+	output_t getOutput(state_t state, input_t input);
 
 	/**
 	* Gets output sequence observed after applying given input sequence from given state.

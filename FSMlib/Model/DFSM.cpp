@@ -72,10 +72,10 @@ output_t DFSM::getOutput(state_t state, input_t input) {
 		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
 		return WRONG_OUTPUT;
 	}
-	if (input == STOUT_INPUT) {
+	if (_isOutputState && (input == STOUT_INPUT)) { // holds also for Moore and DFA
 		return _outputState[state];
 	}
-	if (input >= _numberOfInputs) {
+	if ((input >= _numberOfInputs) || (input == STOUT_INPUT))  {// STOUT is wrong for Mealy
 		ERROR_MESSAGE("%s::getOutput - bad input (%d)", machineTypeNames[_type], input);
 		return WRONG_OUTPUT;
 	}
@@ -84,7 +84,7 @@ output_t DFSM::getOutput(state_t state, input_t input) {
 		ERROR_MESSAGE("%s::getOutput - there is no such transition (%d, %d)", machineTypeNames[_type], state, input);
 		return WRONG_OUTPUT;
 	}
-	return _outputTransition[state][input];
+	return (_isOutputTransition) ? _outputTransition[state][input] : _outputState[nextState]; // DFSM and Mealy vs Moore and DFA
 }
 
 sequence_out_t DFSM::getOutputAlongPath(state_t state, sequence_in_t path) {

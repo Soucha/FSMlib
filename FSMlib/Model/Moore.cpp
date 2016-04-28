@@ -19,6 +19,7 @@
 
 #include "Moore.h"
 
+/*
 output_t Moore::getOutput(state_t state, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
@@ -38,7 +39,7 @@ output_t Moore::getOutput(state_t state, input_t input) {
 	}
 	return _outputState[nextState];
 }
-
+*/
 bool Moore::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::setOutput - bad state (%d)", machineTypeNames[_type], state);

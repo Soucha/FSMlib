@@ -18,7 +18,7 @@
 #include <iostream>
 
 #ifndef PARALLEL_COMPUTING
-#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
+//#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
 #endif // !PARALLEL_COMPUTING
 #include "../FSMlib/FSMlib.h"
 
@@ -129,8 +129,7 @@ static void testAllMethod(string filename) {
 	indist.clear();
 }
 
-int main(int argc, char** argv) {
-
+static void testAll() {
 	Mealy mealy;
 	fsm = &mealy;
 
@@ -142,6 +141,35 @@ int main(int argc, char** argv) {
 	DFSM dfsm;
 	fsm = &dfsm;
 	testAllMethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+
+}
+
+static DFSM getFSM() {
+	DFSM dfsm;
+	dfsm.create(3, 4, 5);
+	dfsm.setTransition(0, 1, 2, 3);
+	return dfsm;
+}
+
+int main(int argc, char** argv) {
+	
+	DFSM ff = getFSM();// move assignment
+	ff.setTransition(1, 2, 3, 4);
+
+	ff = getFSM();
+
+	DFSM fg(getFSM());// move constructor
+	fg.setTransition(2, 0, 1, 0);
+
+	ff = fg;// copy assignment
+	auto out = ff.getOutput(2, 0);
+	ff.setTransition(1, 2, 3, 4);
+
+	out = fg.getOutput(2, 0);
+
+	DFSM fh(fg);// copy constructor
+
+	out = fh.getNextState(2, 0);
 
 	char c;
 	cin >> c;

@@ -31,13 +31,10 @@ public:
 		_type = TYPE_DFA;
 	}
 
-	DFA(const DFA& other) :
-		Moore(other) {
-	}
+	// implicit copy and move constructors and assignment operators
 
 	/// inherited
 	//state_t getNextState(state_t state, input_t input);
-
 	/// inherited
 	//output_t getOutput(state_t state, input_t input);
 

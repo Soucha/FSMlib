@@ -18,7 +18,7 @@
 #include "stdafx.h"
 
 #include "Mealy.h"
-
+/*
 output_t Mealy::getOutput(state_t state, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
@@ -35,7 +35,7 @@ output_t Mealy::getOutput(state_t state, input_t input) {
 	}
 	return _outputTransition[state][input];
 }
-
+*/
 bool Mealy::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::setOutput - bad state (%d)", machineTypeNames[_type], state);
