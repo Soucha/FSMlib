@@ -88,12 +88,10 @@ namespace FSMtesting {
 			}
 		}
 
-		shortest_paths_t sp;
-		FSMmodel::createAllShortestPaths(fsm, sp);
+		auto sp = FSMmodel::createAllShortestPaths(fsm);
 		sequence_vec_t trSeq(N);
 		if (resetEnabled) {
-			sequence_set_t sc;
-			getStateCover(fsm, sc);
+			auto sc = getStateCover(fsm);
 			for (auto seq : sc) {
 				trSeq[fsm->getEndPathState(0, seq)] = seq;
 			}
@@ -231,8 +229,7 @@ namespace FSMtesting {
 						CS.assign(trSeq[next[idx] / P].begin(), trSeq[next[idx] / P].end());
 					}
 					else {
-						sequence_in_t shortestPath;
-						FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp, shortestPath);
+						auto shortestPath = FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp);
 						CS.insert(CS.end(), shortestPath.begin(), shortestPath.end());
 					}
 				}

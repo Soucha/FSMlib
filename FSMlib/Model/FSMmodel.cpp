@@ -124,40 +124,40 @@ namespace FSMmodel {
 		return true;
 	}
 
-	static int getSCComponent(int state, int & idx, vector<int> & index, DFSM* fsm) {
-		int lowlink = idx;
+	static state_t getSCComponent(state_t state, state_t & idx, vector<state_t> & index, DFSM* fsm) {
+		state_t lowlink = idx;
 		index[state] = idx;
 		idx++;
 		for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
 			auto nextState = fsm->getNextState(state, i);
 			if (nextState == NULL_STATE) continue;
-			if (index[nextState] == -1) {
+			if (index[nextState] == NULL_STATE) {
 				auto ret = getSCComponent(nextState, idx, index, fsm);
-				if (ret == -1) return ret;
+				if (ret == NULL_STATE) return ret;
 				if (ret < lowlink) lowlink = ret;
 			}
 			else if (index[nextState] < lowlink) {
 				lowlink = index[nextState];
 			}
 		}
-		if (lowlink == index[state]) return -1;
+		if (lowlink == index[state]) return NULL_STATE;
 		return lowlink;
 	}
 
 	bool isStronglyConnected(DFSM * fsm) {
-		vector<int> index(fsm->getNumberOfStates(), -1);
-		int idx = 0;
+		vector<state_t> index(fsm->getNumberOfStates(), NULL_STATE);
+		state_t idx = 0;
 		index[0] = idx++;
 		for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
 			auto nextState = fsm->getNextState(0, i);
 			if (nextState == NULL_STATE) continue;
-			if (index[nextState] == -1) {
+			if (index[nextState] == NULL_STATE) {
 				auto ret = getSCComponent(nextState, idx, index, fsm);
-				if (ret == -1) return false;
+				if (ret == NULL_STATE) return false;
 			}
 		}
 		for (auto i : index) {
-			if (i == -1) return false;
+			if (i == NULL_STATE) return false;
 		}
 		return true;
 	}
@@ -233,9 +233,9 @@ namespace FSMmodel {
 		return s;
 	}
 
-	void createAllShortestPaths(DFSM* fsm, shortest_paths_t & shortestPaths) {
+	shortest_paths_t createAllShortestPaths(DFSM* fsm) {
 		state_t N = fsm->getNumberOfStates();
-		shortestPaths.resize(N);
+		shortest_paths_t shortestPaths(N);
 		for (state_t i = 0; i < N; i++) {
 			shortestPaths[i].resize(N);
 			for (state_t j = 0; j < N; j++) {
@@ -259,19 +259,20 @@ namespace FSMmodel {
 				}
 			}
 		}
+		return shortestPaths;
 	}
 
-	bool getShortestPath(DFSM * fsm, state_t from, state_t to,
-		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath) {
-		shortestPath.clear();
-		if ((from == to) || (shortestPaths[from][to].second == STOUT_INPUT)) {// empty sequence or there is no shortest path
-			return (from == to);
+	sequence_in_t getShortestPath(DFSM * fsm, state_t from, state_t to, const shortest_paths_t & shortestPaths) {
+		sequence_in_t shortestPath;
+		//if (from == to) return shortestPath;// empty sequence
+		if (shortestPaths[from][to].second == STOUT_INPUT) {// there is no shortest path
+			return shortestPath;
 		}
 		do {
 			shortestPath.push_back(shortestPaths[from][to].second);
 			if (fsm->isOutputState()) shortestPath.push_back(STOUT_INPUT);
 			from = fsm->getNextState(from, shortestPaths[from][to].second);
 		} while (from != to);
-		return true;
+		return shortestPath;
 	}
 }

@@ -18,24 +18,7 @@
 #include "stdafx.h"
 
 #include "Mealy.h"
-/*
-output_t Mealy::getOutput(state_t state, input_t input) {
-	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
-		return WRONG_OUTPUT;
-	}
-	if ((input >= _numberOfInputs) || (input == STOUT_INPUT)) {
-		ERROR_MESSAGE("%s::getOutput - bad input (%d)", machineTypeNames[_type], input);
-		return WRONG_OUTPUT;
-	}
-	state_t& nextState = _transition[state][input];
-	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		ERROR_MESSAGE("%s::getOutput - there is no such transition (%d, %d)", machineTypeNames[_type], state, input); 
-		return WRONG_OUTPUT;
-	}
-	return _outputTransition[state][input];
-}
-*/
+
 bool Mealy::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::setOutput - bad state (%d)", machineTypeNames[_type], state);

@@ -105,9 +105,9 @@ namespace FSMmodel {
 	* Creates a table of shortest paths between all states.
 	* 
 	* @param fsm - Deterministic FSM
-	* @param shortestPaths - resulting table 
+	* @return shortest paths
 	*/
-	FSMLIB_API void createAllShortestPaths(DFSM * fsm, shortest_paths_t & shortestPaths);
+	FSMLIB_API shortest_paths_t createAllShortestPaths(DFSM * fsm);
 	
 	/**
 	* Designs a shortest path from given start state to given end state
@@ -117,10 +117,10 @@ namespace FSMmodel {
 	* @param from - start state
 	* @param to - end state
 	* @param shortestPaths - the result of call createAllShortestPaths
-	* @param shortestPath - a shortest path from given start to end state
-	* @return true if there is a path from start state to end state, false otherwise
+	* @return a shortest path from given start to end state, or
+	*		empty sequence if there is no path
 	*/
-	FSMLIB_API bool getShortestPath(DFSM * fsm, state_t from, state_t to,
-		shortest_paths_t & shortestPaths, sequence_in_t & shortestPath);
+	FSMLIB_API sequence_in_t getShortestPath(DFSM * fsm, state_t from, state_t to,
+		const shortest_paths_t & shortestPaths);
 
 }

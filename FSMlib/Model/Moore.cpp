@@ -19,27 +19,6 @@
 
 #include "Moore.h"
 
-/*
-output_t Moore::getOutput(state_t state, input_t input) {
-	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
-		ERROR_MESSAGE("%s::getOutput - bad state id (%d)", machineTypeNames[_type], state);
-		return WRONG_OUTPUT;
-	}
-	if (input == STOUT_INPUT) {
-		return _outputState[state];
-	}
-	if (input >= _numberOfInputs) {
-		ERROR_MESSAGE("%s::getOutput - bad input (%d)", machineTypeNames[_type], input);
-		return WRONG_OUTPUT;
-	}
-	state_t& nextState = _transition[state][input];
-	if ((nextState == NULL_STATE) || (nextState >= _usedStateIDs.size()) || (!_usedStateIDs[nextState])) {
-		ERROR_MESSAGE("%s::getOutput - there is no such transition (%d, %d)", machineTypeNames[_type], state, input); 
-		return WRONG_OUTPUT;
-	}
-	return _outputState[nextState];
-}
-*/
 bool Moore::setOutput(state_t state, output_t output, input_t input) {
 	if ((state >= _usedStateIDs.size()) || (!_usedStateIDs[state])) {
 		ERROR_MESSAGE("%s::setOutput - bad state (%d)", machineTypeNames[_type], state);

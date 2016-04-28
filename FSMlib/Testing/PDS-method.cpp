@@ -29,9 +29,8 @@ namespace FSMtesting {
 			return false;
 		}
 
-		sequence_set_t transitionCover, traversalSet;
-		getTransitionCover(fsm, transitionCover);
-		getTraversalSet(fsm, traversalSet, extraStates);
+		auto transitionCover = getTransitionCover(fsm);
+		auto traversalSet = getTraversalSet(fsm, extraStates);
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {

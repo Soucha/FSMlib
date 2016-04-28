@@ -42,9 +42,10 @@ namespace FSMtesting {
 		sequence_vec_t E(N);
 		sequence_in_t CS;
 		sequence_set_t stateCover;
-		if (resetEnabled)
-			getStateCover(fsm, stateCover);
-
+		if (resetEnabled) {
+			stateCover = getStateCover(fsm);
+		}
+		
 		getADSet(fsm, ADS, E);
 		delete ADS;
 		/* // Example from simao2009checking

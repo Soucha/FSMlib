@@ -82,9 +82,9 @@ namespace FSMsequence {
 	* State 0 is start state and FSM goes to unique state using each sequence.
 	* Sequences are sorted by lenght and then lexicographically from the shortest.
 	* @param dfsm - Deterministic FSM
-	* @param stateCover
+	* @return state cover
 	*/
-	FSMLIB_API void getStateCover(DFSM * dfsm, sequence_set_t & stateCover);
+	FSMLIB_API sequence_set_t getStateCover(DFSM * dfsm);
 
 	/**
 	* Fills given set with input sequences that cover all transitions.
@@ -92,17 +92,17 @@ namespace FSMsequence {
 	* of state cover is extended by each input symbol.
 	* State 0 is start state for all sequences.
 	* @param dfsm - Deterministic FSM
-	* @param transitionCover
+	* @return transition cover
 	*/
-	FSMLIB_API void getTransitionCover(DFSM * dfsm, sequence_set_t & transitionCover);
+	FSMLIB_API sequence_set_t getTransitionCover(DFSM * dfsm);
 
 	/**
 	* Fills given set with all input sequences of the lenght up to depth.
 	* @param dfsm - Deterministic FSM
-	* @param traversalSet
 	* @param depth
+	* @return traversal set
 	*/
-	FSMLIB_API void getTraversalSet(DFSM * dfsm, sequence_set_t & traversalSet, seq_len_t depth);
+	FSMLIB_API sequence_set_t getTraversalSet(DFSM * dfsm, seq_len_t depth);
 
 	/**
 	* Finds a shortest preset distinguishing sequence if FSM has it.<br><br>

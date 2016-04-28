@@ -74,9 +74,8 @@ namespace FSMlibTest
 
 		void testGetStateCover(string filename, int unreachableStates = 0) {
 			fsm->load(filename);
-			sequence_set_t stateCover;
 			set<state_t> coveredStates;
-			getStateCover(fsm, stateCover);
+			auto stateCover = getStateCover(fsm);
 			coveredStates.clear();
 			DEBUG_MSG("State cover of %s\n", filename.c_str());
 			for (sequence_in_t seq : stateCover) {
@@ -93,8 +92,7 @@ namespace FSMlibTest
 
 		void testGetTransitionCover(string filename) {
 			fsm->load(filename);
-			sequence_set_t transitionCover;
-			getTransitionCover(fsm, transitionCover);
+			auto transitionCover = getTransitionCover(fsm);
 			set< pair<state_t, input_t> > covered;
 			bool isEmptySeq = false;
 			state_t state;
@@ -107,6 +105,7 @@ namespace FSMlibTest
 					isEmptySeq = true;
 				}
 				else {
+					if (fsm->isOutputState()) seq.pop_back();
 					input = seq.back();
 					seq.pop_back();
 					state = fsm->getEndPathState(0, seq);
@@ -132,16 +131,15 @@ namespace FSMlibTest
 
 		void testGetTraversalSet(string filename) {
 			fsm->load(filename);
-			sequence_set_t traversalSet;
-
-			getTraversalSet(fsm, traversalSet, 0);
+			
+			auto traversalSet = getTraversalSet(fsm, 0);
 			ARE_EQUAL(true, traversalSet.empty(), "Traversal set is not empty by depth of zero.");
 			
-			traversalSet.clear();
-			getTraversalSet(fsm, traversalSet, 1);
+			traversalSet = getTraversalSet(fsm, 1);
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				sequence_in_t seq;
 				seq.push_back(input);
+				if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
 				ARE_EQUAL(1, int(traversalSet.count(seq)), "Traversal set (1) contains %d-times sequence %s",
 					traversalSet.count(seq), FSMmodel::getInSequenceAsString(seq).c_str());
 				traversalSet.erase(seq);
@@ -153,20 +151,22 @@ namespace FSMlibTest
 				ARE_EQUAL(true, traversalSet.empty(), "Traversal set (1) contains %d extra sequences", traversalSet.size());
 			}
 
-			traversalSet.clear();
-			getTraversalSet(fsm, traversalSet, 2);
+			traversalSet = getTraversalSet(fsm, 2);
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				sequence_in_t seq;
 				seq.push_back(input);
+				if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
 				ARE_EQUAL(1, int(traversalSet.count(seq)), "Traversal set (2) contains %d-times sequence %s",
 					traversalSet.count(seq), FSMmodel::getInSequenceAsString(seq).c_str());
 				traversalSet.erase(seq);
 				for (input_t input2 = 0; input2 < fsm->getNumberOfInputs(); input2++) {
 					seq.push_back(input2);
+					if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
 					ARE_EQUAL(1, int(traversalSet.count(seq)), "Traversal set (2) contains %d-times sequence %s",
 						traversalSet.count(seq), FSMmodel::getInSequenceAsString(seq).c_str());
 					traversalSet.erase(seq);
 					seq.pop_back();
+					if (fsm->isOutputState()) seq.pop_back();
 				}
 			}
 			if (!traversalSet.empty()) {
@@ -177,8 +177,7 @@ namespace FSMlibTest
 			}
 			
 			DEBUG_MSG("Traversal set (3) of %s\n", filename.c_str());
-			traversalSet.clear();
-			getTraversalSet(fsm, traversalSet, 3);
+			traversalSet = getTraversalSet(fsm, 3);
 			for (sequence_in_t seq : traversalSet) {
 				DEBUG_MSG(" %s\n", FSMmodel::getInSequenceAsString(seq).c_str());
 			}

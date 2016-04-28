@@ -27,12 +27,11 @@ namespace FSMtesting {
 		if (extraStates < 0) return NULL_STATE;
 		auto states = fsm->getStates();
 		sequence_vec_t VSet;
-		sequence_set_t stateCover, traversalSet;
 		vector<sequence_set_t> SCSets;
 		bool startWithStout = false;
 
-		getStateCover(fsm, stateCover);
-		getTraversalSet(fsm, traversalSet, extraStates);
+		auto stateCover = getStateCover(fsm);
+		auto traversalSet = getTraversalSet(fsm, extraStates);
 		sequence_in_t emptySeq;
 		traversalSet.insert(emptySeq);
 		getVerifyingSet(fsm, VSet);
