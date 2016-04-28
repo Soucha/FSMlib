@@ -18,6 +18,7 @@
 #include "stdafx.h"
 
 #include <sstream>
+#include <process.h>
 #include "FSMmodel.h"
 
 #define SEQUENCE_SEPARATOR       ","
@@ -162,7 +163,8 @@ namespace FSMmodel {
 	}
 
 	static bool createImage(string fileName, string extension) {
-		int rv = system((string("dot -T") + extension + string(" -O ") + fileName).c_str());
+		extension = "-T" + extension;
+		auto rv = _spawnlp(P_WAIT, "dot", "dot", extension.c_str(), "-O", fileName.c_str(), NULL);
 		return (rv == 0);
 	}
 

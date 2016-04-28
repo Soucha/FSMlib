@@ -18,6 +18,7 @@
 
 #include <sys/stat.h>
 #include <direct.h>
+#include <process.h>
 #include "FSMtesting.h"
 #include "../UnionFind.h"
 
@@ -123,27 +124,6 @@ namespace FSMtesting {
 		fflush(file);
 		fclose(file);
 		return true;
-	}
-
-	static void getSolution(vector<state_t> & order, string fileName) {
-		//sleep(1);
-		struct stat buffer;
-		while (stat(fileName.c_str(), &buffer) != 0) {
-			Sleep(1);
-		}
-		ifstream fin(fileName);
-		string s;
-		state_t numTests = state_t(order.size());
-		int pos;
-		getline(fin, s);
-		for (state_t i = 0; i < numTests; i++) {
-			for (state_t j = 0; j < numTests; j++) {
-				fin >> s >> pos;
-				if (pos) {
-					order[i] = j;
-				}
-			}
-		}
 	}
 
 	static bool process_Mstar(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
@@ -312,8 +292,9 @@ namespace FSMtesting {
 		fileName = FSMlib::Utils::getUniqueName(fileName, "lp", string(LP_FOLDER)+"/");
 
 		if (!writeLP(costs, fileName)) return false;
-		string call = "start " + string(gurobiPath) + GUROBI_SOLVER + " ResultFile=" + fileName + ".sol " + fileName;
-		int rv = system(call.c_str());
+		string gurobiCl = string(gurobiPath) + GUROBI_SOLVER;
+		string resultFile = "ResultFile=" + fileName + ".sol";
+		auto rv = _spawnl(P_WAIT, gurobiCl.c_str(), gurobiCl.c_str(), resultFile.c_str(), fileName.c_str(), NULL);
 		if (rv != 0) {
 			ERROR_MESSAGE("Mstar-method: Fail in solving LP.\n");
 			return false;
@@ -321,7 +302,23 @@ namespace FSMtesting {
 
 		// obtain solution of LP
 		vector<state_t> next(Tsize);
-		getSolution(next, fileName + ".sol");
+		fileName += ".sol";
+		ifstream fin(fileName);
+		if (!fin.is_open()) {
+			ERROR_MESSAGE("Mstar-method - unable to open file %s", fileName.c_str());
+			return false;
+		}
+		string s;
+		int pos;
+		getline(fin, s);
+		for (state_t i = 0; i < Tsize; i++) {
+			for (state_t j = 0; j < Tsize; j++) {
+				fin >> s >> pos;
+				if (pos) {
+					next[i] = j;
+				}
+			}
+		}
 
 		// create CS
 		idx = Tsize - 1;
