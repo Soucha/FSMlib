@@ -107,17 +107,15 @@ namespace FSMsequence {
 			}
 			partition.insert(block);
 		}
-		queue<pds_node_t*> fifo;
-		multimap<int, pds_node_t*> used;// <id, node>, id = getSetId(node) = sum of state IDs in the first block of node's partition
-		pair <multimap<int, pds_node_t*>::iterator, multimap<int, pds_node_t*>::iterator> usedIt;
-		pds_node_t* act, *succ;
+		queue<unique_ptr<pds_node_t>> fifo;
+		// <id, node's partition>, id = getSetId(node) = sum of state IDs in the first block of node's partition
+		multimap<int, partition_t> used;
 		bool stop, stoutUsed = false;
 
-		act = new pds_node_t(partition, s);
-		fifo.push(act);
-		used.insert(make_pair(getSetId(*partition.begin()), act));
+		fifo.push(unique_ptr<pds_node_t>(new pds_node_t(partition, s)));
+		used.insert(make_pair(getSetId(*partition.begin()), partition));
 		while (!fifo.empty() && used.size() < MAX_CLOSED) {
-			act = fifo.front();
+			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				stop = false;
@@ -196,18 +194,13 @@ namespace FSMsequence {
 					testOut += ss.str();
 					//printf("%d;%d;%d;", outPDS.size(), used.size()-fifo.size(), fifo.size());
 #endif // SEQUENCES_PERFORMANCE_TEST
-					for (multimap<int, pds_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
-						delete it->second;
-					}
-					used.clear();
 					return outPDS;
 				}
 				// go through all blocks in new partition
 				for (partition_t::iterator pIt = partition.begin(); pIt != partition.end(); pIt++) {
-					usedIt = used.equal_range(getSetId(*pIt));
-					for (multimap<int, pds_node_t*>::iterator it = usedIt.first; it != usedIt.second; it++) {
-						if (isSubsetPartition(it->second->partition.begin(), it->second->partition.end(),
-							pIt, partition.end())) {
+					auto usedIt = used.equal_range(getSetId(*pIt));
+					for (auto it = usedIt.first; it != usedIt.second; it++) {
+						if (isSubsetPartition(it->second.begin(), it->second.end(), pIt, partition.end())) {
 							stop = true;
 							break;
 						}
@@ -219,9 +212,8 @@ namespace FSMsequence {
 					s = act->ds;
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					succ = new pds_node_t(partition, s);
-					fifo.push(succ);
-					used.insert(make_pair(getSetId(*partition.begin()), succ));
+					fifo.push(unique_ptr<pds_node_t>(new pds_node_t(partition, s)));
+					used.insert(make_pair(getSetId(*partition.begin()), partition));
 				}
 			}
 		}
@@ -231,10 +223,6 @@ namespace FSMsequence {
 		testOut += ss.str();
 		//printf("%d;%d;%d;", ((fifo.empty()) ? -1 : -2), used.size()-fifo.size(), fifo.size());		
 #endif // SEQUENCES_PERFORMANCE_TEST
-		for (multimap<int, pds_node_t*>::iterator it = used.begin(); it != used.end(); it++) {
-			delete it->second;
-		}
-		used.clear();
 		return outPDS;
 	}
 }
