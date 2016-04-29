@@ -173,12 +173,11 @@ namespace FSMsequence {
 		printf("\n");
 	}
 
-	extern void getSCSet(vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N,
-		sequence_set_t & outSCSet, bool filterPrefixes = false);
+	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false);
 
 	int getDistinguishingSequences(DFSM * fsm, sequence_in_t& outPDS, AdaptiveDS*& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-			void(*getSeparatingSequences)(DFSM * dfsm, vector<sequence_in_t> & seq), bool filterPrefixes,
+			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm), bool filterPrefixes,
 			void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet),
 			void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet)) {
 		state_t M, N = fsm->getNumberOfStates();
@@ -188,10 +187,9 @@ namespace FSMsequence {
 		output_t output;
 		list<output_t> actOutputs;
 		bool stop, stoutUsed;
-		vector<state_t> states = fsm->getStates();
-		vector<sequence_in_t> seq(M);
-
-		(*getSeparatingSequences)(fsm, seq);
+		auto states = fsm->getStates();
+		
+		auto seq = (*getSeparatingSequences)(fsm);
 
 		outVSet.clear();
 		outVSet.resize(N);
@@ -201,7 +199,7 @@ namespace FSMsequence {
 		outSCSets.resize(N);
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
-			getSCSet(seq, i, N, outSCSets[i], filterPrefixes);
+			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
 			if (*reduceSCSetFunc != NULL)
 				(*reduceSCSetFunc)(fsm, i, outSCSets[i]);
 		}

@@ -230,8 +230,7 @@ namespace FSMtesting {
 		specification = fsm;
 		states = fsm->getStates();
 
-		vector<sequence_set_t> H;
-		getHarmonizedStateIdentifiers(fsm, H);
+		auto H = getHarmonizedStateIdentifiers(fsm);
 
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < H.size(); i++) {

@@ -147,16 +147,14 @@ namespace FSMlibTest
 
 		void testGetStateCharacterizingSet(string filename, state_t stateIdx) {
 			if (!filename.empty()) fsm->load(filename);
-			sequence_set_t sCSet;
 			vector<state_t> states = fsm->getStates();
-			getStateCharacterizingSet(fsm, states[stateIdx], sCSet, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+			auto sCSet = getStateCharacterizingSet(fsm, states[stateIdx], getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 			testSCSet(stateIdx, sCSet);
 		}
 
 		void testGetStatesCharacterizingSets(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			vector<sequence_set_t> sCSets;
-			getStatesCharacterizingSets(fsm, sCSets, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+			auto sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 			for (state_t i = 0; i < fsm->getNumberOfStates(); i++) {
 				testSCSet(i, sCSets[i]);
 			}
@@ -164,8 +162,7 @@ namespace FSMlibTest
 
 		void testGetCharacterizingSet(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			sequence_set_t CSet;
-			getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
+			auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
 			vector<state_t> states = fsm->getStates();
@@ -214,8 +211,7 @@ namespace FSMlibTest
 
 		void testGetHarmonizedStateIdentifiers(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			vector<sequence_set_t> HCSet;
-			getHarmonizedStateIdentifiers(fsm, HCSet);
+			auto HCSet = getHarmonizedStateIdentifiers(fsm);
 			state_t N = fsm->getNumberOfStates();
 			FSMlib::PrefixSet pset;
 			int len;
@@ -254,8 +250,7 @@ namespace FSMlibTest
 
 		void testGetSeparatingSequences(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			vector<LinkCell> seq;
-			getSeparatingSequences(fsm, seq);
+			auto seq = getSeparatingSequences(fsm);
 			vector<state_t> states = fsm->getStates();
 			state_t N = fsm->getNumberOfStates(), idx, nextStateI, nextStateJ, nextIdx;
 

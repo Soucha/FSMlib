@@ -28,10 +28,9 @@ namespace FSMtesting {
 			return;
 		}
 
-		sequence_set_t CSet;
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		getCharacterizingSet(fsm, CSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
+		auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {

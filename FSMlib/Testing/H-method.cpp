@@ -290,7 +290,7 @@ namespace FSMtesting {
 		specification = fsm;
 		states = fsm->getStates();
 
-		getSeparatingSequences(fsm, sepSeq);
+		sepSeq = getSeparatingSequences(fsm);
 
 		// 1. step
 		createBasicTree(fsm, extraStates);

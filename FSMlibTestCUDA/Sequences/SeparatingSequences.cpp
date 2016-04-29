@@ -107,10 +107,9 @@ namespace FSMlibTestCUDA
 #endif
 		}
 
-		void testGetSeparatingSequences(string filename, void(*getSepSeq)(DFSM * dfsm, vector<sequence_in_t> & seq), string name) {
+		void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(DFSM * dfsm), string name) {
 			if (!filename.empty()) fsm->load(filename);
-			vector<sequence_in_t> seq;
-			(*getSepSeq)(fsm, seq);
+			auto seq = (*getSepSeq)(fsm);
 			DEBUG_MSG("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
 			vector<state_t> states = fsm->getStates();
 			state_t k = 0, N = fsm->getNumberOfStates();

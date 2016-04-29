@@ -46,36 +46,35 @@ int getCSet() {
 	if (!fsm->load("../data/tests/sequences/Moore_R6_ADS.fsm")) return 1;
 	sequence_set_t outCSet;
 	cout << "filter prefix: YES, no reduction" << endl;
-	getCharacterizingSet(fsm, outCSet);
+	outCSet = getCharacterizingSet(fsm);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	cout << "filter prefix: NO, no reduction" << endl;
-	getCharacterizingSet(fsm, outCSet, getStatePairsShortestSeparatingSequences, false);
+	outCSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	cout << "filter prefix: YES, LS_SL" << endl;
-	getCharacterizingSet(fsm, outCSet, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
+	outCSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	cout << "filter prefix: NO, LS_SL" << endl;
-	getCharacterizingSet(fsm, outCSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
+	outCSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	cout << "filter prefix: YES, EqualLength" << endl;
-	getCharacterizingSet(fsm, outCSet, getStatePairsShortestSeparatingSequences, true, reduceCSet_EqualLength);
+	outCSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_EqualLength);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	cout << "filter prefix: NO, EqualLength" << endl;
-	getCharacterizingSet(fsm, outCSet, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
+	outCSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
 	printSeqSet(outCSet);
 	outCSet.clear();
 	return 0;
 }
 
-void testGetSeparatingSequences(string filename, void(*getSepSeq)(DFSM * dfsm, vector<sequence_in_t> & seq), string name) {
+void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(DFSM * dfsm), string name) {
 	if (!filename.empty()) fsm->load(filename);
-	vector<sequence_in_t> seq;
-	(*getSepSeq)(fsm, seq);
+	auto seq = (*getSepSeq)(fsm);
 	printf("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
 	vector<state_t> states = fsm->getStates();
 	state_t k = 0, N = fsm->getNumberOfStates();

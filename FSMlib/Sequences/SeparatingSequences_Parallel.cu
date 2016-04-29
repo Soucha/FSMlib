@@ -28,7 +28,7 @@ namespace FSMsequence {
 
 #define IS_ERROR(error) isError(error, __FILE__, __LINE__)
 #define CHECK_ERROR(error) if (isError(error, __FILE__, __LINE__)) return false;
-#define RETURN_ON_ERROR(error) if (isError(error, __FILE__, __LINE__)) return;
+#define RETURN_ON_ERROR(error) if (isError(error, __FILE__, __LINE__)) return seq;
 
 	static void freeCuda();
 	static bool isError(cudaError_t error, const char *file, int line) {
@@ -62,7 +62,7 @@ namespace FSMsequence {
 	extern float gpuLoadTime, gpuProcessTime, gpuTotalTime;
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-	extern state_t getIdx(vector<state_t>& states, state_t stateId);
+	extern state_t getIdx(const vector<state_t>& states, state_t stateId);
 
 	static bool initCuda(DFSM* fsm, bool useQueue) {
 		auto states = fsm->getStates();
@@ -378,15 +378,15 @@ namespace FSMsequence {
 		return true;
 	}
 
-	void getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * fsm, vector<sequence_in_t> & seq) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * fsm) {
+		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();
 		M = ((N - 1) * N) / 2;
-		seq.clear();
 		if (M > MAX_BLOCKS * THREADS_PER_BLOCK) {
 			ERROR_MESSAGE("%s::getStatePairsShortestSeparatingSequences_ParallelSF - too many states (%d), max is %d",
 				machineTypeNames[fsm->getType()], M, MAX_BLOCKS * THREADS_PER_BLOCK);
-			return; 
+			return seq; 
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventCreate(&start));
@@ -394,7 +394,7 @@ namespace FSMsequence {
 		RETURN_ON_ERROR(cudaEventRecord(start, 0));
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-		if (!initCuda(fsm, false)) return;
+		if (!initCuda(fsm, false)) return seq;
 
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
@@ -438,17 +438,18 @@ namespace FSMsequence {
 		}
 
 		if (!getSequences(fsm, seq)) seq.clear();
+		return seq;
 	}
 
-	void getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * fsm, vector<sequence_in_t> & seq) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * fsm) {
+		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();
 		M = ((N - 1) * N) / 2;
-		seq.clear();
 		if (M > MAX_BLOCKS * THREADS_PER_BLOCK) {
 			ERROR_MESSAGE("%s::getStatePairsShortestSeparatingSequences_ParallelQueue - too many states (%d), max is %d",
 				machineTypeNames[fsm->getType()], M, MAX_BLOCKS * THREADS_PER_BLOCK);
-			return;
+			return seq;
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventCreate(&start));
@@ -456,7 +457,7 @@ namespace FSMsequence {
 		RETURN_ON_ERROR(cudaEventRecord(start, 0));
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-		if (!initCuda(fsm, true)) return;
+		if (!initCuda(fsm, true)) return seq;
 
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
@@ -494,7 +495,7 @@ namespace FSMsequence {
 			devPrevIdxLen = prescan(M + 1, devPrevIdx);
 			if (devPrevIdxLen == NULL) {
 				freeCuda();
-				return;
+				return seq;
 			}
 #if DEBUG
 			cudaMemcpy(tmp, devPrevIdxLen, (M + 1)*sizeof(state_t), cudaMemcpyDeviceToHost);
@@ -549,5 +550,6 @@ namespace FSMsequence {
 		}
 
 		if (!getSequences(fsm, seq)) seq.clear();
+		return seq;
 	}
 }

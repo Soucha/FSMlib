@@ -29,12 +29,11 @@ namespace FSMtesting {
 		}
 		auto states = fsm->getStates();
 		sequence_set_t CSet;
-		vector<sequence_set_t> SCSets;
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		sequence_in_t emptySeq;
 		traversalSet.insert(emptySeq);
-		getStatesCharacterizingSets(fsm, SCSets, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 		bool startWithStout = false;
 		FSMlib::PrefixSet pset;
 
