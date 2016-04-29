@@ -57,13 +57,7 @@ typedef set<sequence_in_t, seqcomp> sequence_set_t;
 struct AdaptiveDS {
 	sequence_in_t input;
 	vector<state_t> initialStates, currentStates;
-	map<output_t, AdaptiveDS*> decision;
-
-	~AdaptiveDS() {
-		for (auto succ : decision) {
-			delete succ.second;
-		}
-	}
+	map<output_t, unique_ptr<AdaptiveDS>> decision;
 };
 
 struct LinkCell {
@@ -133,19 +127,25 @@ namespace FSMsequence {
 	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
 	*
 	* @param dfsm - Deterministic FSM
-	* @param outADS
-	* @return true if FSM has ADS, false otherwise
+	* @return an Adaptive Distinguishing Sequence, or nullptr if there is no ADS
 	*/
-	FSMLIB_API bool getAdaptiveDistinguishingSequence(DFSM * dfsm, AdaptiveDS* & outADS);
+	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * dfsm);
 
 	/**
-	* Fills given collection with a distinguishing sequence that is included in given
+	* Creates a distinguishing sequence that is included in given
 	* Adaptive Distinguishing Sequence for each state.
 	* @param dfsm - Deterministic FSM
 	* @param ads - Adaptive Distinguishing Sequence
-	* @param ADSet - a collection of distinguishing sequences for each state index
+	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS
 	*/
-	FSMLIB_API void getADSet(DFSM * dfsm, AdaptiveDS* ads, sequence_vec_t& ADSet);
+	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm, const unique_ptr<AdaptiveDS>& ads);
+
+	/**
+	* Finds an adaptive distinguishing sequence for each state (using getAdaptiveDistinguishingSequence).
+	* @param dfsm - Deterministic FSM
+	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS 
+	*/
+	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm);
 
 	/**
 	* Finds a shortest state verifying sequence for given state.<br><br>
@@ -366,7 +366,7 @@ namespace FSMsequence {
 	*			- NOTE that some require not to filter prefixes
 	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND
 	*/
-	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, AdaptiveDS* & outADS,
+	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
 		bool filterPrefixes = true, void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL,

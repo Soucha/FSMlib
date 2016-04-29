@@ -26,9 +26,8 @@ namespace FSMsequence {
 		partition_t partition;
 		sequence_in_t ds;
 
-		pds_node_t(partition_t partition, sequence_in_t ds) {
-			this->partition = partition;
-			this->ds = ds;
+		pds_node_t(partition_t partition, sequence_in_t ds) :
+			partition(partition), ds(ds) {
 		}
 	};
 

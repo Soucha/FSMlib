@@ -54,28 +54,35 @@ namespace FSMsequence {
 		}
 	};
 
-	void getADSet(DFSM * fsm, AdaptiveDS* ads, sequence_vec_t& ADSet) {
+	sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm, const unique_ptr<AdaptiveDS>& ads) {
+		sequence_vec_t ADSet;
+		if (!ads) return ADSet;
 		stack< pair<AdaptiveDS*, sequence_in_t> > lifo;
 		sequence_in_t seq;
-		lifo.push(make_pair(ads, seq));
+		lifo.push(make_pair(ads.get(), seq));
 		ADSet.resize(fsm->getNumberOfStates());
 		auto states = fsm->getStates();
 		while (!lifo.empty()) {
 			auto p = lifo.top();
 			lifo.pop();
-			for (auto pNext : p.first->decision) {
-				seq = p.second;
-				seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
-				lifo.push(make_pair(pNext.second, seq));
+			seq = p.second;
+			seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
+			for (auto it = p.first->decision.begin(); it != p.first->decision.end(); it++) {
+				lifo.push(make_pair(it->second.get(), seq));
 			}
 			if (p.first->decision.empty()) {
 				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
 			}
 		}
+		return ADSet;
 	}
 
-	bool getAdaptiveDistinguishingSequence(DFSM * fsm, AdaptiveDS* & outADS) {
-		outADS = NULL;
+	sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm) {
+		auto ads = getAdaptiveDistinguishingSequence(fsm);
+		return getAdaptiveDistinguishingSet(fsm, ads);
+	}
+
+	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * fsm) {
 		state_t N = fsm->getGreatestStateId(), idx;
 		priority_queue<st_node_t*, vector<st_node_t*>, blockcomp> partition;
 		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t> >, lencomp> bfsqueue;
@@ -214,7 +221,7 @@ namespace FSMsequence {
 			}
 			if (node->succ.empty()) {// no valid input - possible only by root
 				delete rootST;
-				return false;
+				return nullptr;
 			}
 			if (!node->nextStates.empty()) {// block is distinguished by input
 				for (output_t i = 0; i < node->succ.size(); i++) {
@@ -395,20 +402,20 @@ namespace FSMsequence {
 				// check that all dependent was divided
 				if (distCounter != 0) {
 					delete rootST;
-					return false;
+					return nullptr;
 				}
 				dependent.clear();
 			}
 		}
 		// build ADS from ST
-		outADS = new AdaptiveDS;
+		auto outADS = unique_ptr<AdaptiveDS>(new AdaptiveDS);
 		outADS->initialStates = outADS->currentStates = rootST->block;
 
 		queue<AdaptiveDS*> fifo;
 		AdaptiveDS* adsNode;
-		map<output_t, AdaptiveDS*>::iterator outIt;
+		map<output_t, unique_ptr<AdaptiveDS>>::iterator outIt;
 		state_t pivot;
-		fifo.push(outADS);
+		fifo.push(outADS.get());
 		while (!fifo.empty()) {
 			adsNode = fifo.front();
 			fifo.pop();
@@ -432,12 +439,12 @@ namespace FSMsequence {
 					if (binary_search(next->succ[i].second->block.begin(),
 						next->succ[i].second->block.end(), adsNode->currentStates[sI])) {
 						if ((outIt = adsNode->decision.find(next->succ[i].first)) == adsNode->decision.end()) {
-							AdaptiveDS* adsNext = new AdaptiveDS;
+							auto adsNext = unique_ptr<AdaptiveDS>(new AdaptiveDS);
 							adsNext->initialStates.push_back(adsNode->initialStates[sI]);
 							for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
 							adsNext->currentStates.push_back(next->nextStates[idx]);
-							adsNode->decision[next->succ[i].first] = adsNext;
-							fifo.push(adsNext);
+							fifo.push(adsNext.get()); 
+							adsNode->decision[next->succ[i].first] = move(adsNext);
 						}
 						else {
 							outIt->second->initialStates.push_back(adsNode->initialStates[sI]);
@@ -450,6 +457,6 @@ namespace FSMsequence {
 			}
 		}
 		delete rootST;
-		return true;
+		return outADS;
 	}
 }

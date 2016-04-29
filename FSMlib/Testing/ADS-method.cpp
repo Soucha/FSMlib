@@ -23,16 +23,12 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
-		AdaptiveDS* ADS;
 		TS.clear();
-		if ((extraStates < 0) || !getAdaptiveDistinguishingSequence(fsm, ADS)) {
+		auto ADSet = getAdaptiveDistinguishingSet(fsm);
+		if ((extraStates < 0) || ADSet.empty()) {
 			return false;
 		}
 		auto states = fsm->getStates();
-		sequence_vec_t ADSet;
-		getADSet(fsm, ADS, ADSet);
-		delete ADS;
-
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		bool startWithStout = false;

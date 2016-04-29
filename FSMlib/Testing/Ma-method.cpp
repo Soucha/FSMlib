@@ -33,22 +33,20 @@ namespace FSMtesting {
 	}
 
 	static bool process_Ma(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
-		AdaptiveDS* ADS;
 		TS.clear();
-		if (!getAdaptiveDistinguishingSequence(fsm, ADS)) {
+		auto E = getAdaptiveDistinguishingSet(fsm);
+		if (E.empty()) {
 			return false;
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs(), currState, nextState;
-		sequence_vec_t E(N);
 		sequence_in_t CS;
 		sequence_set_t stateCover;
 		if (resetEnabled) {
 			stateCover = getStateCover(fsm);
 		}
 		
-		getADSet(fsm, ADS, E);
-		delete ADS;
 		/* // Example from simao2009checking
+		E.clear();
 		E[0].push_back(0);
 		E[0].push_back(1);
 		E[0].push_back(0);

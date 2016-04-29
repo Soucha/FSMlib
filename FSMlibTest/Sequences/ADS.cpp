@@ -97,13 +97,13 @@ namespace FSMlibTest
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm", false);
 		}
 
-		void printADS(AdaptiveDS* node, int base = 0) {
+		void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 			if (node->currentStates.size() == 1) {
 				DEBUG_MSG(": %u => %u\n", node->initialStates[0], node->currentStates[0]);
 			}
 			else {
 				DEBUG_MSG(" -> %s\n", FSMmodel::getInSequenceAsString(node->input).c_str());
-				for (map<output_t, AdaptiveDS*>::iterator it = node->decision.begin();
+				for (map<output_t, unique_ptr<AdaptiveDS>>::iterator it = node->decision.begin();
 					it != node->decision.end(); it++) {
 					DEBUG_MSG("%*u", base + 3, it->first);
 					printADS(it->second, base + 3);
@@ -121,8 +121,8 @@ namespace FSMlibTest
 
 		void testGetAdaptiveDS(string filename, bool hasDS = true) {
 			fsm->load(filename);
-			AdaptiveDS* ads = NULL;
-			if (getAdaptiveDistinguishingSequence(fsm, ads)) {
+			auto ads = getAdaptiveDistinguishingSequence(fsm);
+			if (ads) {
 				DEBUG_MSG("Adaptive DS of %s:\n", filename.c_str());
 				printADS(ads);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but it was found.");
@@ -146,13 +146,13 @@ namespace FSMlibTest
 
 				//checkInputValidity(ads->input);
 				queue<AdaptiveDS*> fifo;
-				fifo.push(ads);
+				fifo.push(ads.get());
 				while (!fifo.empty()) {
-					ads = fifo.front();
+					auto ads = fifo.front();
 					fifo.pop();
 					if (ads->currentStates.size() == 1) continue;
 					states.clear();
-					for (map<output_t, AdaptiveDS*>::iterator it = ads->decision.begin(); it != ads->decision.end(); it++) {
+					for (map<output_t, unique_ptr<AdaptiveDS>>::iterator it = ads->decision.begin(); it != ads->decision.end(); it++) {
 						//checkInputValidity(it->second->input);
 						it->second->input.insert(it->second->input.begin(),	ads->input.begin(), ads->input.end());
 						ARE_EQUAL(it->second->currentStates.size(), it->second->initialStates.size(),
@@ -171,7 +171,7 @@ namespace FSMlibTest
 								FSMmodel::getInSequenceAsString(ads->input).c_str(), it->second->initialStates[i]);
 						}
 						if (it->second->currentStates.size() != 1) {
-							fifo.push(it->second);
+							fifo.push(it->second.get());
 						}
 						else {
 							ARE_EQUAL(false, bool(dist[it->second->initialStates[0]]),
@@ -191,14 +191,12 @@ namespace FSMlibTest
 				for (state_t i : fsm->getStates()) {
 					ARE_EQUAL(true, bool(dist[i]), "State %d was not distinguished", i);
 				}
-				delete ads;
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS but it was not found.");
 				if (ads) {
 					printADS(ads);
 					ARE_EQUAL(false, true, "FSM has not adaptive DS but it was found.");
-					delete ads;
 				}
 				DEBUG_MSG("ADS of %s: NO\n", filename.c_str());
 			}

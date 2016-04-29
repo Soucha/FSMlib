@@ -25,17 +25,15 @@ namespace FSMsequence {
 		block_t collapsedStates;
 		sequence_in_t ss;
 
-		ss_node_t(block_t states, sequence_in_t ss) {
-			this->collapsedStates = states;
-			this->ss = ss;
+		ss_node_t(block_t states, sequence_in_t ss) :
+			collapsedStates(states), ss(ss) {
 		}
 	};
 
 	sequence_in_t getSynchronizingSequence(DFSM * fsm) {
 		sequence_in_t outSS;
-		queue<ss_node_t*> fifo;
+		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;
-		ss_node_t* act, *succ;
 		block_t states;
 		state_t nextState;
 		sequence_in_t s;
@@ -43,11 +41,10 @@ namespace FSMsequence {
 		for (state_t i : fsm->getStates()) {
 			states.insert(i);
 		}
-		act = new ss_node_t(states, s);
-		fifo.push(act);
+		fifo.push(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
 		used.insert(states);
 		while (!fifo.empty()) {
-			act = fifo.front();
+			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				states.clear();
@@ -68,21 +65,15 @@ namespace FSMsequence {
 				if (states.size() == 1) {
 					outSS = act->ss;
 					outSS.push_back(input);
-					while (!fifo.empty()) {
-						delete fifo.front();
-						fifo.pop();
-					}
 					return outSS;
 				}
 				if (used.find(states) == used.end()) {
 					s = act->ss;
 					s.push_back(input);
-					succ = new ss_node_t(states, s);
-					fifo.push(succ);
+					fifo.push(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
 					used.insert(states);
 				}
 			}
-			delete act;
 		}
 		return outSS;
 	}

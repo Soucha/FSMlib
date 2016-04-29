@@ -175,7 +175,7 @@ namespace FSMsequence {
 
 	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false);
 
-	int getDistinguishingSequences(DFSM * fsm, sequence_in_t& outPDS, AdaptiveDS*& outADS,
+	int getDistinguishingSequences(DFSM * fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm), bool filterPrefixes,
 			void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet),
@@ -222,9 +222,8 @@ namespace FSMsequence {
 			(*reduceCSetFunc)(fsm, outCSet);
 
 		// ADS
-		bool hasADS = getAdaptiveDistinguishingSequence(fsm, outADS);
-
-		if (hasADS) {// can has PDS
+		outADS = move(getAdaptiveDistinguishingSequence(fsm));
+		if (outADS) {// can has PDS
 			retVal = ADS_FOUND;
 
 			input_t minValidInput;

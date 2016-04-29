@@ -26,10 +26,8 @@ namespace FSMsequence {
 		sequence_in_t svs;
 		state_t state;
 
-		svs_node_t(block_t states, sequence_in_t svs, state_t state) {
-			this->undistinguishedStates = states;
-			this->svs = svs;
-			this->state = state;
+		svs_node_t(block_t states, sequence_in_t svs, state_t state) :
+			undistinguishedStates(states), svs(svs), state(state) {
 		}
 	};
 

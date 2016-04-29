@@ -150,26 +150,30 @@ static DFSM getFSM() {
 	return dfsm;
 }
 
+void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
+	if (node->currentStates.size() == 1) {
+		printf(": %u => %u\n", node->initialStates[0], node->currentStates[0]);
+	}
+	else {
+		printf(" -> %s\n", FSMmodel::getInSequenceAsString(node->input).c_str());
+		for (map<output_t, unique_ptr<AdaptiveDS>>::iterator it = node->decision.begin();
+			it != node->decision.end(); it++) {
+			printf("%*u", base + 3, it->first);
+			printADS(it->second, base + 3);
+		}
+	}
+}
+
 int main(int argc, char** argv) {
 	
-	DFSM ff = getFSM();// move assignment
-	ff.setTransition(1, 2, 3, 4);
-
-	ff = getFSM();
-
-	DFSM fg(getFSM());// move constructor
-	fg.setTransition(2, 0, 1, 0);
-
-	ff = fg;// copy assignment
-	auto out = ff.getOutput(2, 0);
-	ff.setTransition(1, 2, 3, 4);
-
-	out = fg.getOutput(2, 0);
-
-	DFSM fh(fg);// copy constructor
-
-	out = fh.getNextState(2, 0);
-
+	DFSM dfsm;
+	fsm = &dfsm;
+	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	auto ads = getAdaptiveDistinguishingSequence(fsm);
+	if (ads) {
+		printADS(ads);
+	}
+	
 	char c;
 	cin >> c;
 	return 0;

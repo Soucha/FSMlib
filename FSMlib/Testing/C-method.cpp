@@ -181,18 +181,16 @@ namespace FSMtesting {
 	}
 
 	bool C_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
-		AdaptiveDS* ADS;
 		CS.clear();
-		if (!getAdaptiveDistinguishingSequence(fsm, ADS)) {
+		auto E = getAdaptiveDistinguishingSet(fsm);
+		if (E.empty()) {
 			return false;
 		}
 		auto states = fsm->getStates();
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs(), currState, nextState;
-		sequence_vec_t E(N);
-
-		getADSet(fsm, ADS, E);
-		delete ADS;
+		
 		/* // Example from simao2009checking
+		E.clear();
 		E[0].push_back(0);
 		E[0].push_back(1);
 		E[0].push_back(0);
