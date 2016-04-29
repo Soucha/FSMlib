@@ -67,17 +67,15 @@ namespace FSMsequence {
 				states.insert(i);
 			}
 		}
-		queue<svs_node_t*> fifo;
+		queue<unique_ptr<svs_node_t>> fifo;
 		set< pair<block_t, state_t> > used;
-		svs_node_t *act, *succ;
 		state_t nextState;
 		bool badInput, stoutUsed = false;
 
-		act = new svs_node_t(states, s, state);
-		fifo.push(act);
+		fifo.push(unique_ptr<svs_node_t>(new svs_node_t(states, s, state)));
 		used.insert(make_pair(states, state));
 		while (!fifo.empty()) {
-			act = fifo.front();
+			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				states.clear();
@@ -125,11 +123,6 @@ namespace FSMsequence {
 					openCount += fifo.size();
 					closedCount += used.size();
 #endif // SEQUENCES_PERFORMANCE_TEST
-					// clean up
-					while (!fifo.empty()) {
-						delete fifo.front();
-						fifo.pop();
-					}
 					return outSVS;
 				}
 				// has already the same group of states analysed?
@@ -137,12 +130,10 @@ namespace FSMsequence {
 					s = act->svs;
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					succ = new svs_node_t(states, s, nextState);
-					fifo.push(succ);
+					fifo.push(unique_ptr<svs_node_t>(new svs_node_t(states, s, nextState)));
 					used.insert(make_pair(states, nextState));
 				}
 			}
-			delete act;
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount += fifo.size();
