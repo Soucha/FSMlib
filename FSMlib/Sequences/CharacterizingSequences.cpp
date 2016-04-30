@@ -80,10 +80,10 @@ namespace FSMsequence {
 								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 							if (seq[nextIdx].empty()) {
 								if (nextIdx != idx)
-									link[nextIdx].push_back(make_pair(idx, input));
+									link[nextIdx].emplace_back(make_pair(idx, input));
 							}
 							else {// distinguished by word of length 2
-								link[nextIdx].push_back(make_pair(idx, input));
+								link[nextIdx].emplace_back(make_pair(idx, input));
 								unchecked.push(nextIdx);
 								break;
 							}
@@ -151,7 +151,7 @@ namespace FSMsequence {
 								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 							if (nextIdx != idx) {
 								seq[idx].next[input] = nextIdx;
-								link[nextIdx].push_back(make_pair(idx, input));
+								link[nextIdx].emplace_back(make_pair(idx, input));
 							}// TODO what about swap 
 						}
 					}
@@ -275,11 +275,11 @@ namespace FSMsequence {
 					sIt--;
 				}
 				else {
-					sequence_in_t shortSeq = *sIt;
+					sequence_in_t shortSeq(*sIt);
 					outCSet.erase(--sIt.base());
 					sIt--;
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, false);
-					outCSet.insert(shortSeq);
+					outCSet.emplace(shortSeq);
 				}
 			}
 		}
@@ -290,11 +290,11 @@ namespace FSMsequence {
 					outCSet.erase(sIt--);
 				}
 				else {
-					sequence_in_t shortSeq = *sIt;
+					sequence_in_t shortSeq(*sIt);
 					outCSet.erase(sIt--);
 					shortSeq.pop_back();
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, true);
-					outCSet.insert(shortSeq);
+					outCSet.emplace(shortSeq);
 				}
 			}
 		}
@@ -324,7 +324,7 @@ namespace FSMsequence {
 						}
 					}
 					seqInfo.seqIt = it->seqIt;
-					tmp.insert(seqInfo);
+					tmp.emplace(seqInfo);
 				}
 			}
 			infos = tmp;
@@ -383,7 +383,7 @@ namespace FSMsequence {
 			}
 			else {
 				seqInfo.seqIt = sIt;
-				infos.insert(seqInfo);
+				infos.emplace(seqInfo);
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
@@ -415,7 +415,7 @@ namespace FSMsequence {
 				auto seq = *(outCSet.begin());
 				outCSet.erase(outCSet.begin());
 				seq.push_front(STOUT_INPUT);
-				outCSet.insert(seq);
+				outCSet.emplace(seq);
 			}
 		}
 	}
@@ -435,7 +435,7 @@ namespace FSMsequence {
 		}
 		else {
 			for (state_t i = 0; i < seq.size(); i++) {
-				outCSet.insert(seq[i]);
+				outCSet.emplace(seq[i]);
 			}
 		}
 		if (*reduceFunc != NULL)
@@ -485,11 +485,11 @@ namespace FSMsequence {
 					sIt--;
 				}
 				else {
-					sequence_in_t shortSeq = *sIt;
+					sequence_in_t shortSeq(*sIt);
 					outSCSet.erase(--sIt.base());
 					sIt--;
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, false, stateIdx);
-					outSCSet.insert(shortSeq);
+					outSCSet.emplace(shortSeq);
 				}
 			}
 		}
@@ -500,10 +500,10 @@ namespace FSMsequence {
 					outSCSet.erase(sIt--);
 				}
 				else {
-					sequence_in_t shortSeq = *sIt;
+					sequence_in_t shortSeq(*sIt);
 					outSCSet.erase(sIt--);
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, true, stateIdx);
-					outSCSet.insert(shortSeq);
+					outSCSet.emplace(shortSeq);
 				}
 			}
 		}
@@ -568,7 +568,7 @@ namespace FSMsequence {
 			}
 			else {
 				seqInfo.seqIt = sIt;
-				infos.insert(seqInfo);
+				infos.emplace(seqInfo);
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outSCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
@@ -597,7 +597,7 @@ namespace FSMsequence {
 				auto seq = *(outSCSet.begin());
 				outSCSet.erase(outSCSet.begin());
 				seq.push_front(STOUT_INPUT);
-				outSCSet.insert(seq);
+				outSCSet.emplace(seq);
 			}
 		}
 	}
@@ -612,14 +612,14 @@ namespace FSMsequence {
 			if (filterPrefixes)
 				pset.insert(distSeqs[idx]);
 			else
-				outSCSet.insert(distSeqs[idx]);
+				outSCSet.emplace(distSeqs[idx]);
 		}
 		idx = stateIdx * N + stateIdx - (stateIdx * (stateIdx + 3)) / 2;
 		for (state_t j = stateIdx + 1; j < N; j++, idx++) {
 			if (filterPrefixes)
 				pset.insert(distSeqs[idx]);
 			else
-				outSCSet.insert(distSeqs[idx]);
+				outSCSet.emplace(distSeqs[idx]);
 		}
 		if (filterPrefixes)
 			pset.getMaximalSequences(outSCSet);

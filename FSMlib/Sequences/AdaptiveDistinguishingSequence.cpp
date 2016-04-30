@@ -408,7 +408,7 @@ namespace FSMsequence {
 			}
 		}
 		// build ADS from ST
-		auto outADS = unique_ptr<AdaptiveDS>(new AdaptiveDS);
+		auto outADS = make_unique<AdaptiveDS>();
 		outADS->initialStates = outADS->currentStates = rootST->block;
 
 		queue<AdaptiveDS*> fifo;
@@ -439,7 +439,7 @@ namespace FSMsequence {
 					if (binary_search(next->succ[i].second->block.begin(),
 						next->succ[i].second->block.end(), adsNode->currentStates[sI])) {
 						if ((outIt = adsNode->decision.find(next->succ[i].first)) == adsNode->decision.end()) {
-							auto adsNext = unique_ptr<AdaptiveDS>(new AdaptiveDS);
+							auto adsNext = make_unique<AdaptiveDS>();
 							adsNext->initialStates.push_back(adsNode->initialStates[sI]);
 							for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
 							adsNext->currentStates.push_back(next->nextStates[idx]);

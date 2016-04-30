@@ -35,7 +35,7 @@ namespace FSMsequence {
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;
 		auto allStates = fsm->getStates();
-		fifo.emplace(unique_ptr<ss_node_t>(new ss_node_t(block_t(allStates.begin(), allStates.end()), sequence_in_t())));
+		fifo.emplace(make_unique<ss_node_t>(block_t(allStates.begin(), allStates.end()), sequence_in_t()));
 		used.emplace(block_t(allStates.begin(), allStates.end()));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
@@ -63,7 +63,7 @@ namespace FSMsequence {
 				if (used.find(states) == used.end()) {
 					sequence_in_t s(act->ss);
 					s.push_back(input);
-					fifo.emplace(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
+					fifo.emplace(make_unique<ss_node_t>(states, s));
 					used.emplace(states);
 				}
 			}

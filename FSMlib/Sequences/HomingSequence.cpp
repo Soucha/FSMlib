@@ -96,7 +96,7 @@ namespace FSMsequence {
 		multimap<state_t, partition_t> used;
 		bool stop, stoutUsed = false;
 
-		fifo.emplace(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
+		fifo.emplace(make_unique<hs_node_t>(partition, s));
 		used.emplace(make_pair(getSetId(*partition.begin()), partition));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
@@ -178,7 +178,7 @@ namespace FSMsequence {
 					s = act->hs;
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					fifo.emplace(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
+					fifo.emplace(make_unique<hs_node_t>(partition, s));
 					used.emplace(make_pair(getSetId(*partition.begin()), partition));
 				}
 			}

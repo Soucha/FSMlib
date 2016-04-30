@@ -46,7 +46,7 @@ namespace FSMsequence {
 		sequence_in_t s;
 		if (fsm->isOutputState()) {
 			output = fsm->getOutput(state, STOUT_INPUT);
-			for (state_t i : allStates) {
+			for (auto i : allStates) {
 				if (fsm->getOutput(i, STOUT_INPUT) == output) {
 					states.insert(i);
 				}
@@ -70,7 +70,7 @@ namespace FSMsequence {
 		state_t nextState;
 		bool badInput, stoutUsed = false;
 
-		fifo.emplace(unique_ptr<svs_node_t>(new svs_node_t(states, s, state)));
+		fifo.emplace(make_unique<svs_node_t>(states, s, state));
 		used.emplace(make_pair(states, state));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
@@ -127,7 +127,7 @@ namespace FSMsequence {
 					sequence_in_t s(act->svs);
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					fifo.emplace(unique_ptr<svs_node_t>(new svs_node_t(states, s, nextState)));
+					fifo.emplace(make_unique<svs_node_t>(states, s, nextState));
 					used.emplace(make_pair(states, nextState));
 				}
 			}

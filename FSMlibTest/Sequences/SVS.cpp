@@ -65,7 +65,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
-			//*
+			/*
 			testGetVerifyingSet(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", 2, 58, 95);//2 states that have not SVS
 			testGetVerifyingSet(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
 			testGetVerifyingSet(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");
