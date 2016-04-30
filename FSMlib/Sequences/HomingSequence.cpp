@@ -31,12 +31,12 @@ namespace FSMsequence {
 		}
 	};
 
-	static const int getSetId(const block_t & block) {
-		int sum = 0;
-		for (block_t::iterator blockIt = block.begin(); blockIt != block.end(); blockIt++) {
-			sum += *blockIt;
+	static const state_t getSetId(const block_t & block) {
+		state_t sum = 0;
+		for (auto state : block) {
+			sum += state;
 		}
-		sum += int(block.size());
+		sum += state_t(block.size());
 		return sum;
 	}
 
@@ -61,28 +61,25 @@ namespace FSMsequence {
 		sequence_in_t outHS;
 		partition_t partition;
 		sequence_in_t s;
-		block_t block;
 		vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 		set<output_t> actOutputs;
-		output_t output;
-		partition.clear();
+		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
 			// get output of all states
-			for (auto state : fsm->getStates()) {
-				output = fsm->getOutput(state, STOUT_INPUT);
+			for (auto state : states) {
+				auto output = fsm->getOutput(state, STOUT_INPUT);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
-				sameOutput[output].insert(state);
-				actOutputs.insert(output);
+				sameOutput[output].emplace(state);
+				actOutputs.emplace(output);
 			}
 			if (actOutputs.size() > 1)
 				s.push_back(STOUT_INPUT);
 			// save block with more then one state and clear sameOutput
-			for (set<output_t>::iterator out = actOutputs.begin(); out != actOutputs.end(); out++) {
-				if (sameOutput[*out].size() > 1) {
-					block_t b(sameOutput[*out]);
-					partition.insert(b);
+			for (auto out : actOutputs) {
+				if (sameOutput[out].size() > 1) {
+					partition.emplace(sameOutput[out]);
 				}
-				sameOutput[*out].clear();
+				sameOutput[out].clear();
 			}
 			actOutputs.clear();
 			// all blocks are singletons
@@ -92,19 +89,15 @@ namespace FSMsequence {
 			}
 		}
 		else {
-			block.clear();
-			for (auto state : fsm->getStates()) {
-				block.insert(state);
-			}
-			partition.insert(block);
+			partition.emplace(block_t(states.begin(), states.end()));
 		}
 		queue<unique_ptr<hs_node_t>> fifo;
 		// <id, node's partition>, id = getSetId(node) = sum of state IDs in the first block of node's partition
-		multimap<int, partition_t> used;
+		multimap<state_t, partition_t> used;
 		bool stop, stoutUsed = false;
 
-		fifo.push(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
-		used.insert(make_pair(getSetId(*partition.begin()), partition));
+		fifo.emplace(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
+		used.emplace(make_pair(getSetId(*partition.begin()), partition));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
@@ -112,26 +105,25 @@ namespace FSMsequence {
 				stop = false;
 				partition.clear();
 				// go through all blocks in current partition
-				for (partition_t::iterator pIt = act->partition.begin(); pIt != act->partition.end(); pIt++) {
+				for (auto block : act->partition) {
 					// go through all states in current block
-					for (block_t::iterator blockIt = (*pIt).begin(); blockIt != (*pIt).end(); blockIt++) {
-						output = fsm->getOutput(*blockIt, input);
+					for (auto state : block) {
+						auto output = fsm->getOutput(state, input);
 						if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 						if (output == WRONG_OUTPUT) {
 							// there is no transition so next state is uncertain
 							stop = true;
 							break;
 						}
-						sameOutput[output].insert(fsm->getNextState(*blockIt, input));
-						actOutputs.insert(output);
+						sameOutput[output].emplace(fsm->getNextState(state, input));
+						actOutputs.emplace(output);
 					}
 					// save block with more then one state
-					for (set<output_t>::iterator out = actOutputs.begin(); out != actOutputs.end(); out++) {
-						if (!stop && (sameOutput[*out].size() > 1)) {
-							block_t b(sameOutput[*out]);
-							partition.insert(b);
+					for (auto out : actOutputs) {
+						if (!stop && (sameOutput[out].size() > 1)) {
+							partition.emplace(sameOutput[out]);
 						}
-						sameOutput[*out].clear();
+						sameOutput[out].clear();
 					}
 					actOutputs.clear();
 					if (stop) break;
@@ -144,19 +136,18 @@ namespace FSMsequence {
 					stoutUsed = false;
 					for (auto block : partition) {
 						for (auto state : block) {
-							output = fsm->getOutput(state, STOUT_INPUT);
+							auto output = fsm->getOutput(state, STOUT_INPUT);
 							if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
-							sameOutput[output].insert(state);
-							actOutputs.insert(output);
+							sameOutput[output].emplace(state);
+							actOutputs.emplace(output);
 						}
 						if (actOutputs.size() > 1) stoutUsed = true;
 						// save block with more then one state and clear sameOutput
-						for (set<output_t>::iterator out = actOutputs.begin(); out != actOutputs.end(); out++) {
-							if (sameOutput[*out].size() > 1) {
-								block_t b(sameOutput[*out]);
-								tmp.insert(b);
+						for (auto out : actOutputs) {
+							if (sameOutput[out].size() > 1) {
+								tmp.emplace(sameOutput[out]);
 							}
-							sameOutput[*out].clear();
+							sameOutput[out].clear();
 						}
 						actOutputs.clear();
 					}
@@ -175,8 +166,7 @@ namespace FSMsequence {
 				for (partition_t::iterator pIt = partition.begin(); pIt != partition.end(); pIt++) {
 					auto usedIt = used.equal_range(getSetId(*pIt));
 					for (auto it = usedIt.first; it != usedIt.second; it++) {
-						if (isSubsetPartition(it->second.begin(), it->second.end(),
-							pIt, partition.end())) {
+						if (isSubsetPartition(it->second.begin(), it->second.end(), pIt, partition.end())) {
 							stop = true;
 							break;
 						}
@@ -188,8 +178,8 @@ namespace FSMsequence {
 					s = act->hs;
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					fifo.push(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
-					used.insert(make_pair(getSetId(*partition.begin()), partition));
+					fifo.emplace(unique_ptr<hs_node_t>(new hs_node_t(partition, s)));
+					used.emplace(make_pair(getSetId(*partition.begin()), partition));
 				}
 			}
 		}

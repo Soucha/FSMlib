@@ -34,31 +34,24 @@ namespace FSMsequence {
 		sequence_in_t outSS;
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;
-		block_t states;
-		state_t nextState;
-		sequence_in_t s;
-		states.clear();
-		for (state_t i : fsm->getStates()) {
-			states.insert(i);
-		}
-		fifo.push(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
-		used.insert(states);
+		auto allStates = fsm->getStates();
+		fifo.emplace(unique_ptr<ss_node_t>(new ss_node_t(block_t(allStates.begin(), allStates.end()), sequence_in_t())));
+		used.emplace(block_t(allStates.begin(), allStates.end()));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				states.clear();
-				nextState = 0;
-				for (block_t::iterator blockIt = act->collapsedStates.begin();
-					blockIt != act->collapsedStates.end(); blockIt++) {
-					nextState = fsm->getNextState(*blockIt, input);
+				block_t states;
+				for (auto state : act->collapsedStates) {
+					auto nextState = fsm->getNextState(state, input);
 					// nextState is not WRONG_STATE because *blockIt and input are valid
 					if (nextState == NULL_STATE) {// all states need to have transition on input
+						states.clear();
 						break;
 					}
-					states.insert(nextState);
+					states.emplace(nextState);
 				}
-				if (nextState == NULL_STATE) {// all states need to have transition on input
+				if (states.empty()) {// all states need to have transition on input
 					continue;
 				}
 				// SS found
@@ -68,10 +61,10 @@ namespace FSMsequence {
 					return outSS;
 				}
 				if (used.find(states) == used.end()) {
-					s = act->ss;
+					sequence_in_t s(act->ss);
 					s.push_back(input);
-					fifo.push(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
-					used.insert(states);
+					fifo.emplace(unique_ptr<ss_node_t>(new ss_node_t(states, s)));
+					used.emplace(states);
 				}
 			}
 		}

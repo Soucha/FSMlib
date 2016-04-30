@@ -40,13 +40,13 @@ namespace FSMsequence {
 	sequence_in_t getStateVerifyingSequence(DFSM * fsm, state_t state) {
 		sequence_in_t outSVS;
 		
+		auto allStates = fsm->getStates();
 		block_t states;
 		output_t output;
-		states.clear();
 		sequence_in_t s;
 		if (fsm->isOutputState()) {
 			output = fsm->getOutput(state, STOUT_INPUT);
-			for (state_t i : fsm->getStates()) {
+			for (state_t i : allStates) {
 				if (fsm->getOutput(i, STOUT_INPUT) == output) {
 					states.insert(i);
 				}
@@ -63,17 +63,15 @@ namespace FSMsequence {
 		}
 		else {// TYPE_MEALY
 			// all states are initially undistinguished
-			for (state_t i : fsm->getStates()) {
-				states.insert(i);
-			}
+			states.insert(allStates.begin(), allStates.end());
 		}
 		queue<unique_ptr<svs_node_t>> fifo;
 		set< pair<block_t, state_t> > used;
 		state_t nextState;
 		bool badInput, stoutUsed = false;
 
-		fifo.push(unique_ptr<svs_node_t>(new svs_node_t(states, s, state)));
-		used.insert(make_pair(states, state));
+		fifo.emplace(unique_ptr<svs_node_t>(new svs_node_t(states, s, state)));
+		used.emplace(make_pair(states, state));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
@@ -82,18 +80,17 @@ namespace FSMsequence {
 				nextState = fsm->getNextState(act->state, input);
 				output = fsm->getOutput(act->state, input);
 				badInput = false;
-				for (block_t::iterator blockIt = act->undistinguishedStates.begin();
-					blockIt != act->undistinguishedStates.end(); blockIt++) {
-					if (output == fsm->getOutput(*blockIt, input)) {
+				for (auto state : act->undistinguishedStates) {
+					if (output == fsm->getOutput(state, input)) {
 						// is state undistinguishable from fixed state?
-						if ((nextState == fsm->getNextState(*blockIt, input))
-							// holds even if there is no transition
-							&& (*blockIt != act->state)) {
+						if ((nextState == fsm->getNextState(state, input))
+								// holds even if there is no transition
+								&& (state != act->state)) {
 							// other state goes to the same state under this input
 							badInput = true;
 							break;
 						}
-						states.insert(fsm->getNextState(*blockIt, input));
+						states.emplace(fsm->getNextState(state, input));
 					}
 				}
 				if (badInput) {
@@ -105,7 +102,7 @@ namespace FSMsequence {
 					output = fsm->getOutput(nextState, STOUT_INPUT);
 					for (state_t i : states) {
 						if (fsm->getOutput(i, STOUT_INPUT) == output) {
-							tmp.insert(i);
+							tmp.emplace(i);
 						}
 					}
 					// is reference state distinguished by appending STOUT_INPUT?
@@ -127,11 +124,11 @@ namespace FSMsequence {
 				}
 				// has already the same group of states analysed?
 				if (used.find(make_pair(states, nextState)) == used.end()) {
-					s = act->svs;
+					sequence_in_t s(act->svs);
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
-					fifo.push(unique_ptr<svs_node_t>(new svs_node_t(states, s, nextState)));
-					used.insert(make_pair(states, nextState));
+					fifo.emplace(unique_ptr<svs_node_t>(new svs_node_t(states, s, nextState)));
+					used.emplace(make_pair(states, nextState));
 				}
 			}
 		}
@@ -148,8 +145,7 @@ namespace FSMsequence {
 		openCount = closedCount = 0;
 #endif // SEQUENCES_PERFORMANCE_TEST
 		for (state_t state : fsm->getStates()) {
-			auto sVS = getStateVerifyingSequence(fsm, state);
-			outVSet.push_back(sVS);
+			outVSet.emplace_back(getStateVerifyingSequence(fsm, state));
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		stringstream ss;

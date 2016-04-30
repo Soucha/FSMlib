@@ -42,7 +42,7 @@ namespace FSMlibTest
 		{
 			Mealy mealy;
 			fsm = &mealy;
-			//*
+			/*
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm", SVS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm", PDS_FOUND);
@@ -65,7 +65,7 @@ namespace FSMlibTest
 		{
 			Moore moore;
 			fsm = &moore;
-			//*
+			/*
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", CSet_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", PDS_FOUND);

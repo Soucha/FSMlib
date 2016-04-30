@@ -23,27 +23,24 @@ namespace FSMsequence {
 		sequence_set_t stateCover;
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
-		pair<state_t, sequence_in_t> current;
-		sequence_in_t s;
-		state_t nextState;
-
+		
 		// empty sequence
-		stateCover.insert(s);
+		stateCover.emplace(sequence_in_t());
 
 		covered[0] = true;
-		fifo.push(make_pair(0, s));
+		fifo.emplace(make_pair(0, sequence_in_t()));
 		while (!fifo.empty()) {
-			current = fifo.front();
+			auto current = fifo.front();
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
-				nextState = dfsm->getNextState(current.first, input);
+				auto nextState = dfsm->getNextState(current.first, input);
 				if ((nextState != NULL_STATE) && !covered[nextState]) {
 					covered[nextState] = true;
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
 					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
-					stateCover.insert(newPath);
-					fifo.push(make_pair(nextState, newPath));
+					stateCover.emplace(newPath);
+					fifo.emplace(make_pair(nextState, newPath));
 				}
 			}
 		}
@@ -54,28 +51,25 @@ namespace FSMsequence {
 		sequence_set_t transitionCover;
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
-		pair<state_t, sequence_in_t> current;
-		sequence_in_t s;
-		state_t nextState;
-
+		
 		// empty sequence
-		transitionCover.insert(s);
+		transitionCover.emplace(sequence_in_t());
 
 		covered[0] = true;
-		fifo.push(make_pair(0, s));
+		fifo.emplace(make_pair(0, sequence_in_t()));
 		while (!fifo.empty()) {
-			current = fifo.front();
+			auto current = fifo.front();
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
-				nextState = dfsm->getNextState(current.first, input);
+				auto nextState = dfsm->getNextState(current.first, input);
 				if (nextState != NULL_STATE) {
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
 					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
-					transitionCover.insert(newPath);
+					transitionCover.emplace(newPath);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
-						fifo.push(make_pair(nextState, newPath));
+						fifo.emplace(make_pair(nextState, newPath));
 					}
 				}
 			}
@@ -87,18 +81,17 @@ namespace FSMsequence {
 		sequence_set_t traversalSet;
 		if (depth <= 0) return traversalSet;
 		queue<sequence_in_t> fifo;
-		sequence_in_t seq;
-		fifo.push(seq);
+		fifo.emplace(sequence_in_t());
 		if (dfsm->isOutputState()) depth *= 2; // STOUT_INPUT follows each input
 		while (!fifo.empty()) {
-			seq = fifo.front();
+			auto seq = fifo.front();
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				sequence_in_t extSeq(seq);
 				extSeq.push_back(input);
 				if (dfsm->isOutputState()) extSeq.push_back(STOUT_INPUT);
-				traversalSet.insert(extSeq);
-				if (extSeq.size() < depth) fifo.push(extSeq);
+				traversalSet.emplace(extSeq);
+				if (extSeq.size() < depth) fifo.emplace(extSeq);
 			}
 		}
 		return traversalSet;
