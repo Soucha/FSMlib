@@ -28,7 +28,7 @@ namespace FSMsequence {
 		stateCover.emplace(sequence_in_t());
 
 		covered[0] = true;
-		fifo.emplace(make_pair(0, sequence_in_t()));
+		fifo.emplace(0, sequence_in_t());
 		while (!fifo.empty()) {
 			auto current = fifo.front();
 			fifo.pop();
@@ -40,7 +40,7 @@ namespace FSMsequence {
 					newPath.push_back(input);
 					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
 					stateCover.emplace(newPath);
-					fifo.emplace(make_pair(nextState, newPath));
+					fifo.emplace(nextState, newPath);
 				}
 			}
 		}
@@ -56,7 +56,7 @@ namespace FSMsequence {
 		transitionCover.emplace(sequence_in_t());
 
 		covered[0] = true;
-		fifo.emplace(make_pair(0, sequence_in_t()));
+		fifo.emplace(0, sequence_in_t());
 		while (!fifo.empty()) {
 			auto current = fifo.front();
 			fifo.pop();
@@ -69,7 +69,7 @@ namespace FSMsequence {
 					transitionCover.emplace(newPath);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
-						fifo.emplace(make_pair(nextState, newPath));
+						fifo.emplace(nextState, newPath);
 					}
 				}
 			}

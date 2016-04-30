@@ -80,10 +80,10 @@ namespace FSMsequence {
 								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 							if (seq[nextIdx].empty()) {
 								if (nextIdx != idx)
-									link[nextIdx].emplace_back(make_pair(idx, input));
+									link[nextIdx].emplace_back(idx, input);
 							}
 							else {// distinguished by word of length 2
-								link[nextIdx].emplace_back(make_pair(idx, input));
+								link[nextIdx].emplace_back(idx, input);
 								unchecked.push(nextIdx);
 								break;
 							}
@@ -151,7 +151,7 @@ namespace FSMsequence {
 								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 							if (nextIdx != idx) {
 								seq[idx].next[input] = nextIdx;
-								link[nextIdx].emplace_back(make_pair(idx, input));
+								link[nextIdx].emplace_back(idx, input);
 							}// TODO what about swap 
 						}
 					}

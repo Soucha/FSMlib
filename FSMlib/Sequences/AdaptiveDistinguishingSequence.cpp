@@ -59,7 +59,7 @@ namespace FSMsequence {
 		if (!ads) return ADSet;
 		stack< pair<AdaptiveDS*, sequence_in_t> > lifo;
 		sequence_in_t seq;
-		lifo.push(make_pair(ads.get(), seq));
+		lifo.emplace(ads.get(), seq);
 		ADSet.resize(fsm->getNumberOfStates());
 		auto states = fsm->getStates();
 		while (!lifo.empty()) {
@@ -68,7 +68,7 @@ namespace FSMsequence {
 			seq = p.second;
 			seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
 			for (auto it = p.first->decision.begin(); it != p.first->decision.end(); it++) {
-				lifo.push(make_pair(it->second.get(), seq));
+				lifo.emplace(it->second.get(), seq);
 			}
 			if (p.first->decision.empty()) {
 				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
@@ -96,7 +96,7 @@ namespace FSMsequence {
 			node->sequence.push_back(STOUT_INPUT);
 			next = new st_node_t;
 			output = fsm->getOutput(0, STOUT_INPUT);
-			node->succ.push_back(make_pair(output, next));
+			node->succ.emplace_back(output, next);
 			for (state_t state : fsm->getStates()) {
 				node->block.push_back(state);
 				node->nextStates.push_back(state);
@@ -107,7 +107,7 @@ namespace FSMsequence {
 					if (i == node->succ.size()) {
 						st_node_t* newNode = new st_node_t;
 						newNode->block.push_back(state);
-						node->succ.push_back(make_pair(outputSecond, newNode));
+						node->succ.emplace_back(outputSecond, newNode);
 					}
 					else {
 						node->succ[i].second->block.push_back(state);
@@ -152,7 +152,7 @@ namespace FSMsequence {
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				next = new st_node_t;
 				output = fsm->getOutput(node->block[0], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
-				node->succ.push_back(make_pair(output, next));
+				node->succ.emplace_back(output, next);
 				used.clear();
 				otherUsed.clear();
 				// check input validity for all states in block
@@ -166,7 +166,7 @@ namespace FSMsequence {
 						if (i == node->succ.size()) {
 							st_node_t* newNode = new st_node_t;
 							newNode->block.push_back(node->block[state]);
-							node->succ.push_back(make_pair(outputSecond, newNode));
+							node->succ.emplace_back(outputSecond, newNode);
 							set<state_t> tmp;
 							tmp.insert(next->nextStates.back());
 							otherUsed.push_back(tmp);
@@ -282,7 +282,7 @@ namespace FSMsequence {
 						}
 						if (diffStates.empty()) {// input to another dependent block
 							if (curNode[pivot] != node) {
-								link[curNode[pivot]->nextStates[0]].push_back(make_pair(i, dI));
+								link[curNode[pivot]->nextStates[0]].emplace_back(i, dI);
 							}
 						}
 						else {// distinguishing input
@@ -303,8 +303,8 @@ namespace FSMsequence {
 						}
 					}
 					if (bestNext != NULL) {
-						bfsqueue.push(make_pair(seq_len_t(bestNext->sequence.size()), dI));
-						node->succ.push_back(make_pair(bestInput, bestNext));
+						bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
+						node->succ.emplace_back(bestInput, bestNext);
 					}
 				}
 				state_t distCounter = state_t(dependent.size());
@@ -329,7 +329,7 @@ namespace FSMsequence {
 						for (output_t i = 0; i < next->succ.size(); i++) {
 							if (i == node->succ.size()) {
 								st_node_t* newNode = new st_node_t;
-								node->succ.push_back(make_pair(next->succ[i].first, newNode));
+								node->succ.emplace_back(next->succ[i].first, newNode);
 							}
 							else {
 								node->succ[i].first = next->succ[i].first;
@@ -385,14 +385,14 @@ namespace FSMsequence {
 							next = dependent[link[dI][i].second];
 							if (next->nextStates.size() == 1) {// still unresolved
 								if (next->sequence.size() == next->succ.size()) {
-									next->succ.push_back(make_pair(link[dI][i].first, node));
-									bfsqueue.push(make_pair(seq_len_t(node->sequence.size()), next->nextStates[0]));
+									next->succ.emplace_back(link[dI][i].first, node);
+									bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 								}
 								else if (next->succ.back().second->sequence.size() >
 									node->sequence.size()) {
 									next->succ.back().first = link[dI][i].first;
 									next->succ.back().second = node;
-									bfsqueue.push(make_pair(seq_len_t(node->sequence.size()), next->nextStates[0]));
+									bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 								}
 							}
 						}

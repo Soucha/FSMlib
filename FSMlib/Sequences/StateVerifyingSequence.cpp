@@ -71,7 +71,7 @@ namespace FSMsequence {
 		bool badInput, stoutUsed = false;
 
 		fifo.emplace(make_unique<svs_node_t>(states, s, state));
-		used.emplace(make_pair(states, state));
+		used.emplace(states, state);
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
@@ -128,7 +128,7 @@ namespace FSMsequence {
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<svs_node_t>(states, s, nextState));
-					used.emplace(make_pair(states, nextState));
+					used.emplace(states, nextState);
 				}
 			}
 		}

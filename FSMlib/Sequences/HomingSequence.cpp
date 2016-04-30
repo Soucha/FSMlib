@@ -97,7 +97,7 @@ namespace FSMsequence {
 		bool stop, stoutUsed = false;
 
 		fifo.emplace(make_unique<hs_node_t>(partition, s));
-		used.emplace(make_pair(getSetId(*partition.begin()), partition));
+		used.emplace(getSetId(*partition.begin()), partition);
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
@@ -179,7 +179,7 @@ namespace FSMsequence {
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<hs_node_t>(partition, s));
-					used.emplace(make_pair(getSetId(*partition.begin()), partition));
+					used.emplace(getSetId(*partition.begin()), partition);
 				}
 			}
 		}
