@@ -21,7 +21,7 @@
 namespace FSMlib {
 	struct prefix_set_node_t {
 		input_t input = STOUT_INPUT;
-		prefix_set_node_t *neighbor = NULL, *child = NULL;
+		prefix_set_node_t *neighbor = nullptr, *child = nullptr;
 	};
 
 	class FSMLIB_API PrefixSet {

@@ -250,7 +250,7 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API sequence_set_t getStateCharacterizingSet(DFSM * dfsm, state_t state,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM.<br>
@@ -267,7 +267,7 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API vector<sequence_set_t> getStatesCharacterizingSets(DFSM * dfsm,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM<br>
@@ -285,7 +285,7 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(DFSM * dfsm,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL);
+		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds characterizing set for FSM.<br>
@@ -302,7 +302,7 @@ namespace FSMsequence {
 	*/
 	FSMLIB_API sequence_set_t getCharacterizingSet(DFSM * dfsm,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
+		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = nullptr);
 
 	/**
 	* Finds synchronizing sequence of FSM if exists.<br><br>
@@ -369,8 +369,8 @@ namespace FSMsequence {
 	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = NULL,
-		void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet) = NULL);
+		bool filterPrefixes = true, void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr,
+		void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet) = nullptr);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).
@@ -379,6 +379,15 @@ namespace FSMsequence {
 	* @return index of stateId in states, or NULL_STATE if missing
 	*/
 	FSMLIB_API state_t getIdx(const vector<state_t>& states, state_t stateId);
+
+	/**
+	* Calculates index of given pair of states.
+	* @param s1 - the first state
+	* @param s2 - the second state
+	* @param N - the number of states
+	* @return index of state pair
+	*/
+	FSMLIB_API state_t getStatePairIdx(const state_t& s1, const state_t& s2, const state_t& N);
 
 	/**
 	* Reduces the number of sequences in given Characterizing set.

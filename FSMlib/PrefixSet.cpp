@@ -20,14 +20,14 @@
 
 namespace FSMlib {
 	static void deleteTree(prefix_set_node_t* ps) {
-		if (ps == NULL) return;
+		if (ps == nullptr) return;
 		deleteTree(ps->neighbor);
 		deleteTree(ps->child);
 		delete ps;
 	}
 
 	static bool insertInTree(prefix_set_node_t* & ps, sequence_in_t seq) {
-		if (ps == NULL) {
+		if (ps == nullptr) {
 			ps = new prefix_set_node_t;
 			ps->input = seq.front();
 			seq.pop_front();
@@ -43,7 +43,7 @@ namespace FSMlib {
 	}
 
 	PrefixSet::PrefixSet() {
-		root = NULL;
+		root = nullptr;
 	}
 
 	PrefixSet::~PrefixSet() {
@@ -57,7 +57,7 @@ namespace FSMlib {
 
 	void PrefixSet::getMaximalSequences(sequence_set_t & outSet) {
 		outSet.clear();
-		if (root == NULL) {// TODO return empty sequence or empty set???
+		if (root == nullptr) {// TODO return empty sequence or empty set???
 			//sequence_in_t seq;
 			//outSet.insert(seq);
 			return;
@@ -68,11 +68,11 @@ namespace FSMlib {
 		while (!lifo.empty()) {
 			auto p = lifo.top();
 			lifo.pop();
-			if (p.first->neighbor != NULL) {
+			if (p.first->neighbor != nullptr) {
 				lifo.push(make_pair(p.first->neighbor, p.second));
 			}
 			p.second.push_back(p.first->input);
-			if (p.first->child == NULL) {
+			if (p.first->child == nullptr) {
 				outSet.insert(p.second);
 			}
 			else {
@@ -83,14 +83,14 @@ namespace FSMlib {
 
 	void PrefixSet::popMaximalSequence(sequence_in_t& outSeq) {
 		outSeq.clear();
-		if (root == NULL) {
+		if (root == nullptr) {
 			return;
 		}
 		auto node = root;
 		auto removeNode = root;
-		while (node != NULL) {
+		while (node != nullptr) {
 			outSeq.push_back(node->input);
-			if ((node->child != NULL) && (node->child->neighbor != NULL)) {
+			if ((node->child != nullptr) && (node->child->neighbor != nullptr)) {
 				removeNode = node;
 			}
 			node = node->child;
@@ -103,7 +103,7 @@ namespace FSMlib {
 			node = removeNode->child;
 			removeNode->child = node->neighbor;
 		}
-		node->neighbor = NULL;
+		node->neighbor = nullptr;
 		deleteTree(node);
 	}
 
@@ -111,19 +111,19 @@ namespace FSMlib {
 		sequence_in_t::iterator end, sequence_in_t& outSeq) {
 		outSeq.clear();
 		auto node = root;
-		prefix_set_node_t* removeNode = NULL;
+		prefix_set_node_t* removeNode = nullptr;
 		bool removingChild = false;
-		while ((node != NULL) && (start != end)) {
+		while ((node != nullptr) && (start != end)) {
 			if (node->input == *start) {
 				start++;
-				if ((node->child != NULL) && (node->child->neighbor != NULL)) {
+				if ((node->child != nullptr) && (node->child->neighbor != nullptr)) {
 					removeNode = node;
 					removingChild = true;
 				}
 				node = node->child;
 			}
 			else {
-				if (node->neighbor != NULL) {
+				if (node->neighbor != nullptr) {
 					removeNode = node;
 					removingChild = false;
 				}
@@ -131,14 +131,14 @@ namespace FSMlib {
 			}
 		}
 		if (start != end) return false;
-		while (node != NULL) {
+		while (node != nullptr) {
 			outSeq.push_back(node->input);
-			if ((node->child != NULL) && (node->child->neighbor != NULL)) {
+			if ((node->child != nullptr) && (node->child->neighbor != nullptr)) {
 				removeNode = node;
 			}
 			node = node->child;
 		}
-		if (removeNode == NULL) {
+		if (removeNode == nullptr) {
 			node = root;
 			root = root->neighbor;
 		}
@@ -150,25 +150,25 @@ namespace FSMlib {
 			node = removeNode->neighbor;
 			removeNode->neighbor = node->neighbor;
 		}
-		node->neighbor = NULL;
+		node->neighbor = nullptr;
 		deleteTree(node);
 		return true;
 	}
 
 	void PrefixSet::clear() {
 		deleteTree(root);
-		root = NULL;
+		root = nullptr;
 	}
 
 	bool PrefixSet::empty() {
-		return (root == NULL);
+		return (root == nullptr);
 	}
 
 	seq_len_t PrefixSet::contains(sequence_in_t seq) {
 		if (seq.empty()) return -1;
 		seq_len_t len = seq_len_t(seq.size());
 		prefix_set_node_t* node = root;
-		while ((node != NULL) && (!seq.empty())) {
+		while ((node != nullptr) && (!seq.empty())) {
 			if (node->input == seq.front()) {
 				seq.pop_front();
 				node = node->child;

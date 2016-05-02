@@ -113,7 +113,7 @@ namespace FSMsequence {
 				}
 				// is SVS found?
 				if (states.size() == 1) {
-					outSVS = act->svs;
+					outSVS.swap(act->svs);
 					outSVS.push_back(input);
 					if (stoutUsed) outSVS.push_back(STOUT_INPUT);
 #if SEQUENCES_PERFORMANCE_TEST

@@ -33,6 +33,12 @@ namespace FSMsequence {
 		}
 	};
 
+	state_t getStatePairIdx(const state_t& s1, const state_t& s2, const state_t& N) {
+		return (s1 < s2) ?
+			(s1 * N + s2 - 1 - (s1 * (s1 + 3)) / 2) :
+			(s2 * N + s1 - 1 - (s2 * (s2 + 3)) / 2);
+	}
+	
 	state_t getIdx(const vector<state_t>& states, state_t stateId) {
 		if ((stateId < states.size()) && (states[stateId] == stateId)) return stateId;
 		auto lower = std::lower_bound(states.begin(), states.end(), stateId);
@@ -43,48 +49,44 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences(DFSM * fsm) {
-		sequence_vec_t seq;
 		state_t M, N = fsm->getNumberOfStates();
 		M = ((N - 1) * N) / 2;
-		seq.resize(M);
-		state_t nextStateI, nextStateJ, nextIdx, idx;
+		sequence_vec_t seq(M);
 		vector< vector< pair<state_t, input_t> > > link(M);
 		vector<state_t> states = fsm->getStates();
 		queue<state_t> unchecked;
 		for (state_t i = 0; i < N - 1; i++) {
 			for (state_t j = i + 1; j < N; j++) {
-				idx = i * N + j - 1 - (i * (i + 3)) / 2;
+				auto idx = getStatePairIdx(i, j, N);
 				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
 					seq[idx].push_back(STOUT_INPUT);
-					unchecked.push(idx);
+					unchecked.emplace(idx);
 					continue;
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
 						seq[idx].push_back(input);
-						unchecked.push(idx);
+						unchecked.emplace(idx);
 						break;
 					}
 				}
 				if (seq[idx].empty()) {// not distinguished by one symbol?
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-						nextStateI = fsm->getNextState(states[i], input);
-						nextStateJ = fsm->getNextState(states[j], input);
+						auto nextStateI = fsm->getNextState(states[i], input);
+						auto nextStateJ = fsm->getNextState(states[j], input);
 						// there are no transition -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
 							nextStateI = getIdx(states, nextStateI);
 							nextStateJ = getIdx(states, nextStateJ);
-							nextIdx = (nextStateI < nextStateJ) ?
-								(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
-								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
+							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
 							if (seq[nextIdx].empty()) {
 								if (nextIdx != idx)
 									link[nextIdx].emplace_back(idx, input);
 							}
 							else {// distinguished by word of length 2
 								link[nextIdx].emplace_back(idx, input);
-								unchecked.push(nextIdx);
+								unchecked.emplace(nextIdx);
 								break;
 							}
 						}
@@ -94,14 +96,14 @@ namespace FSMsequence {
 		}
 		// fill all undistinguished pair gradually using links
 		while (!unchecked.empty()) {
-			idx = unchecked.front();
+			auto idx = unchecked.front();
 			unchecked.pop();
 			for (state_t k = 0; k < link[idx].size(); k++) {
-				nextIdx = link[idx][k].first;
+				auto nextIdx = link[idx][k].first;
 				if (seq[nextIdx].empty()) {
 					seq[nextIdx].push_back(link[idx][k].second);
 					seq[nextIdx].insert(seq[nextIdx].end(), seq[idx].begin(), seq[idx].end());
-					unchecked.push(nextIdx);
+					unchecked.emplace(nextIdx);
 				}
 			}
 			link[idx].clear();
@@ -110,45 +112,42 @@ namespace FSMsequence {
 	}
 
 	vector<LinkCell> getSeparatingSequences(DFSM * fsm) {
-		vector<LinkCell> seq;
 		state_t M, N = fsm->getNumberOfStates();
-		state_t nextStateI, nextStateJ, nextIdx, idx;
+		//state_t nextStateI, nextStateJ, nextIdx, idx;
 		queue<state_t> unchecked;
 		vector<state_t> states = fsm->getStates();
 		M = ((N - 1) * N) / 2;
 		vector< vector< pair<state_t, input_t> > > link(M);
 
 		// init seq
-		seq.resize(M);
+		vector<LinkCell> seq(M);
 		for (state_t i = 0; i < M; i++) {
 			seq[i].next.resize(fsm->getNumberOfInputs(), NULL_STATE);
 		}
 		for (state_t i = 0; i < N - 1; i++) {
 			for (state_t j = i + 1; j < N; j++) {
-				idx = i * N + j - 1 - (i * (i + 3)) / 2;
+				auto idx = getStatePairIdx(i, j, N);
 				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
 					seq[idx].minLen = 1;// to correspond that STOUT_INPUT needs to be applied
-					unchecked.push(idx);
+					unchecked.emplace(idx);
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
 						seq[idx].next[input] = idx;
 						if (seq[idx].minLen == 0) {
 							seq[idx].minLen = 1;
-							unchecked.push(idx);
+							unchecked.emplace(idx);
 						}
 					}
 					else {
-						nextStateI = fsm->getNextState(states[i], input);
-						nextStateJ = fsm->getNextState(states[j], input);
+						auto nextStateI = fsm->getNextState(states[i], input);
+						auto nextStateJ = fsm->getNextState(states[j], input);
 						// there are no transitions -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
 							nextStateI = getIdx(states, nextStateI);
 							nextStateJ = getIdx(states, nextStateJ);
-							nextIdx = (nextStateI < nextStateJ) ?
-								(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
-								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
+							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
 							if (nextIdx != idx) {
 								seq[idx].next[input] = nextIdx;
 								link[nextIdx].emplace_back(idx, input);
@@ -160,13 +159,13 @@ namespace FSMsequence {
 		}
 		// fill all undistinguished pair gradually using links
 		while (!unchecked.empty()) {
-			nextIdx = unchecked.front();
+			auto nextIdx = unchecked.front();
 			unchecked.pop();
 			for (state_t k = 0; k < link[nextIdx].size(); k++) {
-				idx = link[nextIdx][k].first;
+				auto idx = link[nextIdx][k].first;
 				if (seq[idx].minLen == 0) {
 					seq[idx].minLen = seq[nextIdx].minLen + 1;
-					unchecked.push(idx);
+					unchecked.emplace(idx);
 				}
 			}
 			link[nextIdx].clear();
@@ -194,7 +193,7 @@ namespace FSMsequence {
 	static bool distinguishBySequence(DFSM * fsm, const sequence_in_t& seq,
 		const vector<state_t>& states, vector<state_t>& dist, vector<bool>& distinguished) {
 		
-		state_t N = fsm->getNumberOfStates(), idx;
+		state_t N = fsm->getNumberOfStates();
 		sequence_out_t outI, outIWithoutLast, outJ;
 		bool hasMinLen = false;
 		dist.clear();
@@ -205,7 +204,7 @@ namespace FSMsequence {
 			for (state_t j = i + 1; j < N; j++) {
 				outJ = fsm->getOutputAlongPath(states[j], seq);
 				if (outI != outJ) {
-					idx = i * N + j - 1 - (i * (i + 3)) / 2;
+					auto idx = getStatePairIdx(i, j, N);
 					if (!distinguished[idx]) {
 						dist.push_back(idx);
 						outJ.pop_back();
@@ -327,35 +326,33 @@ namespace FSMsequence {
 					tmp.emplace(seqInfo);
 				}
 			}
-			infos = tmp;
+			infos.swap(tmp);
 		}
 	}
 
 	void reduceCSet_EqualLength(DFSM* fsm, sequence_set_t & outCSet) {
-		state_t N = fsm->getNumberOfStates(), idx;
+		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(((N - 1) * N) / 2, false); // is already a pair of states distinguished?
-		seq_len_t len;
 		set<seq_info_t, seq_info_t> infos;
 		sequence_out_t outI, outIWithoutLast, outJ;
-		sequence_set_t::iterator sIt;
-		vector<state_t> states = fsm->getStates();
-		size_t seqIdx = outCSet.size();
+		auto states = fsm->getStates();
+		auto seqIdx = outCSet.size();
 		if (fsm->isOutputState() && (outCSet.begin()->size() == 1) && (outCSet.begin()->front() == STOUT_INPUT)) {
 			// STOUT_INPUT is the first element in outCSet
 			for (state_t i = 0; i < N - 1; i++) {
 				output_t output = fsm->getOutput(states[i], STOUT_INPUT);
 				for (state_t j = i + 1; j < N; j++) {
 					if (output != fsm->getOutput(states[j], STOUT_INPUT)) {
-						idx = i * N + j - 1 - (i * (i + 3)) / 2;
+						auto idx = getStatePairIdx(i, j, N);
 						distinguished[idx] = true;
 					}
 				}
 			}
 			seqIdx--;// the first sequence won't be processed
 		}
-		sIt = outCSet.end();
+		auto sIt = outCSet.end();
 		sIt--; // point to the last sequence, i.e. longest one
-		len = seq_len_t(sIt->size());
+		auto len = sIt->size();
 		//printf("start %d\n",state);
 		for (; seqIdx > 0; seqIdx--) {// passes CSet from the longest
 			seq_info_t seqInfo;
@@ -366,13 +363,13 @@ namespace FSMsequence {
 				for (state_t j = i + 1; j < N; j++) {
 					outJ = fsm->getOutputAlongPath(states[j], *sIt);
 					if (outI != outJ) {
-						idx = i * N + j - 1 - (i * (i + 3)) / 2;
+						auto idx = getStatePairIdx(i, j, N);
 						if (!distinguished[idx]) {
-							seqInfo.dist.push_back(idx);
+							seqInfo.dist.emplace_back(idx);
 							outJ.pop_back();
 							// could it be shorter?
 							if (outIWithoutLast == outJ) {
-								seqInfo.lastDist.push_back(idx);
+								seqInfo.lastDist.emplace_back(idx);
 							}
 						}
 					}
@@ -387,7 +384,7 @@ namespace FSMsequence {
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
-				len = seq_len_t(sIt->size());
+				len = sIt->size();
 				reduceSequencesOfSameLength(infos, distinguished, outCSet);
 			}
 		}
@@ -425,7 +422,6 @@ namespace FSMsequence {
 			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, sequence_set_t & outCSet)) {
 		sequence_set_t outCSet;
 		auto seq = (*getSeparatingSequences)(fsm);
-		outCSet.clear();
 		if (filterPrefixes) {
 			FSMlib::PrefixSet pset;
 			for (state_t i = 0; i < seq.size(); i++) {
@@ -438,7 +434,7 @@ namespace FSMsequence {
 				outCSet.emplace(seq[i]);
 			}
 		}
-		if (*reduceFunc != NULL)
+		if (*reduceFunc != nullptr)
 			(*reduceFunc)(fsm, outCSet);
 		return outCSet;
 	}
@@ -456,7 +452,7 @@ namespace FSMsequence {
 				outJ = fsm->getOutputAlongPath(states[j], seq);
 				if (outS != outJ) {
 					if (!distinguished[j]) {
-						dist.push_back(j);
+						dist.emplace_back(j);
 						outJ.pop_back();
 						// could it be shorter?
 						if (outSWithoutLast == outJ) {
@@ -477,7 +473,7 @@ namespace FSMsequence {
 	void reduceSCSet_LS_SL(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
-		vector<state_t> states = fsm->getStates();
+		auto states = fsm->getStates();
 		for (sequence_set_t::reverse_iterator sIt = outSCSet.rbegin(); sIt != outSCSet.rend(); sIt++) {
 			if (!distinguishBySequenceFromState(fsm, *sIt, stateIdx, states, dist, distinguished)) {
 				if (dist.empty()) {
@@ -512,7 +508,7 @@ namespace FSMsequence {
 	void reduceSCSet_LS(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
-		vector<state_t> states = fsm->getStates();
+		auto states = fsm->getStates();
 		for (sequence_set_t::reverse_iterator sIt = outSCSet.rbegin(); sIt != outSCSet.rend(); sIt++) {
 			if (!distinguishBySequenceFromState(fsm, *sIt, stateIdx, states, dist, distinguished)) {
 				outSCSet.erase(--sIt.base());
@@ -524,12 +520,10 @@ namespace FSMsequence {
 	void reduceSCSet_EqualLength(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(N, false); // is already a pair of states distinguished?
-		seq_len_t len;
 		set<seq_info_t, seq_info_t> infos;
 		sequence_out_t outS, outSWithoutLast, outJ;
-		sequence_set_t::iterator sIt;
-		vector<state_t> states = fsm->getStates();
-		size_t seqIdx = outSCSet.size();
+		auto states = fsm->getStates();
+		auto seqIdx = outSCSet.size();
 		if (fsm->isOutputState() && (outSCSet.begin()->size() == 1) && (outSCSet.begin()->front() == STOUT_INPUT)) {
 			// STOUT_INPUT is the first element in outSCSet
 			output_t output = fsm->getOutput(states[stateIdx], STOUT_INPUT);
@@ -540,9 +534,9 @@ namespace FSMsequence {
 			}
 			seqIdx--;// the first sequence won't be processed
 		}
-		sIt = outSCSet.end();
+		auto sIt = outSCSet.end();
 		sIt--; // point to the last sequence, i.e. longest one
-		len = seq_len_t(sIt->size());
+		auto len = sIt->size();
 		//printf("start %d\n",state);
 		for (; seqIdx > 0; seqIdx--) {
 			seq_info_t seqInfo;
@@ -572,7 +566,7 @@ namespace FSMsequence {
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outSCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
-				len = seq_len_t(sIt->size());
+				len = sIt->size();
 				reduceSequencesOfSameLength(infos, distinguished, outSCSet);
 			}
 		}
@@ -603,23 +597,17 @@ namespace FSMsequence {
 	}
 
 	sequence_set_t getSCSet(const sequence_vec_t& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false) {
-		state_t idx;
 		sequence_set_t outSCSet;
 		FSMlib::PrefixSet pset;
 		// grab sequence from table seq incident with stateIdx
-		for (state_t j = 0; j < stateIdx; j++) {
-			idx = j * N + stateIdx - 1 - (j * (j + 3)) / 2;
-			if (filterPrefixes)
-				pset.insert(distSeqs[idx]);
-			else
-				outSCSet.emplace(distSeqs[idx]);
-		}
-		idx = stateIdx * N + stateIdx - (stateIdx * (stateIdx + 3)) / 2;
-		for (state_t j = stateIdx + 1; j < N; j++, idx++) {
-			if (filterPrefixes)
-				pset.insert(distSeqs[idx]);
-			else
-				outSCSet.emplace(distSeqs[idx]);
+		for (state_t j = 0; j < N; j++) {
+			if (j != stateIdx) {
+				auto idx = getStatePairIdx(j, stateIdx, N);
+				if (filterPrefixes)
+					pset.insert(distSeqs[idx]);
+				else
+					outSCSet.emplace(distSeqs[idx]);
+			}
 		}
 		if (filterPrefixes)
 			pset.getMaximalSequences(outSCSet);
@@ -633,7 +621,7 @@ namespace FSMsequence {
 		state_t stateIdx = getIdx(fsm->getStates(), state);
 		auto outSCSet = getSCSet(seq, stateIdx, fsm->getNumberOfStates(), filterPrefixes);
 		// try to reduce count of seqeunces
-		if (*reduceFunc != NULL)
+		if (*reduceFunc != nullptr)
 			(*reduceFunc)(fsm, stateIdx, outSCSet);
 		return outSCSet;
 	}
@@ -643,13 +631,12 @@ namespace FSMsequence {
 			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
-		vector<sequence_set_t> outSCSets;
-		outSCSets.resize(N);
+		vector<sequence_set_t> outSCSets(N);
 		// grab sequence from table seq incident with stateIdx i
 		for (state_t i = 0; i < N; i++) {
 			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
 			// try to reduce count of seqeunces
-			if (*reduceFunc != NULL)
+			if (*reduceFunc != nullptr)
 				(*reduceFunc)(fsm, i, outSCSets[i]);
 		}
 		return outSCSets;
@@ -660,12 +647,11 @@ namespace FSMsequence {
 			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
-		vector<sequence_set_t> outSCSets;
-		outSCSets.resize(N);
+		vector<sequence_set_t> outSCSets(N);
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
 			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
-			if (*reduceFunc != NULL)
+			if (*reduceFunc != nullptr)
 				(*reduceFunc)(fsm, i, outSCSets[i]);
 		}
 		return outSCSets;

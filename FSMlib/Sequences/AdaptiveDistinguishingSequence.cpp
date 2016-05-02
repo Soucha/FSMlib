@@ -22,13 +22,7 @@ namespace FSMsequence {
 	struct st_node_t {// Splitting Tree node
 		vector<state_t> block, nextStates;
 		sequence_in_t sequence;
-		vector< pair<output_t, st_node_t* > > succ;
-
-		~st_node_t() {
-			for (auto succPair : succ) {
-				delete succPair.second;
-			}
-		}
+		vector<pair<output_t, shared_ptr<st_node_t>>> succ;
 	};
 
 	struct blockcomp {
@@ -37,7 +31,7 @@ namespace FSMsequence {
 		* compares two nodes of splitting tree firstly by their length,
 		* larger first, then compares pointer address
 		*/
-		bool operator() (const st_node_t* ln, const st_node_t* rn) const {
+		bool operator() (const shared_ptr<st_node_t> ln, const shared_ptr<st_node_t> rn) const {
 			if (ln->block.size() != rn->block.size())
 				return ln->block.size() < rn->block.size();
 			return ln < rn;
@@ -58,20 +52,21 @@ namespace FSMsequence {
 		sequence_vec_t ADSet;
 		if (!ads) return ADSet;
 		stack< pair<AdaptiveDS*, sequence_in_t> > lifo;
-		sequence_in_t seq;
-		lifo.emplace(ads.get(), seq);
+		lifo.emplace(ads.get(), sequence_in_t());
 		ADSet.resize(fsm->getNumberOfStates());
 		auto states = fsm->getStates();
 		while (!lifo.empty()) {
 			auto p = lifo.top();
 			lifo.pop();
-			seq = p.second;
-			seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
-			for (auto it = p.first->decision.begin(); it != p.first->decision.end(); it++) {
-				lifo.emplace(it->second.get(), seq);
-			}
 			if (p.first->decision.empty()) {
 				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
+			}
+			else {
+				sequence_in_t seq(p.second);
+				seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
+				for (auto it = p.first->decision.begin(); it != p.first->decision.end(); it++) {
+					lifo.emplace(it->second.get(), seq);
+				}
 			}
 		}
 		return ADSet;
@@ -82,352 +77,233 @@ namespace FSMsequence {
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
 
-	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * fsm) {
-		state_t N = fsm->getGreatestStateId(), idx;
-		priority_queue<st_node_t*, vector<st_node_t*>, blockcomp> partition;
-		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t> >, lencomp> bfsqueue;
-		st_node_t* rootST = new st_node_t, *node, *next, *bestNext;
-		vector<st_node_t*> curNode(N, rootST), distinguished(((N - 1) * N) / 2), dependent;
-		set<state_t> used;
-		vector< set<state_t> > otherUsed;
-		output_t output, outputSecond, outCounter;
-		if (fsm->isOutputState()) {
-			node = rootST;
-			node->sequence.push_back(STOUT_INPUT);
-			next = new st_node_t;
-			output = fsm->getOutput(0, STOUT_INPUT);
-			node->succ.emplace_back(output, next);
-			for (state_t state : fsm->getStates()) {
-				node->block.push_back(state);
-				node->nextStates.push_back(state);
-				outputSecond = fsm->getOutput(state, STOUT_INPUT);
-				if (output != outputSecond) {
-					output_t i = 1;
-					for (; (i < node->succ.size()) && (outputSecond != node->succ[i].first); i++);
-					if (i == node->succ.size()) {
-						st_node_t* newNode = new st_node_t;
-						newNode->block.push_back(state);
-						node->succ.emplace_back(outputSecond, newNode);
-					}
-					else {
-						node->succ[i].second->block.push_back(state);
-					}
-				}
-				else {
-					next->block.push_back(state);
-				}
-			}
-			for (output_t i = 0; i < node->succ.size(); i++) {
-				next = node->succ[i].second;
-				if (next->block.size() > 1) {// child is not singleton
-					partition.push(next);
-				}
-				for (state_t sI = 0; sI < next->block.size(); sI++) {
-					state_t stateI = next->block[sI];
-					curNode[stateI] = next;
-					for (output_t j = i + 1; j < node->succ.size(); j++) {
-						for (state_t sJ = 0; sJ < node->succ[j].second->block.size(); sJ++) {
-							state_t stateJ = node->succ[j].second->block[sJ];
-							// 2D -> 1D index
-							idx = (stateI < stateJ) ?
-								(stateI * N + stateJ - 1 - (stateI * (stateI + 3)) / 2) :
-								(stateJ * N + stateI - 1 - (stateJ * (stateJ + 3)) / 2);
-							distinguished[idx] = node;// where two states were distinguished
-						}
-					}
-				}
-			}
-		}
-		else {
-			for (state_t i : fsm->getStates()) {
-				rootST->block.push_back(i);
-			}
-			partition.push(rootST);
-		}
-		while (!partition.empty()) {
-			node = partition.top();
-			partition.pop();
-			outCounter = 0;
-			// find distinguishing input or sort out other valid inputs
-			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				next = new st_node_t;
-				output = fsm->getOutput(node->block[0], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
-				node->succ.emplace_back(output, next);
-				used.clear();
-				otherUsed.clear();
-				// check input validity for all states in block
-				for (state_t state = 0; state < node->block.size(); state++) {
-					next->nextStates.push_back(fsm->getNextState(node->block[state], input));
-					outputSecond = fsm->getOutput(node->block[state], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
-					// nextStates would contain two WRONG_STATE if there is WRONG_OUTPUT -> invalid input
-					if (output != outputSecond) {
-						output_t i = outCounter + 1;
-						for (; (i < node->succ.size()) && (outputSecond != node->succ[i].first); i++);
-						if (i == node->succ.size()) {
-							st_node_t* newNode = new st_node_t;
-							newNode->block.push_back(node->block[state]);
-							node->succ.emplace_back(outputSecond, newNode);
-							set<state_t> tmp;
-							tmp.insert(next->nextStates.back());
-							otherUsed.push_back(tmp);
-						}
-						else if (!otherUsed[i - outCounter - 1].insert(next->nextStates.back()).second) {// invalid input
-							used.clear();
+	static void distinguishSTnode(DFSM * fsm, const shared_ptr<st_node_t>& node, const vector<state_t>& states) {
+		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
+			vector<set<state_t>> sameOutput;
+			auto succCount = node->succ.size();
+			auto invalidInput = false;
+			// check input validity for all states in block
+			for (state_t state : node->block) {
+				// nextStates would contain two WRONG_STATE if there is WRONG_OUTPUT -> invalid input
+				auto nextState = fsm->getNextState(states[state], input);
+				auto output = fsm->getOutput(states[state], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
+				bool found = false;
+				for (auto i = succCount; i < node->succ.size(); i++) {
+					if (node->succ[i].first == output) {
+						if (!sameOutput[i - succCount].insert(nextState).second) {
+							invalidInput = true;
 							break;
 						}
-						else {
-							node->succ[i].second->block.push_back(node->block[state]);
-						}
-					}
-					else if (!used.insert(next->nextStates.back()).second) {// invalid input
-						used.clear();
+						node->succ[i].second->block.emplace_back(state);
+						found = true;
 						break;
 					}
-					else {
-						next->block.push_back(node->block[state]);
-					}
 				}
-				if (!used.empty()) {// valid input
-					if (outCounter + 1 < node->succ.size()) {// distinguishing input
-						node->nextStates = next->nextStates;
-						next->nextStates.clear();
-						output_t size = min(outCounter, output_t(node->succ.size() - outCounter));
-						for (output_t i = 0; i < size; i++) {
-							delete node->succ[i].second;
-							node->succ[i] = node->succ.back();
-							node->succ.pop_back();
-						}
-						if (size != outCounter) {
-							for (long i = long(node->succ.size() - 1); i >= long(size); i--) {
-								delete node->succ[i].second;
-								node->succ.pop_back();
+				if (invalidInput) break;
+				if (!found) {
+					auto next = make_shared<st_node_t>();
+					next->block.emplace_back(state);
+					node->succ.emplace_back(output, next);
+					sameOutput.emplace_back(set<state_t>({ nextState }));
+				}
+				// add the next state in the first successor
+				node->succ[succCount].second->nextStates.emplace_back(getIdx(states, nextState));
+			}
+			if (invalidInput) {
+				while (node->succ.size() > succCount) node->succ.pop_back();
+			}
+			else if (succCount + 1 < node->succ.size()) {// distinguishing input
+				node->nextStates = node->succ[succCount].second->nextStates;
+				node->succ[succCount].second->nextStates.clear();
+				node->sequence.clear();
+				node->sequence.push_back(input);
+				if (succCount != 0) {// shift successor
+					output_t idx = 0;
+					for (; succCount < node->succ.size(); succCount++, idx++) {
+						node->succ[idx].swap(node->succ[succCount]);
+					}
+					while (node->succ.size() > idx) node->succ.pop_back();
+				}
+				break;
+			}
+			else {// valid input
+				node->sequence.push_back(input);
+			}
+		}
+	}
+
+	static vector<vector<pair<input_t, state_t>>> prepareLinks(const vector<shared_ptr<st_node_t>>& dependent,
+		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
+		const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
+
+		vector<vector<pair<input_t, state_t>>> link(dependent.size());
+		shared_ptr<st_node_t> bestNext;
+		state_t N = state_t(curNode.size());
+		// add link to dependent vector
+		for (state_t dI = 0; dI < dependent.size(); dI++) {
+			dependent[dI]->nextStates.emplace_back(dI);
+		}
+		// check dependent
+		for (state_t dI = 0; dI < dependent.size(); dI++) {
+			auto node = dependent[dI];
+			auto seqInIt = node->sequence.begin();
+			bestNext = nullptr;
+			input_t bestInput = STOUT_INPUT;
+			// check other valid input
+			for (input_t i = 0; i < node->sequence.size(); i++, seqInIt++) {
+				node->succ[i].first = *seqInIt; // for easier access to right input
+				vector<state_t> diffStates;
+				state_t pivot = node->succ[i].second->nextStates[0];
+				for (state_t stateI : node->succ[i].second->nextStates) {
+					if (curNode[pivot] != curNode[stateI]) {
+						bool inDiff = false;
+						for (auto diffState : diffStates) {
+							if (curNode[stateI] == curNode[diffState]) {
+								inDiff = true;
+								break;
 							}
 						}
-						node->sequence.clear();
-						node->sequence.push_back(input);
-						break;
-					}
-					else {
-						node->sequence.push_back(input);
-						outCounter++;
+						if (!inDiff) {
+							diffStates.push_back(stateI);
+						}
 					}
 				}
-				else {// invalid input -> delete allocated space
-					for (long i = long(node->succ.size() - 1); i >= long(outCounter); i--) {
-						delete node->succ[i].second;
+				if (diffStates.empty()) {// input to another dependent block
+					if (curNode[pivot] != node) {
+						link[curNode[pivot]->nextStates[0]].emplace_back(i, dI);
+					}
+				}
+				else {// distinguishing input
+					auto next = curNode[pivot];
+					// find lowest node of ST with block of all diffStates and pivot
+					for (state_t j = 0; j < diffStates.size(); j++) {
+						auto idx = getStatePairIdx(pivot, diffStates[j], N);
+						if (next->block.size() < distinguished[idx]->block.size()) {
+							next = distinguished[idx];
+						}
+					}
+					if (!bestNext || (bestNext->sequence.size() > next->sequence.size())) {
+						bestNext = next;
+						bestInput = i;
+					}
+				}
+			}
+			if (bestNext) {
+				bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
+				node->succ.emplace_back(bestInput, bestNext);
+			}
+		}
+		return link;
+	}
+
+	static bool processDependent(const vector<shared_ptr<st_node_t>>& dependent,
+		vector<vector<pair<input_t, state_t>>>& link,
+		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp>& partition,
+		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
+		vector<shared_ptr<st_node_t>>& curNode, vector<shared_ptr<st_node_t>>& distinguished) {
+		state_t N = state_t(curNode.size());
+		auto distCounter = dependent.size();
+		while (!bfsqueue.empty()) {
+			auto dI = bfsqueue.top().second;
+			auto node = dependent[dI];
+			bfsqueue.pop();
+			if (node->nextStates.size() == 1) {// undistinguished
+				node->sequence.clear();
+				// hack (input stored in place of output -> it does not have to be found in node->sequence by iteration first)
+				node->sequence.emplace_back(node->succ[node->succ.back().first].first);
+				auto next = node->succ.back().second;// best successor
+				node->sequence.insert(node->sequence.end(), next->sequence.begin(), next->sequence.end());
+				// update next states after the valid input
+				node->nextStates.swap(node->succ[node->succ.back().first].second->nextStates);
+				// prepare succ
+				node->succ.pop_back(); // link to next
+				if (node->succ.size() > next->succ.size()) node->succ.resize(next->succ.size());
+				for (output_t i = 0; i < next->succ.size(); i++) {
+					if (i == node->succ.size()) {
+						node->succ.emplace_back(next->succ[i].first, make_shared<st_node_t>());
+					}
+					else {
+						node->succ[i].first = next->succ[i].first;
+						node->succ[i].second->block.clear();
+						node->succ[i].second->nextStates.clear();
+					}
+				}
+				// distinguish block of states
+				for (state_t sI = 0; sI < node->block.size(); sI++) {
+					for (output_t i = 0; i < next->succ.size(); i++) {
+						if (binary_search(next->succ[i].second->block.begin(),
+								next->succ[i].second->block.end(), node->nextStates[sI])) {
+							node->succ[i].second->block.push_back(node->block[sI]);
+							// update next state after applying entire input sequence
+							state_t idx;
+							for (idx = 0; next->block[idx] != node->nextStates[sI]; idx++);
+							node->nextStates[sI] = next->nextStates[idx];
+							break;
+						}
+					}
+				}
+				// remove unused output
+				for (long i = long(node->succ.size() - 1); i >= 0; i--) {
+					if (node->succ[i].second->block.empty()) {
+						node->succ[i].swap(node->succ.back());
 						node->succ.pop_back();
 					}
 				}
-			}
-			if (node->succ.empty()) {// no valid input - possible only by root
-				delete rootST;
-				return nullptr;
-			}
-			if (!node->nextStates.empty()) {// block is distinguished by input
+				// update links
 				for (output_t i = 0; i < node->succ.size(); i++) {
 					next = node->succ[i].second;
 					if (next->block.size() > 1) {// child is not singleton
-						partition.push(next);
+						partition.emplace(next);
 					}
-					for (state_t sI = 0; sI < next->block.size(); sI++) {
-						state_t stateI = next->block[sI];
+					for (state_t stateI : next->block) {
 						curNode[stateI] = next;
 						for (output_t j = i + 1; j < node->succ.size(); j++) {
-							for (state_t sJ = 0; sJ < node->succ[j].second->block.size(); sJ++) {
-								state_t stateJ = node->succ[j].second->block[sJ];
-								idx = (stateI < stateJ) ?
-									(stateI * N + stateJ - 1 - (stateI * (stateI + 3)) / 2) :
-									(stateJ * N + stateI - 1 - (stateJ * (stateJ + 3)) / 2);
-								distinguished[idx] = node;
+							for (state_t stateJ : node->succ[j].second->block) {
+								auto idx = getStatePairIdx(stateI, stateJ, N);
+								distinguished[idx] = node;// where two states were distinguished
 							}
 						}
 					}
 				}
-			}
-			else {
-				dependent.push_back(node);
-			}
-			// are all blocks with max cardinality distinguished by one input?
-			if (!dependent.empty() && (partition.empty() || (partition.top()->block.size() != node->block.size()))) {
-				vector< vector<pair<input_t, state_t> > > link(dependent.size());
-				vector<state_t> diffStates;
-				sequence_in_t::iterator seqInIt;
-				// add link to dependent vector
-				for (state_t dI = 0; dI < dependent.size(); dI++) {
-					dependent[dI]->nextStates.push_back(dI);
-				}
-				// check dependent
-				for (state_t dI = 0; dI < dependent.size(); dI++) {
-					node = dependent[dI];
-					seqInIt = node->sequence.begin();
-					bestNext = NULL;
-					input_t bestInput = STOUT_INPUT;
-					// check other valid input
-					for (input_t i = 0; i < node->sequence.size(); i++, seqInIt++) {
-						node->succ[i].first = *seqInIt; // for easier access to right input
-						diffStates.clear();
-						state_t pivot = node->succ[i].second->nextStates[0], stateI;
-						for (state_t sI = 1; sI < node->block.size(); sI++) {
-							stateI = node->succ[i].second->nextStates[sI];
-							if (curNode[pivot] != curNode[stateI]) {
-								state_t j;
-								for (j = 0; j < diffStates.size(); j++) {
-									if (curNode[stateI] == curNode[diffStates[j]])
-										break;
-								}
-								if (j == diffStates.size()) {
-									diffStates.push_back(stateI);
-								}
-							}
+				// count resolved dependent
+				distCounter--;
+				// push unresolved dependent to queue
+				for (auto p : link[dI]) {
+					next = dependent[p.second];
+					if (next->nextStates.size() == 1) {// still unresolved
+						if (next->sequence.size() == next->succ.size()) {// best not set
+							next->succ.emplace_back(p.first, node);
+							bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 						}
-						if (diffStates.empty()) {// input to another dependent block
-							if (curNode[pivot] != node) {
-								link[curNode[pivot]->nextStates[0]].emplace_back(i, dI);
-							}
-						}
-						else {// distinguishing input
-							next = curNode[pivot];
-							// find lowest node of ST with block of all diffStates and pivot
-							for (state_t j = 0; j < diffStates.size(); j++) {
-								idx = (pivot < diffStates[j]) ?
-									(pivot * N + diffStates[j] - 1 - (pivot * (pivot + 3)) / 2) :
-									(diffStates[j] * N + pivot - 1 - (diffStates[j] * (diffStates[j] + 3)) / 2);
-								if (next->block.size() < distinguished[idx]->block.size()) {
-									next = distinguished[idx];
-								}
-							}
-							if (bestNext == NULL || bestNext->sequence.size() > next->sequence.size()) {
-								bestNext = next;
-								bestInput = i;
-							}
+						else if (next->succ.back().second->sequence.size() > node->sequence.size()) {// update best
+							next->succ.back().first = p.first;
+							next->succ.back().second = node;
+							bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 						}
 					}
-					if (bestNext != NULL) {
-						bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
-						node->succ.emplace_back(bestInput, bestNext);
-					}
 				}
-				state_t distCounter = state_t(dependent.size());
-				while (!bfsqueue.empty()) {
-					state_t dI = bfsqueue.top().second;
-					node = dependent[dI];
-					bfsqueue.pop();
-					if (node->nextStates.size() == 1) {
-						node->sequence.clear();
-						node->sequence.push_back(node->succ[node->succ.back().first].first);
-						next = node->succ.back().second;
-						node->sequence.insert(node->sequence.end(),
-							next->sequence.begin(), next->sequence.end());
-						// update next states after one valid input
-						node->nextStates = node->succ[node->succ.back().first].second->nextStates;
-						// prepare succ
-						node->succ.pop_back(); // link to next
-						for (long i = long(node->succ.size() - 1); i >= long(next->succ.size()); i--) {
-							delete node->succ[i].second;
-							node->succ.pop_back();
-						}
-						for (output_t i = 0; i < next->succ.size(); i++) {
-							if (i == node->succ.size()) {
-								st_node_t* newNode = new st_node_t;
-								node->succ.emplace_back(next->succ[i].first, newNode);
-							}
-							else {
-								node->succ[i].first = next->succ[i].first;
-								node->succ[i].second->block.clear();
-								node->succ[i].second->nextStates.clear();
-							}
-						}
-						// distinguish block of states
-						for (state_t sI = 0; sI < node->block.size(); sI++) {
-							for (output_t i = 0; i < next->succ.size(); i++) {
-								if (binary_search(next->succ[i].second->block.begin(),
-									next->succ[i].second->block.end(), node->nextStates[sI])) {
-									node->succ[i].second->block.push_back(node->block[sI]);
-									// update next state after applying entire input sequence
-									for (idx = 0; next->block[idx] != node->nextStates[sI]; idx++);
-									node->nextStates[sI] = next->nextStates[idx];
-									break;
-								}
-							}
-						}
-						// remove unused output
-						for (long i = long(node->succ.size() - 1); i >= 0; i--) {
-							if (node->succ[i].second->block.empty()) {
-								delete node->succ[i].second;
-								node->succ[i] = node->succ.back();
-								node->succ.pop_back();
-							}
-						}
-						// update links
-						for (output_t i = 0; i < node->succ.size(); i++) {
-							next = node->succ[i].second;
-							if (next->block.size() > 1) {// child is not singleton
-								partition.push(next);
-							}
-							for (state_t sI = 0; sI < next->block.size(); sI++) {
-								state_t stateI = next->block[sI];
-								curNode[stateI] = next;
-								for (output_t j = i + 1; j < node->succ.size(); j++) {
-									for (state_t sJ = 0; sJ < node->succ[j].second->block.size(); sJ++) {
-										state_t stateJ = node->succ[j].second->block[sJ];
-										idx = (stateI < stateJ) ?
-											(stateI * N + stateJ - 1 - (stateI * (stateI + 3)) / 2) :
-											(stateJ * N + stateI - 1 - (stateJ * (stateJ + 3)) / 2);
-										distinguished[idx] = node;
-									}
-								}
-							}
-						}
-						// count resolved dependent
-						distCounter--;
-						// push unresolved dependent to queue
-						for (state_t i = 0; i < link[dI].size(); i++) {
-							next = dependent[link[dI][i].second];
-							if (next->nextStates.size() == 1) {// still unresolved
-								if (next->sequence.size() == next->succ.size()) {
-									next->succ.emplace_back(link[dI][i].first, node);
-									bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
-								}
-								else if (next->succ.back().second->sequence.size() >
-									node->sequence.size()) {
-									next->succ.back().first = link[dI][i].first;
-									next->succ.back().second = node;
-									bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
-								}
-							}
-						}
-						link[dI].clear();
-					}
-				}
-				// check that all dependent was divided
-				if (distCounter != 0) {
-					delete rootST;
-					return nullptr;
-				}
-				dependent.clear();
+				link[dI].clear();
 			}
 		}
-		// build ADS from ST
+		return (distCounter == 0);
+	}
+
+	static unique_ptr<AdaptiveDS> buildAds(const vector<state_t>& block, const state_t& N, 
+			const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
 		auto outADS = make_unique<AdaptiveDS>();
-		outADS->initialStates = outADS->currentStates = rootST->block;
+		outADS->initialStates = outADS->currentStates = block;
 
 		queue<AdaptiveDS*> fifo;
-		AdaptiveDS* adsNode;
-		map<output_t, unique_ptr<AdaptiveDS>>::iterator outIt;
-		state_t pivot;
 		fifo.push(outADS.get());
 		while (!fifo.empty()) {
-			adsNode = fifo.front();
+			auto adsNode = fifo.front();
 			fifo.pop();
 			if (adsNode->currentStates.size() == 1) continue;
-			pivot = adsNode->currentStates[0];
-			next = curNode[pivot];
+			auto pivot = adsNode->currentStates[0];
+			auto next = curNode[pivot];
 			// find lowest node of ST with block of all currentStates
 			for (state_t j = 1; j < adsNode->currentStates.size(); j++) {
-				idx = (pivot < adsNode->currentStates[j]) ?
-					(pivot * N + adsNode->currentStates[j] - 1 - (pivot * (pivot + 3)) / 2) :
-					(adsNode->currentStates[j] * N + pivot - 1 -
-					(adsNode->currentStates[j] * (adsNode->currentStates[j] + 3)) / 2);
+				auto idx = getStatePairIdx(pivot, adsNode->currentStates[j], N);
 				if (next->block.size() < distinguished[idx]->block.size()) {
 					next = distinguished[idx];
 				}
@@ -435,20 +311,20 @@ namespace FSMsequence {
 			// set distinguishing input sequence
 			adsNode->input = next->sequence;
 			for (state_t sI = 0; sI < adsNode->initialStates.size(); sI++) {
-				for (output_t i = 0; i < next->succ.size(); i++) {
-					if (binary_search(next->succ[i].second->block.begin(),
-						next->succ[i].second->block.end(), adsNode->currentStates[sI])) {
-						if ((outIt = adsNode->decision.find(next->succ[i].first)) == adsNode->decision.end()) {
+				for (auto &p : next->succ) {
+					if (binary_search(p.second->block.begin(), p.second->block.end(), adsNode->currentStates[sI])) {
+						state_t idx;
+						for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
+						auto outIt = adsNode->decision.find(p.first);
+						if (outIt == adsNode->decision.end()) {
 							auto adsNext = make_unique<AdaptiveDS>();
 							adsNext->initialStates.push_back(adsNode->initialStates[sI]);
-							for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
 							adsNext->currentStates.push_back(next->nextStates[idx]);
-							fifo.push(adsNext.get()); 
-							adsNode->decision[next->succ[i].first] = move(adsNext);
+							fifo.push(adsNext.get());
+							adsNode->decision[p.first] = move(adsNext);
 						}
 						else {
 							outIt->second->initialStates.push_back(adsNode->initialStates[sI]);
-							for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
 							outIt->second->currentStates.push_back(next->nextStates[idx]);
 						}
 						break;
@@ -456,7 +332,100 @@ namespace FSMsequence {
 				}
 			}
 		}
-		delete rootST;
 		return outADS;
+	}
+
+	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * fsm) {
+		state_t N = fsm->getNumberOfStates();
+		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
+		auto rootST = make_shared<st_node_t>();
+		vector<shared_ptr<st_node_t>> curNode(N, rootST);
+		vector<shared_ptr<st_node_t>> distinguished(((N - 1) * N) / 2, nullptr);
+		vector<shared_ptr<st_node_t>> dependent;
+		auto states = fsm->getStates();
+		if (fsm->isOutputState()) {
+			auto node = rootST;
+			node->sequence.push_back(STOUT_INPUT);
+			for (state_t state = 0; state < N; state++) {
+				node->block.push_back(state);
+				node->nextStates.push_back(state);
+				bool found = false;
+				auto output = fsm->getOutput(states[state], STOUT_INPUT);
+				for (auto &p : node->succ) {
+					if (p.first == output) {
+						p.second->block.emplace_back(state);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					auto next = make_shared<st_node_t>();
+					next->block.emplace_back(state);
+					node->succ.emplace_back(output, next);
+				}
+			}
+			for (output_t i = 0; i < node->succ.size(); i++) {
+				auto &next = node->succ[i].second;
+				if (next->block.size() > 1) {// child is not singleton
+					partition.emplace(next);
+				}
+				for (state_t stateI : next->block) {
+					curNode[stateI] = next;
+					for (output_t j = i + 1; j < node->succ.size(); j++) {
+						for (state_t stateJ : node->succ[j].second->block) {
+							auto idx = getStatePairIdx(stateI, stateJ, N);
+							distinguished[idx] = node;// where two states were distinguished
+						}
+					}
+				}
+			}
+		}
+		else {
+			for (state_t state = 0; state < N; state++) {
+				rootST->block.emplace_back(state);
+			}
+			partition.emplace(rootST);
+		}
+		while (!partition.empty()) {
+			auto node = partition.top();
+			partition.pop();
+			// find distinguishing input or sort out other valid inputs
+			distinguishSTnode(fsm, node, states);
+			if (node->succ.empty()) {// no valid input - possible only by root
+				return nullptr;
+			}
+			if (!node->nextStates.empty()) {// block is distinguished by an input
+				for (output_t i = 0; i < node->succ.size(); i++) {
+					auto & next = node->succ[i].second;
+					if (next->block.size() > 1) {// child is not singleton
+						partition.emplace(next);
+					}
+					for (state_t stateI : next->block) {
+						curNode[stateI] = next;
+						for (output_t j = i + 1; j < node->succ.size(); j++) {
+							for (state_t stateJ : node->succ[j].second->block) {
+								auto idx = getStatePairIdx(stateI, stateJ, N);
+								distinguished[idx] = node;// where two states were distinguished
+							}
+						}
+					}
+				}
+			}
+			else {
+				dependent.emplace_back(node);
+			}
+			// are all blocks with max cardinality distinguished by one input?
+			if (!dependent.empty() && (partition.empty() || (partition.top()->block.size() != node->block.size()))) {				
+				priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp> bfsqueue;
+				auto link = prepareLinks(dependent, bfsqueue, curNode, distinguished);
+				// check that all dependent was divided
+				if (!processDependent(dependent, link, partition, bfsqueue, curNode, distinguished)) {
+					return nullptr;
+				}
+				dependent.clear();
+			}
+		}
+		// build ADS from ST
+		return buildAds(rootST->block, N, curNode, distinguished);
 	}
 }

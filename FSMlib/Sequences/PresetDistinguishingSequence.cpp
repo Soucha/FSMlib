@@ -171,12 +171,12 @@ namespace FSMsequence {
 						actOutputs.clear();
 					}
 					if (stoutUsed) {
-						partition = tmp;
+						partition.swap(tmp);
 					}
 				}
 				// all blocks are singletons
 				if (partition.empty()) {
-					outPDS = act->ds;
+					outPDS.swap(act->ds);
 					outPDS.push_back(input);
 					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
 #if SEQUENCES_PERFORMANCE_TEST

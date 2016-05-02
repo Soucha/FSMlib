@@ -59,12 +59,6 @@ namespace FSMtesting {
 		}
 	}
 
-	static state_t getPairIdx(state_t s1, state_t s2) {
-		return (s1 < s2) ?
-			(s1 * specification->getNumberOfStates() + s2 - 1 - (s1 * (s1 + 3)) / 2) :
-			(s2 * specification->getNumberOfStates() + s1 - 1 - (s2 * (s2 + 3)) / 2);
-	}
-
 	static void createBasicTree(DFSM * fsm, int extraStates) {
 		output_t outputState, outputTransition;
 		state_t state;
@@ -124,7 +118,7 @@ namespace FSMtesting {
 	}
 
 	static int getEstimate(TestNodeH* n1, TestNodeH* n2, input_t input) {
-		state_t idx = getPairIdx(n1->state, n2->state);
+		state_t idx = getStatePairIdx(n1->state, n2->state, specification->getNumberOfStates());
 		state_t nextIdx = sepSeq[idx].next[input];
 		if (nextIdx == NULL_STATE) return -1;
 		if (nextIdx == idx) return 1;
@@ -176,7 +170,7 @@ namespace FSMtesting {
 	}
 
 	static void appendSeparatingSequence(TestNodeH* n1, TestNodeH* n2) {
-		state_t idx = getPairIdx(n1->state, n2->state), nextIdx;
+		state_t idx = getStatePairIdx(n1->state, n2->state, specification->getNumberOfStates()), nextIdx;
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
 			nextIdx = sepSeq[idx].next[i];

@@ -56,7 +56,7 @@ namespace FSMsequence {
 				}
 				// SS found
 				if (states.size() == 1) {
-					outSS = act->ss;
+					outSS.swap(act->ss);
 					outSS.push_back(input);
 					return outSS;
 				}

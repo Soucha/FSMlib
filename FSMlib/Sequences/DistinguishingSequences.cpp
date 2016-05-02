@@ -87,11 +87,10 @@ namespace FSMsequence {
 
 	static inline void initH(const shared_ptr<block_node_t>& node, const vector<sequence_in_t>& seq, const state_t& N) {
 		node->h = 0;
-		state_t idx;
 		for (block_t::iterator i = node->states.begin(); i != node->states.end(); i++) {
 			block_t::iterator j = i;
 			for (j++; j != node->states.end(); j++) {
-				idx = *i * N + *j - 1 - (*i * (*i + 3)) / 2;
+				auto idx = getStatePairIdx(*i, *j, N);
 				if (node->h < seq[idx].size()) {
 					node->h = seq_len_t(seq[idx].size());
 				}
@@ -101,16 +100,9 @@ namespace FSMsequence {
 
 	static inline void initSVS_H(const unique_ptr<node_svs_t>& node, const vector<sequence_in_t>& seq, const state_t& N) {
 		node->h = 0;
-		state_t idx, state = node->actState;
 		for (auto i : node->states) {
-			if (i < state) {
-				idx = i * N + state - 1 - (i * (i + 3)) / 2;
-				if (node->h < seq[idx].size()) {
-					node->h = seq_len_t(seq[idx].size());
-				}
-			}
-			else if (i > state) {
-				idx = state * N + i - 1 - (state * (state + 3)) / 2;
+			if (i != node->actState) {
+				auto idx = getStatePairIdx(i, node->actState, N);
 				if (node->h < seq[idx].size()) {
 					node->h = seq_len_t(seq[idx].size());
 				}
@@ -616,7 +608,7 @@ namespace FSMsequence {
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
 			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
-			if (*reduceSCSetFunc != NULL)
+			if (*reduceSCSetFunc != nullptr)
 				(*reduceSCSetFunc)(fsm, i, outSCSets[i]);
 		}
 		
@@ -634,7 +626,7 @@ namespace FSMsequence {
 				outCSet.emplace(seq[i]);
 			}
 		}
-		if (*reduceCSetFunc != NULL)
+		if (*reduceCSetFunc != nullptr)
 			(*reduceCSetFunc)(fsm, outCSet);
 
 		// ADS
