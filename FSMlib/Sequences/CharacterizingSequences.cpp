@@ -48,7 +48,7 @@ namespace FSMsequence {
 		return NULL_STATE;
 	}
 
-	sequence_vec_t getStatePairsShortestSeparatingSequences(DFSM * fsm) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences(const unique_ptr<DFSM>& fsm) {
 		state_t M, N = fsm->getNumberOfStates();
 		M = ((N - 1) * N) / 2;
 		sequence_vec_t seq(M);
@@ -111,7 +111,7 @@ namespace FSMsequence {
 		return seq;
 	}
 
-	vector<LinkCell> getSeparatingSequences(DFSM * fsm) {
+	vector<LinkCell> getSeparatingSequences(const unique_ptr<DFSM>& fsm) {
 		state_t M, N = fsm->getNumberOfStates();
 		//state_t nextStateI, nextStateJ, nextIdx, idx;
 		queue<state_t> unchecked;
@@ -190,7 +190,7 @@ namespace FSMsequence {
 		return c;
 	}
 
-	static bool distinguishBySequence(DFSM * fsm, const sequence_in_t& seq,
+	static bool distinguishBySequence(const unique_ptr<DFSM>& fsm, const sequence_in_t& seq,
 		const vector<state_t>& states, vector<state_t>& dist, vector<bool>& distinguished) {
 		
 		state_t N = fsm->getNumberOfStates();
@@ -224,7 +224,7 @@ namespace FSMsequence {
 		return hasMinLen;
 	}
 
-	static void truncateSeq(DFSM * fsm, sequence_in_t& shortSeq,
+	static void truncateSeq(const unique_ptr<DFSM>& fsm, sequence_in_t& shortSeq,
 		const vector<state_t>& states, const vector<state_t>& dist, vector<bool>& distinguished,
 		bool setDistinguished, state_t stateIdx = NULL_STATE) {
 		
@@ -262,7 +262,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void reduceCSet_LS_SL(DFSM * fsm, sequence_set_t & outCSet) {
+	void reduceCSet_LS_SL(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet) {
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(((N - 1) * N) / 2, false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished pair of states by current sequence
@@ -330,7 +330,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void reduceCSet_EqualLength(DFSM* fsm, sequence_set_t & outCSet) {
+	void reduceCSet_EqualLength(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet) {
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(((N - 1) * N) / 2, false); // is already a pair of states distinguished?
 		set<seq_info_t, seq_info_t> infos;
@@ -417,9 +417,9 @@ namespace FSMsequence {
 		}
 	}
 
-	sequence_set_t getCharacterizingSet(DFSM * fsm,
-			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm),
-			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, sequence_set_t & outCSet)) {
+	sequence_set_t getCharacterizingSet(const unique_ptr<DFSM>& fsm,
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet)) {
 		sequence_set_t outCSet;
 		auto seq = (*getSeparatingSequences)(fsm);
 		if (filterPrefixes) {
@@ -439,7 +439,7 @@ namespace FSMsequence {
 		return outCSet;
 	}
 
-	static bool distinguishBySequenceFromState(DFSM * fsm, const sequence_in_t& seq, state_t stateIdx,
+	static bool distinguishBySequenceFromState(const unique_ptr<DFSM>& fsm, const sequence_in_t& seq, state_t stateIdx,
 			const vector<state_t>& states, vector<state_t>& dist, vector<bool>& distinguished) {	
 		state_t N = fsm->getNumberOfStates();
 		bool hasMinLen = false;
@@ -470,7 +470,7 @@ namespace FSMsequence {
 		return hasMinLen;
 	}
 
-	void reduceSCSet_LS_SL(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_LS_SL(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
 		auto states = fsm->getStates();
@@ -505,7 +505,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void reduceSCSet_LS(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_LS(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
 		auto states = fsm->getStates();
@@ -517,7 +517,7 @@ namespace FSMsequence {
 		}
 	}
 
-	void reduceSCSet_EqualLength(DFSM* fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_EqualLength(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(N, false); // is already a pair of states distinguished?
 		set<seq_info_t, seq_info_t> infos;
@@ -614,9 +614,9 @@ namespace FSMsequence {
 		return outSCSet;
 	}
 
-	sequence_set_t getStateCharacterizingSet(DFSM * fsm, state_t state,
-			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm),
-			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	sequence_set_t getStateCharacterizingSet(const unique_ptr<DFSM>& fsm, state_t state,
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		auto seq = (*getSeparatingSequences)(fsm);
 		state_t stateIdx = getIdx(fsm->getStates(), state);
 		auto outSCSet = getSCSet(seq, stateIdx, fsm->getNumberOfStates(), filterPrefixes);
@@ -626,9 +626,9 @@ namespace FSMsequence {
 		return outSCSet;
 	}
 
-	vector<sequence_set_t> getStatesCharacterizingSets(DFSM * fsm,
-			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm),
-			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	vector<sequence_set_t> getStatesCharacterizingSets(const unique_ptr<DFSM>& fsm,
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
 		vector<sequence_set_t> outSCSets(N);
@@ -642,9 +642,9 @@ namespace FSMsequence {
 		return outSCSets;
 	}
 
-	vector<sequence_set_t> getHarmonizedStateIdentifiers(DFSM * fsm,
-			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm),
-			bool filterPrefixes, void(*reduceFunc)(DFSM * fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+	vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& fsm,
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
 		vector<sequence_set_t> outSCSets(N);

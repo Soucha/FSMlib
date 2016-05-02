@@ -32,7 +32,7 @@ namespace FSMmodel {
 	* @param numberOfOutputs
 	* @return a pointer to a new FSM
 	*/
-	FSMLIB_API FSM * createFSM(machine_type_t machineType, state_t numberOfStates = 1, input_t numberOfInputs = 0, output_t numberOfOutputs = 0);
+	FSMLIB_API unique_ptr<DFSM> createFSM(machine_type_t machineType, state_t numberOfStates = 1, input_t numberOfInputs = 0, output_t numberOfOutputs = 0);
 
 	/**
 	* Creates a copy of provided finite state machine.
@@ -40,7 +40,7 @@ namespace FSMmodel {
 	* @param fsm
 	* @return a pointer to the copy of given FSM
 	*/
-	FSMLIB_API FSM * duplicateFSM(FSM * fsm);
+	FSMLIB_API unique_ptr<DFSM> duplicateFSM(const unique_ptr<DFSM>& fsm);
 
 	/**
 	* Compares two DFSMs with same input and output alphabet and initial state 0.
@@ -51,14 +51,14 @@ namespace FSMmodel {
 	* @param fsm2
 	* @return True if given machines are isomorphic
 	*/
-	FSMLIB_API bool areIsomorphic(DFSM * dfsm1, DFSM * dfsm2);
+	FSMLIB_API bool areIsomorphic(const unique_ptr<DFSM>& dfsm1, const unique_ptr<DFSM>& dfsm2);
 
 	/**
 	* Checks if each state is reacheable from each other.
 	* @param dfsm
 	* @return true if the given DFSM is strongly connected
 	*/
-	FSMLIB_API bool isStronglyConnected(DFSM * dfsm);
+	FSMLIB_API bool isStronglyConnected(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Creates GIF file from DOT file.
@@ -107,7 +107,7 @@ namespace FSMmodel {
 	* @param fsm - Deterministic FSM
 	* @return shortest paths
 	*/
-	FSMLIB_API shortest_paths_t createAllShortestPaths(DFSM * fsm);
+	FSMLIB_API shortest_paths_t createAllShortestPaths(const unique_ptr<DFSM>& fsm);
 	
 	/**
 	* Designs a shortest path from given start state to given end state
@@ -120,7 +120,7 @@ namespace FSMmodel {
 	* @return a shortest path from given start to end state, or
 	*		empty sequence if there is no path
 	*/
-	FSMLIB_API sequence_in_t getShortestPath(DFSM * fsm, state_t from, state_t to,
+	FSMLIB_API sequence_in_t getShortestPath(const unique_ptr<DFSM>& fsm, state_t from, state_t to,
 		const shortest_paths_t & shortestPaths);
 
 }

@@ -24,52 +24,46 @@
 #define SEQUENCE_SEPARATOR       ","
 
 namespace FSMmodel {
-	FSM * createFSM(machine_type_t machineType, state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
-		FSM * fsm = NULL;
+	unique_ptr<DFSM> createFSM(machine_type_t machineType, state_t numberOfStates, input_t numberOfInputs, output_t numberOfOutputs) {
+		unique_ptr<DFSM> fsm;
 		switch (machineType)
 		{
 		case TYPE_DFSM:
-			fsm = new DFSM();
+			fsm = move(make_unique<DFSM>());
 			break;
 		case TYPE_MEALY:
-			fsm = new Mealy();
+			fsm = move(make_unique<Mealy>());
 			break;
 		case TYPE_MOORE:
-			fsm = new Moore();
+			fsm = move(make_unique<Moore>());
 			break;
 		case TYPE_DFA:
-			fsm = new DFA();
+			fsm = move(make_unique<DFA>());
 			break;
 		default:
-			return fsm;
+			return nullptr;
 		}
 		fsm->create(numberOfStates, numberOfInputs, numberOfOutputs);
 		return fsm;
 	}
 
-	FSM * duplicateFSM(FSM * origFSM) {
-		FSM * fsm = NULL;
+	unique_ptr<DFSM> duplicateFSM(const unique_ptr<DFSM>& origFSM) {
 		switch (origFSM->getType())
 		{
 		case TYPE_DFSM:
-			fsm = new DFSM(*((DFSM*)origFSM));
-			break;
+			return make_unique<DFSM>(*origFSM);
 		case TYPE_MEALY:
-			fsm = new Mealy(*((Mealy*)origFSM));
-			break;
+			return make_unique<Mealy>(*(static_cast<Mealy*>(origFSM.get())));
 		case TYPE_MOORE:
-			fsm = new Moore(*((Moore*)origFSM));
-			break;
+			return make_unique<Moore>(*(static_cast<Moore*>(origFSM.get())));
 		case TYPE_DFA:
-			fsm = new DFA(*((DFA*)origFSM));
-			break;
-		default:
-			return fsm;
+			return make_unique<DFA>(*(static_cast<DFA*>(origFSM.get())));
+		//default:
 		}
-		return fsm;
+		return nullptr;
 	}
 
-	bool areIsomorphic(DFSM* fsm1, DFSM* fsm2) {
+	bool areIsomorphic(const unique_ptr<DFSM>& fsm1, const unique_ptr<DFSM>& fsm2) {
 		if (!fsm1->isReduced()) {
 			fsm1->minimize();
 		}
@@ -123,7 +117,7 @@ namespace FSMmodel {
 		return true;
 	}
 
-	static state_t getSCComponent(state_t state, state_t & idx, vector<state_t> & index, DFSM* fsm) {
+	static state_t getSCComponent(state_t state, state_t & idx, vector<state_t> & index, const unique_ptr<DFSM>& fsm) {
 		state_t lowlink = idx;
 		index[state] = idx;
 		idx++;
@@ -143,7 +137,7 @@ namespace FSMmodel {
 		return lowlink;
 	}
 
-	bool isStronglyConnected(DFSM * fsm) {
+	bool isStronglyConnected(const unique_ptr<DFSM>& fsm) {
 		vector<state_t> index(fsm->getNumberOfStates(), NULL_STATE);
 		state_t idx = 0;
 		index[0] = idx++;
@@ -232,7 +226,7 @@ namespace FSMmodel {
 		return s;
 	}
 
-	shortest_paths_t createAllShortestPaths(DFSM* fsm) {
+	shortest_paths_t createAllShortestPaths(const unique_ptr<DFSM>& fsm) {
 		state_t N = fsm->getNumberOfStates();
 		shortest_paths_t shortestPaths(N);
 		for (state_t i = 0; i < N; i++) {
@@ -261,7 +255,7 @@ namespace FSMmodel {
 		return shortestPaths;
 	}
 
-	sequence_in_t getShortestPath(DFSM * fsm, state_t from, state_t to, const shortest_paths_t & shortestPaths) {
+	sequence_in_t getShortestPath(const unique_ptr<DFSM>& fsm, state_t from, state_t to, const shortest_paths_t & shortestPaths) {
 		sequence_in_t shortestPath;
 		//if (from == to) return shortestPath;// empty sequence
 		if (shortestPaths[from][to].second == STOUT_INPUT) {// there is no shortest path

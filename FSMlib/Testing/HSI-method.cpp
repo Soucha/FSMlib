@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	void HSI_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+	void HSI_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
 		if (extraStates < 0) {
 			return;

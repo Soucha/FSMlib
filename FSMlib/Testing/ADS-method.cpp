@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+	bool ADS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
 		auto ADSet = getAdaptiveDistinguishingSet(fsm);
 		if ((extraStates < 0) || ADSet.empty()) {

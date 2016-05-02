@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+	bool PDS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
 		auto DS = getPresetDistinguishingSequence(fsm);
 		if ((extraStates < 0) || DS.empty()) {

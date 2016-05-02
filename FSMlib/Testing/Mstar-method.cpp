@@ -126,7 +126,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool process_Mstar(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
+	static bool process_Mstar(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
 		TS.clear();
 		char* gurobiPath;
 		gurobiPath = getenv("GUROBI_HOME");
@@ -348,7 +348,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	bool Mstar_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
+	bool Mstar_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
 		sequence_set_t TS;
 		CS.clear();
 		if (!process_Mstar(fsm, TS, extraStates, false)) return false;
@@ -356,7 +356,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	bool Mrstar_method(DFSM* fsm, sequence_set_t& TS, int extraStates) {
+	bool Mrstar_method(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates) {
 		return process_Mstar(fsm, TS, extraStates, true);
 	}
 

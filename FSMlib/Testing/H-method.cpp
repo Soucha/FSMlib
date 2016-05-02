@@ -40,7 +40,7 @@ namespace FSMtesting {
 	};
 
 	static vector<TestNodeH*> coreNodes, extNodes; // stores SC, TC-SC respectively
-	static DFSM * specification;
+	static unique_ptr<DFSM> specification;
 	static vector<LinkCell> sepSeq;
 	static vector<state_t> states;
 
@@ -59,7 +59,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static void createBasicTree(DFSM * fsm, int extraStates) {
+	static void createBasicTree(const unique_ptr<DFSM>& fsm, int extraStates) {
 		output_t outputState, outputTransition;
 		state_t state;
 		vector<bool> covered(fsm->getNumberOfStates(), false);
@@ -276,12 +276,12 @@ namespace FSMtesting {
 		}
 	}
 
-	void H_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+	void H_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
 		if (extraStates < 0) {
 			return;
 		}
-		specification = fsm;
+		//specification = fsm;
 		states = fsm->getStates();
 
 		sepSeq = getSeparatingSequences(fsm);

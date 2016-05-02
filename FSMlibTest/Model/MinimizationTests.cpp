@@ -22,15 +22,14 @@ namespace FSMlibTest
 	TEST_CLASS(MinimizationTests)
 	{
 	public:
-		DFSM * fsm, * fsm2;
+		unique_ptr<DFSM> fsm, fsm2;
 
 		// TODO: test incomplete machines
 
 		TEST_METHOD(TestRemoveUnreachableStatesDFSM)
 		{
-			DFSM dfsm, dfsm2;
-			fsm = &dfsm;
-			fsm2 = &dfsm2;
+			fsm = make_unique<DFSM>();
+			fsm2 = make_unique<DFSM>();
 			create();
 			tRemoveUnreachableStates();
 			tMakeCompact();
@@ -38,9 +37,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestMinimizeDFSM)
 		{
-			DFSM dfsm, dfsm2;
-			fsm = &dfsm;
-			fsm2 = &dfsm2;
+			fsm = make_unique<DFSM>();
+			fsm2 = make_unique<DFSM>();
 			tIsomorphismSameFSM(DATA_PATH + MINIMIZATION_DIR + "DFSM_R4.fsm");
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFSM_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "DFSM_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFSM_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "DFSM_R4.fsm");
@@ -49,9 +47,8 @@ namespace FSMlibTest
 		
 		TEST_METHOD(TestRemoveUnreachableStatesMealy)
 		{
-			Mealy mealy, mealy2;
-			fsm = &mealy;
-			fsm2 = &mealy2;
+			fsm = make_unique<Mealy>();
+			fsm2 = make_unique<Mealy>();
 			create();
 			tRemoveUnreachableStates();
 			tMakeCompact();
@@ -59,9 +56,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestMinimizeMealy)
 		{
-			Mealy mealy, mealy2;
-			fsm = &mealy;
-			fsm2 = &mealy2;
+			fsm = make_unique<Mealy>();
+			fsm2 = make_unique<Mealy>();
 			tIsomorphismSameFSM(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
@@ -78,9 +74,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveUnreachableStatesMoore)
 		{
-			Moore moore, moore2;
-			fsm = &moore;
-			fsm2 = &moore2;
+			fsm = make_unique<Moore>();
+			fsm2 = make_unique<Moore>();
 			create();
 			tRemoveUnreachableStates();
 			tMakeCompact();
@@ -88,9 +83,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestMinimizeMoore)
 		{
-			Moore moore, moore2;
-			fsm = &moore;
-			fsm2 = &moore2;
+			fsm = make_unique<Moore>();
+			fsm2 = make_unique<Moore>();
 			tIsomorphismSameFSM(DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "Moore_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "Moore_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
@@ -106,9 +100,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveUnreachableStatesDFA)
 		{
-			DFA dfa, dfa2;
-			fsm = &dfa;
-			fsm2 = &dfa2;
+			fsm = make_unique<DFA>();
+			fsm2 = make_unique<DFA>();
 			create();
 			tRemoveUnreachableStates();
 			tMakeCompact();
@@ -116,9 +109,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestMinimizeDFA)
 		{
-			DFA dfa, dfa2;
-			fsm = &dfa;
-			fsm2 = &dfa2;
+			fsm = make_unique<DFA>();
+			fsm2 = make_unique<DFA>();
 			tIsomorphismSameFSM(DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
 			tIsomorphismPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFA_R4_P.fsm", DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
 			tIsomorphismBadPermuteState(DATA_PATH + MINIMIZATION_DIR + "DFA_R4_BP.fsm", DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");

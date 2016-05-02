@@ -20,7 +20,7 @@
 #include "DFSM.h"
 
 // helps to generate connected state diagram
-static bool isReacheableWithoutEdge(DFSM* fsm, state_t start, input_t input) {
+static bool isReacheableWithoutEdge(DFSM * fsm, state_t start, input_t input) {
 	vector<bool> isReachable(fsm->getNumberOfStates(), false);
 	queue<state_t> fifo;
 	auto end = fsm->getNextState(start, input);

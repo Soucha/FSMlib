@@ -37,7 +37,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0
 	* @return true if a test suite is designed, false if there is no PDS or negative extraStates
 	*/
-	FSMLIB_API bool PDS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API bool PDS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -55,7 +55,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0
 	* @return true if a test suite is designed, false if there is no ADS or negative extraStates
 	*/
-	FSMLIB_API bool ADS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API bool ADS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states are confirmed
@@ -77,7 +77,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0
 	* @return the number of states without SVS, or NULL_STATE if extraStates is negative
 	*/
-	FSMLIB_API state_t SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API state_t SVS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -100,7 +100,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API void W_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API void W_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -120,7 +120,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API void Wp_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API void Wp_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -138,7 +138,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API void HSI_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API void HSI_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all state pairs are distinguished and thus confirmed
@@ -157,7 +157,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API void H_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API void H_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -175,7 +175,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API void SPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API void SPY_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/// TODO
 	/**
@@ -192,7 +192,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	//FSMLIB_API void FF_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API void FF_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	*
@@ -208,7 +208,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	//FSMLIB_API void SC_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API void SC_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	*
@@ -223,11 +223,11 @@ namespace FSMtesting {
 	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many states shall be considered relatively to the number of states,
 	*/
-	//FSMLIB_API void P_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API void P_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	/// Attempts
-	//FSMLIB_API void GSPY_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
-	//FSMLIB_API void SPYH_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void GSPY_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void SPYH_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
 	
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -247,7 +247,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API bool Mra_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API bool Mra_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -270,7 +270,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API bool Mrstar_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API bool Mrstar_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -295,7 +295,7 @@ namespace FSMtesting {
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
 	*/
-	FSMLIB_API bool Mrg_method(DFSM* fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API bool Mrg_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
 
 	//<-- Checking sequence methods -->//
 
@@ -314,7 +314,7 @@ namespace FSMtesting {
 	*		default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e.there is an ADS, otherwise false
 	*/
-	//FSMLIB_API bool HrADS_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API bool HrADS_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -332,7 +332,7 @@ namespace FSMtesting {
 	*		default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e.there is an PDS, otherwise false
 	*/
-	//FSMLIB_API bool D_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API bool D_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -355,7 +355,7 @@ namespace FSMtesting {
 	*		default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e.there is an ADS, otherwise false
 	*/
-	//FSMLIB_API bool AD_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API bool AD_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -370,7 +370,7 @@ namespace FSMtesting {
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
 	*/
-	//FSMLIB_API void DW_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API void DW_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -385,7 +385,7 @@ namespace FSMtesting {
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
 	*/
-	//FSMLIB_API void DWp_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API void DWp_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -408,7 +408,7 @@ namespace FSMtesting {
 	*		default is no extra state, needs to be positive or 0)
 	* @return 
 	*/
-	//FSMLIB_API int UIO_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API int UIO_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -424,7 +424,7 @@ namespace FSMtesting {
 	*		default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, otherwise false
 	*/
-	//FSMLIB_API bool CSP_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API bool CSP_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -447,7 +447,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	FSMLIB_API bool C_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API bool C_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	*
@@ -464,10 +464,10 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	//FSMLIB_API bool K_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API bool K_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 
 	// Attempts
-	//FSMLIB_API void MHSI_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);// is it correct?
+	//FSMLIB_API void MHSI_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);// is it correct?
 
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -485,7 +485,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	FSMLIB_API bool Ma_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API bool Ma_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -507,7 +507,7 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	FSMLIB_API bool Mstar_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API bool Mstar_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -529,5 +529,5 @@ namespace FSMtesting {
 	*		 default is no extra state, needs to be positive or 0)
 	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
 	*/
-	FSMLIB_API bool Mg_method(DFSM* fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API bool Mg_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
 }

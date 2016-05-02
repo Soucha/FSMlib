@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(DS)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestDS_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm", ADS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", CSet_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm", PDS_FOUND);
@@ -40,8 +39,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestDS_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			/*
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm", SVS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm", PDS_FOUND);
@@ -63,8 +61,7 @@ namespace FSMlibTest
 		
 		TEST_METHOD(TestDS_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			/*
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", CSet_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", PDS_FOUND);
@@ -87,8 +84,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestDS_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm", ADS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm", PDS_FOUND);
 			testGetDistinguishingSequences(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm", PDS_FOUND);

@@ -25,45 +25,45 @@ namespace FSMtesting {
 		*
 		* @param fsm - Deterministic FSM
 		* @param CS - Checking Sequence which fault coverage is to be checked
-		* @param indistinguishable - a collection to fill up with FSMs that cannot be distinguished by given CS
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
+		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/ 
-		FSMLIB_API void getFSMs(DFSM* dfsm, sequence_in_t & CS, vector<DFSM*>& indistinguishable, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_in_t & CS, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided checking sequence.
 		*
 		* @param fsm - Deterministic FSM
 		* @param CS - Checking Sequence which fault coverage is to be checked
-		* @param indistinguishable - a collection to fill up with FSMs that cannot be distinguished by given CS
 		* @param hint - a collection of sequences leading to reference states that can be distinguished from each other
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
+		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API void getFSMs(DFSM* dfsm, sequence_in_t & CS, vector<DFSM*>& indistinguishable, sequence_vec_t hint, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_in_t & CS, sequence_vec_t hint, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided test suite.
 		*
 		* @param fsm - Deterministic FSM
 		* @param TS - Test Suite which fault coverage is to be checked
-		* @param indistinguishable - a collection to fill up with FSMs that cannot be distinguished by given TS
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
+		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API void getFSMs(DFSM* dfsm, sequence_set_t & TS, vector<DFSM*>& indistinguishable, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_set_t & TS, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided test suite.
 		*
 		* @param fsm - Deterministic FSM
 		* @param TS - Test Suite which fault coverage is to be checked
-		* @param indistinguishable - a collection to fill up with FSMs that cannot be distinguished by given TS
 		* @param hint - a collection of sequences leading to reference states that can be distinguished from each other
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
+		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API void getFSMs(DFSM* dfsm, sequence_set_t & TS, vector<DFSM*>& indistinguishable, sequence_vec_t hint, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_set_t & TS, sequence_vec_t hint, int extraStates = 0);
 	}
 }

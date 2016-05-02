@@ -22,12 +22,11 @@ namespace FSMlibTest
 	TEST_CLASS(BasicOpsTests)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		TEST_METHOD(TestTransitionsDFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
@@ -35,8 +34,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestOutputDFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, STOUT_INPUT, 1, STOUT_INPUT, 0, STOUT_INPUT, 
@@ -47,16 +45,14 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveDFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			tRemoveState();
 			tRemoveTransition();
 		}
 
 		TEST_METHOD(TestTransitionsMealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
@@ -64,8 +60,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestOutputMealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { 0, 1, 0, 2, 2, 1, 0 };
@@ -75,16 +70,14 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveMealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			tRemoveState();
 			tRemoveTransition();
 		}
 
 		TEST_METHOD(TestTransitionsMoore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
@@ -92,8 +85,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestOutputMoore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, 1, 0, 2, 2, 1, 0 };
@@ -103,16 +95,14 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveMoore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			tRemoveState();
 			tRemoveTransition();
 		}
 
 		TEST_METHOD(TestTransitionsDFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			tSetTransition();
 			tGetNextState();
 			tGetEndPathState();
@@ -120,8 +110,7 @@ namespace FSMlibTest
 		
 		TEST_METHOD(TestOutputDFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			tSetOutput();
 			tGetOutput();
 			sequence_in_t seq = { STOUT_INPUT, 0, 1, 0, 2, 2, 1, 0 };
@@ -131,8 +120,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestRemoveDFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			tRemoveState();
 			tRemoveTransition();
 		}

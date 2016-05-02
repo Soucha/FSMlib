@@ -30,7 +30,7 @@
 *
 * Recommended usage:<br>
 * Use a derived class DFSM or NFSM according to determinism of targeted FSM.
-* &nbsp;  DFSM * fsm = new &lt;derived_class&gt;();<br>
+* &nbsp;  auto fsm = make_unique&lt;derived_class&gt;();<br>
 * &nbsp;  where &lt;derived_class&gt; is DFSM, Moore, Mealy or DFA
 */
 class FSMLIB_API FSM {

@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(TScomp)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 		
 		// TODO: incomplete machines
 
 		TEST_METHOD(TScomp_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -40,8 +39,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TScomp_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
@@ -63,8 +61,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TScomp_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
@@ -87,8 +84,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TScomp_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
@@ -115,23 +111,21 @@ namespace FSMlibTest
 			for (sequence_in_t seq : TS) {
 				len += seq_len_t(seq.size());
 			}
-			vector<DFSM*> indistinguishable;
-			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), TS.size(), len, indistinguishable.size());
 			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
 				method.c_str(), indistinguishable.size());
-			for (auto f : indistinguishable) delete f;
+			//for (auto f : indistinguishable) delete f;
 			if (printSeq) printTS(TS);
 			return len;
 		}
 
 		seq_len_t printInfo(sequence_in_t & CS, string method, int extraStates = 0, bool printSeq = false) {
-			vector<DFSM*> indistinguishable;
-			FaultCoverageChecker::getFSMs(fsm, CS, indistinguishable, extraStates);	
+			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, CS, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), int(!CS.empty()), CS.size(), indistinguishable.size());
 			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
 				method.c_str(), indistinguishable.size());
-			for (auto f : indistinguishable) delete f;
+			//for (auto f : indistinguishable) delete f;
 			if (printSeq) DEBUG_MSG("%s\n", FSMmodel::getInSequenceAsString(CS).c_str());
 			return seq_len_t(CS.size());
 		}

@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(CoverTests)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 		
 		// TODO: more tests, incomplete machines
 
 		TEST_METHOD(TestCoversDFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "DFSM_R4.fsm");
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "DFSM_U7.fsm", 2);
 			testGetTransitionCover(DATA_PATH + MINIMIZATION_DIR + "DFSM_R4.fsm");
@@ -41,8 +40,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCoversMealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "Mealy_U7.fsm", 2);
 			testGetTransitionCover(DATA_PATH + MINIMIZATION_DIR + "Mealy_R4.fsm");
@@ -52,8 +50,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCoversMoore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "Moore_U7.fsm", 2);
 			testGetTransitionCover(DATA_PATH + MINIMIZATION_DIR + "Moore_R4.fsm");
@@ -63,8 +60,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCoversDFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");
 			testGetStateCover(DATA_PATH + MINIMIZATION_DIR + "DFA_U7.fsm", 2);
 			testGetTransitionCover(DATA_PATH + MINIMIZATION_DIR + "DFA_R4.fsm");

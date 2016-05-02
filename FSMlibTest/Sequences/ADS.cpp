@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(ADS)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestADS_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", false);
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -40,8 +39,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestADS_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			/*
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm", false);
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
@@ -63,8 +61,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestADS_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			/*
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm", false);
 			testGetAdaptiveDS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm"); 
@@ -87,8 +84,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestADS_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			testGetAdaptiveDS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");

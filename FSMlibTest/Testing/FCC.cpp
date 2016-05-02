@@ -38,8 +38,7 @@ namespace FSMlibTest
 		}
 
 		void testFCC() {
-			Mealy mealy;
-			DFSM * fsm = &mealy;
+			unique_ptr<DFSM> fsm = make_unique<Mealy>();
 			fsm->create(2, 2, 2);
 			fsm->setTransition(0, 0, 0, 0);
 			fsm->setTransition(0, 1, 1, 0);
@@ -49,11 +48,10 @@ namespace FSMlibTest
 			sequence_in_t test1{ 0, 0 };
 			sequence_in_t test2{ 1, 0, 0 };
 			sequence_in_t test3{ 1, 1, 0 };
-			vector<DFSM*> indistinguishable;
 			int extraStates = 0;
 			//W_method(fsm, TS, extraStates);
 			
-			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			ARE_EQUAL(0, int(indistinguishable.size()), "A machine found in an empty TS.");
 
 			TS.clear();
@@ -61,16 +59,14 @@ namespace FSMlibTest
 			TS.insert(test2);
 			TS.insert(test3);
 			printTS(TS);
-			indistinguishable.clear();
-			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+			indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			ARE_EQUAL(1, int(indistinguishable.size()), "TS has not complete fault coverage.");
 
 			TS.clear();
 			//TS.insert(test1);
 			TS.insert(test2);
 			TS.insert(test3);
-			indistinguishable.clear();
-			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+			indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			ARE_EQUAL(4, int(indistinguishable.size()), "There are 4 indistiguishable machines.");
 
 			TS.clear();
@@ -78,8 +74,7 @@ namespace FSMlibTest
 			TS.insert(test2);
 			test3.pop_back();// the last transition is not confirmed
 			TS.insert(test3);
-			indistinguishable.clear();
-			FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+			indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			ARE_EQUAL(2, int(indistinguishable.size()), "There are only two indistiguishable machines.");
 
 		}

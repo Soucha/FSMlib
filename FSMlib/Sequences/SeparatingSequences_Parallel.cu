@@ -64,7 +64,7 @@ namespace FSMsequence {
 
 	extern state_t getIdx(const vector<state_t>& states, state_t stateId);
 
-	static bool initCuda(DFSM* fsm, bool useQueue) {
+	static bool initCuda(const unique_ptr<DFSM>& fsm, bool useQueue) {
 		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
 			CHECK_ERROR(cudaMalloc((void**)&(devStateOutput), N * sizeof(output_t)));
@@ -343,7 +343,7 @@ namespace FSMsequence {
 
 	// <--- common functions --->
 
-	static bool getSequences(DFSM * fsm, vector<sequence_in_t> & seq) {
+	static bool getSequences(const unique_ptr<DFSM>& fsm, vector<sequence_in_t> & seq) {
 #if SEQUENCES_PERFORMANCE_TEST
 		CHECK_ERROR(cudaEventRecord(stop, 0));
 		CHECK_ERROR(cudaEventSynchronize(stop));
@@ -378,7 +378,7 @@ namespace FSMsequence {
 		return true;
 	}
 
-	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * fsm) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& fsm) {
 		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();
@@ -441,7 +441,7 @@ namespace FSMsequence {
 		return seq;
 	}
 
-	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * fsm) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& fsm) {
 		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();

@@ -62,7 +62,7 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	sequence_in_t getPresetDistinguishingSequence(DFSM * fsm) {
+	sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& fsm) {
 		sequence_in_t outPDS;
 		partition_t partition;
 		sequence_in_t s;

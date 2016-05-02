@@ -30,7 +30,7 @@ namespace FSMsequence {
 		}
 	};
 
-	sequence_in_t getSynchronizingSequence(DFSM * fsm) {
+	sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& fsm) {
 		sequence_in_t outSS;
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;

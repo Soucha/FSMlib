@@ -24,14 +24,13 @@ namespace FSMlibTestCUDA
 	TEST_CLASS(SepSeq)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestSepSeq_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -40,8 +39,7 @@ namespace FSMlibTestCUDA
 
 		TEST_METHOD(TestSepSeq_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
@@ -63,8 +61,7 @@ namespace FSMlibTestCUDA
 
 		TEST_METHOD(TestSepSeq_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			/*
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			groupTest(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
@@ -87,8 +84,7 @@ namespace FSMlibTestCUDA
 
 		TEST_METHOD(TestSepSeq_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			groupTest(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
@@ -107,7 +103,7 @@ namespace FSMlibTestCUDA
 #endif
 		}
 
-		void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(DFSM * dfsm), string name) {
+		void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(const unique_ptr<DFSM>& dfsm), string name) {
 			if (!filename.empty()) fsm->load(filename);
 			auto seq = (*getSepSeq)(fsm);
 			DEBUG_MSG("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());

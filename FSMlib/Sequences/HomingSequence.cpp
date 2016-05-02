@@ -57,7 +57,7 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	sequence_in_t getPresetHomingSequence(DFSM * fsm) {
+	sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& fsm) {
 		sequence_in_t outHS;
 		partition_t partition;
 		sequence_in_t s;

@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(SS)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestSS_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -40,8 +39,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestSS_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			//*
 			//testGetSynchronizingS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");// too hard
 			//testGetSynchronizingS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");// too hard
@@ -63,8 +61,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestSS_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			//*
 			//testGetSynchronizingS(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");// too hard
 			testGetSynchronizingS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", false); 
@@ -87,8 +84,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestSS_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			testGetSynchronizingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm", false);

@@ -37,7 +37,7 @@ namespace FSMsequence {
 	extern int closedCount, openCount;
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
-	sequence_in_t getStateVerifyingSequence(DFSM * fsm, state_t state) {
+	sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& fsm, state_t state) {
 		sequence_in_t outSVS;
 		
 		auto allStates = fsm->getStates();
@@ -139,7 +139,7 @@ namespace FSMsequence {
 		return outSVS;
 	}
 
-	sequence_vec_t getVerifyingSet(DFSM * fsm) {
+	sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& fsm) {
 		sequence_vec_t outVSet;
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;

@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(HS)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestHS_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -40,9 +39,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestHS_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
-			//*
+			fsm = make_unique<Mealy>();
+			/*
 			testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm");
@@ -63,9 +61,8 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestHS_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
-			//*
+			fsm = make_unique<Moore>();
+			/*
 			testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			//testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm"); // too hard
 			testGetPresetHomingS(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");
@@ -87,8 +84,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestHS_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			testGetPresetHomingS(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");

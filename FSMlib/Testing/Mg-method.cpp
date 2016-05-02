@@ -49,7 +49,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool process_Mg(DFSM* fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
+	static bool process_Mg(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
 		TS.clear();
 		auto d = getAdaptiveDistinguishingSet(fsm);
 		if (d.empty()) {
@@ -245,7 +245,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	bool Mg_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
+	bool Mg_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
 		sequence_set_t TS;
 		CS.clear();
 		if (!process_Mg(fsm, TS, extraStates, false)) return false;
@@ -253,7 +253,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	bool Mrg_method(DFSM* fsm, sequence_set_t& TS, int extraStates) {
+	bool Mrg_method(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates) {
 		return process_Mg(fsm, TS, extraStates, true);
 	}
 

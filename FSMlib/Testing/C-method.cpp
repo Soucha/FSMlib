@@ -180,7 +180,7 @@ namespace FSMtesting {
 		return len;
 	}
 
-	bool C_method(DFSM* fsm, sequence_in_t& CS, int extraStates) {
+	bool C_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
 		CS.clear();
 		auto E = getAdaptiveDistinguishingSet(fsm);
 		if (E.empty()) {

@@ -48,10 +48,10 @@ namespace FSMsequence {
 		}
 	};
 
-	sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm, const unique_ptr<AdaptiveDS>& ads) {
+	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads) {
 		sequence_vec_t ADSet;
 		if (!ads) return ADSet;
-		stack< pair<AdaptiveDS*, sequence_in_t> > lifo;
+		stack<pair<AdaptiveDS*, sequence_in_t>> lifo;
 		lifo.emplace(ads.get(), sequence_in_t());
 		ADSet.resize(fsm->getNumberOfStates());
 		auto states = fsm->getStates();
@@ -72,12 +72,12 @@ namespace FSMsequence {
 		return ADSet;
 	}
 
-	sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm) {
+	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm) {
 		auto ads = getAdaptiveDistinguishingSequence(fsm);
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
 
-	static void distinguishSTnode(DFSM * fsm, const shared_ptr<st_node_t>& node, const vector<state_t>& states) {
+	static void distinguishSTnode(const unique_ptr<DFSM>& fsm, const shared_ptr<st_node_t>& node, const vector<state_t>& states) {
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 			vector<set<state_t>> sameOutput;
 			auto succCount = node->succ.size();
@@ -334,7 +334,7 @@ namespace FSMsequence {
 		return outADS;
 	}
 
-	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * fsm) {
+	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm) {
 		state_t N = fsm->getNumberOfStates();
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
 		auto rootST = make_shared<st_node_t>();

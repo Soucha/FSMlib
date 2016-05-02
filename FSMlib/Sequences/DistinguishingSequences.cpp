@@ -163,7 +163,7 @@ namespace FSMsequence {
 
 	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false);
 
-	static void distinguishBN(DFSM * fsm, const shared_ptr<block_node_t> bn, const sequence_vec_t& seq, bn_partition_t& allBN) {
+	static void distinguishBN(const unique_ptr<DFSM>& fsm, const shared_ptr<block_node_t> bn, const sequence_vec_t& seq, bn_partition_t& allBN) {
 		state_t N = fsm->getNumberOfStates();
 		auto states = fsm->getStates();
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
@@ -256,7 +256,7 @@ namespace FSMsequence {
 		}
 	}
 
-	static sequence_in_t findPDS(DFSM * fsm, const sequence_vec_t& seq, int& retVal, sequence_vec_t& outVSet) {
+	static sequence_in_t findPDS(const unique_ptr<DFSM>& fsm, const sequence_vec_t& seq, int& retVal, sequence_vec_t& outVSet) {
 		shared_ptr<block_node_t> hookBN;
 		bn_partition_t allBN;
 		multimap<state_t, bn_partition_t> closedPDS;
@@ -464,7 +464,7 @@ namespace FSMsequence {
 		return outPDS;
 	}
 
-	static sequence_in_t findSVS(DFSM * fsm, const state_t refState, const sequence_vec_t& seq, int& retVal) {
+	static sequence_in_t findSVS(const unique_ptr<DFSM>& fsm, const state_t refState, const sequence_vec_t& seq, int& retVal) {
 		multimap<state_t, block_t> closedSVS;
 		priority_queue<unique_ptr<node_svs_t>, vector<unique_ptr<node_svs_t>>, svs_heur_comp> openSVS;
 		sequence_in_t outSVS;
@@ -589,11 +589,11 @@ namespace FSMsequence {
 		return outSVS;
 	}
 
-	int getDistinguishingSequences(DFSM * fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
+	int getDistinguishingSequences(const unique_ptr<DFSM>& fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-			sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm), bool filterPrefixes,
-			void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet),
-			void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet)) {
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm), bool filterPrefixes,
+			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet),
+			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet)) {
 		state_t N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
 		

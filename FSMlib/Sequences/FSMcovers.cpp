@@ -19,7 +19,7 @@
 #include "FSMsequence.h"
 
 namespace FSMsequence {
-	sequence_set_t getStateCover(DFSM * dfsm) {
+	sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm) {
 		sequence_set_t stateCover;
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
@@ -47,7 +47,7 @@ namespace FSMsequence {
 		return stateCover;
 	}
 
-	sequence_set_t getTransitionCover(DFSM * dfsm) {
+	sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm) {
 		sequence_set_t transitionCover;
 		vector<bool> covered(dfsm->getGreatestStateId(), false);
 		queue< pair<state_t, sequence_in_t> > fifo;
@@ -77,7 +77,7 @@ namespace FSMsequence {
 		return transitionCover;
 	}
 
-	sequence_set_t getTraversalSet(DFSM * dfsm, seq_len_t depth) {
+	sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth) {
 		sequence_set_t traversalSet;
 		if (depth <= 0) return traversalSet;
 		queue<sequence_in_t> fifo;

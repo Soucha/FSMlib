@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	state_t SVS_method(DFSM* fsm, sequence_set_t & TS, int extraStates) {
+	state_t SVS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 		TS.clear();
 		if (extraStates < 0) return NULL_STATE;
 		auto states = fsm->getStates();

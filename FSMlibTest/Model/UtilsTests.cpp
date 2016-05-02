@@ -23,7 +23,7 @@ namespace FSMlibTest
 	{
 	public:
 
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 		
 		TEST_METHOD(Utils_hashCode) {
 			int len = 5;
@@ -70,26 +70,22 @@ namespace FSMlibTest
 		}
 
 		TEST_METHOD(CreateImageDFSM) {
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			tCreateImage();
 		}
 
 		TEST_METHOD(CreateImageMealy) {
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			tCreateImage();
 		}
 
 		TEST_METHOD(CreateImageMoore) {
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			tCreateImage();
 		}
 
 		TEST_METHOD(CreateImageDFA) {
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			tCreateImage();
 		}
 

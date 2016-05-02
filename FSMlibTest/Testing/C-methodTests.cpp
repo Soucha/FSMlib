@@ -24,14 +24,13 @@ namespace FSMlibTest
 	TEST_CLASS(Cmethod)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
 		TEST_METHOD(TestCmethod_DFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm", false);
@@ -39,8 +38,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCmethod_Mealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", false);
@@ -48,8 +46,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCmethod_Moore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm", false);
@@ -57,8 +54,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestCmethod_DFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
 			testCmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm", false);
@@ -81,8 +77,7 @@ namespace FSMlibTest
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
 				ARE_EQUAL(false, CS.empty(), "Obtained TS is empty.");
-				vector<DFSM*> indistinguishable;
-				FaultCoverageChecker::getFSMs(fsm, TS, indistinguishable, extraStates);
+				auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 				ARE_EQUAL(1, int(indistinguishable.size()), "The C-method (%d extra states) has not complete fault coverage,"
 					" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
 			}

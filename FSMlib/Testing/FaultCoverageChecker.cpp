@@ -135,11 +135,11 @@ namespace FSMtesting {
 			}
 		};
 
-		static DFSM * partial;
+		static unique_ptr<DFSM> partial;
 		static vector<StateVariable*> var;
 		static vector<vector<state_t>> refStates;
 		static stack<state_t> instantiated;
-		static vector<DFSM*> indistinguishable;
+		//static vector<unique_ptr<DFSM>> indistinguishable;
 		static stack<LogItemFC*> log;
 		static int level = -1;
 		
@@ -171,13 +171,13 @@ namespace FSMtesting {
 			if (level >= 0) {
 				cleanLevel(0);
 				refStates.clear();
-				delete partial;
+				//delete partial;
 				level--;
 			}
-			indistinguishable.clear();
+			//indistinguishable.clear();
 		}
 
-		static void initVar(DFSM* fsm, sequence_set_t& TS) {
+		static void initVar(const unique_ptr<DFSM>& fsm, sequence_set_t& TS) {
 			StateVariable* root, *actStateVar;
 			output_t outputState;
 			state_t nextState;
@@ -524,16 +524,18 @@ namespace FSMtesting {
 		}
 
 		static void checkSolution() {
-			DFSM* accurate = (DFSM*)FSMmodel::duplicateFSM(partial);
+			auto accurate = FSMmodel::duplicateFSM(partial);
 			accurate->minimize();
-			for (auto f : indistinguishable) {
+			/*
+			for (auto &f : indistinguishable) {
 				if (FSMmodel::areIsomorphic(f, accurate)) {
-					delete accurate;
+					//delete accurate;
 					return;
 				}
 			}
 
-			indistinguishable.push_back(accurate);
+			indistinguishable.emplace_back(move(accurate));
+			*/
 		}
 
 		static void copyVar(state_t rootIdx, state_t newRootIdx) {
@@ -604,30 +606,31 @@ namespace FSMtesting {
 			}
 			level--;
 		}
-
-		void getFSMs(DFSM* fsm, sequence_in_t & CS, vector<DFSM*>& indistinguishable, int extraStates) {
+		
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates) {
 			sequence_vec_t hint;
-			getFSMs(fsm, CS, indistinguishable, hint, extraStates);
+			return getFSMs(fsm, CS, hint, extraStates);
 		}
 
-		void getFSMs(DFSM* fsm, sequence_in_t & CS, vector<DFSM*>& indistinguishable, sequence_vec_t hint, int extraStates) {
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, sequence_vec_t hint, int extraStates) {
 			sequence_set_t TS;
 			TS.insert(CS);
-			getFSMs(fsm, TS, indistinguishable, hint, extraStates);
+			return getFSMs(fsm, TS, hint, extraStates);
 		}
 
-		void getFSMs(DFSM* fsm, sequence_set_t & TS, vector<DFSM*>& indistinguishable, int extraStates) {
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
 			sequence_vec_t hint;
-			getFSMs(fsm, TS, indistinguishable, hint, extraStates);
+			return getFSMs(fsm, TS, hint, extraStates);
 		}
+		
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, sequence_vec_t hint, int extraStates) {
+			//indistinguishable.clear();
+			vector<unique_ptr<DFSM>> indistinguishable;
+			if (TS.empty() || (TS.begin())->empty()) return indistinguishable;
 
-		void getFSMs(DFSM* fsm, sequence_set_t & TS, vector<DFSM*>& indistinguishableFSMs, sequence_vec_t hint, int extraStates) {
-			indistinguishableFSMs.clear();
-			if (TS.empty() || (TS.begin())->empty()) return;
-
-			partial = (DFSM*)FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,
-				fsm->getNumberOfInputs(), fsm->getNumberOfOutputs());
-			if (partial == NULL) return;
+			//partial = (D FSM*)FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,
+				//fsm->getNumberOfInputs(), fsm->getNumberOfOutputs());
+			if (partial == NULL) return indistinguishable;
 			
 			P = fsm->getNumberOfInputs();
 			MaxStates = fsm->getNumberOfStates() + extraStates;
@@ -645,20 +648,20 @@ namespace FSMtesting {
 			if (!reduceDomains() || !processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
 				cleanup();
-				return;
+				return indistinguishable;
 			}
 			while (!instantiated.empty()) {
 				if (!processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
 					ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
 					cleanup();
-					return;
+					return indistinguishable;
 				}
 			}
 
 			if (!isConsistent()) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
 				cleanup();
-				return;
+				return indistinguishable;
 			}
 			if (idx == NULL_STATE) {
 				checkSolution();
@@ -667,8 +670,9 @@ namespace FSMtesting {
 				search(idx, 0);
 			}
 			
-			indistinguishableFSMs.assign(indistinguishable.begin(), indistinguishable.end());
+			//indistinguishableFSMs.assign(indistinguishable.begin(), indistinguishable.end());
 			cleanup();
+			return indistinguishable;
 		}
 	}
 }

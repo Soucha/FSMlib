@@ -78,7 +78,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return state cover
 	*/
-	FSMLIB_API sequence_set_t getStateCover(DFSM * dfsm);
+	FSMLIB_API sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Fills given set with input sequences that cover all transitions.
@@ -88,7 +88,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return transition cover
 	*/
-	FSMLIB_API sequence_set_t getTransitionCover(DFSM * dfsm);
+	FSMLIB_API sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Fills given set with all input sequences of the lenght up to depth.
@@ -96,7 +96,7 @@ namespace FSMsequence {
 	* @param depth
 	* @return traversal set
 	*/
-	FSMLIB_API sequence_set_t getTraversalSet(DFSM * dfsm, seq_len_t depth);
+	FSMLIB_API sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth);
 
 	/**
 	* Finds a shortest preset distinguishing sequence if FSM has it.<br><br>
@@ -111,7 +111,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a shortest preset distinguishing sequence, or empty sequence if there is no SS
 	*/
-	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(DFSM * dfsm);
+	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Finds an adaptive distinguishing sequence if FSM has it.<br><br>
@@ -129,7 +129,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return an Adaptive Distinguishing Sequence, or nullptr if there is no ADS
 	*/
-	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(DFSM * dfsm);
+	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Creates a distinguishing sequence that is included in given
@@ -138,14 +138,14 @@ namespace FSMsequence {
 	* @param ads - Adaptive Distinguishing Sequence
 	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS
 	*/
-	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm, const unique_ptr<AdaptiveDS>& ads);
+	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads);
 
 	/**
 	* Finds an adaptive distinguishing sequence for each state (using getAdaptiveDistinguishingSequence).
 	* @param dfsm - Deterministic FSM
 	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS 
 	*/
-	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(DFSM * fsm);
+	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm);
 
 	/**
 	* Finds a shortest state verifying sequence for given state.<br><br>
@@ -154,7 +154,7 @@ namespace FSMsequence {
 	* @param state
 	* @return a shortest state verifying sequence, or empty sequence if there is no SVS
 	*/
-	FSMLIB_API sequence_in_t getStateVerifyingSequence(DFSM * dfsm, state_t state);
+	FSMLIB_API sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& dfsm, state_t state);
 
 	/**
 	* Finds state verifying sequences for all states of FSM.<br>
@@ -165,7 +165,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return Verifying Set of SVSs
 	*/
-	FSMLIB_API sequence_vec_t getVerifyingSet(DFSM * dfsm);
+	FSMLIB_API sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Fills given seq table with the shortest possible sequences
@@ -181,7 +181,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a collection of shortest separating sequences for each state pair
 	*/
-	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences(DFSM * dfsm);
+	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences(const unique_ptr<DFSM>& dfsm);
 
 #ifdef PARALLEL_COMPUTING
 	/**
@@ -201,7 +201,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a collection of shortest separating sequences for each state pair, or empty collection if there is an error
 	*/
-	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(DFSM * dfsm);
+	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Fills given seq table with the shortest possible sequences
@@ -222,7 +222,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a collection of shortest separating sequences for each state pair, or empty collection if there is an error
 	*/
-	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(DFSM * dfsm);
+	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& dfsm);
 #endif
 
 	/**
@@ -232,7 +232,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return characterizing table
 	*/
-	FSMLIB_API vector<LinkCell> getSeparatingSequences(DFSM * dfsm);
+	FSMLIB_API vector<LinkCell> getSeparatingSequences(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Finds state characterizing set for given state.<br>
@@ -248,9 +248,9 @@ namespace FSMsequence {
 	*			- NOTE that some require not to filter prefixes
 	* @return State Characterizing Set of given state
 	*/
-	FSMLIB_API sequence_set_t getStateCharacterizingSet(DFSM * dfsm, state_t state,
-		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+	FSMLIB_API sequence_set_t getStateCharacterizingSet(const unique_ptr<DFSM>& dfsm, state_t state,
+		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM.<br>
@@ -265,9 +265,9 @@ namespace FSMsequence {
 	*			- NOTE that some require not to filter prefixes
 	* @return a collection of State Charactirizing Sets of all states
 	*/
-	FSMLIB_API vector<sequence_set_t> getStatesCharacterizingSets(DFSM * dfsm,
-		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+	FSMLIB_API vector<sequence_set_t> getStatesCharacterizingSets(const unique_ptr<DFSM>& dfsm,
+		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true,	void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM<br>
@@ -283,9 +283,9 @@ namespace FSMsequence {
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
 	* @return a family of Harmonized State Identifiers
 	*/
-	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(DFSM * dfsm,
-		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& dfsm,
+		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds characterizing set for FSM.<br>
@@ -300,9 +300,9 @@ namespace FSMsequence {
 	*			- NOTE that some require not to filter prefixes
 	* @return Characterizing Set
 	*/
-	FSMLIB_API sequence_set_t getCharacterizingSet(DFSM * dfsm,
-		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true,	void(*reduceFunc)(DFSM * dfsm, sequence_set_t & outCSet) = nullptr);
+	FSMLIB_API sequence_set_t getCharacterizingSet(const unique_ptr<DFSM>& dfsm,
+		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true,	void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr);
 
 	/**
 	* Finds synchronizing sequence of FSM if exists.<br><br>
@@ -317,7 +317,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a synchronizing sequence, or empty sequence if there is no SS
 	*/
-	FSMLIB_API sequence_in_t getSynchronizingSequence(DFSM * dfsm);
+	FSMLIB_API sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Finds homing sequence of FSM if exists.<br><br>
@@ -333,7 +333,7 @@ namespace FSMsequence {
 	* @param dfsm - Deterministic FSM
 	* @return a homing sequence, or empty sequence if there is no HS
 	*/
-	FSMLIB_API sequence_in_t getPresetHomingSequence(DFSM * dfsm);
+	FSMLIB_API sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& dfsm);
 
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>
@@ -366,11 +366,11 @@ namespace FSMsequence {
 	*			- NOTE that some require not to filter prefixes
 	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND
 	*/
-	FSMLIB_API int getDistinguishingSequences(DFSM * dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
+	FSMLIB_API int getDistinguishingSequences(const unique_ptr<DFSM>& dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-		sequence_vec_t(*getSeparatingSequences)(DFSM * dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceSCSetFunc)(DFSM * dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr,
-		void(*reduceCSetFunc)(DFSM * dfsm, sequence_set_t & outCSet) = nullptr);
+		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr,
+		void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).
@@ -399,7 +399,7 @@ namespace FSMsequence {
 	* @param dfsm
 	* @param outCSet
 	*/
-	FSMLIB_API void reduceCSet_LS_SL(DFSM * dfsm, sequence_set_t & outCSet);
+	FSMLIB_API void reduceCSet_LS_SL(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet);
 	
 	/**
 	* Reduces the number of sequence in given Characterizing set.
@@ -416,7 +416,7 @@ namespace FSMsequence {
 	* @param dfsm
 	* @param outCSet - CSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceCSet_EqualLength(DFSM* dfsm, sequence_set_t & outCSet);
+	FSMLIB_API void reduceCSet_EqualLength(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet);
 	
 	/**
 	* Reduces the number of sequences in given State Characterizing set.
@@ -426,7 +426,7 @@ namespace FSMsequence {
 	* @param stateIdx - index of state in fsm->getStates()
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_LS(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	FSMLIB_API void reduceSCSet_LS(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);
 	
 	/**
 	* Reduces the number of sequences in given State Characterizing set.
@@ -440,7 +440,7 @@ namespace FSMsequence {
 	* @param stateIdx - index of state in fsm->getStates()
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_LS_SL(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	FSMLIB_API void reduceSCSet_LS_SL(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);
 	
 	/**
 	* Reduces the number of sequence in given State Characterizing set.
@@ -458,5 +458,5 @@ namespace FSMsequence {
 	* @param stateIdx - index of state in fsm->getStates()
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_EqualLength(DFSM* dfsm, state_t stateIdx, sequence_set_t & outSCSet);	
+	FSMLIB_API void reduceSCSet_EqualLength(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);	
 }

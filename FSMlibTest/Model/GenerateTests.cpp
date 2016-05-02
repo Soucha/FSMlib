@@ -22,12 +22,11 @@ namespace FSMlibTest
 	TEST_CLASS(GenerateTests)
 	{
 	public:
-		DFSM * fsm;
+		unique_ptr<DFSM> fsm;
 
 		TEST_METHOD(TestGenerateDFSM)
 		{
-			DFSM dfsm;
-			fsm = &dfsm;
+			fsm = make_unique<DFSM>();
 			tGenerate(5, 4, 3);
 			
 			// reduction of the number of output
@@ -37,8 +36,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestGenerateMealy)
 		{
-			Mealy mealy;
-			fsm = &mealy;
+			fsm = make_unique<Mealy>();
 			tGenerate(5, 4, 3);
 
 			// reduction of the number of output
@@ -48,8 +46,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestGenerateMoore)
 		{
-			Moore moore;
-			fsm = &moore;
+			fsm = make_unique<Moore>();
 			tGenerate(5, 4, 3);
 
 			// reduction of the number of output
@@ -59,8 +56,7 @@ namespace FSMlibTest
 
 		TEST_METHOD(TestGenerateDFA)
 		{
-			DFA dfa;
-			fsm = &dfa;
+			fsm = make_unique<DFA>();
 			tGenerate(5, 4, 2);
 
 			// reduction of the number of output

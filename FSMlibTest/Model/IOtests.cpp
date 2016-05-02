@@ -22,69 +22,61 @@ namespace FSMlibTest
 	TEST_CLASS(IOtests)
 	{
 	public:
-		DFSM * fsm, * fsm2;
+		unique_ptr<DFSM> fsm, fsm2;
 
 		TEST_METHOD(TestCreateSaveLoadDFSM)
 		{
-			DFSM dfsm, dfsm2;
-			fsm = &dfsm;
-			fsm2 = &dfsm2; 
+			fsm = make_unique<DFSM>();
+			fsm2 = make_unique<DFSM>();
 			tCreateSaveLoad();
 		}
 
 		TEST_METHOD(TestGenerateSaveLoadDFSM)
 		{
-			DFSM dfsm, dfsm2;
-			fsm = &dfsm;
-			fsm2 = &dfsm2;
+			fsm = make_unique<DFSM>();
+			fsm2 = make_unique<DFSM>();
 			tGenerateSaveLoad();
 		}
 
 		TEST_METHOD(TestCreateSaveLoadMealy)
 		{
-			Mealy mealy, mealy2;
-			fsm = &mealy;
-			fsm2 = &mealy2;
+			fsm = make_unique<Mealy>();
+			fsm2 = make_unique<Mealy>();
 			tCreateSaveLoad();
 		}
 
 		TEST_METHOD(TestGenereateSaveLoadMealy)
 		{
-			Mealy mealy, mealy2;
-			fsm = &mealy;
-			fsm2 = &mealy2;
+			fsm = make_unique<Mealy>();
+			fsm2 = make_unique<Mealy>();
 			tGenerateSaveLoad();
 		}
 
 		TEST_METHOD(TestCreateSaveLoadMoore)
 		{
-			Moore moore, moore2;
-			fsm = &moore;
-			fsm2 = &moore2;
+			fsm = make_unique<Moore>();
+			fsm2 = make_unique<Moore>();
 			tCreateSaveLoad();
 		}
 
 		TEST_METHOD(TestGenerateSaveLoadMoore)
 		{
-			Moore moore, moore2;
-			fsm = &moore;
-			fsm2 = &moore2;
+			fsm = make_unique<Moore>();
+			fsm2 = make_unique<Moore>();
 			tGenerateSaveLoad();
 		}
 		
 		TEST_METHOD(TestCreateSaveLoadDFA)
 		{
-			DFA dfa, dfa2;
-			fsm = &dfa;
-			fsm2 = &dfa2;
+			fsm = make_unique<DFA>();
+			fsm2 = make_unique<DFA>();
 			tCreateSaveLoad();
 		}
 
 		TEST_METHOD(TestGenerateSaveLoadDFA)
 		{
-			DFA dfa, dfa2;
-			fsm = &dfa;
-			fsm2 = &dfa2;
+			fsm = make_unique<DFA>();
+			fsm2 = make_unique<DFA>();
 			tGenerateSaveLoad();
 		}
 
