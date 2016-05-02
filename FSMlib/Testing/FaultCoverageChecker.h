@@ -29,7 +29,7 @@ namespace FSMtesting {
 		*		 default is no extra state, needs to be positive or 0
 		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/ 
-		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_in_t & CS, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_in_t& CS, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided checking sequence.
@@ -41,7 +41,7 @@ namespace FSMtesting {
 		*		 default is no extra state, needs to be positive or 0
 		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_in_t & CS, sequence_vec_t hint, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_in_t& CS, const sequence_vec_t& hint, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided test suite.
@@ -52,7 +52,7 @@ namespace FSMtesting {
 		*		 default is no extra state, needs to be positive or 0
 		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_set_t & TS, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_set_t& TS, int extraStates = 0);
 		
 		/**
 		* Finds all machines that cannot be distinguished using provided test suite.
@@ -64,6 +64,6 @@ namespace FSMtesting {
 		*		 default is no extra state, needs to be positive or 0
 		* @return a collection of FSMs that cannot be distinguished by given TS
 		*/
-		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, sequence_set_t & TS, sequence_vec_t hint, int extraStates = 0);
+		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_set_t& TS, const sequence_vec_t& hint, int extraStates = 0);
 	}
 }

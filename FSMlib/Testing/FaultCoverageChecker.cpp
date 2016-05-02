@@ -25,6 +25,10 @@ namespace FSMtesting {
 			size_t counter;
 			size_t npos = size_t(-1);
 
+			size_t size() const {
+				return data.size();
+			}
+
 			void resize(size_t N, bool val) {
 				data.resize(N, val);
 				counter = val ? N : 0;
@@ -92,9 +96,6 @@ namespace FSMtesting {
 			}
 		};
 
-		static input_t P = STOUT_INPUT;
-		static state_t MaxStates;
-
 		struct StateVariable {
 			state_t varIdx, tmp;
 			state_t instance = NULL_STATE, state;
@@ -106,9 +107,9 @@ namespace FSMtesting {
 
 			output_t stateOutput;
 			vector<output_t> transitionOutput;
-			vector<StateVariable*> next;
+			vector<shared_ptr<StateVariable>> next;
 
-			StateVariable(input_t input, state_t state, output_t output) :
+			StateVariable(input_t input, state_t state, output_t output, input_t P, state_t MaxStates) :
 				prevInput(input), state(state), stateOutput(output) {
 				next.resize(P);
 				transitionOutput.resize(P);
@@ -119,7 +120,7 @@ namespace FSMtesting {
 				varIdx(sv.varIdx), instance(sv.instance), state(sv.state), prev(sv.prev),
 				prevInput(sv.prevInput), isRefState(sv.isRefState), stateOutput(sv.stateOutput),
 				transitionOutput(sv.transitionOutput) {
-				next.resize(P);
+				next.resize(sv.next.size());
 				domain = sv.domain;
 			}
 		};
@@ -128,107 +129,64 @@ namespace FSMtesting {
 			state_t from, to;
 			input_t input;
 			output_t output;
-			int level;
-
-			LogItemFC(state_t from, input_t input, state_t to, output_t output, int level) :
-				from(from), input(input), output(output), to(to), level(level) {
+			
+			LogItemFC(state_t from, input_t input, state_t to, output_t output) :
+				from(from), input(input), output(output), to(to) {
 			}
 		};
 
-		static unique_ptr<DFSM> partial;
-		static vector<StateVariable*> var;
-		static vector<vector<state_t>> refStates;
-		static stack<state_t> instantiated;
-		//static vector<unique_ptr<DFSM>> indistinguishable;
-		static stack<LogItemFC*> log;
-		static int level = -1;
-		
-		static void cleanLevel(state_t rootIdx) {
-			while (var.size() > rootIdx) {
-				if (var.back() != NULL) {
-					delete var.back();
-				}
-				var.pop_back();
-			}
-			refStates[level].clear();
-			refStates.pop_back();
-			while (!log.empty() && (log.top()->level == level)) {
-				auto & li = log.top();
-				if (li->to == NULL_STATE) {
-					partial->removeTransition(li->from, li->input);
-				} else {
-					partial->setOutput(li->from, li->output, li->input);
-				}
-				delete li;
-				log.pop();
-			}
-			while (!instantiated.empty()) {
-				instantiated.pop();
-			}
-		}
-
-		static void cleanup() {
-			if (level >= 0) {
-				cleanLevel(0);
-				refStates.clear();
-				//delete partial;
-				level--;
-			}
-			//indistinguishable.clear();
-		}
-
-		static void initVar(const unique_ptr<DFSM>& fsm, sequence_set_t& TS) {
-			StateVariable* root, *actStateVar;
-			output_t outputState;
-			state_t nextState;
+		static vector<shared_ptr<StateVariable>> initVar(const unique_ptr<DFSM>& fsm, const sequence_set_t& TS, int extraStates) {
 			auto states = fsm->getStates();
-			outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-			root = new StateVariable(STOUT_INPUT, 0, outputState);
+			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
+			input_t P = fsm->getNumberOfInputs();
+			state_t MaxStates = fsm->getNumberOfStates() + extraStates;
+			auto root = make_shared<StateVariable>(STOUT_INPUT, 0, outputState, P, MaxStates);
 			root->prev = 0;
 			
-			for (sequence_in_t seq : TS) {
-				actStateVar = root;
-				for (input_t input : seq) {
+			for (auto& seq : TS) {
+				auto actStateVar = root;
+				for (auto& input : seq) {
 					if (input == STOUT_INPUT) continue;
-					if (actStateVar->next[input] != NULL) {
+					if (actStateVar->next[input]) {
 						actStateVar = actStateVar->next[input];
 						continue;
 					}
-					nextState = fsm->getNextState(states[actStateVar->state], input);
+					auto nextState = fsm->getNextState(states[actStateVar->state], input);
 					outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 					nextState = FSMsequence::getIdx(states, nextState);
 					actStateVar->transitionOutput[input] = (fsm->isOutputTransition()) ?
 						fsm->getOutput(states[actStateVar->state], input) : DEFAULT_OUTPUT;
-					actStateVar->next[input] = new StateVariable(input, nextState, outputState);
+					actStateVar->next[input] = make_shared<StateVariable>(input, nextState, outputState, P, MaxStates);
 					actStateVar = actStateVar->next[input];		
 				}
 			}
 			// set varIdx and prev variables
-			queue<StateVariable*> fifo;
-			fifo.push(root);
+			queue<shared_ptr<StateVariable>> fifo;
+			vector<shared_ptr<StateVariable>> var;
+			fifo.emplace(move(root));
 			while (!fifo.empty()) {
-				actStateVar = fifo.front();
-				fifo.pop();
-
+				auto & actStateVar = fifo.front();
 				actStateVar->varIdx = state_t(var.size());
-				var.push_back(actStateVar);
-				for (input_t input = 0; input < P; input++) {
-					if (actStateVar->next[input] != NULL) {
+				var.emplace_back(actStateVar);
+				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
+					if (actStateVar->next[input]) {
 						actStateVar->next[input]->prev = actStateVar->varIdx;
-						fifo.push(actStateVar->next[input]);
+						fifo.emplace(actStateVar->next[input]);
 					}
 				}
+				fifo.pop();
 			}
+			return var;
 		}
 
-		static bool areNodesDifferent(StateVariable* first, StateVariable* second, bool cyclic = false) {
+		static bool areNodesDifferent(const shared_ptr<StateVariable>& first, const shared_ptr<StateVariable>& second, bool cyclic = false) {
 			if ((cyclic) && (first->instance != NULL_STATE)) {
 				return (!first->domain.intersects(second->domain));
 			}
 			if (first->stateOutput != second->stateOutput) return true;
 			//if ((first->stateOutput != second->stateOutput) || (!first->domain.intersects(second->domain))) return true;
-			for (input_t i = 0; i < P; i++) {
-				if ((first->next[i] != NULL) && (second->next[i] != NULL) &&
+			for (input_t i = 0; i < first->next.size(); i++) {
+				if ((first->next[i]) && (second->next[i]) &&
 						((first->transitionOutput[i] != second->transitionOutput[i]) ||
 						areNodesDifferent(first->next[i], second->next[i], cyclic)))
 					return true;
@@ -236,9 +194,9 @@ namespace FSMtesting {
 			return false;
 		}
 
-		static bool isUniqueNode(StateVariable* node) {
+		static bool isUniqueNode(shared_ptr<StateVariable>& node, vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates) {
 			bool unique = true;
-			for (auto idx : refStates[level]) {
+			for (auto idx : refStates) {
 				if (areNodesDifferent(node, var[idx])) {
 					node->domain.set(var[idx]->instance, false);
 				}
@@ -249,49 +207,52 @@ namespace FSMtesting {
 			return unique;
 		}
 
-		static void initRefStates(StateVariable* root, sequence_vec_t hint) {
+		static vector<state_t> initRefStates(vector<shared_ptr<StateVariable>>& var, const sequence_vec_t& hint) {
+			vector<state_t> refStates;
 			if (hint.empty()) {
+				auto & root = var[0];
 				root->domain.flip();
 				root->domain.set(0, true);
 				root->instance = 0;
 				root->isRefState = true;
-				refStates[level].push_back(root->varIdx);
+				refStates.emplace_back(root->varIdx);
 			}
 			else {
-				for (auto seq : hint) {
-					StateVariable* sv;
-					auto node = root;
-					for (auto i : seq) {
+				for (auto& seq : hint) {
+					auto node = var[0];
+					for (auto& i : seq) {
 						if (i != STOUT_INPUT)
 							node = node->next[i];
 					}
-					sv = node;
-					if (isUniqueNode(sv)) {
+					auto sv = node;
+					if (isUniqueNode(sv, var, refStates)) {
 						sv->domain.reset();
-						sv->domain.set(refStates[level].size(), true);
-						sv->instance = state_t(refStates[level].size());
+						sv->domain.set(refStates.size(), true);
+						sv->instance = state_t(refStates.size());
 						sv->isRefState = true;
-						refStates[level].push_back(sv->varIdx);
+						refStates.emplace_back(sv->varIdx);
 					}
 				}
 			}
+			return refStates;
 		}
 
-		static bool instantiate(StateVariable* node) {
-			state_t idx = node->varIdx;
+		static bool instantiate(shared_ptr<StateVariable>& node, vector<shared_ptr<StateVariable>>& var, 
+				vector<state_t>& refStates, stack<state_t>& instantiated) {
+			state_t& idx = node->varIdx;
 			if (var[idx]->domain.none()) return false;
 			var[idx]->instance = state_t(var[idx]->domain.find_first());
-			if (var[idx]->instance >= refStates[level].size()) {
-				refStates[level].push_back(idx);
+			if (var[idx]->instance >= refStates.size()) {
+				refStates.emplace_back(idx);
 				var[idx]->isRefState = true;
 			}
-			instantiated.push(idx);
+			instantiated.emplace(idx);
 			for (auto j : var[idx]->different) {
-				if (var[j] != NULL) {
+				if (var[j]) {
 					if (var[j]->instance == NULL_STATE) {
 						var[j]->domain.set(var[idx]->instance, false);
 						if (var[j]->domain.count() == 1) {
-							if (!instantiate(var[j])) return false;
+							if (!instantiate(var[j], var, refStates, instantiated)) return false;
 						}
 					}
 					else if (var[j]->instance == var[idx]->instance) {
@@ -302,30 +263,30 @@ namespace FSMtesting {
 			return true;
 		}
 
-		static bool reduceDomains() {
+		static bool reduceDomains(vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
 			for (state_t i = 0; i < var.size(); i++) {
 				if (var[i]->instance != NULL_STATE) continue; // a ref state
-				bool unique = isUniqueNode(var[i]);
+				bool unique = isUniqueNode(var[i], var, refStates);
 				if ((unique) || (var[i]->domain.count() == 1)) {
 					if (unique) {
 						// assign unused state to the var
 						var[i]->domain.reset();
-						var[i]->domain.set(refStates[level].size(), true);
-						var[i]->instance = state_t(refStates[level].size());
+						var[i]->domain.set(refStates.size(), true);
+						var[i]->instance = state_t(refStates.size());
 						var[i]->isRefState = true;
-						refStates[level].push_back(i);
+						refStates.emplace_back(i);
 					}
 					else {
 						var[i]->instance = state_t(var[i]->domain.find_first());
-						instantiated.push(i);
+						instantiated.emplace(i);
 					}
 					for (state_t j = 0; j < i; j++) {
-						if (var[j]->instance == NULL_STATE && // not a reference state
-							areNodesDifferent(var[i], var[j])) {
+						if ((var[j]->instance == NULL_STATE) && // not a reference state
+								areNodesDifferent(var[i], var[j])) {
 							var[j]->domain.set(var[i]->instance, false);
 
 							if (var[j]->domain.count() == 1) {
-								if (!instantiate(var[j])) return false;
+								if (!instantiate(var[j], var, refStates, instantiated)) return false;
 							}
 						}
 					}
@@ -333,7 +294,7 @@ namespace FSMtesting {
 				else {
 					for (state_t j = 0; j < i; j++) {
 						if (!var[j]->isRefState && // not a reference state
-							areNodesDifferent(var[i], var[j])) {
+								areNodesDifferent(var[i], var[j])) {
 							if (var[j]->instance != NULL_STATE) {
 								var[i]->domain.set(var[j]->instance, false);
 							}
@@ -344,14 +305,15 @@ namespace FSMtesting {
 						}
 					}
 					if (var[i]->domain.count() == 1) {
-						if (!instantiate(var[i])) return false;
+						if (!instantiate(var[i], var, refStates, instantiated)) return false;
 					}
 				}
 			}
 			return true;
 		}
 
-		static bool mergeNodes(StateVariable* fromNode, StateVariable* toNode) {
+		static bool mergeNodes(shared_ptr<StateVariable>& fromNode, shared_ptr<StateVariable>& toNode,
+				vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
 			toNode->domain &= fromNode->domain;
 			if (toNode->domain.none() || ((toNode->instance != fromNode->instance) &&
 				(toNode->instance != NULL_STATE) && (fromNode->instance != NULL_STATE)))
@@ -359,18 +321,18 @@ namespace FSMtesting {
 			if (!toNode->isRefState)
 				toNode->different.insert(fromNode->different.begin(), fromNode->different.end());
 			if ((toNode->instance == NULL_STATE) && (toNode->domain.count() == 1)) {
-				if (!instantiate(toNode)) return false;
+				if (!instantiate(toNode, var, refStates, instantiated)) return false;
 			}
 			else if (fromNode->instance == NULL_STATE) {
 				if (toNode->domain.count() == 1) {
 					fromNode->domain = toNode->domain;
-					if (!instantiate(fromNode)) return false;
+					if (!instantiate(fromNode, var, refStates, instantiated)) return false;
 				}
 			} //else in instantiated
 
-			for (input_t i = 0; i < P; i++) {
-				if (fromNode->next[i] != NULL) {
-					if (toNode->next[i] != NULL) {
+			for (input_t i = 0; i < fromNode->next.size(); i++) {
+				if (fromNode->next[i]) {
+					if (toNode->next[i]) {
 						if (fromNode->next[i] == toNode->next[i]) {
 							toNode->next[i]->prev = toNode->varIdx;
 							continue;
@@ -379,7 +341,7 @@ namespace FSMtesting {
 							fromNode->next[i]->prev = toNode->varIdx;
 							if (toNode->next[i]->instance == NULL_STATE) {
 								toNode->next[i]->domain = fromNode->next[i]->domain;
-								if (!instantiate(toNode->next[i])) return false;
+								if (!instantiate(toNode->next[i], var, refStates, instantiated)) return false;
 							}
 							else if (toNode->next[i]->isRefState ||
 								(toNode->next[i]->instance != fromNode->next[i]->instance)) {
@@ -387,49 +349,49 @@ namespace FSMtesting {
 							} // else in instantiated
 							continue;
 						}
-						if (!mergeNodes(fromNode->next[i], toNode->next[i])) return false;
+						if (!mergeNodes(fromNode->next[i], toNode->next[i], var, refStates, instantiated)) return false;
 					}
 					else {
 						fromNode->next[i]->prev = toNode->varIdx;
-						toNode->next[i] = fromNode->next[i];
+						toNode->next[i].swap(fromNode->next[i]);
 						toNode->transitionOutput[i] = fromNode->transitionOutput[i];
 					}
 				}
 			}
-			var[fromNode->varIdx] = NULL;
-			delete fromNode;
-
+			var[fromNode->varIdx].reset();
+			fromNode.reset();
 			return true;
 		}
 
-		static bool processInstantiated() {
+		static bool processInstantiated(vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
 			bool consistent = true;
 			while (!instantiated.empty()) {
-				state_t i = instantiated.top();
+				auto i = instantiated.top();
 				instantiated.pop();
-				if (!consistent || (var[i] == NULL) || (var[i]->isRefState)) continue;
+				if (!consistent || (!var[i]) || (var[i]->isRefState)) continue;
 				
-				StateVariable* & sv = var[refStates[level][var[i]->instance]];
+				auto & sv = var[refStates[var[i]->instance]];
 				var[var[i]->prev]->next[var[i]->prevInput] = sv;
-				consistent = mergeNodes(var[i], sv);
+				consistent = mergeNodes(var[i], sv, var, refStates, instantiated);
 			}
 			return consistent;
 		}
 
-		static state_t isSolved(state_t rootIdx) {
-			state_t minDom = MaxStates + 1;
+		static state_t isSolved(state_t rootIdx, vector<shared_ptr<StateVariable>>& var,
+				vector<state_t>& refStates, stack<state_t>& instantiated) {
+			state_t minDom = state_t(var[refStates[0]]->domain.size() + 1);
 			state_t minIdx = NULL_STATE;
 			for (state_t i = rootIdx; i < var.size(); i++) {
-				if (var[i] != NULL) {
+				if (var[i]) {
 					auto & node = var[i];
 					if (node->domain.count() != 1) {
 						for (state_t state = state_t(node->domain.find_first());
-							((state != state_t(node->domain.npos)) && (state < state_t(refStates[level].size())));
+							((state != state_t(node->domain.npos)) && (state < state_t(refStates.size())));
 							state = state_t(node->domain.find_next(state))) {
-							if (areNodesDifferent(node, var[refStates[level][state]], true)) {
+							if (areNodesDifferent(node, var[refStates[state]], true)) {
 								node->domain.set(state, false);
 								if (node->domain.count() == 1) {
-									if (!instantiate(node))
+									if (!instantiate(node, var, refStates, instantiated))
 										return WRONG_STATE;
 								}
 								else if (node->domain.none()) {
@@ -447,19 +409,18 @@ namespace FSMtesting {
 			return minIdx;
 		}
 
-		static bool setTransitions(StateVariable* node) {
-			output_t outNS, outTranNS, outputState, outputTransition;
-			StateVariable* nodeNS;
-			for (input_t input = 0; input < P; input++) {
-				if (node->next[input] == NULL) continue;
-				nodeNS = node->next[input];
-				outTranNS = node->transitionOutput[input];
-				outNS = nodeNS->stateOutput;
+		static bool setTransitions(shared_ptr<StateVariable>& node, const unique_ptr<DFSM>& partial, stack<unique_ptr<LogItemFC>>& log, 
+				vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
+			for (input_t input = 0; input < node->next.size(); input++) {
+				if (!node->next[input]) continue;
+				auto & nodeNS = node->next[input];
+				auto & outTranNS = node->transitionOutput[input];
+				auto outNS = nodeNS->stateOutput;
 				state_t & insNS = nodeNS->instance;
 				state_t nextState = partial->getNextState(node->instance, input);
 				if (nextState != NULL_STATE) {
-					outputState = (partial->isOutputState()) ? partial->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-					outputTransition = (partial->isOutputTransition()) ? partial->getOutput(node->instance, input) : DEFAULT_OUTPUT;
+					auto outputState = (partial->isOutputState()) ? partial->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
+					auto outputTransition = (partial->isOutputTransition()) ? partial->getOutput(node->instance, input) : DEFAULT_OUTPUT;
 					if (((outputState != DEFAULT_OUTPUT) && (outNS != outputState)) ||
 						((outputTransition != DEFAULT_OUTPUT) && (outTranNS != outputTransition)) ||
 						((insNS != NULL_STATE) && (insNS != nextState))) {
@@ -468,20 +429,20 @@ namespace FSMtesting {
 					if (insNS == NULL_STATE) {
 						nodeNS->domain.reset();
 						nodeNS->domain.set(nextState, true);
-						instantiate(nodeNS);
-						if (!setTransitions(nodeNS)) return false;
+						instantiate(nodeNS, var, refStates, instantiated);
+						if (!setTransitions(nodeNS, partial, log, var, refStates, instantiated)) return false;
 					}
 					if (outputTransition != outTranNS) {// set transition output
 						partial->setTransition(node->instance, input, insNS, outTranNS);
-						log.push(new LogItemFC(node->instance, input, insNS, DEFAULT_OUTPUT, level));
+						log.emplace(make_unique<LogItemFC>(node->instance, input, insNS, DEFAULT_OUTPUT));
 					}
 					if (outputState != outNS) {// set state output
 						partial->setOutput(insNS, outNS);
-						log.push(new LogItemFC(insNS, STOUT_INPUT, insNS, DEFAULT_OUTPUT, level));
+						log.emplace(make_unique<LogItemFC>(insNS, STOUT_INPUT, insNS, DEFAULT_OUTPUT));
 					}
 				}
 				else if (insNS != NULL_STATE) {
-					outputState = (partial->isOutputState()) ? partial->getOutput(insNS, STOUT_INPUT) : DEFAULT_OUTPUT;
+					auto outputState = (partial->isOutputState()) ? partial->getOutput(insNS, STOUT_INPUT) : DEFAULT_OUTPUT;
 					//outputTransition = (partial->isOutputTransition()) ? partial->getOutput(node->instance, input) : DEFAULT_OUTPUT;
 					if ((outputState != DEFAULT_OUTPUT) && (outNS != outputState)) {
 						//((outputTransition != DEFAULT_OUTPUT) && (outTranNS != outputTransition))) {
@@ -490,10 +451,10 @@ namespace FSMtesting {
 					printf("what output on: %d - %d / ? -> ? (%d)\n", node->instance, input, outTranNS);
 					// set transition and possibly even output
 					partial->setTransition(node->instance, input, insNS, outTranNS);
-					log.push(new LogItemFC(node->instance, input, NULL_STATE, DEFAULT_OUTPUT, level));
+					log.emplace(make_unique<LogItemFC>(node->instance, input, NULL_STATE, DEFAULT_OUTPUT));
 					if (outputState != outNS) {// set state output
 						partial->setOutput(insNS, outNS);
-						log.push(new LogItemFC(insNS, STOUT_INPUT, insNS, DEFAULT_OUTPUT, level));
+						log.emplace(make_unique<LogItemFC>(insNS, STOUT_INPUT, insNS, DEFAULT_OUTPUT));
 					}
 				}
 				else if (partial->isOutputTransition()) {
@@ -506,7 +467,7 @@ namespace FSMtesting {
 						}
 						// set output
 						partial->setOutput(node->instance, outTranNS, input);
-						log.push(new LogItemFC(node->instance, input, NULL_STATE, DEFAULT_OUTPUT, level));
+						log.emplace(make_unique<LogItemFC>(node->instance, input, NULL_STATE, DEFAULT_OUTPUT, level));
 					}
 					*/
 				}
@@ -514,164 +475,172 @@ namespace FSMtesting {
 			return true;
 		}
 
-		static bool isConsistent() {
-			for (auto idx : refStates[level]) {
-				if (!setTransitions(var[idx])) {
+		static bool isConsistent(const unique_ptr<DFSM>& partial, stack<unique_ptr<LogItemFC>>& log,
+				vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
+			for (auto idx : refStates) {
+				if (!setTransitions(var[idx], partial, log, var, refStates, instantiated)) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		static void checkSolution() {
+		static void checkSolution(vector<unique_ptr<DFSM>>& indistinguishable, const unique_ptr<DFSM>& partial) {
 			auto accurate = FSMmodel::duplicateFSM(partial);
 			accurate->minimize();
-			/*
 			for (auto &f : indistinguishable) {
 				if (FSMmodel::areIsomorphic(f, accurate)) {
-					//delete accurate;
 					return;
 				}
 			}
-
 			indistinguishable.emplace_back(move(accurate));
-			*/
 		}
 
-		static void copyVar(state_t rootIdx, state_t newRootIdx) {
+		static void copyVar(state_t rootIdx, state_t newRootIdx, vector<shared_ptr<StateVariable>>& var) {
 			for (state_t i = rootIdx; i < newRootIdx; i++) {
-				if (var[i] != NULL) {
+				if (var[i]) {
 					var[i]->tmp = state_t(var.size());
-					var.push_back(new StateVariable(*(var[i])));
+					var.emplace_back(make_shared<StateVariable>(*(var[i])));
 				}
 			}
 			for (state_t i = newRootIdx; i < var.size(); i++) {
 				for (auto dn : var[var[i]->varIdx]->different) {
-					if (var[dn] != NULL) {
+					if (var[dn]) {
 						var[i]->different.insert(var[dn]->tmp);
 					}
 				}
-				for (input_t input = 0; input < P; input++) {
-					if (var[var[i]->varIdx]->next[input] != NULL) {
+				for (input_t input = 0; input < var[newRootIdx]->next.size(); input++) {
+					if (var[var[i]->varIdx]->next[input]) {
 						var[i]->next[input] = var[var[var[i]->varIdx]->next[input]->tmp];
 					}
 				}
 				var[i]->varIdx = i;
 				var[i]->prev = var[var[i]->prev]->tmp;
 			}
-			vector<state_t> rs;
-			refStates.push_back(rs);
-			for (auto i : refStates[level - 1]) {
-				refStates[level].push_back(var[i]->tmp);
+		}
+
+		static void cleanLevel(const unique_ptr<DFSM>& partial, stack<unique_ptr<LogItemFC>>& log) {
+			while (!log.empty()) {
+				auto & li = log.top();
+				if (li->to == NULL_STATE) {
+					partial->removeTransition(li->from, li->input);
+				} else {
+					partial->setOutput(li->from, li->output, li->input);
+				}
+				log.pop();
 			}
 		}
 
-		static void search(state_t idx, state_t rootIdx) {
-			level++;
+		static void cleanLevel(state_t rootIdx, vector<shared_ptr<StateVariable>>& var, stack<state_t>& instantiated) {
+			var.resize(rootIdx);
+			while (!instantiated.empty()) {
+				instantiated.pop();
+			}
+		}
+
+		static void search(state_t idx, state_t rootIdx, vector<unique_ptr<DFSM>>& indistinguishable, const unique_ptr<DFSM>& partial,
+				vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
 			//printf("search: %d %d %d\n", level, rootIdx, idx);
 			bool fail;
 			state_t newRootIdx = state_t(var.size()), newIdx;
 			for (state_t state = state_t(var[idx]->domain.find_first());
-					((state != state_t(var[idx]->domain.npos)) && (state <= state_t(refStates[level - 1].size()))); // it can be new ref state
+					((state != state_t(var[idx]->domain.npos)) && (state <= state_t(refStates.size()))); // it can be new ref state
 					state = state_t(var[idx]->domain.find_next(state))) {
 				fail = false;
-				copyVar(rootIdx, newRootIdx);
+				copyVar(rootIdx, newRootIdx, var);
+				vector<state_t> newRefStates;
+				for (auto i : refStates) {
+					newRefStates.emplace_back(var[i]->tmp);
+				}
 				var[var[idx]->tmp]->domain.reset();
 				var[var[idx]->tmp]->domain.set(state, true);
-				if (!instantiate(var[var[idx]->tmp])) {
-					cleanLevel(newRootIdx);
+				if (!instantiate(var[var[idx]->tmp], var, newRefStates, instantiated)) {
+					cleanLevel(newRootIdx, var, instantiated);
 					continue;
 				}
+				stack<unique_ptr<LogItemFC>> log;
 				do {
 					while (!instantiated.empty()) {
-						if (!processInstantiated() || ((newIdx = isSolved(newRootIdx)) == -2)) {
+						if (!processInstantiated(var, newRefStates, instantiated) ||
+							((newIdx = isSolved(newRootIdx, var, newRefStates, instantiated)) == WRONG_STATE)) {
 							fail = true;
 							break;
 						}
 					}
-					if (fail || !isConsistent()) {
+					if (fail || !isConsistent(partial, log, var, newRefStates, instantiated)) {
 						fail = true;
 						break;
 					}
 				} while (!instantiated.empty());
 				if (!fail) {
-					if (newIdx == -1) {
-						checkSolution();
+					if (newIdx == NULL_STATE) {
+						checkSolution(indistinguishable, partial);
 					}
 					else {
-						search(newIdx, newRootIdx);
+						search(newIdx, newRootIdx, indistinguishable, partial, var, newRefStates, instantiated);
 					}
 				}
-				cleanLevel(newRootIdx);
+				cleanLevel(newRootIdx, var, instantiated);
+				cleanLevel(partial, log);
 			}
-			level--;
 		}
 		
-		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates) {
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_in_t & CS, int extraStates) {
 			sequence_vec_t hint;
 			return getFSMs(fsm, CS, hint, extraStates);
 		}
 
-		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, sequence_vec_t hint, int extraStates) {
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_in_t & CS, const sequence_vec_t& hint, int extraStates) {
 			sequence_set_t TS;
 			TS.insert(CS);
 			return getFSMs(fsm, TS, hint, extraStates);
 		}
 
-		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_set_t & TS, int extraStates) {
 			sequence_vec_t hint;
 			return getFSMs(fsm, TS, hint, extraStates);
 		}
 		
-		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, sequence_vec_t hint, int extraStates) {
-			//indistinguishable.clear();
+		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_set_t & TS, const sequence_vec_t& hint, int extraStates) {
 			vector<unique_ptr<DFSM>> indistinguishable;
 			if (TS.empty() || (TS.begin())->empty()) return indistinguishable;
 
-			//partial = (D FSM*)FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,
-				//fsm->getNumberOfInputs(), fsm->getNumberOfOutputs());
-			if (partial == NULL) return indistinguishable;
-			
-			P = fsm->getNumberOfInputs();
-			MaxStates = fsm->getNumberOfStates() + extraStates;
+			auto partial = FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,
+				fsm->getNumberOfInputs(), fsm->getNumberOfOutputs());
+			if (!partial) return indistinguishable;
 
-			level = 0;
-			vector<state_t> rs;
-			refStates.push_back(rs);
-			initVar(fsm, TS);
+			auto var = initVar(fsm, TS, extraStates);
 			if (fsm->isOutputState()) {
 				partial->setOutput(0, var[0]->stateOutput);
 			}
 
-			initRefStates(var[0], hint);
+			auto refStates = initRefStates(var, hint);
 			state_t idx;
-			if (!reduceDomains() || !processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
+			stack<state_t> instantiated;
+			if (!reduceDomains(var, refStates, instantiated) || 
+				!processInstantiated(var, refStates, instantiated) || 
+				((idx = isSolved(0, var, refStates, instantiated)) == WRONG_STATE)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-				cleanup();
 				return indistinguishable;
 			}
 			while (!instantiated.empty()) {
-				if (!processInstantiated() || ((idx = isSolved(0)) == WRONG_STATE)) {
+				if (!processInstantiated(var, refStates, instantiated) ||
+					((idx = isSolved(0, var, refStates, instantiated)) == WRONG_STATE)) {
 					ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-					cleanup();
 					return indistinguishable;
 				}
 			}
-
-			if (!isConsistent()) {
+			stack<unique_ptr<LogItemFC>> log;
+			if (!isConsistent(partial, log, var, refStates, instantiated)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-				cleanup();
 				return indistinguishable;
 			}
 			if (idx == NULL_STATE) {
-				checkSolution();
+				checkSolution(indistinguishable, partial);
 			}
 			else {
-				search(idx, 0);
+				search(idx, 0, indistinguishable, partial, var, refStates, instantiated);
 			}
-			
-			//indistinguishableFSMs.assign(indistinguishable.begin(), indistinguishable.end());
-			cleanup();
 			return indistinguishable;
 		}
 	}
