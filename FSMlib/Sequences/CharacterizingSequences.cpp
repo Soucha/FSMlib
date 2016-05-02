@@ -278,7 +278,7 @@ namespace FSMsequence {
 					outCSet.erase(--sIt.base());
 					sIt--;
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, false);
-					outCSet.emplace(shortSeq);
+					outCSet.emplace(move(shortSeq));
 				}
 			}
 		}
@@ -293,7 +293,7 @@ namespace FSMsequence {
 					outCSet.erase(sIt--);
 					shortSeq.pop_back();
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, true);
-					outCSet.emplace(shortSeq);
+					outCSet.emplace(move(shortSeq));
 				}
 			}
 		}
@@ -323,7 +323,7 @@ namespace FSMsequence {
 						}
 					}
 					seqInfo.seqIt = it->seqIt;
-					tmp.emplace(seqInfo);
+					tmp.emplace(move(seqInfo));
 				}
 			}
 			infos.swap(tmp);
@@ -380,7 +380,7 @@ namespace FSMsequence {
 			}
 			else {
 				seqInfo.seqIt = sIt;
-				infos.emplace(seqInfo);
+				infos.emplace(move(seqInfo));
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
@@ -412,7 +412,7 @@ namespace FSMsequence {
 				auto seq = *(outCSet.begin());
 				outCSet.erase(outCSet.begin());
 				seq.push_front(STOUT_INPUT);
-				outCSet.emplace(seq);
+				outCSet.emplace(move(seq));
 			}
 		}
 	}
@@ -485,7 +485,7 @@ namespace FSMsequence {
 					outSCSet.erase(--sIt.base());
 					sIt--;
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, false, stateIdx);
-					outSCSet.emplace(shortSeq);
+					outSCSet.emplace(move(shortSeq));
 				}
 			}
 		}
@@ -499,7 +499,7 @@ namespace FSMsequence {
 					sequence_in_t shortSeq(*sIt);
 					outSCSet.erase(sIt--);
 					truncateSeq(fsm, shortSeq, states, dist, distinguished, true, stateIdx);
-					outSCSet.emplace(shortSeq);
+					outSCSet.emplace(move(shortSeq));
 				}
 			}
 		}
@@ -562,7 +562,7 @@ namespace FSMsequence {
 			}
 			else {
 				seqInfo.seqIt = sIt;
-				infos.emplace(seqInfo);
+				infos.emplace(move(seqInfo));
 			}
 			// is the first sequence of set reached? will be next sequence shorter?
 			if ((sIt == outSCSet.begin()) || ((--sIt)->size() != len) || (sIt->front() == STOUT_INPUT)) {
@@ -591,7 +591,7 @@ namespace FSMsequence {
 				auto seq = *(outSCSet.begin());
 				outSCSet.erase(outSCSet.begin());
 				seq.push_front(STOUT_INPUT);
-				outSCSet.emplace(seq);
+				outSCSet.emplace(move(seq));
 			}
 		}
 	}

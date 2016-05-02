@@ -84,16 +84,15 @@ namespace FSMmodel {
 			(fsm1->isOutputTransition() != fsm2->isOutputTransition())) {
 			return false;
 		}
-		state_t state, nextState1, nextState2;
 		vector<state_t> stateEq(fsm1->getNumberOfStates());
 		vector<bool> used(fsm1->getNumberOfStates(), false);
 		queue<state_t> fifo;
 
 		stateEq[0] = 0;
 		used[0] = true;
-		fifo.push(0);
+		fifo.emplace(0);
 		while (!fifo.empty()) {
-			state = fifo.front();
+			auto state = fifo.front();
 			fifo.pop();
 			if (fsm1->isOutputState() && 
 				(fsm1->getOutput(state, STOUT_INPUT) != fsm2->getOutput(stateEq[state], STOUT_INPUT))) {
@@ -104,8 +103,8 @@ namespace FSMmodel {
 					(fsm1->getOutput(state, input) != fsm2->getOutput(stateEq[state], input))) {
 					return false;
 				}
-				nextState1 = fsm1->getNextState(state, input);
-				nextState2 = fsm2->getNextState(stateEq[state], input);
+				auto nextState1 = fsm1->getNextState(state, input);
+				auto nextState2 = fsm2->getNextState(stateEq[state], input);
 				if ((nextState1 == WRONG_STATE) || (nextState2 == WRONG_STATE)) {
 					return false;
 				} else if ((nextState1 == NULL_STATE) || (nextState2 == NULL_STATE)) {
@@ -117,7 +116,7 @@ namespace FSMmodel {
 				} else {
 					stateEq[nextState1] = nextState2;
 					used[nextState1] = true;
-					fifo.push(nextState1);
+					fifo.emplace(nextState1);
 				}
 			}
 		}

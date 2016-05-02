@@ -103,7 +103,7 @@ namespace FSMsequence {
 				if (!found) {
 					auto next = make_shared<st_node_t>();
 					next->block.emplace_back(state);
-					node->succ.emplace_back(output, next);
+					node->succ.emplace_back(output, move(next));
 					sameOutput.emplace_back(set<state_t>({ nextState }));
 				}
 				// add the next state in the first successor
@@ -137,7 +137,6 @@ namespace FSMsequence {
 		const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
 
 		vector<vector<pair<input_t, state_t>>> link(dependent.size());
-		shared_ptr<st_node_t> bestNext;
 		state_t N = state_t(curNode.size());
 		// add link to dependent vector
 		for (state_t dI = 0; dI < dependent.size(); dI++) {
@@ -147,7 +146,7 @@ namespace FSMsequence {
 		for (state_t dI = 0; dI < dependent.size(); dI++) {
 			auto node = dependent[dI];
 			auto seqInIt = node->sequence.begin();
-			bestNext = nullptr;
+			shared_ptr<st_node_t> bestNext;
 			input_t bestInput = STOUT_INPUT;
 			// check other valid input
 			for (input_t i = 0; i < node->sequence.size(); i++, seqInIt++) {
@@ -190,7 +189,7 @@ namespace FSMsequence {
 			}
 			if (bestNext) {
 				bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
-				node->succ.emplace_back(bestInput, bestNext);
+				node->succ.emplace_back(bestInput, move(bestNext));
 			}
 		}
 		return link;
@@ -361,7 +360,7 @@ namespace FSMsequence {
 				if (!found) {
 					auto next = make_shared<st_node_t>();
 					next->block.emplace_back(state);
-					node->succ.emplace_back(output, next);
+					node->succ.emplace_back(output, move(next));
 				}
 			}
 			for (output_t i = 0; i < node->succ.size(); i++) {

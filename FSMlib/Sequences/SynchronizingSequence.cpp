@@ -64,7 +64,7 @@ namespace FSMsequence {
 					sequence_in_t s(act->ss);
 					s.push_back(input);
 					fifo.emplace(make_unique<ss_node_t>(states, s));
-					used.emplace(states);
+					used.emplace(move(states));
 				}
 			}
 		}

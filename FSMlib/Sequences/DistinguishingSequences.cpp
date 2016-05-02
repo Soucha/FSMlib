@@ -241,14 +241,14 @@ namespace FSMsequence {
 										initH(succStoutBN, seq, N);
 										allBN.insert(succStoutBN);
 									}
-									outOnSTOUT.emplace_back(p.first, succStoutBN);
+									outOnSTOUT.emplace_back(p.first, move(succStoutBN));
 								}
-								succBN->succ.emplace_back(STOUT_INPUT, outOnSTOUT);
+								succBN->succ.emplace_back(STOUT_INPUT, move(outOnSTOUT));
 							}
 						}
 					}
 				}
-				bn->succ.emplace_back(input, outOnIn);
+				bn->succ.emplace_back(input, move(outOnIn));
 			}
 		}
 		if (bn->succ.empty()) {// undistinguishable set of states
@@ -294,7 +294,7 @@ namespace FSMsequence {
 			for (output_t output = 0; output < fsm->getNumberOfOutputs() + 1; output++) {
 				if (!sameOutput[output].empty()) {
 					auto succBN = make_shared<block_node_t>();
-					succBN->states.insert(sameOutput[output].begin(), sameOutput[output].end());
+					succBN->states.swap(sameOutput[output]);
 					auto allBNit = allBN.find(succBN);
 					if (allBNit != allBN.end()) {
 						succBN = *allBNit;
@@ -304,19 +304,19 @@ namespace FSMsequence {
 						allBN.emplace(succBN);
 					}
 					outOnIn.emplace_back(output, succBN);
-					if (sameOutput[output].size() > 1) {
+					if (succBN->states.size() > 1) {
 						succPDS->partition.emplace(succBN);
 						if (succPDS->value < succBN->h) {
 							succPDS->value = succBN->h;
 						}
 					}
 					else {
-						outVSet[*sameOutput[output].begin()].push_back(STOUT_INPUT);
+						outVSet[*(succBN->states.begin())].push_back(STOUT_INPUT);
 					}
 					sameOutput[output].clear();
 				}
 			}
-			rootBN->succ.emplace_back(STOUT_INPUT, outOnIn);
+			rootBN->succ.emplace_back(STOUT_INPUT, move(outOnIn));
 			// all blocks are singletons
 			if (succPDS->partition.empty()) {
 				outPDS.push_back(STOUT_INPUT);
@@ -424,7 +424,7 @@ namespace FSMsequence {
 				}
 				if (stop) continue;
 				if (succPDS->partition.empty()) {// PDS found
-					outPDS.insert(outPDS.end(), actPDS->ds.begin(), actPDS->ds.end());
+					outPDS.swap(actPDS->ds);
 					outPDS.push_back(hookBN->succ[i].first);
 					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
 					retVal = PDS_FOUND;
@@ -447,7 +447,7 @@ namespace FSMsequence {
 				if (stoutUsed) succPDS->ds.push_back(STOUT_INPUT);
 				setHeuristic(succPDS);
 				//printPDS(succPDS);
-				openPDS.push(move(succPDS));
+				openPDS.emplace(move(succPDS));
 			}
 			if (retVal == PDS_FOUND) break;
 		}
@@ -543,12 +543,12 @@ namespace FSMsequence {
 					}
 					// is reference state distinguished by appending STOUT_INPUT?
 					if (tmp.size() != sameOutput.size()) {
-						sameOutput = tmp;
+						sameOutput.swap(tmp);
 						stoutUsed = true;
 					}
 				}
 				if (sameOutput.size() == 1) {// SVS found
-					outSVS.insert(outSVS.end(), actSVS->svs.begin(), actSVS->svs.end());
+					outSVS.swap(actSVS->svs);
 					outSVS.push_back(input);
 					if (stoutUsed) outSVS.push_back(STOUT_INPUT);
 					stop = true;
@@ -569,7 +569,7 @@ namespace FSMsequence {
 
 				auto succSVS = make_unique<node_svs_t>();
 				succSVS->actState = nextState;
-				succSVS->states.insert(sameOutput.begin(), sameOutput.end());
+				succSVS->states.swap(sameOutput);
 				initSVS_H(succSVS, seq, N);
 				succSVS->svs.insert(succSVS->svs.begin(), actSVS->svs.begin(), actSVS->svs.end());
 				succSVS->svs.push_back(input);

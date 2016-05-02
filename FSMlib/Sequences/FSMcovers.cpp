@@ -40,7 +40,7 @@ namespace FSMsequence {
 					newPath.push_back(input);
 					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
 					stateCover.emplace(newPath);
-					fifo.emplace(nextState, newPath);
+					fifo.emplace(nextState, move(newPath));
 				}
 			}
 		}
@@ -69,7 +69,7 @@ namespace FSMsequence {
 					transitionCover.emplace(newPath);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
-						fifo.emplace(nextState, newPath);
+						fifo.emplace(nextState, move(newPath));
 					}
 				}
 			}
@@ -91,7 +91,7 @@ namespace FSMsequence {
 				extSeq.push_back(input);
 				if (dfsm->isOutputState()) extSeq.push_back(STOUT_INPUT);
 				traversalSet.emplace(extSeq);
-				if (extSeq.size() < depth) fifo.emplace(extSeq);
+				if (extSeq.size() < depth) fifo.emplace(move(extSeq));
 			}
 		}
 		return traversalSet;

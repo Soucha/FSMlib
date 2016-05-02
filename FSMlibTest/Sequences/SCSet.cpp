@@ -101,7 +101,7 @@ namespace FSMlibTest
 			testGetCharacterizingSet(filename);
 			//testGetStatesCharacterizingSets("");
 			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
-			//testGetHarmonizedStateIdentifiers("");
+			testGetHarmonizedStateIdentifiers("");
 			testGetSeparatingSequences("");
 		}
 

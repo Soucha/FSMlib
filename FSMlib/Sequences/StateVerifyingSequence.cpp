@@ -71,12 +71,12 @@ namespace FSMsequence {
 		bool badInput, stoutUsed = false;
 
 		fifo.emplace(make_unique<svs_node_t>(states, s, state));
-		used.emplace(states, state);
+		used.emplace(move(states), state);
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				states.clear();
+				block_t states;
 				nextState = fsm->getNextState(act->state, input);
 				output = fsm->getOutput(act->state, input);
 				badInput = false;
@@ -107,7 +107,7 @@ namespace FSMsequence {
 					}
 					// is reference state distinguished by appending STOUT_INPUT?
 					if (tmp.size() != states.size()) {
-						states = tmp;
+						states.swap(tmp);
 						stoutUsed = true;
 					}
 				}
@@ -128,7 +128,7 @@ namespace FSMsequence {
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<svs_node_t>(states, s, nextState));
-					used.emplace(states, nextState);
+					used.emplace(move(states), nextState);
 				}
 			}
 		}

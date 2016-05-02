@@ -64,12 +64,12 @@ namespace FSMsequence {
 
 	sequence_in_t getPresetDistinguishingSequence(DFSM * fsm) {
 		sequence_in_t outPDS;
-		vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
-		set<output_t> actOutputs;
 		partition_t partition;
 		sequence_in_t s;
 		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
+			set<output_t> actOutputs;
+			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 			// get output of all states
 			for (auto state : states) {
 				auto output = fsm->getOutput(state, STOUT_INPUT);
@@ -82,9 +82,8 @@ namespace FSMsequence {
 			// save block with more then one state and clear sameOutput
 			for (auto out : actOutputs) {
 				if (sameOutput[out].size() > 1) {
-					partition.emplace(sameOutput[out]);
+					partition.emplace(move(sameOutput[out]));
 				}
-				sameOutput[out].clear();
 			}
 			actOutputs.clear();
 			// are all blocks singletons?
@@ -106,16 +105,18 @@ namespace FSMsequence {
 		bool stop, stoutUsed = false;
 
 		fifo.emplace(make_unique<pds_node_t>(partition, s));
-		used.emplace(getSetId(*partition.begin()), partition);
+		used.emplace(getSetId(*partition.begin()), move(partition));
 		while (!fifo.empty() && used.size() < MAX_CLOSED) {
 			auto act = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				stop = false;
-				partition.clear();
+				partition_t partition;
 				// go through all blocks in current partition
 				for (auto block : act->partition) {
 					bool noTransition = false;
+					set<output_t> actOutputs;
+					vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 					// go through all states in current block
 					for (auto state : block) {
 						auto output = fsm->getOutput(state, input);
@@ -137,15 +138,13 @@ namespace FSMsequence {
 							actOutputs.emplace(output);
 						}
 					}
+					if (stop) break;
 					// save block with more then one state or clear sameOutput if stop
 					for (auto out : actOutputs) {
-						if (!stop && (sameOutput[out].size() > 1)) {
-							partition.emplace(sameOutput[out]);
+						if (sameOutput[out].size() > 1) {
+							partition.emplace(move(sameOutput[out]));
 						}
-						sameOutput[out].clear();
 					}
-					actOutputs.clear();
-					if (stop) break;
 				}
 				if (stop) {// try another input
 					continue;
@@ -154,6 +153,8 @@ namespace FSMsequence {
 					partition_t tmp;
 					stoutUsed = false;
 					for (auto block : partition) {
+						set<output_t> actOutputs;
+						vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 						for (auto state : block) {
 							auto output = fsm->getOutput(state, STOUT_INPUT);
 							if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
@@ -164,11 +165,9 @@ namespace FSMsequence {
 						// save block with more then one state and clear sameOutput
 						for (auto out : actOutputs) {
 							if (sameOutput[out].size() > 1) {
-								tmp.emplace(sameOutput[out]);
+								tmp.emplace(move(sameOutput[out]));
 							}
-							sameOutput[out].clear();
 						}
-						actOutputs.clear();
 					}
 					if (stoutUsed) {
 						partition.swap(tmp);
@@ -204,7 +203,7 @@ namespace FSMsequence {
 					s.push_back(input);
 					if (stoutUsed) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<pds_node_t>(partition, s));
-					used.emplace(getSetId(*partition.begin()), partition);
+					used.emplace(getSetId(*partition.begin()), move(partition));
 				}
 			}
 		}

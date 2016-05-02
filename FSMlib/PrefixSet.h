@@ -19,10 +19,7 @@
 #include "Sequences\FSMsequence.h"
 
 namespace FSMlib {
-	struct prefix_set_node_t {
-		input_t input = STOUT_INPUT;
-		prefix_set_node_t *neighbor = nullptr, *child = nullptr;
-	};
+	struct prefix_set_node_t;
 
 	class FSMLIB_API PrefixSet {
 	public:
@@ -84,6 +81,6 @@ namespace FSMlib {
 		seq_len_t contains(sequence_in_t seq);
 
 	private:
-		prefix_set_node_t* root;
+		shared_ptr<prefix_set_node_t> root;
 	};
 }
