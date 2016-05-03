@@ -23,10 +23,9 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t PDS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		sequence_set_t TS;
 		auto DS = getPresetDistinguishingSequence(fsm);
 		if ((extraStates < 0) || DS.empty()) {
-			return TS;
+			return sequence_set_t();
 		}
 
 		auto transitionCover = getTransitionCover(fsm);
@@ -49,7 +48,7 @@ namespace FSMtesting {
 		}
 
 		FSMlib::PrefixSet pset;
-		for (sequence_in_t trSeq : transitionCover) {
+		for (const auto& trSeq : transitionCover) {
 			sequence_in_t testSeq(trSeq);
 			if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
 			if (startWithStout) {
@@ -57,8 +56,8 @@ namespace FSMtesting {
 				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended PDS)
 			}
 			testSeq.insert(testSeq.end(), DS.begin(), DS.end());
-			pset.insert(testSeq);
-			for (sequence_in_t extSeq : traversalSet) {
+			pset.insert(move(testSeq));
+			for (const auto& extSeq : traversalSet) {
 				sequence_in_t testSeq(trSeq);
 				testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
 				if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
@@ -67,10 +66,9 @@ namespace FSMtesting {
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended PDS)
 				}
 				testSeq.insert(testSeq.end(), DS.begin(), DS.end());
-				pset.insert(testSeq);
+				pset.insert(move(testSeq));
 			}
 		}
-		pset.getMaximalSequences(TS);
-		return TS;
+		return pset.getMaximalSequences();
 	}
 }

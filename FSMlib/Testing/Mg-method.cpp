@@ -78,9 +78,9 @@ namespace FSMtesting {
 		}
 
 		seq_len_t adsLen = 0;
-		for (auto seq : d) {
-			if (adsLen < d.size()) {
-				adsLen = seq_len_t(d.size());
+		for (const auto& seq : d) {
+			if (adsLen < seq.size()) {
+				adsLen = seq_len_t(seq.size());
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace FSMtesting {
 		sequence_vec_t trSeq(N);
 		if (resetEnabled) {
 			auto sc = getStateCover(fsm);
-			for (auto seq : sc) {
+			for (const auto& seq : sc) {
 				trSeq[fsm->getEndPathState(0, seq)] = seq;
 			}
 		}
@@ -100,23 +100,22 @@ namespace FSMtesting {
 			for (input_t input = 0; input < P; input++) {
 				state_t nextState = fsm->getNextState(state, input);
 				if (nextState == NULL_STATE) {
-					sequence_in_t seq;
-					tests.push_back(seq);
+					tests.emplace_back(sequence_in_t());
 					continue;
 				}
 				sequence_in_t seq(d[nextState]);
 				if (fsm->isOutputState()) seq.push_front(STOUT_INPUT);
 				seq.push_front(input);
-				tests.push_back(seq);
+				tests.emplace_back(move(seq));
 				counter++;
 			}
 		}
-		tests.push_back(d[0]);
+		tests.emplace_back(d[0]);
 
 		// compute costs
 		state_t Tsize = state_t(tests.size());
 		seq_len_t maxCost = adsLen + N + 1;
-		vector<vector<seq_len_t> > costs(Tsize);
+		vector<vector<seq_len_t>> costs(Tsize);
 		priority_queue<pq_entry_t, vector<pq_entry_t>, pq_entry_comp> edges;
 		for (state_t i = 0; i < Tsize; i++) {
 			costs[i].resize(Tsize, maxCost);
@@ -138,8 +137,7 @@ namespace FSMtesting {
 					if ((costs[idx][nextIdx] == maxCost) && (nextIdx != idx) && !tests[nextIdx].empty()) {
 						if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 							costs[idx][nextIdx] = cost;
-							pq_entry_t en(idx, nextIdx, cost);
-							edges.push(en);
+							edges.emplace(pq_entry_t(idx, nextIdx, cost));
 						}
 					}
 					actState = fsm->getNextState(actState, *it);
@@ -157,23 +155,20 @@ namespace FSMtesting {
 						else {
 							costs[idx][i] = seq_len_t(tests[idx].size() + sp[actState][i / P].first);
 						}
-						pq_entry_t en(idx, i, costs[idx][i]);
-						edges.push(en);
+						edges.emplace(pq_entry_t(idx, i, costs[idx][i]));
 					}
 				}
 			}
 		}
 		idx = Tsize - 1;
-		auto it = tests[idx].begin();
 		state_t actState = 0;
 		seq_len_t cost = 0;
-		for (; it != tests[idx].end(); it++, cost++) {
+		for (auto it = tests[idx].begin(); it != tests[idx].end(); it++, cost++) {
 			state_t nextIdx = actState * P + (*it);
 			if ((costs[idx][nextIdx] == maxCost) && !tests[nextIdx].empty()) {
 				if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 					costs[idx][nextIdx] = cost;
-					pq_entry_t en(idx, nextIdx, cost);
-					edges.push(en);
+					edges.emplace(pq_entry_t(idx, nextIdx, cost));
 				}
 			}
 			actState = fsm->getNextState(actState, *it);
@@ -191,8 +186,7 @@ namespace FSMtesting {
 				else {
 					costs[idx][i] = seq_len_t(tests[idx].size() + sp[actState][i / P].first);
 				}
-				pq_entry_t en(idx, i, costs[idx][i]);
-				edges.push(en);
+				edges.emplace(pq_entry_t(idx, i, costs[idx][i]));
 			}
 		}
 
@@ -200,8 +194,7 @@ namespace FSMtesting {
 		vector<state_t> prev(Tsize, NULL_STATE), next(Tsize, NULL_STATE);
 		FSMlib::UnionFind uf(Tsize);
 		while (!edges.empty()) {
-			auto e = edges.top();
-			edges.pop();
+			auto & e = edges.top();
 			if (((counter > 0) && (uf.doFind(e.from) != uf.doFind(e.to))) &&
 					(next[e.from] == NULL_STATE) && (prev[e.to] == NULL_STATE)) {
 				uf.doUnion(e.from, e.to);
@@ -209,6 +202,8 @@ namespace FSMtesting {
 				prev[e.to] = e.from;
 				counter--;
 			}
+			else if (counter == 0) break;
+			edges.pop();
 		}
 
 		// create CS
@@ -219,9 +214,7 @@ namespace FSMtesting {
 				state_t from = fsm->getEndPathState((idx == Tsize - 1) ? 0 : idx / P, tests[idx]);
 				if (from != next[idx] / P) {
 					if (resetEnabled && (trSeq[next[idx] / P].size() + 1 < sp[from][next[idx] / P].first)) {
-						sequence_in_t seq(CS);
-						TS.insert(seq);
-						CS.clear();
+						TS.emplace(move(CS));
 						CS.assign(trSeq[next[idx] / P].begin(), trSeq[next[idx] / P].end());
 					}
 					else {
@@ -241,7 +234,7 @@ namespace FSMtesting {
 			idx = next[idx];
 		}
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
-		TS.insert(CS);
+		TS.emplace(move(CS));
 		return TS;
 	}
 

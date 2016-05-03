@@ -40,22 +40,18 @@ namespace FSMlib {
 		return insertInTree(ps->neighbor, seq);
 	}
 
-	PrefixSet::PrefixSet() {}
-
-	PrefixSet::~PrefixSet() {}
-
 	bool PrefixSet::insert(sequence_in_t seq) {
 		if (seq.empty()) return false;
 		return insertInTree(root, seq);
 	}
 
-	void PrefixSet::getMaximalSequences(sequence_set_t & outSet) {
-		outSet.clear();
+	sequence_set_t PrefixSet::getMaximalSequences() {
 		if (!root) {// TODO return empty sequence or empty set???
 			//sequence_in_t seq;
 			//outSet.insert(seq);
-			return;
+			return sequence_set_t();
 		}
+		sequence_set_t outSet;
 		stack<pair<shared_ptr<prefix_set_node_t>, sequence_in_t>> lifo;
 		lifo.emplace(root, sequence_in_t());
 		while (!lifo.empty()) {
@@ -71,13 +67,14 @@ namespace FSMlib {
 				outSet.emplace(move(p.second));
 			}
 		}
+		return outSet;
 	}
 
-	void PrefixSet::popMaximalSequence(sequence_in_t& outSeq) {
-		outSeq.clear();
+	sequence_in_t PrefixSet::popMaximalSequence() {
 		if (!root) {
-			return;
+			return sequence_in_t();
 		}
+		sequence_in_t outSeq;
 		auto node = root;
 		auto removeNode = root;
 		while (node) {
@@ -97,11 +94,10 @@ namespace FSMlib {
 		}
 		node->neighbor.reset();
 		node.reset();
+		return outSeq;
 	}
 
-	bool PrefixSet::popMaximalSequenceWithGivenPrefix(sequence_in_t::iterator start,
-			sequence_in_t::iterator end, sequence_in_t& outSeq) {
-		outSeq.clear();
+	sequence_in_t PrefixSet::popMaximalSequenceWithGivenPrefix(sequence_in_t::iterator start, sequence_in_t::iterator end) {
 		auto node = root;
 		shared_ptr<prefix_set_node_t> removeNode;
 		bool removingChild = false;
@@ -122,7 +118,8 @@ namespace FSMlib {
 				node = node->neighbor;
 			}
 		}
-		if (start != end) return false;
+		if (start != end) return sequence_in_t();
+		sequence_in_t outSeq;
 		while (node) {
 			outSeq.push_back(node->input);
 			if (node->child && node->child->neighbor) {
@@ -144,7 +141,7 @@ namespace FSMlib {
 		}
 		node->neighbor.reset();
 		node.reset();
-		return true;
+		return outSeq;
 	}
 
 	void PrefixSet::clear() {

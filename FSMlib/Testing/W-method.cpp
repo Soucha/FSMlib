@@ -33,15 +33,15 @@ namespace FSMtesting {
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {
-			for (auto seq : CSet) {
+			for (const auto& seq : CSet) {
 				if (seq.front() == STOUT_INPUT) {
 					startWithStout = true;
 					break;
 				}
 			}
 			sequence_set_t tmp;
-			for (auto origDS : CSet) {
-				sequence_in_t seq = origDS;
+			for (const auto& origDS : CSet) {
+				sequence_in_t seq(origDS);
 				auto DSit = seq.begin();
 				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
 					if (*it == STOUT_INPUT) continue;
@@ -55,25 +55,25 @@ namespace FSMtesting {
 				if (startWithStout) {
 					if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
 				}
-				tmp.insert(seq);
+				tmp.emplace(move(seq));
 			}
-			CSet = tmp;
+			CSet.swap(tmp);
 		}
 
 		FSMlib::PrefixSet pset;
-		for (sequence_in_t trSeq : transitionCover) {
+		for (const auto& trSeq : transitionCover) {
 			if (fsm->getEndPathState(0, trSeq) == WRONG_STATE) continue;
-			for (sequence_in_t cSeq : CSet) {
+			for (const auto& cSeq : CSet) {
 				sequence_in_t testSeq(trSeq);
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 				}
 				testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-				pset.insert(testSeq);
+				pset.insert(move(testSeq));
 			}
-			for (sequence_in_t extSeq : traversalSet) {
-				for (sequence_in_t cSeq : CSet) {
+			for (const auto& extSeq : traversalSet) {
+				for (const auto& cSeq : CSet) {
 					sequence_in_t testSeq(trSeq);
 					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
 					if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
@@ -82,12 +82,10 @@ namespace FSMtesting {
 						testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 					}
 					testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-					pset.insert(testSeq);
+					pset.insert(move(testSeq));
 				}
 			}
 		}
-		sequence_set_t TS;
-		pset.getMaximalSequences(TS);
-		return TS;
+		return pset.getMaximalSequences();
 	}
 }

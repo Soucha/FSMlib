@@ -23,10 +23,9 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		sequence_set_t TS;
 		auto ADSet = getAdaptiveDistinguishingSet(fsm);
 		if ((extraStates < 0) || ADSet.empty()) {
-			return TS;
+			return sequence_set_t();
 		}
 		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
@@ -51,7 +50,7 @@ namespace FSMtesting {
 		}
 
 		FSMlib::PrefixSet pset;
-		for (sequence_in_t trSeq : transitionCover) {
+		for (const auto& trSeq : transitionCover) {
 			sequence_in_t testSeq(trSeq);
 			state_t state = fsm->getEndPathState(0, testSeq);
 			if (state == WRONG_STATE) continue;
@@ -61,8 +60,8 @@ namespace FSMtesting {
 				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 			}
 			testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
-			pset.insert(testSeq);
-			for (sequence_in_t extSeq : traversalSet) {
+			pset.insert(move(testSeq));
+			for (const auto& extSeq : traversalSet) {
 				sequence_in_t testSeq(trSeq);
 				testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, testSeq);
@@ -73,10 +72,9 @@ namespace FSMtesting {
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
 				}
 				testSeq.insert(testSeq.end(), ADSet[state].begin(), ADSet[state].end());
-				pset.insert(testSeq);
+				pset.insert(move(testSeq));
 			}
 		}
-		pset.getMaximalSequences(TS);
-		return TS;
+		return pset.getMaximalSequences();
 	}
 }

@@ -23,40 +23,34 @@ namespace FSMlib {
 
 	class FSMLIB_API PrefixSet {
 	public:
-		PrefixSet();
-		virtual ~PrefixSet();
-
 		/**
-		* Inserts given sequence in prefix set.
+		* Inserts given sequence in the prefix set.
 		* @param seq - sequence to insert
 		* @return true if seq was inserted, false if prefix set had contained seq
 		*/
 		bool insert(sequence_in_t seq);
 
 		/**
-		* Fills given set with maximal sequences of prefix set.
+		* Creates a collection of all maximal sequences of the prefix set.
 		* No maximal sequence is a prefix of another maximal one.
-		* @param outSet
+		* @return a collection of maximal sequences
 		*/
-		void getMaximalSequences(sequence_set_t & outSet);
+		sequence_set_t getMaximalSequences();
 
 		/**
-		* Erases and returns the first maximal sequence of prefix set.
-		* @param outSeq - returned maximal sequence
+		* Erases and returns the first maximal sequence of the prefix set.
+		* @return a maximal sequence, or an empty sequence if the set is empty
 		*/
-		void popMaximalSequence(sequence_in_t & outSeq);
+		sequence_in_t popMaximalSequence();
 
 		/**
-		* Erases and returns a suffix of maximal sequence of prefix set
+		* Erases and returns a suffix of maximal sequence of the prefix set
 		* with given prefix, if such sequence exists.
 		* @param start of searched prefix
 		* @param end of searched prefix
-		* @param outSeq - returned maximal sequence WITHOUT given prefix
-		* @return true if maximal sequence is returned, 
-		*	false if there is no maximal sequence with given prefix
+		* @return maximal sequence WITHOUT given prefix, or an empty sequence if there is no such maximal sequence
 		*/
-		bool popMaximalSequenceWithGivenPrefix(sequence_in_t::iterator start,
-			sequence_in_t::iterator end, sequence_in_t & outSeq);
+		sequence_in_t popMaximalSequenceWithGivenPrefix(sequence_in_t::iterator start, sequence_in_t::iterator end);
 		
 		/*
 		* Clears prefix set.

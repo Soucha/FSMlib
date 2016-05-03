@@ -57,19 +57,18 @@ namespace FSMlibTest
 			sequence_in_t tc(c, c + sizeof(c) / sizeof(input_t));
 			sequence_in_t td(d, d + sizeof(d) / sizeof(input_t));
 
-			sequence_set_t out;
 			bool ret;
 			int count;
 
 			ret = pset.insert(ta);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(ta).c_str());
-			pset.getMaximalSequences(out);
+			auto out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
 			ret = pset.insert(tb);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(tb).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
@@ -83,13 +82,13 @@ namespace FSMlibTest
 			
 			ret = pset.insert(tc);
 			ARE_EQUAL(false, ret, "%s was inserted even though PS contains it", FSMmodel::getInSequenceAsString(tc).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
 			ret = pset.insert(td);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(td).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(2, count, "%d maximal sequences were obtained instead of 2", count);
@@ -107,54 +106,52 @@ namespace FSMlibTest
 			sequence_in_t tc(c, c + sizeof(c) / sizeof(input_t));
 			sequence_in_t td(d, d + sizeof(d) / sizeof(input_t));
 
-			sequence_set_t out;
-			sequence_in_t seqOut;
 			bool ret;
 			int count;
 
 			ret = pset.insert(ta);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(ta).c_str());
-			pset.getMaximalSequences(out);
+			auto out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
 			ret = pset.insert(tb);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(tb).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(2, count, "%d maximal sequences were obtained instead of 2", count);
 			ret = pset.insert(tc);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(tc).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(3, count, "%d maximal sequences were obtained instead of 3", count);
 
 			ARE_EQUAL(false, pset.empty(), "PS is not empty");
-			ret = pset.popMaximalSequenceWithGivenPrefix(td.begin(), td.end(), seqOut);
-			ARE_EQUAL(false, ret, "Maximal sequence %s found with given prefix %s.",
+			auto seqOut = pset.popMaximalSequenceWithGivenPrefix(td.begin(), td.end());
+			ARE_EQUAL(true, seqOut.empty(), "Maximal sequence %s found with given prefix %s.",
 				FSMmodel::getInSequenceAsString(seqOut).c_str(), FSMmodel::getInSequenceAsString(td).c_str());
 			ARE_EQUAL(true, seqOut.empty(), "Returned sequence %s is not empty",
 				FSMmodel::getInSequenceAsString(seqOut).c_str());
 			
 			td.pop_back();
-			ret = pset.popMaximalSequenceWithGivenPrefix(td.begin(), td.end(), seqOut);
-			ARE_EQUAL(true, ret, "No maximal sequence with prefix %s was found", FSMmodel::getInSequenceAsString(td).c_str());
+			seqOut = pset.popMaximalSequenceWithGivenPrefix(td.begin(), td.end());
+			ARE_EQUAL(false, seqOut.empty(), "No maximal sequence with prefix %s was found", FSMmodel::getInSequenceAsString(td).c_str());
 			// tb = td.td (0,1, 0,1) => seqOut = (0,1) = td
 			ARE_EQUAL(true, td == seqOut, "Returned sequence %s differs from %s",
 				FSMmodel::getInSequenceAsString(seqOut).c_str(), FSMmodel::getInSequenceAsString(td).c_str());
 
-			pset.popMaximalSequence(seqOut);
+			seqOut = pset.popMaximalSequence();
 			if (seqOut == ta) {
-				pset.popMaximalSequence(seqOut);
+				seqOut = pset.popMaximalSequence();
 				ARE_EQUAL(true, tc == seqOut, "Returned sequence %s differs from %s",
 					FSMmodel::getInSequenceAsString(seqOut).c_str(), FSMmodel::getInSequenceAsString(tc).c_str());
 			}
 			else {
 				ARE_EQUAL(true, tc == seqOut, "Returned sequence %s differs from %s",
 					FSMmodel::getInSequenceAsString(seqOut).c_str(), FSMmodel::getInSequenceAsString(tc).c_str());
-				pset.popMaximalSequence(seqOut);
+				seqOut = pset.popMaximalSequence();
 				ARE_EQUAL(true, ta == seqOut, "Returned sequence %s differs from %s",
 					FSMmodel::getInSequenceAsString(seqOut).c_str(), FSMmodel::getInSequenceAsString(ta).c_str());
 			}
@@ -162,14 +159,14 @@ namespace FSMlibTest
 			
 			ret = pset.insert(td);
 			ARE_EQUAL(true, ret, "%s was not inserted", FSMmodel::getInSequenceAsString(td).c_str());
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
 			pset.clear();
 			ret = pset.empty();
 			ARE_EQUAL(true, pset.empty(), "PS is empty");
-			pset.getMaximalSequences(out);
+			out = pset.getMaximalSequences();
 			count = int(out.size());
 			ARE_EQUAL(0, count, "%d maximal sequences were obtained instead of 0", count);
 		}

@@ -23,9 +23,8 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		sequence_set_t TS;
 		if (extraStates < 0) {
-			return TS;
+			return sequence_set_t();
 		}
 		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
@@ -34,7 +33,7 @@ namespace FSMtesting {
 		bool startWithStout = false;
 
 		if (fsm->isOutputState()) {
-			for (auto seq : H[0]) {
+			for (const auto& seq : H[0]) {
 				if (seq.front() == STOUT_INPUT) {
 					startWithStout = true;
 					break;
@@ -42,8 +41,8 @@ namespace FSMtesting {
 			}
 			for (state_t i = 0; i < H.size(); i++) {
 				sequence_set_t tmp;
-				for (auto origDS : H[i]) {
-					sequence_in_t seq = origDS;
+				for (const auto& origDS : H[i]) {
+					sequence_in_t seq(origDS);
 					auto DSit = seq.begin();
 					for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
 						if (*it == STOUT_INPUT) continue;
@@ -58,31 +57,31 @@ namespace FSMtesting {
 						if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
 					}
 					else if (seq.front() == STOUT_INPUT) seq.pop_front();
-					tmp.insert(seq);
+					tmp.emplace(move(seq));
 				}
-				H[i] = tmp;
+				H[i].swap(tmp);
 			}
 		}
 
 		FSMlib::PrefixSet pset;
-		for (sequence_in_t trSeq : transitionCover) {
+		for (const auto& trSeq : transitionCover) {
 			state_t state = fsm->getEndPathState(0, trSeq);
 			if (state == WRONG_STATE) continue;
 			state = getIdx(states, state);
-			for (sequence_in_t cSeq : H[state]) {
+			for (const auto& cSeq : H[state]) {
 				sequence_in_t testSeq(trSeq);
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 				}
 				testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-				pset.insert(testSeq);
+				pset.insert(move(testSeq));
 			}
-			for (sequence_in_t extSeq : traversalSet) {
+			for (const auto& extSeq : traversalSet) {
 				state_t endState = fsm->getEndPathState(state, extSeq);
 				if (endState == WRONG_STATE) continue;
 				endState = getIdx(states, endState);
-				for (sequence_in_t cSeq : H[endState]) {
+				for (const auto& cSeq : H[endState]) {
 					sequence_in_t testSeq(trSeq);
 					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
 					if (startWithStout) {
@@ -90,11 +89,10 @@ namespace FSMtesting {
 						testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 					}
 					testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-					pset.insert(testSeq);
+					pset.insert(move(testSeq));
 				}
 			}
 		}
-		pset.getMaximalSequences(TS);
-		return TS;
+		return pset.getMaximalSequences();
 	}
 }

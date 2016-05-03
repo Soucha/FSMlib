@@ -29,24 +29,19 @@ namespace FSMtesting {
 
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		sequence_in_t emptySeq;
-		traversalSet.insert(emptySeq);
+		traversalSet.emplace(sequence_in_t());
 		auto VSet = getVerifyingSet(fsm);
 		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
 		
-		state_t counter = 0;
 		for (int i = 0; i < SCSets.size(); i++) {
-			if (VSet[i].empty()) {
-				counter++;
-			}
-			else {
+			if (!VSet[i].empty()) {
 				SCSets[i].clear();
-				SCSets[i].insert(VSet[i]);
+				SCSets[i].emplace(move(VSet[i]));
 			}
 		}
 
 		if (fsm->isOutputState()) {
-			for (auto seq : SCSets[0]) {
+			for (const auto& seq : SCSets[0]) {
 				if (seq.front() == STOUT_INPUT) {
 					startWithStout = true;
 					break;
@@ -54,8 +49,8 @@ namespace FSMtesting {
 			}
 			for (state_t i = 0; i < SCSets.size(); i++) {
 				sequence_set_t tmp;
-				for (auto origDS : SCSets[i]) {
-					sequence_in_t seq = origDS;
+				for (const auto& origDS : SCSets[i]) {
+					sequence_in_t seq(origDS);
 					auto DSit = seq.begin();
 					for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
 						if (*it == STOUT_INPUT) continue;
@@ -70,16 +65,16 @@ namespace FSMtesting {
 						if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
 					}
 					else if (seq.front() == STOUT_INPUT) seq.pop_front();
-					tmp.insert(seq);
+					tmp.emplace(move(seq));
 				}
-				SCSets[i] = tmp;
+				SCSets[i].swap(tmp);
 			}
 			extraStates *= 2; // STOUT_INPUT follows each input in traversalSet
 		}
 
 		FSMlib::PrefixSet pset;
-		for (sequence_in_t trSeq : stateCover) {
-			for (sequence_in_t extSeq : traversalSet) {
+		for (const auto& trSeq : stateCover) {
+			for (const auto& extSeq : traversalSet) {
 				sequence_in_t transferSeq(trSeq);
 				transferSeq.insert(transferSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, transferSeq);
@@ -93,7 +88,7 @@ namespace FSMtesting {
 							testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
 						}
 						testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-						pset.insert(testSeq);
+						pset.insert(move(testSeq));
 					}
 				}
 				if (extSeq.size() == extraStates) {// check outcoming transitions
@@ -104,7 +99,7 @@ namespace FSMtesting {
 						state_t nextState = fsm->getNextState(state, input);
 						if (nextState == NULL_STATE) continue;
 						nextState = getIdx(states, nextState);
-						for (sequence_in_t cSeq : SCSets[nextState]) {
+						for (const auto& cSeq : SCSets[nextState]) {
 							sequence_in_t testSeq(transferSeq);
 							testSeq.push_back(input);
 							if (startWithStout) {
@@ -114,14 +109,12 @@ namespace FSMtesting {
 								testSeq.push_back(STOUT_INPUT);
 							}
 							testSeq.insert(testSeq.end(), cSeq.begin(), cSeq.end());
-							pset.insert(testSeq);
+							pset.insert(move(testSeq));
 						}
 					}
 				}
 			}
 		}
-		sequence_set_t TS;
-		pset.getMaximalSequences(TS);
-		return TS;
+		return pset.getMaximalSequences();
 	}
 }

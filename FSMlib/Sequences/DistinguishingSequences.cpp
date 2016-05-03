@@ -619,7 +619,7 @@ namespace FSMsequence {
 			for (state_t i = 0; i < seq.size(); i++) {
 				pset.insert(seq[i]);
 			}
-			pset.getMaximalSequences(outCSet);
+			outCSet = pset.getMaximalSequences();
 		}
 		else {
 			for (state_t i = 0; i < seq.size(); i++) {
