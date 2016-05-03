@@ -69,9 +69,9 @@ namespace FSMlibTest
 
 		void testADSmethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
-			sequence_set_t TS;
 			for (int extraStates = 0; extraStates < 3; extraStates++) {
-				if (ADS_method(fsm, TS, extraStates)) {
+				auto TS = ADS_method(fsm, extraStates);
+				if (!TS.empty()) {
 					printTS(TS, filename);
 					ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
 					ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");

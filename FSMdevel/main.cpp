@@ -108,7 +108,6 @@ void testSepSeqs() {
 static void testAllMethod(string filename) {
 	sequence_vec_t hint;
 	sequence_in_t CS;
-	sequence_set_t TS;
 	int len;
 	int extraStates = 0;
 	
@@ -116,13 +115,11 @@ static void testAllMethod(string filename) {
 	printf("%d;%d;%d;%d;%d;1;%d;", fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(),
 		fsm->getType(), (int)fsm->isReduced(), extraStates);
 
-	SPY_method(fsm, TS, extraStates);
+	auto TS = SPY_method(fsm, extraStates);
 	len = 0;
 	for (sequence_in_t seq : TS) len += seq.size() + 1;
 	auto indist = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 	printf("%d;%d;", len, indist.size());
-	//for (auto f : indist) delete f;
-	indist.clear();
 }
 
 static void testAll() {

@@ -73,9 +73,8 @@ namespace FSMlibTest
 
 		void testWpmethod(string filename) {
 			fsm->load(filename);
-			sequence_set_t TS;
 			for (int extraStates = 0; extraStates < 3; extraStates++) {
-				Wp_method(fsm, TS, extraStates);
+				auto TS = Wp_method(fsm, extraStates);
 				printTS(TS, filename);
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
 				auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);

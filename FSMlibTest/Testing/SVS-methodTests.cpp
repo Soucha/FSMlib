@@ -73,10 +73,10 @@ namespace FSMlibTest
 
 		void testSVSmethod(string filename, state_t statesWithoutSVS = 0) {
 			fsm->load(filename);
-			sequence_set_t TS;
 			for (int extraStates = 0; extraStates < 3; extraStates++) {
-				ARE_EQUAL(statesWithoutSVS, SVS_method(fsm, TS, extraStates), "The number of states without SVS differ.");
+				auto TS = SVS_method(fsm, extraStates);
 				printTS(TS, filename);
+				DEBUG_MSG("The number of states without SVS: %d\n", statesWithoutSVS);
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
 				auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 				ARE_EQUAL(1, int(indistinguishable.size()), "The SVS-method (%d extra states) has not complete fault coverage,"

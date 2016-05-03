@@ -143,38 +143,36 @@ namespace FSMlibTest
 				return;
 			}
 
-			sequence_in_t CS_M, CS_C;
-			int len_M, len_C;
-			bool hasADS;
+			
+			auto CS_C = C_method(fsm, extraStates);
+			auto CS_M = Ma_method(fsm, extraStates);
 
-			hasADS = C_method(fsm, CS_C, extraStates);
-			hasADS = Ma_method(fsm, CS_M, extraStates);
+			bool hasADS = !CS_C.empty();
 
 			DEBUG_MSG("Comparison of testing CS methods on %s with %d extra states:\n", filename.c_str(), extraStates);
 			DEBUG_MSG("ADS: %d\n", int(hasADS));
 			DEBUG_MSG("Method\tlength\t#indistFSM\n");
-			len_C = printInfo(CS_C, "C", extraStates);
-			len_M = printInfo(CS_M, "M", extraStates);
+			auto len_C = printInfo(CS_C, "C", extraStates);
+			auto len_M = printInfo(CS_M, "M", extraStates);
 		}
 
 		void testingTSmethodComp(string filename, int extraStates = 0) {
 			if (!filename.empty()) fsm->load(filename);
 
-			sequence_set_t TS_W, TS_Wp, TS_HSI, TS_PDS, TS_SVS, TS_H, TS_SPY, TS_ADS;
 			seq_len_t len_W, len_Wp, len_HSI, len_PDS, len_SVS, len_H, len_SPY, len_ADS;
 
-			W_method(fsm, TS_W, extraStates);
-			Wp_method(fsm, TS_Wp, extraStates);
-			HSI_method(fsm, TS_HSI, extraStates);
-			H_method(fsm, TS_H, extraStates);
-			SPY_method(fsm, TS_SPY, extraStates);
-			//Testing::GSPY_method(fsm, TS_GSPY, extraStates);
-			bool hasPDS = PDS_method(fsm, TS_PDS, extraStates);
-			bool hasADS = ADS_method(fsm, TS_ADS, extraStates);
-			int statesWithoutSVS = SVS_method(fsm, TS_SVS, extraStates);
-
+			auto TS_W = W_method(fsm, extraStates);
+			auto TS_Wp = Wp_method(fsm, extraStates);
+			auto TS_HSI = HSI_method(fsm, extraStates);
+			auto TS_H = H_method(fsm, extraStates);
+			auto TS_SPY = SPY_method(fsm, extraStates);
+			auto TS_PDS = PDS_method(fsm, extraStates);
+			auto TS_ADS = ADS_method(fsm, extraStates);
+			auto TS_SVS = SVS_method(fsm, extraStates);
+			bool hasPDS = !TS_PDS.empty();
+			bool hasADS = !TS_ADS.empty();
 			DEBUG_MSG("Comparison of testing methods on %s with %d extra states:\n", filename.c_str(), extraStates);
-			DEBUG_MSG("PDS: %d, ADS: %d, States without SVS: %d\n", int(hasPDS), int(hasADS), statesWithoutSVS);
+			DEBUG_MSG("PDS: %d, ADS: %d\n", int(hasPDS), int(hasADS));
 			DEBUG_MSG("Method\t#seqs\tlength\t#indistFSM\n");
 			len_PDS = printInfo(TS_PDS, "PDS", extraStates);
 			len_ADS = printInfo(TS_ADS, "ADS", extraStates);
@@ -184,8 +182,7 @@ namespace FSMlibTest
 			len_HSI = printInfo(TS_HSI, "HSI", extraStates);
 			len_H = printInfo(TS_H, "H", extraStates);
 			len_SPY = printInfo(TS_SPY, "SPY", extraStates);
-			//len_GSPY = printInfo(TS_GSPY, "GSPY", extraStates);
-
+			
 			/*
 			comp2methods(len_Wp, len_W, "Wp", "W", "lengths");
 			comp2methods(len_HSI, len_W, "HSI", "W", "lengths");

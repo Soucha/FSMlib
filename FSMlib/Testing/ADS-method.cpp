@@ -22,11 +22,11 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	bool ADS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
-		TS.clear();
+	sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		sequence_set_t TS;
 		auto ADSet = getAdaptiveDistinguishingSet(fsm);
 		if ((extraStates < 0) || ADSet.empty()) {
-			return false;
+			return TS;
 		}
 		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
@@ -77,6 +77,6 @@ namespace FSMtesting {
 			}
 		}
 		pset.getMaximalSequences(TS);
-		return true;
+		return TS;
 	}
 }

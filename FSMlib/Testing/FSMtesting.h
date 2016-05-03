@@ -32,12 +32,11 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return true if a test suite is designed, false if there is no PDS or negative extraStates
+	* @return a Test Suite, or an empty collection if there is no PDS or negative extraStates
 	*/
-	FSMLIB_API bool PDS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t PDS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -50,12 +49,11 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return true if a test suite is designed, false if there is no ADS or negative extraStates
+	* @return a Test Suite, or an empty collection if there is no ADS or negative extraStates
 	*/
-	FSMLIB_API bool ADS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states are confirmed
@@ -72,12 +70,11 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return the number of states without SVS, or NULL_STATE if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API state_t SVS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -95,12 +92,11 @@ namespace FSMtesting {
 	* Software Engineering, IEEE Transactions on, IEEE, 1978, 178-187
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences, 
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API void W_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -115,12 +111,11 @@ namespace FSMtesting {
 	* Software Engineering, IEEE Transactions on, IEEE, 1991, 17, 591-603
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API void Wp_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -133,12 +128,11 @@ namespace FSMtesting {
 	* Proceedings of the IFIP TC6/WG6. 1 Fourth International Workshop on Protocol Test Systems IV, 1991, 83-94
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API void HSI_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all state pairs are distinguished and thus confirmed
@@ -152,12 +146,11 @@ namespace FSMtesting {
 	* Formal Techniques for Networked and Distributed Systems-FORTE 2005, Springer, 2005, 204-218
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API void H_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t H_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -170,12 +163,11 @@ namespace FSMtesting {
 	* Software Testing, Verification and Reliability, Wiley Online Library, 2012, 22, 435-454
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	FSMLIB_API void SPY_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/// TODO
 	/**
@@ -187,12 +179,11 @@ namespace FSMtesting {
 	* Proceedings of the IFIP TC6/WG6. 1 Twelth International Symposium on Protocol Specification, Testing and Verification XII, 1992, 229-243
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	//FSMLIB_API void FF_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API sequence_set_t FF_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -203,12 +194,11 @@ namespace FSMtesting {
 	* Computers, IEEE Transactions on, IEEE, 2005, 54, 1154-1165
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative
 	*/
-	//FSMLIB_API void SC_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API sequence_set_t SC_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -219,15 +209,14 @@ namespace FSMtesting {
 	* The Computer Journal, Br Computer Soc, 2009, bxp073 
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many states shall be considered relatively to the number of states,
+	* @return a Test Suite
 	*/
-	//FSMLIB_API void P_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	//FSMLIB_API sequence_set_t P_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/// Attempts
-	//FSMLIB_API void GSPY_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
-	//FSMLIB_API void SPYH_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);// is it correct?
+	//FSMLIB_API sequence_set_t GSPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);// is it correct?
+	//FSMLIB_API sequence_set_t SPYH_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);// is it correct?
 	
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -242,35 +231,11 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative
 	*/
-	FSMLIB_API bool Mra_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
-	
-	/**
-	* Designs a checking sequence using an adaptive distinguishing sequence
-	* such that each transition and state is verified by ADS in resulting CS.
-	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
-	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
-	* using GUROBI solver. A test segment corresponds to a node in TSP and
-	* a cost of edge is possible overlapping of two related test segments.
-	* If two consecutive segments do not overlap, reset can be used if a shorter CS is produced.
-	*
-	* Source:
-	* MastersThesis (soucha2015checking)
-	* Soucha, M.
-	* Checking Experiment Design Methods
-	* Czech Technical Univerzity in Prague, 2015
-	*
-	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
-	* @param extraStates - how many extra states shall be considered,
-	*		 default is no extra state, needs to be positive or 0
-	*/
-	FSMLIB_API bool Mrstar_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t Mra_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -290,13 +255,34 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param TS - Test Suite to fill up with test sequences,
-	*		 TS will be empty if extraStates is negative
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative
 	*/
-	FSMLIB_API bool Mrg_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates = 0);
+	FSMLIB_API sequence_set_t Mrg_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
+	/**
+	* Designs a checking sequence using an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
+	* using GUROBI solver. A test segment corresponds to a node in TSP and
+	* a cost of edge is possible overlapping of two related test segments.
+	* If two consecutive segments do not overlap, reset can be used if a shorter CS is produced.
+	*
+	* Source:
+	* MastersThesis (soucha2015checking)
+	* Soucha, M.
+	* Checking Experiment Design Methods
+	* Czech Technical Univerzity in Prague, 2015
+	*
+	* @param fsm - Deterministic FSM
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative or an error occured due to use of GUROBI
+	*/
+	FSMLIB_API sequence_set_t Mrstar_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	
 	//<-- Checking sequence methods -->//
 
 	/// TODO
@@ -309,12 +295,11 @@ namespace FSMtesting {
 	* Computers, IEEE Transactions on, IEEE, 1971, 100, 1152-1166
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e.there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	//FSMLIB_API bool HrADS_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t HrADS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -327,12 +312,11 @@ namespace FSMtesting {
 	* Further sources: gonenc1970method, ural1997minimizing, hierons2006optimizing,... (see soucha2015checking)
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a PDS
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e.there is an PDS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no PDS
 	*/
-	//FSMLIB_API bool D_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t D_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -350,12 +334,11 @@ namespace FSMtesting {
 	* Software Engineering and Formal Methods, 2009 Seventh IEEE International Conference on, 2009, 157-166
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e.there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	//FSMLIB_API bool AD_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t AD_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -366,11 +349,11 @@ namespace FSMtesting {
 	* Switching Circuit Theory and Logical Design, 1964 Proceedings of the Fifth Annual Symposium on, 1964, 95-110
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
+	* @return a Checking Sequence
 	*/
-	//FSMLIB_API void DW_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t DW_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -381,11 +364,11 @@ namespace FSMtesting {
 	* Formal Methods and Software Engineering, Springer, 2013, 115-130
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
+	* @return a Checking Sequence
 	*/
-	//FSMLIB_API void DWp_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t DWp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -403,12 +386,11 @@ namespace FSMtesting {
 	* and many others... see soucha2015checking
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return 
+	* @return a Checking Sequence, or an empty sequence if there is a state without SVS
 	*/
-	//FSMLIB_API int UIO_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t UIO_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -419,12 +401,11 @@ namespace FSMtesting {
 	* Global Telecommunications Conference, 1990, and Exhibition. 'Communications: Connecting the Future', GLOBECOM'90., IEEE, 1990, 1880-1884 
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no PDS (? TODO ?)
 	*/
-	//FSMLIB_API bool CSP_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t CSP_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -442,12 +423,11 @@ namespace FSMtesting {
 	* Software Testing, Verification and Validation Workshops, 2009. ICSTW'09. International Conference on, 2009, 48-56
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	FSMLIB_API bool C_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API sequence_in_t C_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	*
@@ -459,15 +439,14 @@ namespace FSMtesting {
 	* Jožef Stefan Institute Technical Report, 2010, 10574
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	//FSMLIB_API bool K_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	//FSMLIB_API sequence_in_t K_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
 	// Attempts
-	//FSMLIB_API void MHSI_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);// is it correct?
+	//FSMLIB_API sequence_in_t MHSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);// is it correct?
 
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
@@ -480,34 +459,11 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	FSMLIB_API bool Ma_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
-	
-	/**
-	* Designs a checking sequence using an adaptive distinguishing sequence
-	* such that each transition and state is verified by ADS in resulting CS.
-	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
-	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
-	* using GUROBI solver. A test segment corresponds to a node in TSP and
-	* a cost of edge is possible overlapping of two related test segments.
-	*
-	* Source:
-	* MastersThesis (soucha2015checking)
-	* Soucha, M.
-	* Checking Experiment Design Methods
-	* Czech Technical Univerzity in Prague, 2015
-	*
-	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
-	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
-	*		 default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
-	*/
-	FSMLIB_API bool Mstar_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API sequence_in_t Ma_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence using an adaptive distinguishing sequence
@@ -524,10 +480,30 @@ namespace FSMtesting {
 	* Czech Technical Univerzity in Prague, 2015
 	*
 	* @param fsm - Deterministic FSM
-	* @param CS - Checking Sequence if given DFSM has a ADS
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return true if a checking sequence is designed, i.e. there is an ADS, otherwise false
+	* @return a Checking Sequence, or an empty sequence if there is no ADS
 	*/
-	FSMLIB_API bool Mg_method(const unique_ptr<DFSM>& fsm, sequence_in_t & CS, int extraStates = 0);
+	FSMLIB_API sequence_in_t Mg_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	
+	/**
+	* Designs a checking sequence using an adaptive distinguishing sequence
+	* such that each transition and state is verified by ADS in resulting CS.
+	* A Test Segment, i.e. a transition followed by ADS, is created for each transition.
+	* Order of test segments in resulting CS is obtained by solving Travelling Salesman Problem (TSP)
+	* using GUROBI solver. A test segment corresponds to a node in TSP and
+	* a cost of edge is possible overlapping of two related test segments.
+	*
+	* Source:
+	* MastersThesis (soucha2015checking)
+	* Soucha, M.
+	* Checking Experiment Design Methods
+	* Czech Technical Univerzity in Prague, 2015
+	*
+	* @param fsm - Deterministic FSM
+	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0)
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or an error occured due to use of GUROBI
+	*/
+	FSMLIB_API sequence_in_t Mstar_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 }

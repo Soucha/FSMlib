@@ -22,9 +22,8 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	state_t SVS_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
-		TS.clear();
-		if (extraStates < 0) return NULL_STATE;
+	sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		if (extraStates < 0) return sequence_set_t();
 		auto states = fsm->getStates();
 		bool startWithStout = false;
 
@@ -121,7 +120,8 @@ namespace FSMtesting {
 				}
 			}
 		}
+		sequence_set_t TS;
 		pset.getMaximalSequences(TS);
-		return counter;
+		return TS;
 	}
 }

@@ -22,10 +22,9 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	void Wp_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
-		TS.clear();
+	sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates) {
 		if (extraStates < 0) {
-			return;
+			return sequence_set_t();
 		}
 		auto states = fsm->getStates();
 		sequence_set_t CSet;
@@ -120,6 +119,8 @@ namespace FSMtesting {
 				}
 			}
 		}
+		sequence_set_t TS;
 		pset.getMaximalSequences(TS);
+		return TS;
 	}
 }

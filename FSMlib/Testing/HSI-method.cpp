@@ -22,10 +22,10 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	void HSI_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
-		TS.clear();
+	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		sequence_set_t TS;
 		if (extraStates < 0) {
-			return;
+			return TS;
 		}
 		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
@@ -95,5 +95,6 @@ namespace FSMtesting {
 			}
 		}
 		pset.getMaximalSequences(TS);
+		return TS;
 	}
 }

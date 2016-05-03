@@ -126,18 +126,18 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool process_Mstar(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
-		TS.clear();
+	static sequence_set_t process_Mstar(const unique_ptr<DFSM>& fsm, int extraStates, bool resetEnabled) {
+		sequence_set_t TS;
 		char* gurobiPath;
 		gurobiPath = getenv("GUROBI_HOME");
 		if (gurobiPath == NULL) {
 			ERROR_MESSAGE("Mstar-method needs Gurobi solver to run and GUROBI_HOME is not a system variable!");
-			return false;
+			return TS;
 		}
 		
 		auto d = getAdaptiveDistinguishingSet(fsm);
 		if (d.empty()) {
-			return false;
+			return TS;
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
@@ -285,13 +285,13 @@ namespace FSMtesting {
 		string fileName = fsm->getFilename();
 		fileName = FSMlib::Utils::getUniqueName(fileName, "lp", string(LP_FOLDER)+"/");
 
-		if (!writeLP(costs, fileName)) return false;
+		if (!writeLP(costs, fileName)) return TS;
 		string gurobiCl = string(gurobiPath) + GUROBI_SOLVER;
 		string resultFile = "ResultFile=" + fileName + ".sol";
 		auto rv = _spawnl(P_WAIT, gurobiCl.c_str(), gurobiCl.c_str(), resultFile.c_str(), fileName.c_str(), NULL);
 		if (rv != 0) {
 			ERROR_MESSAGE("Mstar-method: Fail in solving LP.\n");
-			return false;
+			return TS;
 		}
 
 		// obtain solution of LP
@@ -300,7 +300,7 @@ namespace FSMtesting {
 		ifstream fin(fileName);
 		if (!fin.is_open()) {
 			ERROR_MESSAGE("Mstar-method - unable to open file %s", fileName.c_str());
-			return false;
+			return TS;
 		}
 		string s;
 		int pos;
@@ -345,19 +345,16 @@ namespace FSMtesting {
 		}
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
 		TS.insert(CS);
-		return true;
+		return TS;
 	}
 
-	bool Mstar_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
-		sequence_set_t TS;
-		CS.clear();
-		if (!process_Mstar(fsm, TS, extraStates, false)) return false;
-		CS.insert(CS.end(), TS.begin()->begin(), TS.begin()->end());
-		return true;
+	sequence_in_t Mstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		auto TS = process_Mstar(fsm, extraStates, false);
+		if (TS.empty()) return sequence_in_t();
+		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
-	bool Mrstar_method(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates) {
-		return process_Mstar(fsm, TS, extraStates, true);
+	sequence_set_t Mrstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		return process_Mstar(fsm, extraStates, true);
 	}
-
 }

@@ -69,10 +69,10 @@ namespace FSMlibTest
 
 		void testMamethod(string filename, bool hasDS = true) {
 			fsm->load(filename);
-			sequence_set_t TS;
-			sequence_in_t CS;
 			int extraStates = 0;
-			if (Ma_method(fsm, CS, extraStates)) {
+			auto CS = Ma_method(fsm, extraStates);
+			if (!CS.empty()) {
+				sequence_set_t TS;
 				TS.insert(CS);
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
@@ -83,15 +83,10 @@ namespace FSMlibTest
 			}
 			else {
 				ARE_EQUAL(false, hasDS, "FSM has adaptive DS so a TS can be created but it was not obtained.");
-				if (!TS.empty()) printTS(TS, filename);
-				else {
-					DEBUG_MSG("Ma-method on %s: no ADS, no TS\n", filename.c_str());
-				}
-				ARE_EQUAL(true, TS.empty(), "FSM has not adaptive DS but obtained TS has %d sequences.",
-					TS.size());
+				DEBUG_MSG("Ma-method on %s: no ADS, no TS\n", filename.c_str());
 			}
-			TS.clear();
-			if (Mra_method(fsm, TS, extraStates)) {
+			auto TS = Mra_method(fsm, extraStates);
+			if (!TS.empty()) {
 				printTS(TS, filename);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but a TS was obtained.");
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");

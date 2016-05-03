@@ -49,11 +49,11 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool process_Mg(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates, bool resetEnabled) {
-		TS.clear();
+	static sequence_set_t process_Mg(const unique_ptr<DFSM>& fsm, int extraStates, bool resetEnabled) {
+		sequence_set_t TS;
 		auto d = getAdaptiveDistinguishingSet(fsm);
 		if (d.empty()) {
-			return false;
+			return TS;
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
@@ -242,19 +242,16 @@ namespace FSMtesting {
 		}
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
 		TS.insert(CS);
-		return true;
+		return TS;
 	}
 
-	bool Mg_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
-		sequence_set_t TS;
-		CS.clear();
-		if (!process_Mg(fsm, TS, extraStates, false)) return false;
-		CS.insert(CS.end(), TS.begin()->begin(), TS.begin()->end());
-		return true;
+	sequence_in_t Mg_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		auto TS = process_Mg(fsm, extraStates, false);
+		if (TS.empty()) return sequence_in_t();
+		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
-	bool Mrg_method(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates) {
-		return process_Mg(fsm, TS, extraStates, true);
+	sequence_set_t Mrg_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		return process_Mg(fsm, extraStates, true);
 	}
-
 }

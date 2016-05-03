@@ -180,11 +180,11 @@ namespace FSMtesting {
 		return len;
 	}
 
-	bool C_method(const unique_ptr<DFSM>& fsm, sequence_in_t& CS, int extraStates) {
-		CS.clear();
+	sequence_in_t C_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		sequence_in_t CS;
 		auto E = getAdaptiveDistinguishingSet(fsm);
 		if (E.empty()) {
-			return false;
+			return CS;
 		}
 		auto states = fsm->getStates();
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs(), currState, nextState;
@@ -431,7 +431,7 @@ namespace FSMtesting {
 			delete tn;
 		}
 		cs.clear();
-		return true;
+		return CS;
 	}
 
 }

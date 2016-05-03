@@ -43,7 +43,7 @@ namespace FSMtesting {
 	static vector<pair<state_t, input_t>> uncoveredTransitions;
 	static vector<vector<bool>> coveredTransitions;
 	static vector<vector<TestNodeSPY*>> confirmedNodes;
-	static unique_ptr<DFSM> specification;
+	static DFSM* specification;
 	static vector<state_t> states;
 
 	static void cleanup() {
@@ -222,12 +222,11 @@ namespace FSMtesting {
 		}
 	}
 
-	void SPY_method(const unique_ptr<DFSM>& fsm, sequence_set_t& TS, int extraStates) {
-		TS.clear();
+	sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates) {
 		if (extraStates < 0) {
-			return;
+			return sequence_set_t();
 		}
-		//specification = fsm;
+		specification = fsm.get();
 		states = fsm->getStates();
 
 		auto H = getHarmonizedStateIdentifiers(fsm);
@@ -292,8 +291,10 @@ namespace FSMtesting {
 
 		// obtain TS
 		//printTStree(coreNodes[0]);
+		sequence_set_t TS;
 		getSequences(coreNodes[0], TS);
 
 		cleanup();
+		return TS;
 	}
 }

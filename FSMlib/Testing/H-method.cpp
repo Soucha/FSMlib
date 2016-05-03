@@ -40,7 +40,7 @@ namespace FSMtesting {
 	};
 
 	static vector<TestNodeH*> coreNodes, extNodes; // stores SC, TC-SC respectively
-	static unique_ptr<DFSM> specification;
+	static DFSM * specification;
 	static vector<LinkCell> sepSeq;
 	static vector<state_t> states;
 
@@ -276,12 +276,12 @@ namespace FSMtesting {
 		}
 	}
 
-	void H_method(const unique_ptr<DFSM>& fsm, sequence_set_t & TS, int extraStates) {
-		TS.clear();
+	sequence_set_t H_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		sequence_set_t TS;
 		if (extraStates < 0) {
-			return;
+			return TS;
 		}
-		//specification = fsm;
+		specification = fsm.get();
 		states = fsm->getStates();
 
 		sepSeq = getSeparatingSequences(fsm);
@@ -315,5 +315,6 @@ namespace FSMtesting {
 		getSequences(coreNodes[0], TS);
 
 		cleanup();
+		return TS;
 	}
 }
