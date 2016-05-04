@@ -56,7 +56,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static void printCosts(vector<vector<seq_len_t> >& costs) {
+	static void printCosts(const vector<vector<seq_len_t>>& costs) {
 		state_t Tsize = state_t(costs.size());
 		printf("\t");
 		for (state_t i = 0; i < Tsize; i++) {
@@ -72,7 +72,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static bool writeLP(vector<vector<seq_len_t> >& costs, string fileName) {
+	static bool writeLP(const vector<vector<seq_len_t>>& costs, const string& fileName) {
 		FILE * file = NULL;
 		if (!(file = fopen(fileName.c_str(), "w"))) {
 			ERROR_MESSAGE("Mstar-method: Unable to create a file for LP.");
@@ -127,17 +127,16 @@ namespace FSMtesting {
 	}
 
 	static sequence_set_t process_Mstar(const unique_ptr<DFSM>& fsm, int extraStates, bool resetEnabled) {
-		sequence_set_t TS;
 		char* gurobiPath;
 		gurobiPath = getenv("GUROBI_HOME");
 		if (gurobiPath == NULL) {
 			ERROR_MESSAGE("Mstar-method needs Gurobi solver to run and GUROBI_HOME is not a system variable!");
-			return TS;
+			return sequence_set_t();
 		}
 		
 		auto d = getAdaptiveDistinguishingSet(fsm);
 		if (d.empty()) {
-			return TS;
+			return sequence_set_t();
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
@@ -162,9 +161,9 @@ namespace FSMtesting {
 		}
 
 		seq_len_t adsLen = 0;
-		for (auto seq : d) {
-			if (adsLen < d.size()) {
-				adsLen = seq_len_t(d.size());
+		for (const auto& seq : d) {
+			if (adsLen < seq.size()) {
+				adsLen = seq_len_t(seq.size());
 			}
 		}
 
@@ -172,7 +171,7 @@ namespace FSMtesting {
 		sequence_vec_t trSeq(N);
 		if (resetEnabled) {
 			auto sc = getStateCover(fsm); 
-			for (auto seq : sc) {
+			for (const auto& seq : sc) {
 				trSeq[fsm->getEndPathState(0, seq)] = seq;
 			}
 		}
@@ -184,14 +183,13 @@ namespace FSMtesting {
 			for (input_t input = 0; input < P; input++) {
 				state_t nextState = fsm->getNextState(state, input);
 				if (nextState == NULL_STATE) {
-					sequence_in_t seq;
-					tests.push_back(seq);
+					tests.emplace_back(sequence_in_t());
 					continue;
 				}
 				sequence_in_t seq(d[nextState]);
 				if (fsm->isOutputState()) seq.push_front(STOUT_INPUT);
 				seq.push_front(input);
-				tests.push_back(seq);
+				tests.emplace_back(move(seq));
 				counter++;
 			}
 		}
@@ -222,8 +220,7 @@ namespace FSMtesting {
 					if ((costs[idx][nextIdx] == maxCost) && (nextIdx != idx) && !tests[nextIdx].empty()) {
 						if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 							costs[idx][nextIdx] = cost;
-							pq_entry_t en(idx, nextIdx, cost);
-							edges.push(en);
+							edges.emplace(pq_entry_t(idx, nextIdx, cost));
 						}
 					}
 					actState = fsm->getNextState(actState, *it);
@@ -241,23 +238,20 @@ namespace FSMtesting {
 						else {
 							costs[idx][i] = seq_len_t(tests[idx].size() + sp[actState][i / P].first);
 						}
-						pq_entry_t en(idx, i, costs[idx][i]);
-						edges.push(en);
+						edges.emplace(pq_entry_t(idx, i, costs[idx][i]));
 					}
 				}
 			}
 		}
 		idx = Tsize - 1;
-		auto it = tests[idx].begin();
 		state_t actState = 0;
 		seq_len_t cost = 0;
-		for (; it != tests[idx].end(); it++, cost++) {
+		for (auto it = tests[idx].begin(); it != tests[idx].end(); it++, cost++) {
 			state_t nextIdx = actState * P + (*it);
 			if ((costs[idx][nextIdx] == maxCost) && !tests[nextIdx].empty()) {
 				if (equalSeqPart(it, tests[idx].end(), tests[nextIdx].begin(), tests[nextIdx].end())) {
 					costs[idx][nextIdx] = cost;
-					pq_entry_t en(idx, nextIdx, cost);
-					edges.push(en);
+					edges.emplace(pq_entry_t(idx, nextIdx, cost));
 				}
 			}
 			actState = fsm->getNextState(actState, *it);
@@ -275,8 +269,7 @@ namespace FSMtesting {
 				else {
 					costs[idx][i] = seq_len_t(tests[idx].size() + sp[actState][i / P].first);
 				}
-				pq_entry_t en(idx, i, costs[idx][i]);
-				edges.push(en);
+				edges.emplace(pq_entry_t(idx, i, costs[idx][i]));
 			}
 		}
 
@@ -285,23 +278,23 @@ namespace FSMtesting {
 		string fileName = fsm->getFilename();
 		fileName = FSMlib::Utils::getUniqueName(fileName, "lp", string(LP_FOLDER)+"/");
 
-		if (!writeLP(costs, fileName)) return TS;
+		if (!writeLP(costs, fileName)) return sequence_set_t();
 		string gurobiCl = string(gurobiPath) + GUROBI_SOLVER;
 		string resultFile = "ResultFile=" + fileName + ".sol";
 		auto rv = _spawnl(P_WAIT, gurobiCl.c_str(), gurobiCl.c_str(), resultFile.c_str(), fileName.c_str(), NULL);
 		if (rv != 0) {
 			ERROR_MESSAGE("Mstar-method: Fail in solving LP.\n");
-			return TS;
+			return sequence_set_t();
 		}
 
 		// obtain solution of LP
-		vector<state_t> next(Tsize);
 		fileName += ".sol";
 		ifstream fin(fileName);
 		if (!fin.is_open()) {
 			ERROR_MESSAGE("Mstar-method - unable to open file %s", fileName.c_str());
-			return TS;
+			return sequence_set_t();
 		}
+		vector<state_t> next(Tsize);
 		string s;
 		int pos;
 		getline(fin, s);
@@ -315,6 +308,7 @@ namespace FSMtesting {
 		}
 
 		// create CS
+		sequence_set_t TS;
 		idx = Tsize - 1;
 		for (state_t i = 0; i < Tsize - 1; i++) {
 			if (costs[idx][next[idx]] >= tests[idx].size()) {
@@ -322,9 +316,7 @@ namespace FSMtesting {
 				state_t from = fsm->getEndPathState((idx == Tsize - 1) ? 0 : idx / P, tests[idx]);
 				if (from != next[idx] / P) {
 					if (resetEnabled && (trSeq[next[idx] / P].size() + 1 < sp[from][next[idx] / P].first)) {
-						sequence_in_t seq(CS);
-						TS.insert(seq);
-						CS.clear();
+						TS.emplace(move(CS));
 						CS.assign(trSeq[next[idx] / P].begin(), trSeq[next[idx] / P].end());
 					}
 					else {
@@ -344,7 +336,7 @@ namespace FSMtesting {
 			idx = next[idx];
 		}
 		CS.insert(CS.end(), tests[idx].begin(), tests[idx].end());
-		TS.insert(CS);
+		TS.emplace(move(CS));
 		return TS;
 	}
 

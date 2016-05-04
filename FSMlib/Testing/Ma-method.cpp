@@ -33,12 +33,11 @@ namespace FSMtesting {
 	}
 
 	static sequence_set_t process_Ma(const unique_ptr<DFSM>& fsm, int extraStates, bool resetEnabled) {
-		sequence_set_t TS;
 		auto E = getAdaptiveDistinguishingSet(fsm);
 		if (E.empty()) {
-			return TS;
+			return sequence_set_t();
 		}
-		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs(), currState, nextState;
+		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
 		sequence_set_t stateCover;
 		if (resetEnabled) {
@@ -62,13 +61,11 @@ namespace FSMtesting {
 		//*/
 		auto states = fsm->getStates();
 		int counter = N * fsm->getNumberOfInputs();
-		vector < vector<bool>> verifiedTransition(N);
+		vector<vector<bool>> verifiedTransition(N);
 		vector<input_t> verifiedState(N, P);
 		for (state_t i = 0; i < N; i++) {
-			verifiedTransition[i].assign(P, false);
+			verifiedTransition[i].resize(P, false);
 		}
-		sequence_in_t::iterator currInput, nextInput;
-		input_t input;
 		
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < E.size(); i++) {
@@ -88,21 +85,21 @@ namespace FSMtesting {
 			CS.push_back(STOUT_INPUT);// the first symbol
 		}
 		CS.insert(CS.end(), E[0].begin(), E[0].end());
-
-		currState = 0;
-		currInput = CS.begin();
+		sequence_set_t TS;
+		state_t currState = 0;
+		auto currInput = CS.begin();
 		if (fsm->isOutputState()) currInput++;
 
 		while (counter > 0) {
 			//printf("%u %p %p %s\n", currState, currInput, CS.end(), FSMmodel::getInSequenceAsString(CS).c_str());
 			if (currInput != CS.end()) {
-				input = *currInput;
+				input_t input = *currInput;
 				currInput++;
 				if (fsm->isOutputState()) currInput++;
-				nextState = fsm->getNextState(states[currState], input);
+				auto nextState = fsm->getNextState(states[currState], input);
 				nextState = getIdx(states, nextState);
 				if (!verifiedTransition[currState][input]) {
-					nextInput = E[nextState].begin();
+					auto nextInput = E[nextState].begin();
 					if (equalSeqPart(currInput, CS.end(), nextInput, E[nextState].end())) {
 						if (nextInput != E[nextState].end()) {
 							if (currInput == CS.end()) {
@@ -122,9 +119,9 @@ namespace FSMtesting {
 				currState = nextState;
 			}
 			else if (verifiedState[currState] > 0) {
-				for (input = 0; input < P; input++) {
+				for (input_t input = 0; input < P; input++) {
 					if (!verifiedTransition[currState][input]) {
-						nextState = fsm->getNextState(states[currState], input);
+						auto nextState = fsm->getNextState(states[currState], input);
 						nextState = getIdx(states, nextState);
 						if (currInput == CS.begin()){
 							CS.push_back(input);
@@ -150,20 +147,18 @@ namespace FSMtesting {
 			else {// find unverified transition
 				vector<bool> covered(N, false);
 				list< pair<state_t, sequence_in_t> > fifo;
-				sequence_in_t s;
-
 				covered[currState] = true;
-				fifo.push_back(make_pair(currState, s));
+				fifo.emplace_back(currState, sequence_in_t());
 				while (!fifo.empty()) {
-					auto current = fifo.front();
+					auto current = move(fifo.front());
 					fifo.pop_front();
-					for (input = 0; input < fsm->getNumberOfInputs(); input++) {
-						nextState = fsm->getNextState(states[current.first], input);
+					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
+						auto nextState = fsm->getNextState(states[current.first], input);
 						if (nextState == WRONG_STATE) continue;
 						nextState = getIdx(states, nextState);
 						if (verifiedState[nextState] > 0) {
 							if (resetEnabled) {
-								for (auto trSeq : stateCover) {
+								for (const auto& trSeq : stateCover) {
 									if (trSeq.size() >= current.second.size()) {
 										CS.insert(CS.end(), current.second.begin(), current.second.end());
 										CS.push_back(input);
@@ -174,9 +169,7 @@ namespace FSMtesting {
 									currState = getIdx(states, currState);
 									if (verifiedState[currState] > 0) {
 										nextState = currState;
-										sequence_in_t seq(CS);
-										TS.insert(seq);
-										CS.clear();
+										TS.emplace(move(CS));
 										CS.assign(trSeq.begin(), trSeq.end());
 										break;
 									}
@@ -197,14 +190,14 @@ namespace FSMtesting {
 							sequence_in_t newPath(current.second);
 							newPath.push_back(input);
 							if (fsm->isOutputState()) newPath.push_back(STOUT_INPUT);
-							fifo.push_back(make_pair(nextState, newPath));
+							fifo.emplace_back(nextState, move(newPath));
 						}
 					}
 				}
 
 			}
 		}
-		TS.insert(CS);
+		TS.emplace(move(CS));
 		return TS;
 	}
 

@@ -26,32 +26,14 @@ namespace FSMtesting {
 		output_t stateOutput;
 		state_t state;
 		input_t distinguishingInput = STOUT_INPUT;
-		map<input_t, TestNodeH*> next;
+		map<input_t, shared_ptr<TestNodeH>> next;
 
 		TestNodeH(state_t state, output_t stateOutput, output_t inOutput) :
 			incomingOutput(inOutput), stateOutput(stateOutput), state(state) {
 		}
-
-		~TestNodeH() {
-			for (auto n : next) {
-				delete n.second;
-			}
-		}
 	};
 
-	static vector<TestNodeH*> coreNodes, extNodes; // stores SC, TC-SC respectively
-	static DFSM * specification;
-	static vector<LinkCell> sepSeq;
-	static vector<state_t> states;
-
-	static void cleanup() {
-		delete coreNodes[0];
-		coreNodes.clear();
-		extNodes.clear();
-		sepSeq.clear();
-	}
-
-	static void printTStree(TestNodeH* node, string prefix = "") {
+	static void printTStree(const shared_ptr<TestNodeH>& node, string prefix = "") {
 		printf("%s%d/%d <- %d (in%d)\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput, node->distinguishingInput);
 		for (auto it : node->next) {
 			printf("%s - %d ->\n", prefix.c_str(), it.first);
@@ -59,83 +41,82 @@ namespace FSMtesting {
 		}
 	}
 
-	static void createBasicTree(const unique_ptr<DFSM>& fsm, int extraStates) {
+	static void createBasicTree(const unique_ptr<DFSM>& fsm, vector<shared_ptr<TestNodeH>>& coreNodes,
+			vector<shared_ptr<TestNodeH>>& extNodes, int extraStates) {
 		output_t outputState, outputTransition;
-		state_t state;
 		vector<bool> covered(fsm->getNumberOfStates(), false);
-		
-		coreNodes.clear();
-		extNodes.clear();
-
+		auto states = fsm->getStates();
 		// root
 		outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		TestNodeH* node = new TestNodeH(0, outputState, DEFAULT_OUTPUT);
-		coreNodes.push_back(node);
+		coreNodes.emplace_back(make_shared<TestNodeH>(0, outputState, DEFAULT_OUTPUT));
 		covered[0] = true;
 		for (state_t idx = 0; idx != coreNodes.size(); idx++) {
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				state = fsm->getNextState(states[coreNodes[idx]->state], input);
+				auto state = fsm->getNextState(states[coreNodes[idx]->state], input);
 				if (state == NULL_STATE) continue;
 				outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 				outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[coreNodes[idx]->state], input) : DEFAULT_OUTPUT;
 				state = getIdx(states, state);
-				node = new TestNodeH(state, outputState, outputTransition);
+				auto node = make_shared<TestNodeH>(state, outputState, outputTransition);
 				coreNodes[idx]->next[input] = node;
 				if (covered[state]) {
-					extNodes.push_back(node);
+					extNodes.emplace_back(move(node));
 				}
 				else {
-					coreNodes.push_back(node);
+					coreNodes.emplace_back(move(node));
 					covered[state] = true;
 				}
 			}
 		}
 		// extNodes now contains TC-SC, coreNodes = SC
 		if (extraStates > 0) {
-			stack<TestNodeH*> lifo;
-			for (auto n : extNodes) {
+			stack<shared_ptr<TestNodeH>> lifo;
+			for (const auto& n : extNodes) {
 				n->distinguishingInput = extraStates; // distinguishingInput is used here as a counter
-				lifo.push(n);
+				lifo.emplace(n);
 				while (!lifo.empty()) {
-					auto actNode = lifo.top();
+					auto actNode = move(lifo.top());
 					lifo.pop();
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-						state = fsm->getNextState(states[actNode->state], input);
+						auto state = fsm->getNextState(states[actNode->state], input);
 						if (state == NULL_STATE) continue;
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[actNode->state], input) : DEFAULT_OUTPUT;
 						state = getIdx(states, state);
-						node = new TestNodeH(state, outputState, outputTransition);
-						actNode->next[input] = node;
+						auto node = make_shared<TestNodeH>(state, outputState, outputTransition);
 						if (actNode->distinguishingInput > 1) {
 							node->distinguishingInput = actNode->distinguishingInput - 1;
-							lifo.push(node);
+							lifo.emplace(node);
 						}
+						actNode->next[input] = move(node);
 					}
 				}
 			}
 		}
 	}
 
-	static int getEstimate(TestNodeH* n1, TestNodeH* n2, input_t input) {
-		state_t idx = getStatePairIdx(n1->state, n2->state, specification->getNumberOfStates());
-		state_t nextIdx = sepSeq[idx].next[input];
+	static int getEstimate(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2, const input_t& input,
+			const vector<LinkCell>& sepSeq, const state_t& N) {
+		auto idx = getStatePairIdx(n1->state, n2->state, N);
+		auto nextIdx = sepSeq[idx].next[input];
 		if (nextIdx == NULL_STATE) return -1;
 		if (nextIdx == idx) return 1;
 		return 2 * sepSeq[nextIdx].minLen + 1;
 	}
 
-	static int getMinLenToDistinguish(TestNodeH* n1, TestNodeH* n2) {
-		map<input_t, TestNodeH*>::iterator sIt1, sIt2;
-		int minVal = specification->getNumberOfStates();
+	static int getMinLenToDistinguish(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
+			const vector<LinkCell>& sepSeq, const state_t& N, const input_t& P) {
+		int minVal = N;
 		input_t input = STOUT_INPUT;
-		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
-			if ((sIt1 = n1->next.find(i)) != n1->next.end()) {
-				if ((sIt2 = n2->next.find(i)) != n2->next.end()) {
+		for (input_t i = 0; i < P; i++) {
+			auto sIt1 = n1->next.find(i);
+			auto sIt2 = n2->next.find(i);
+			if (sIt1 != n1->next.end()) {
+				if (sIt2 != n2->next.end()) {
 					if ((sIt1->second->incomingOutput != sIt2->second->incomingOutput) ||
 						(sIt1->second->stateOutput != sIt2->second->stateOutput)) return 0; //distinguished
 					if (sIt1->second->state == sIt2->second->state) continue;
-					int est = getMinLenToDistinguish(sIt1->second, sIt2->second);
+					auto est = getMinLenToDistinguish(sIt1->second, sIt2->second, sepSeq, N, P);
 					if (est == 0) return 0; //distinguished
 					if (minVal >= est) {
 						minVal = est;
@@ -143,25 +124,27 @@ namespace FSMtesting {
 					}
 				}
 				else {
-					int est = getEstimate(n1, n2, i);
+					auto est = getEstimate(n1, n2, i, sepSeq, N);
 					if ((minVal > est) && (est > 0)) {
 						minVal = est;
 						input = i;
 					}
 				}
 			}
-			else if ((sIt2 = n2->next.find(i)) != n2->next.end()) {
-				int est = getEstimate(n2, n1, i);
-				if ((minVal > est) && (est > 0)) {
-					minVal = est;
-					input = i;
-				}
-			}
 			else {
-				int est = getEstimate(n2, n1, i);
-				if ((minVal > est + 1) && (est > 0)) {
-					minVal = est + 1;
-					input = i;
+				if (sIt2 != n2->next.end()) {
+					auto est = getEstimate(n2, n1, i, sepSeq, N);
+					if ((minVal > est) && (est > 0)) {
+						minVal = est;
+						input = i;
+					}
+				}
+				else {
+					auto est = getEstimate(n2, n1, i, sepSeq, N);
+					if ((minVal > est + 1) && (est > 0)) {
+						minVal = est + 1;
+						input = i;
+					}
 				}
 			}
 		}
@@ -169,11 +152,12 @@ namespace FSMtesting {
 		return minVal;
 	}
 
-	static void appendSeparatingSequence(TestNodeH* n1, TestNodeH* n2) {
-		state_t idx = getStatePairIdx(n1->state, n2->state, specification->getNumberOfStates()), nextIdx;
+	static void appendSeparatingSequence(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
+			const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq) {
+		auto idx = getStatePairIdx(n1->state, n2->state, fsm->getNumberOfStates());
 		input_t input = STOUT_INPUT;
-		for (input_t i = 0; i < specification->getNumberOfInputs(); i++) {
-			nextIdx = sepSeq[idx].next[i];
+		for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
+			auto nextIdx = sepSeq[idx].next[i];
 			if (nextIdx == NULL_STATE) continue;
 			if ((nextIdx == idx) || (sepSeq[nextIdx].minLen == sepSeq[idx].minLen - 1)) {
 				if (n1->next.find(i) != n1->next.end()) {
@@ -185,16 +169,16 @@ namespace FSMtesting {
 				}
 			}
 		}
+		auto states = fsm->getStates();
 		output_t outputState1, outputState2, outputTransition1, outputTransition2;
 		auto it = n1->next.find(input);
 		if (it == n1->next.end()) {
-			state_t state = specification->getNextState(states[n1->state], input);
-			outputState1 = (specification->isOutputState()) ? specification->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-			outputTransition1 = (specification->isOutputTransition()) ? 
-				specification->getOutput(states[n1->state], input) : DEFAULT_OUTPUT;
+			state_t state = fsm->getNextState(states[n1->state], input);
+			outputState1 = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
+			outputTransition1 = (fsm->isOutputTransition()) ? 
+				fsm->getOutput(states[n1->state], input) : DEFAULT_OUTPUT;
 			state = getIdx(states, state);
-			TestNodeH* node = new TestNodeH(state, outputState1, outputTransition1);
-			n1->next[input] = node;
+			n1->next[input] = make_shared<TestNodeH>(state, outputState1, outputTransition1);
 		}
 		else {
 			outputState1 = it->second->stateOutput;
@@ -202,119 +186,117 @@ namespace FSMtesting {
 		}
 		it = n2->next.find(input);
 		if (it == n2->next.end()) {
-			state_t state = specification->getNextState(states[n2->state], input);
-			outputState2 = (specification->isOutputState()) ? specification->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-			outputTransition2 = (specification->isOutputTransition()) ?
-				specification->getOutput(states[n2->state], input) : DEFAULT_OUTPUT;
+			state_t state = fsm->getNextState(states[n2->state], input);
+			outputState2 = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
+			outputTransition2 = (fsm->isOutputTransition()) ?
+				fsm->getOutput(states[n2->state], input) : DEFAULT_OUTPUT;
 			state = getIdx(states, state);
-			TestNodeH* node = new TestNodeH(state, outputState2, outputTransition2);
-			n2->next[input] = node;
+			n2->next[input] = make_shared<TestNodeH>(state, outputState2, outputTransition2);
 		}
 		else {
 			outputState2 = it->second->stateOutput;
 			outputTransition2 = it->second->incomingOutput;
 		}
 		if ((outputState1 == outputState2) && (outputTransition1 == outputTransition2)) {
-			appendSeparatingSequence(n1->next[input], n2->next[input]);
+			appendSeparatingSequence(n1->next[input], n2->next[input], fsm, sepSeq);
 			//  } else {
 			//        printTStree(coreNodes[0]);
 		}
 	}
 
-	static void addSeparatingSequence(TestNodeH* n1, TestNodeH* n2) {
+	static void addSeparatingSequence(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
+			const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq) {
 		auto fIt = n1->next.find(n1->distinguishingInput);
 		if (fIt == n1->next.end()) {
-			appendSeparatingSequence(n2, n1);
+			appendSeparatingSequence(n2, n1, fsm, sepSeq);
 			return;
 		}
 		auto sIt = n2->next.find(n1->distinguishingInput);
 		if (sIt == n2->next.end()) {
-			appendSeparatingSequence(n1, n2);
+			appendSeparatingSequence(n1, n2, fsm, sepSeq);
 			return;
 		}
-		addSeparatingSequence(fIt->second, sIt->second);
+		addSeparatingSequence(fIt->second, sIt->second, fsm, sepSeq);
 	}
 
-	static void distinguish(TestNodeH* n1, TestNodeH* n2) {
+	static void distinguish(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
+		const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq) {
 		if ((n1->state == n2->state) || (n1->stateOutput != n2->stateOutput)
-			|| (getMinLenToDistinguish(n1, n2) == 0)) return;
-		addSeparatingSequence(n1, n2);
+			|| (getMinLenToDistinguish(n1, n2, sepSeq, fsm->getNumberOfStates(), fsm->getNumberOfInputs()) == 0)) return;
+		addSeparatingSequence(n1, n2, fsm, sepSeq);
 	}
 
-	static void distinguish(vector<TestNodeH*>& nodes, TestNodeH* currNode, int depth, bool extend = false) {
+	static void distinguish(vector<shared_ptr<TestNodeH>>& nodes, const shared_ptr<TestNodeH>& currNode, 
+		const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq , int depth, bool extend = false) {
 		if (depth > 0) {
-			if (extend) nodes.push_back(currNode);
-			for (auto pNext : currNode->next) {
-				distinguish(nodes, pNext.second, depth - 1, extend);
+			if (extend) nodes.emplace_back(currNode);
+			for (const auto& pNext : currNode->next) {
+				distinguish(nodes, pNext.second, fsm, sepSeq, depth - 1, extend);
 			}
 			if (extend) nodes.pop_back();
 		}
-		for (auto n : nodes) {
-			distinguish(n, currNode);
+		for (const auto& n : nodes) {
+			distinguish(n, currNode, fsm, sepSeq);
 		}
 	}
 
-	static void getSequences(TestNodeH* node, sequence_set_t& TS) {
-		stack< pair<TestNodeH*, sequence_in_t> > lifo;
+	static sequence_set_t getSequences(const shared_ptr<TestNodeH>& node, const unique_ptr<DFSM>& fsm) {
+		sequence_set_t TS;
+		stack<pair<shared_ptr<TestNodeH>, sequence_in_t>> lifo;
 		sequence_in_t seq;
-		if (specification->isOutputState()) seq.push_back(STOUT_INPUT);
-		lifo.push(make_pair(node, seq));
+		if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
+		lifo.emplace(node, move(seq));
 		while (!lifo.empty()) {
-			auto p = lifo.top();
+			auto p = move(lifo.top());
 			lifo.pop();
 			if (p.first->next.empty()) {
-				TS.insert(p.second);
+				TS.emplace(move(p.second));
 			}
 			else {
-				for (auto pNext : p.first->next) {
-					seq = p.second;
+				for (const auto& pNext : p.first->next) {
+					sequence_in_t seq(p.second);
 					seq.push_back(pNext.first);
-					if (specification->isOutputState()) seq.push_back(STOUT_INPUT);
-					lifo.push(make_pair(pNext.second, seq));
+					if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
+					lifo.emplace(pNext.second, move(seq));
 				}
 			}
 		}
+		return TS;
 	}
 
 	sequence_set_t H_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		sequence_set_t TS;
 		if (extraStates < 0) {
-			return TS;
+			return sequence_set_t();
 		}
-		specification = fsm.get();
-		states = fsm->getStates();
-
-		sepSeq = getSeparatingSequences(fsm);
+		auto sepSeq = getSeparatingSequences(fsm);
+		vector<shared_ptr<TestNodeH>> coreNodes, extNodes; // stores SC, TC-SC respectively
 
 		// 1. step
-		createBasicTree(fsm, extraStates);
+		createBasicTree(fsm, coreNodes, extNodes, extraStates);
 		//printTStree(coreNodes[0]);
 
 		// 2. step
 		for (auto n1it = coreNodes.begin(); n1it != coreNodes.end(); n1it++) {
 			for (auto n2it = n1it + 1; n2it != coreNodes.end(); n2it++) {
-				distinguish(*n1it, *n2it);
+				distinguish(*n1it, *n2it, fsm, sepSeq);
 			}
 		}
 
 		// 3. step
-		for (auto n1it = extNodes.begin(); n1it != extNodes.end(); n1it++) {
-			distinguish(coreNodes, *n1it, extraStates);
+		for (const auto& node : extNodes) {
+			distinguish(coreNodes, node, fsm, sepSeq, extraStates);
 		}
 
 		// 4. step
 		if (extraStates > 0) {
-			vector<TestNodeH*> tmp;
-			for (auto n1it = extNodes.begin(); n1it != extNodes.end(); n1it++) {
-				distinguish(tmp, *n1it, extraStates, true);
+			vector<shared_ptr<TestNodeH>> tmp;
+			for (const auto& node : extNodes) {
+				distinguish(tmp, node, fsm, sepSeq, extraStates, true);
 			}
 		}
 
 		// obtain TS
 		//printTStree(coreNodes[0]);
-		getSequences(coreNodes[0], TS);
-
-		cleanup();
-		return TS;
+		return getSequences(coreNodes[0], fsm);
 	}
 }
