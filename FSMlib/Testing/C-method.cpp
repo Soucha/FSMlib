@@ -38,15 +38,8 @@ namespace FSMtesting {
 		}
 	};
 
-	static vector<vector<bool>> verifiedTransition;
-	static vector<int> verifiedState;
-	static vector<vector<int>> confirmedNodes;
-	static vector<shared_ptr<ver_seq_t>> verSeq;
-	static vector<unique_ptr<TestNodeC>> cs;
-	static queue<seq_len_t> newlyConfirmed;
-	static seq_len_t counter, currIdx, lastConfIdx;
-	
-	static bool equalSeqPart(seq_len_t idx, sequence_in_t::iterator & itE, sequence_in_t::iterator endE) {
+	static bool equalSeqPart(seq_len_t idx, sequence_in_t::iterator & itE, sequence_in_t::iterator endE,
+			const vector<unique_ptr<TestNodeC>>& cs) {
 		while ((idx != cs.size()) && (itE != endE)) {
 			if (cs[idx]->input != *itE)
 				return false;
@@ -89,7 +82,8 @@ namespace FSMtesting {
 		shortenTo(nextVs, move(seq));
 	}
 
-	static void checkSucc(seq_len_t idx, const sequence_in_t & seq) {
+	static void checkSucc(seq_len_t idx, const sequence_in_t & seq,
+			const vector<unique_ptr<TestNodeC>>& cs, queue<seq_len_t>& newlyConfirmed) {
 		seq_len_t aIdx = idx;
 		for (auto input : seq) {
 			aIdx++;
@@ -101,9 +95,13 @@ namespace FSMtesting {
 		}
 	}
 
-	static void update(seq_len_t idx);
+	static void update(seq_len_t idx, const vector<unique_ptr<TestNodeC>>& cs, queue<seq_len_t>& newlyConfirmed,
+		vector<vector<bool>>& verifiedTransition, vector<input_t>& verifiedState, vector<shared_ptr<ver_seq_t>>& verSeq,
+		vector<vector<seq_len_t>>& confirmedNodes, seq_len_t& counter);
 
-	static void processNewlyConfirmed() {
+	static void processNewlyConfirmed(const vector<unique_ptr<TestNodeC>>& cs, queue<seq_len_t>& newlyConfirmed,
+		vector<vector<bool>>& verifiedTransition, vector<input_t>& verifiedState, vector<shared_ptr<ver_seq_t>>& verSeq,
+		vector<vector<seq_len_t>>& confirmedNodes, seq_len_t& counter, seq_len_t& currIdx, seq_len_t& lastConfIdx) {
 		while (!newlyConfirmed.empty()) {
 			auto idx = newlyConfirmed.front();
 			if ((idx > lastConfIdx) && (idx <= currIdx)) lastConfIdx = idx;
@@ -114,7 +112,8 @@ namespace FSMtesting {
 				if (!nextVs) {
 					for (; idx < cs.size(); idx++) {
 						if (cs[idx]->confirmed) {
-							update(newlyConfirmed.front());
+							update(newlyConfirmed.front(), cs, newlyConfirmed, verifiedTransition, verifiedState,
+								verSeq, confirmedNodes, counter);
 							break;
 						}
 					}
@@ -128,7 +127,7 @@ namespace FSMtesting {
 					break;
 				}
 				if (cs[idx]->confirmed) {
-					update(newlyConfirmed.front());
+					update(newlyConfirmed.front(), cs, newlyConfirmed, verifiedTransition, verifiedState, verSeq, confirmedNodes, counter);
 					break;
 				}
 				vs = nextVs;
@@ -137,7 +136,9 @@ namespace FSMtesting {
 		}
 	}
 
-	static void update(seq_len_t idx) {
+	static void update(seq_len_t idx, const vector<unique_ptr<TestNodeC>>& cs, queue<seq_len_t>& newlyConfirmed,
+		vector<vector<bool>>& verifiedTransition, vector<input_t>& verifiedState, vector<shared_ptr<ver_seq_t>>& verSeq,
+		vector<vector<seq_len_t>>& confirmedNodes, seq_len_t& counter) {
 		sequence_in_t seq;
 		seq_len_t actIdx = idx;
 		do {
@@ -150,12 +151,12 @@ namespace FSMtesting {
 			counter--;
 		}
 		shortenTo(verSeq[cs[idx]->state], seq);
-		for (auto nIdx : confirmedNodes[cs[idx]->state]) {
-			checkSucc(nIdx, seq);
+		for (const auto& nIdx : confirmedNodes[cs[idx]->state]) {
+			checkSucc(nIdx, seq, cs, newlyConfirmed);
 		}
 	}
 
-	static sequence_in_t getCS(bool stoutUsed) {
+	static sequence_in_t getCS(bool stoutUsed, const vector<unique_ptr<TestNodeC>>& cs) {
 		sequence_in_t CS;
 		for (const auto& n : cs) {
 			CS.push_back(n->input);
@@ -165,9 +166,9 @@ namespace FSMtesting {
 		return CS;
 	}
 
-	static int equalLength(sequence_out_t::iterator f, sequence_out_t::iterator s, int maxLen = -1) {
-		int len = 0;
-		while ((maxLen - len != 0) && (*f == *s)) {
+	static seq_len_t equalLength(sequence_out_t::iterator f, sequence_out_t::iterator s, seq_len_t maxLen) {
+		seq_len_t len = 0;
+		while ((len < maxLen) && (*f == *s)) {
 			f++;
 			s++;
 			len++;
@@ -181,7 +182,8 @@ namespace FSMtesting {
 			return sequence_in_t();
 		}
 		auto states = fsm->getStates();
-		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs(), currState, nextState;
+		auto N = fsm->getNumberOfStates();
+		auto P = fsm->getNumberOfInputs();
 		
 		/* // Example from simao2009checking
 		E.clear();
@@ -198,20 +200,13 @@ namespace FSMtesting {
 		E[4].push_back(0);
 		E[4].push_back(1);
 		//*/
-		counter = N * fsm->getNumberOfInputs();
-		verifiedTransition.clear();
-		verifiedTransition.resize(N);
-		verifiedState.clear();
-		verifiedState.resize(N, P);
-		verSeq.clear();
-		verSeq.resize(N);
+		vector<vector<bool>> verifiedTransition(N);
+		vector<input_t> verifiedState(N, P);
+		vector<shared_ptr<ver_seq_t>> verSeq(N);
 		for (state_t i = 0; i < N; i++) {
-			verifiedTransition[i].assign(P, false);
+			verifiedTransition[i].resize(P, false);
 			verSeq[i] = make_shared<ver_seq_t>();
 		}
-		confirmedNodes.clear();
-		confirmedNodes.resize(N);
-		sequence_in_t::iterator nextInput;
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < N; i++) {
 				sequence_in_t seq;
@@ -224,19 +219,22 @@ namespace FSMtesting {
 		}
 		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
 		output_t outputTransition;
-		cs.clear();
+		vector<unique_ptr<TestNodeC>> cs;
 		cs.emplace_back(make_unique<TestNodeC>(STOUT_INPUT, DEFAULT_OUTPUT, 0, outputState));
-		currState = 0;
+		state_t currState = 0;
 		for (const auto& input : E[0]) {
-			nextState = fsm->getNextState(currState, input);
+			auto nextState = fsm->getNextState(currState, input);
 			outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 			outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
 			cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, getIdx(states, nextState), outputState));
 			currState = nextState;
 		}
+		vector<vector<seq_len_t>> confirmedNodes(N);
 		confirmedNodes[0].push_back(0);
-		currIdx = 1;
-		lastConfIdx = 0;
+		queue<seq_len_t> newlyConfirmed;
+		seq_len_t counter = N * fsm->getNumberOfInputs();
+		seq_len_t currIdx = 1;
+		seq_len_t lastConfIdx = 0;
 		currState = 0;
 
 		while (counter > 0) {
@@ -248,9 +246,9 @@ namespace FSMtesting {
 			}
 			if (currIdx < cs.size()) {
 				if (!cs[currIdx]->confirmed) {
-					nextState = cs[currIdx]->state;
-					nextInput = E[nextState].begin();
-					if (equalSeqPart(currIdx + 1, nextInput, E[nextState].end())) {
+					auto nextState = cs[currIdx]->state;
+					auto nextInput = E[nextState].begin();
+					if (equalSeqPart(currIdx + 1, nextInput, E[nextState].end(), cs)) {
 						currState = cs.back()->state;
 						for (; nextInput != E[cs[currIdx]->state].end(); nextInput++) {
 							nextState = fsm->getNextState(states[currState], *nextInput);
@@ -262,8 +260,9 @@ namespace FSMtesting {
 						}
 						cs[currIdx]->confirmed = true;
 						newlyConfirmed.emplace(currIdx);
-						update(lastConfIdx);
-						processNewlyConfirmed();
+						update(lastConfIdx, cs, newlyConfirmed, verifiedTransition, verifiedState, verSeq, confirmedNodes, counter);
+						processNewlyConfirmed(cs, newlyConfirmed, verifiedTransition, verifiedState, verSeq, confirmedNodes, counter,
+							currIdx, lastConfIdx);
 					}
 				}
 				else {
@@ -275,7 +274,7 @@ namespace FSMtesting {
 				currState = cs.back()->state;
 				for (input_t input = 0; input < P; input++) {
 					if (!verifiedTransition[currState][input]) {
-						nextState = fsm->getNextState(states[currState], input);
+						auto nextState = fsm->getNextState(states[currState], input);
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
 						nextState = getIdx(states, nextState);
@@ -294,18 +293,19 @@ namespace FSMtesting {
 							//      FSMmodel::getInSequenceAsString(suf).c_str(),
 							//    FSMmodel::getOutSequenceAsString(outSuf).c_str(),
 							//  FSMmodel::getOutSequenceAsString(outE).c_str());
-							int lenE = 0; //outE.size();
+							seq_len_t lenE = 0; //outE.size();
 							for (state_t i = 0; i < N; i++) {
 								if (i != nextState) {
 									auto outSufI = fsm->getOutputAlongPath(states[i], suf);
-									auto osl = equalLength(outSuf.begin(), outSufI.begin(), outSuf.size());
+									auto osl = equalLength(outSuf.begin(), outSufI.begin(), seq_len_t(outSuf.size()));
 									if (osl != outSuf.size()) {
 										bool outConfirmed = false;
 										auto sufIt = suf.begin();
-										while (osl-- >= 0) sufIt++;
+										osl++;
+										while (osl-- > 0) sufIt++;
 										for (auto& cnIdx : confirmedNodes[i]) {
 											auto sufBeginIt = suf.begin();
-											if (equalSeqPart(cnIdx + 1, sufBeginIt, sufIt)) {
+											if (equalSeqPart(cnIdx + 1, sufBeginIt, sufIt, cs)) {
 												outConfirmed = true;
 												break;
 											}
@@ -329,7 +329,7 @@ namespace FSMtesting {
 										}
 									}
 									auto outI = fsm->getOutputAlongPath(states[i], E[nextState]);
-									auto oel = 1 + equalLength(outE.begin(), outI.begin());
+									auto oel = 1 + equalLength(outE.begin(), outI.begin(), seq_len_t(outI.size()));
 									//printf("%s/%s x %s %d %d-%d\n", 
 									//      FSMmodel::getInSequenceAsString(E[nextState]).c_str(),
 									//    FSMmodel::getOutSequenceAsString(outE).c_str(),
@@ -357,8 +357,9 @@ namespace FSMtesting {
 							cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, nextState, outputState));
 							currState = nextState;
 						}
-						update(currIdx - 1);
-						processNewlyConfirmed();
+						update(currIdx - 1, cs, newlyConfirmed, verifiedTransition, verifiedState, verSeq, confirmedNodes, counter);
+						processNewlyConfirmed(cs, newlyConfirmed, verifiedTransition, verifiedState, verSeq, confirmedNodes, counter,
+							currIdx, lastConfIdx);
 						break;
 					}
 				}
@@ -373,11 +374,11 @@ namespace FSMtesting {
 					auto current = move(fifo.front());
 					fifo.pop_front();
 					for (input_t input = 0; input < P; input++) {
-						nextState = fsm->getNextState(states[current.first], input);
+						auto nextState = fsm->getNextState(states[current.first], input);
 						if (nextState == WRONG_STATE) continue;
 						nextState = getIdx(states, nextState);
 						if (verifiedState[nextState] > 0) {
-							for (nextInput = current.second.begin(); nextInput != current.second.end(); nextInput++) {
+							for (auto nextInput = current.second.begin(); nextInput != current.second.end(); nextInput++) {
 								nextState = fsm->getNextState(states[currState], *nextInput);
 								outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 								outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], *nextInput) : DEFAULT_OUTPUT;
@@ -408,8 +409,7 @@ namespace FSMtesting {
 
 			}
 		}
-		verSeq.clear();
-		return getCS(fsm->isOutputState());
+		return getCS(fsm->isOutputState(), cs);
 	}
 
 }

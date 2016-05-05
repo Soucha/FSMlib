@@ -30,6 +30,12 @@
     <Filter Include="Source Files\Sequences">
       <UniqueIdentifier>{68ea5792-e7c0-410b-a035-912ce7fe9948}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Testing">
+      <UniqueIdentifier>{63e52288-e004-4153-8289-10c222beeb90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Testing">
+      <UniqueIdentifier>{3c2203d3-466c-427d-b41c-19533c4541a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\FSMlib\FSMlib.h">
@@ -67,6 +73,15 @@
     </ClInclude>
     <ClInclude Include="..\FSMlib\Sequences\FSMsequence.h">
       <Filter>Header Files\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\UnionFind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Testing\FSMtesting.h">
+      <Filter>Header Files\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FSMlib\Testing\FaultCoverageChecker.h">
+      <Filter>Header Files\Testing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +135,48 @@
     </ClCompile>
     <ClCompile Include="..\FSMlib\Sequences\DistinguishingSequences.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\ADS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\C-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\H-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\HSI-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\Ma-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\Mg-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\PDS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\SPY-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\SVS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\W-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\Wp-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\Mstar-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\FaultCoverageChecker.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FSMlib\UnionFind.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

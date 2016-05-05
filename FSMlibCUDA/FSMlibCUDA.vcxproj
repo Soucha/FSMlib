@@ -168,6 +168,9 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="..\FSMlib\Sequences\FSMsequence.h" />
     <ClInclude Include="..\FSMlib\stdafx.h" />
     <ClInclude Include="..\FSMlib\targetver.h" />
+    <ClInclude Include="..\FSMlib\Testing\FaultCoverageChecker.h" />
+    <ClInclude Include="..\FSMlib\Testing\FSMtesting.h" />
+    <ClInclude Include="..\FSMlib\UnionFind.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\FSMlib\dllmain.cpp">
@@ -205,6 +208,20 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\FSMlib\Testing\ADS-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\C-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\FaultCoverageChecker.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\H-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\HSI-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\Ma-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\Mg-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\Mstar-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\PDS-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\SPY-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\SVS-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\W-method.cpp" />
+    <ClCompile Include="..\FSMlib\Testing\Wp-method.cpp" />
+    <ClCompile Include="..\FSMlib\UnionFind.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

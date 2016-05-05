@@ -80,7 +80,7 @@ namespace FSMsequence {
 				nextState = fsm->getNextState(act->state, input);
 				output = fsm->getOutput(act->state, input);
 				badInput = false;
-				for (auto state : act->undistinguishedStates) {
+				for (const auto& state : act->undistinguishedStates) {
 					if (output == fsm->getOutput(state, input)) {
 						// is state undistinguishable from fixed state?
 						if ((nextState == fsm->getNextState(state, input))
@@ -100,7 +100,7 @@ namespace FSMsequence {
 				if (fsm->isOutputState() && (states.size() > 1)) {
 					block_t tmp;
 					output = fsm->getOutput(nextState, STOUT_INPUT);
-					for (state_t i : states) {
+					for (const auto& i : states) {
 						if (fsm->getOutput(i, STOUT_INPUT) == output) {
 							tmp.emplace(i);
 						}

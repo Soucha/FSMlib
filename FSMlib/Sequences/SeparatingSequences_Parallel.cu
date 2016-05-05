@@ -28,7 +28,7 @@ namespace FSMsequence {
 
 #define IS_ERROR(error) isError(error, __FILE__, __LINE__)
 #define CHECK_ERROR(error) if (isError(error, __FILE__, __LINE__)) return false;
-#define RETURN_ON_ERROR(error) if (isError(error, __FILE__, __LINE__)) return seq;
+#define RETURN_ON_ERROR(error) if (isError(error, __FILE__, __LINE__)) return sequence_vec_t();
 
 	static void freeCuda();
 	static bool isError(cudaError_t error, const char *file, int line) {
@@ -343,18 +343,18 @@ namespace FSMsequence {
 
 	// <--- common functions --->
 
-	static bool getSequences(const unique_ptr<DFSM>& fsm, vector<sequence_in_t> & seq) {
+	static sequence_vec_t getSequences(const unique_ptr<DFSM>& fsm) {
 #if SEQUENCES_PERFORMANCE_TEST
-		CHECK_ERROR(cudaEventRecord(stop, 0));
-		CHECK_ERROR(cudaEventSynchronize(stop));
-		CHECK_ERROR(cudaEventElapsedTime(&gpuProcessTime, start, stop));
+		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
+		RETURN_ON_ERROR(cudaEventSynchronize(stop));
+		RETURN_ON_ERROR(cudaEventElapsedTime(&gpuProcessTime, start, stop));
 #endif // SEQUENCES_PERFORMANCE_TEST
 
 		cudaMemcpy(outDistinguishing, devDistinguishing, M*sizeof(input_t), cudaMemcpyDeviceToHost);
 		cudaMemcpy(outNextDistIdx, devNextDistIdx, M*sizeof(state_t), cudaMemcpyDeviceToHost);
 
 		state_t nextIdx;
-		seq.resize(M);
+		sequence_vec_t seq(M);
 		for (state_t idx = 0; idx < M; idx++) {
 			seq[idx].clear();
 			nextIdx = idx;
@@ -369,24 +369,23 @@ namespace FSMsequence {
 		freeCuda();
 
 #if SEQUENCES_PERFORMANCE_TEST
-		CHECK_ERROR(cudaEventRecord(stop, 0));
-		CHECK_ERROR(cudaEventSynchronize(stop));
-		CHECK_ERROR(cudaEventElapsedTime(&gpuTotalTime, start, stop));
-		CHECK_ERROR(cudaEventDestroy(start));
-		CHECK_ERROR(cudaEventDestroy(stop));
+		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
+		RETURN_ON_ERROR(cudaEventSynchronize(stop));
+		RETURN_ON_ERROR(cudaEventElapsedTime(&gpuTotalTime, start, stop));
+		RETURN_ON_ERROR(cudaEventDestroy(start));
+		RETURN_ON_ERROR(cudaEventDestroy(stop));
 #endif // SEQUENCES_PERFORMANCE_TEST
-		return true;
+		return seq;
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& fsm) {
-		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();
 		M = ((N - 1) * N) / 2;
 		if (M > MAX_BLOCKS * THREADS_PER_BLOCK) {
 			ERROR_MESSAGE("%s::getStatePairsShortestSeparatingSequences_ParallelSF - too many states (%d), max is %d",
 				machineTypeNames[fsm->getType()], M, MAX_BLOCKS * THREADS_PER_BLOCK);
-			return seq; 
+			return sequence_vec_t();
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventCreate(&start));
@@ -394,7 +393,7 @@ namespace FSMsequence {
 		RETURN_ON_ERROR(cudaEventRecord(start, 0));
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-		if (!initCuda(fsm, false)) return seq;
+		if (!initCuda(fsm, false)) return sequence_vec_t();
 
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
@@ -436,20 +435,17 @@ namespace FSMsequence {
 			//printf("distinguished: %d\n", count);
 			//getchar();
 		}
-
-		if (!getSequences(fsm, seq)) seq.clear();
-		return seq;
+		return getSequences(fsm);
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& fsm) {
-		sequence_vec_t seq;
 		N = fsm->getNumberOfStates();
 		P = fsm->getNumberOfInputs();
 		M = ((N - 1) * N) / 2;
 		if (M > MAX_BLOCKS * THREADS_PER_BLOCK) {
 			ERROR_MESSAGE("%s::getStatePairsShortestSeparatingSequences_ParallelQueue - too many states (%d), max is %d",
 				machineTypeNames[fsm->getType()], M, MAX_BLOCKS * THREADS_PER_BLOCK);
-			return seq;
+			return sequence_vec_t();
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventCreate(&start));
@@ -457,7 +453,7 @@ namespace FSMsequence {
 		RETURN_ON_ERROR(cudaEventRecord(start, 0));
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-		if (!initCuda(fsm, true)) return seq;
+		if (!initCuda(fsm, true)) return sequence_vec_t();
 
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
@@ -495,7 +491,7 @@ namespace FSMsequence {
 			devPrevIdxLen = prescan(M + 1, devPrevIdx);
 			if (devPrevIdxLen == NULL) {
 				freeCuda();
-				return seq;
+				return sequence_vec_t();
 			}
 #if DEBUG
 			cudaMemcpy(tmp, devPrevIdxLen, (M + 1)*sizeof(state_t), cudaMemcpyDeviceToHost);
@@ -548,8 +544,6 @@ namespace FSMsequence {
 			getchar();
 #endif
 		}
-
-		if (!getSequences(fsm, seq)) seq.clear();
-		return seq;
+		return getSequences(fsm);
 	}
 }

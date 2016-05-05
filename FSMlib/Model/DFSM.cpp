@@ -58,9 +58,9 @@ state_t DFSM::getNextState(state_t state, input_t input) {
 	return _transition[state][input];
 }
 
-state_t DFSM::getEndPathState(state_t state, sequence_in_t path) {
-	for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
-		state = this->getNextState(state, *inputIt);
+state_t DFSM::getEndPathState(state_t state, const sequence_in_t& path) {
+	for (const auto& input : path) {
+		state = this->getNextState(state, input);
 		if (state == NULL_STATE) return WRONG_STATE;
 		if (state == WRONG_STATE) return state;
 	}
@@ -87,11 +87,11 @@ output_t DFSM::getOutput(state_t state, input_t input) {
 	return (_isOutputTransition) ? _outputTransition[state][input] : _outputState[nextState]; // DFSM and Mealy vs Moore and DFA
 }
 
-sequence_out_t DFSM::getOutputAlongPath(state_t state, sequence_in_t path) {
+sequence_out_t DFSM::getOutputAlongPath(state_t state, const sequence_in_t& path) {
 	sequence_out_t sOut;
-	for (sequence_in_t::iterator inputIt = path.begin(); inputIt != path.end(); inputIt++) {
-		sOut.push_back(this->getOutput(state, *inputIt));
-		state = this->getNextState(state, *inputIt);
+	for (const auto& input : path) {
+		sOut.push_back(this->getOutput(state, input));
+		state = this->getNextState(state, input);
 		if ((state == WRONG_STATE) || (sOut.back() == WRONG_OUTPUT)) {
 			sOut.clear();
 			sOut.push_back(WRONG_OUTPUT);

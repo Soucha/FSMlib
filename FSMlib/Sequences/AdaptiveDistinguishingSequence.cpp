@@ -56,16 +56,15 @@ namespace FSMsequence {
 		ADSet.resize(fsm->getNumberOfStates());
 		auto states = fsm->getStates();
 		while (!lifo.empty()) {
-			auto p = lifo.top();
+			auto p = move(lifo.top());
 			lifo.pop();
 			if (p.first->decision.empty()) {
 				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
 			}
 			else {
-				sequence_in_t seq(p.second);
-				seq.insert(seq.end(), p.first->input.begin(), p.first->input.end());
+				p.second.insert(p.second.end(), p.first->input.begin(), p.first->input.end());
 				for (auto it = p.first->decision.begin(); it != p.first->decision.end(); it++) {
-					lifo.emplace(it->second.get(), seq);
+					lifo.emplace(it->second.get(), p.second);
 				}
 			}
 		}
@@ -83,7 +82,7 @@ namespace FSMsequence {
 			auto succCount = node->succ.size();
 			auto invalidInput = false;
 			// check input validity for all states in block
-			for (state_t state : node->block) {
+			for (const state_t& state : node->block) {
 				// nextStates would contain two WRONG_STATE if there is WRONG_OUTPUT -> invalid input
 				auto nextState = fsm->getNextState(states[state], input);
 				auto output = fsm->getOutput(states[state], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
@@ -153,17 +152,17 @@ namespace FSMsequence {
 				node->succ[i].first = *seqInIt; // for easier access to right input
 				vector<state_t> diffStates;
 				state_t pivot = node->succ[i].second->nextStates[0];
-				for (state_t stateI : node->succ[i].second->nextStates) {
+				for (const auto& stateI : node->succ[i].second->nextStates) {
 					if (curNode[pivot] != curNode[stateI]) {
 						bool inDiff = false;
-						for (auto diffState : diffStates) {
+						for (const auto& diffState : diffStates) {
 							if (curNode[stateI] == curNode[diffState]) {
 								inDiff = true;
 								break;
 							}
 						}
 						if (!inDiff) {
-							diffStates.push_back(stateI);
+							diffStates.emplace_back(stateI);
 						}
 					}
 				}
@@ -175,8 +174,8 @@ namespace FSMsequence {
 				else {// distinguishing input
 					auto next = curNode[pivot];
 					// find lowest node of ST with block of all diffStates and pivot
-					for (state_t j = 0; j < diffStates.size(); j++) {
-						auto idx = getStatePairIdx(pivot, diffStates[j], N);
+					for (const auto& diffState : diffStates) {
+						auto idx = getStatePairIdx(pivot, diffState, N);
 						if (next->block.size() < distinguished[idx]->block.size()) {
 							next = distinguished[idx];
 						}
@@ -267,7 +266,7 @@ namespace FSMsequence {
 				// count resolved dependent
 				distCounter--;
 				// push unresolved dependent to queue
-				for (auto p : link[dI]) {
+				for (const auto& p : link[dI]) {
 					next = dependent[p.second];
 					if (next->nextStates.size() == 1) {// still unresolved
 						if (next->sequence.size() == next->succ.size()) {// best not set
@@ -310,7 +309,7 @@ namespace FSMsequence {
 			// set distinguishing input sequence
 			adsNode->input = next->sequence;
 			for (state_t sI = 0; sI < adsNode->initialStates.size(); sI++) {
-				for (auto &p : next->succ) {
+				for (const auto &p : next->succ) {
 					if (binary_search(p.second->block.begin(), p.second->block.end(), adsNode->currentStates[sI])) {
 						state_t idx;
 						for (idx = 0; next->block[idx] != adsNode->currentStates[sI]; idx++);
@@ -350,7 +349,7 @@ namespace FSMsequence {
 				node->nextStates.push_back(state);
 				bool found = false;
 				auto output = fsm->getOutput(states[state], STOUT_INPUT);
-				for (auto &p : node->succ) {
+				for (const auto &p : node->succ) {
 					if (p.first == output) {
 						p.second->block.emplace_back(state);
 						found = true;

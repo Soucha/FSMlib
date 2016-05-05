@@ -100,7 +100,7 @@ namespace FSMsequence {
 
 	static inline void initSVS_H(const unique_ptr<node_svs_t>& node, const vector<sequence_in_t>& seq, const state_t& N) {
 		node->h = 0;
-		for (auto i : node->states) {
+		for (const auto& i : node->states) {
 			if (i != node->actState) {
 				auto idx = getStatePairIdx(i, node->actState, N);
 				if (node->h < seq[idx].size()) {
@@ -117,9 +117,9 @@ namespace FSMsequence {
 
 	static void printPDS(const unique_ptr<node_pds_t> node) {
 		printf("%s - %d:", FSMmodel::getInSequenceAsString(node->ds).c_str(), node->value);
-		for (auto bn : node->partition) {
+		for (const auto& bn : node->partition) {
 			printf(" %d-(", bn->h);
-			for (auto state : bn->states) {
+			for (const auto& state : bn->states) {
 				printf(" %u", state);
 			}
 			printf(")");
@@ -129,7 +129,7 @@ namespace FSMsequence {
 
 	static void printSVS(const unique_ptr<node_svs_t>& node) {
 		printf("%s - %d, %d:", FSMmodel::getInSequenceAsString(node->svs).c_str(), node->actState, node->h);
-		for (auto state : node->states) {
+		for (const auto& state : node->states) {
 			printf(" %u", state);
 		}
 		printf("\n");
@@ -137,7 +137,7 @@ namespace FSMsequence {
 
 	static const state_t getSetId(const block_t & block) {
 		state_t sum = 0;
-		for (auto state : block) {
+		for (const auto& state : block) {
 			sum += state;
 		}
 		sum += state_t(block.size());
@@ -170,7 +170,7 @@ namespace FSMsequence {
 			auto stop = false;
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// + 1 for DEFAULT_OUTPUT
 			list<output_t> actOutputs;
-			for (auto state : bn->states) {
+			for (const auto& state : bn->states) {
 				auto output = fsm->getOutput(states[state], input);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 				if (output == WRONG_OUTPUT) {
@@ -195,10 +195,10 @@ namespace FSMsequence {
 			if (!actOutputs.empty()) {
 				vector<out_bn_ref_t> outOnIn;
 				// save block with more then one state
-				for (auto out : actOutputs) {
+				for (const auto& out : actOutputs) {
 					if (!sameOutput[out].empty()) {
 						auto succBN = make_shared<block_node_t>();
-						succBN->states.insert(sameOutput[out].begin(), sameOutput[out].end());
+						succBN->states = move(sameOutput[out]);
 						auto allBNit = allBN.find(succBN);
 						if (allBNit != allBN.end()) {
 							succBN = *allBNit;
@@ -209,12 +209,10 @@ namespace FSMsequence {
 						}
 						outOnIn.emplace_back(out, succBN);
 						
-						sameOutput[out].clear();
-
 						if (fsm->isOutputState() && succBN->succ.empty() && (succBN->states.size() > 1)) {
 							// TODO some block could be checked several times
 							vector<pair<output_t, block_t>> outStates;
-							for (state_t i : succBN->states) {
+							for (const auto& i : succBN->states) {
 								stop = false;
 								auto output = fsm->getOutput(states[i], STOUT_INPUT);
 								for (output_t outIdx = 0; outIdx < outStates.size(); outIdx++) {
@@ -230,9 +228,9 @@ namespace FSMsequence {
 							}
 							if (outStates.size() > 1) {// distinguished by STOUT
 								vector<out_bn_ref_t> outOnSTOUT;
-								for (auto p : outStates) {
+								for (const auto& p : outStates) {
 									auto succStoutBN = make_shared<block_node_t>();
-									succStoutBN->states.insert(p.second.begin(), p.second.end());
+									succStoutBN->states = move(p.second);
 									auto allBNit = allBN.find(succStoutBN);
 									if (allBNit != allBN.end()) {
 										succStoutBN = *allBNit;
@@ -303,7 +301,6 @@ namespace FSMsequence {
 						initH(succBN, seq, N);
 						allBN.emplace(succBN);
 					}
-					outOnIn.emplace_back(output, succBN);
 					if (succBN->states.size() > 1) {
 						succPDS->partition.emplace(succBN);
 						if (succPDS->value < succBN->h) {
@@ -313,7 +310,7 @@ namespace FSMsequence {
 					else {
 						outVSet[*(succBN->states.begin())].push_back(STOUT_INPUT);
 					}
-					sameOutput[output].clear();
+					outOnIn.emplace_back(output, move(succBN));
 				}
 			}
 			rootBN->succ.emplace_back(STOUT_INPUT, move(outOnIn));
@@ -357,7 +354,6 @@ namespace FSMsequence {
 			input_t minValidInput = fsm->getNumberOfInputs() + 1;
 			// go through all blocks in current partition
 			for (auto &block : actPDS->partition) {
-
 				if (block->succ.empty()) {// block has not been expanded yet
 					distinguishBN(fsm, block, seq, allBN);
 				}
@@ -393,7 +389,7 @@ namespace FSMsequence {
 										break;
 									}
 									if (fsm->isOutputState()) {
-										for (auto out_bn : succBN->succ[0].second) {
+										for (auto& out_bn : succBN->succ[0].second) {
 											auto succPtr = out_bn.second.lock();
 											if (succPtr && (succPtr->states.size() > 1)) {
 												succPDS->partition.emplace(succPtr);
@@ -517,7 +513,7 @@ namespace FSMsequence {
 				auto output = fsm->getOutput(states[actSVS->actState], input);
 				auto nextState = fsm->getNextState(states[actSVS->actState], input);
 				//if (nextState == NULL_STATE) continue;
-				for (auto state : actSVS->states) {
+				for (const auto& state : actSVS->states) {
 					if (output == fsm->getOutput(states[state], input)) {
 						// is state undistinguishable from fixed state?
 						if ((nextState == fsm->getNextState(states[state], input))

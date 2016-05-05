@@ -74,6 +74,7 @@ namespace FSMlibTest
 					auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 					ARE_EQUAL(1, int(indistinguishable.size()), "The PDS-method (%d extra states) has not complete fault coverage,"
 						" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
+					ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
 				}
 				else {
 					ARE_EQUAL(false, hasDS, "FSM has preset DS so a TS can be created but it was not obtained.");

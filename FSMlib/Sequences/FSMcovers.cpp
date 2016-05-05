@@ -30,7 +30,7 @@ namespace FSMsequence {
 		covered[0] = true;
 		fifo.emplace(0, sequence_in_t());
 		while (!fifo.empty()) {
-			auto current = fifo.front();
+			auto current = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				auto nextState = dfsm->getNextState(current.first, input);
@@ -58,7 +58,7 @@ namespace FSMsequence {
 		covered[0] = true;
 		fifo.emplace(0, sequence_in_t());
 		while (!fifo.empty()) {
-			auto current = fifo.front();
+			auto current = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				auto nextState = dfsm->getNextState(current.first, input);
@@ -66,11 +66,11 @@ namespace FSMsequence {
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
 					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
-					transitionCover.emplace(newPath);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
-						fifo.emplace(nextState, move(newPath));
+						fifo.emplace(nextState, newPath);
 					}
+					transitionCover.emplace(move(newPath));
 				}
 			}
 		}
@@ -84,14 +84,14 @@ namespace FSMsequence {
 		fifo.emplace(sequence_in_t());
 		if (dfsm->isOutputState()) depth *= 2; // STOUT_INPUT follows each input
 		while (!fifo.empty()) {
-			auto seq = fifo.front();
+			auto seq = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				sequence_in_t extSeq(seq);
 				extSeq.push_back(input);
 				if (dfsm->isOutputState()) extSeq.push_back(STOUT_INPUT);
-				traversalSet.emplace(extSeq);
-				if (extSeq.size() < depth) fifo.emplace(move(extSeq));
+				if (extSeq.size() < depth) fifo.emplace(extSeq);
+				traversalSet.emplace(move(extSeq));
 			}
 		}
 		return traversalSet;

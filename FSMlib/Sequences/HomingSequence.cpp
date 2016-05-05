@@ -66,7 +66,7 @@ namespace FSMsequence {
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 			set<output_t> actOutputs;
 			// get output of all states
-			for (auto state : states) {
+			for (auto& state : states) {
 				auto output = fsm->getOutput(state, STOUT_INPUT);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 				sameOutput[output].emplace(state);
@@ -75,7 +75,7 @@ namespace FSMsequence {
 			if (actOutputs.size() > 1)
 				s.push_back(STOUT_INPUT);
 			// save block with more then one state and clear sameOutput
-			for (auto out : actOutputs) {
+			for (auto& out : actOutputs) {
 				if (sameOutput[out].size() > 1) {
 					partition.emplace(move(sameOutput[out]));
 				}
@@ -103,11 +103,11 @@ namespace FSMsequence {
 				stop = false;
 				partition_t partition;
 				// go through all blocks in current partition
-				for (auto block : act->partition) {
+				for (const auto& block : act->partition) {
 					vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 					set<output_t> actOutputs;
 					// go through all states in current block
-					for (auto state : block) {
+					for (const auto& state : block) {
 						auto output = fsm->getOutput(state, input);
 						if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 						if (output == WRONG_OUTPUT) {
@@ -132,10 +132,10 @@ namespace FSMsequence {
 				if (fsm->isOutputState()) {
 					partition_t tmp;
 					stoutUsed = false;
-					for (auto block : partition) {
+					for (const auto& block : partition) {
 						vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 						set<output_t> actOutputs;
-						for (auto state : block) {
+						for (const auto& state : block) {
 							auto output = fsm->getOutput(state, STOUT_INPUT);
 							if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 							sameOutput[output].emplace(state);

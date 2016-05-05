@@ -308,7 +308,7 @@ namespace FSMsequence {
 			set<seq_info_t, seq_info_t> tmp;
 			for (++it; it != infos.end(); it++) {
 				seq_info_t seqInfo;
-				for (auto v : it->lastDist) {
+				for (const auto& v : it->lastDist) {
 					if (!distinguished[v]) {
 						seqInfo.lastDist.push_back(v);
 					}
@@ -317,7 +317,7 @@ namespace FSMsequence {
 					outSet.erase(it->seqIt);
 				}
 				else {
-					for (auto v : it->dist) {
+					for (const auto& v : it->dist) {
 						if (!distinguished[v]) {
 							seqInfo.dist.push_back(v);
 						}
@@ -578,7 +578,7 @@ namespace FSMsequence {
 			for (state_t j = 0; j < N; j++) {
 				if ((j != stateIdx) && (output != fsm->getOutput(states[j], STOUT_INPUT))) {
 					stoutNeeded = true;
-					for (auto seq : outSCSet) {
+					for (const auto& seq : outSCSet) {
 						if (fsm->getOutputAlongPath(states[stateIdx], seq) != fsm->getOutputAlongPath(states[j], seq)) {
 							stoutNeeded = false;
 							break;

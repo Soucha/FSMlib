@@ -42,7 +42,7 @@ namespace FSMsequence {
 			fifo.pop();
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				block_t states;
-				for (auto state : act->collapsedStates) {
+				for (const auto& state : act->collapsedStates) {
 					auto nextState = fsm->getNextState(state, input);
 					// nextState is not WRONG_STATE because *blockIt and input are valid
 					if (nextState == NULL_STATE) {// all states need to have transition on input

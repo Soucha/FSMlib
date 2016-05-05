@@ -77,7 +77,7 @@ public:
 	* @param path
 	* @return end state or WRONG_STATE if given state or path is not valid
 	*/
-	state_t getEndPathState(state_t state, sequence_in_t path);
+	state_t getEndPathState(state_t state, const sequence_in_t& path);
 
 	//<-- OUTPUT BEHAVIOUR -->//
 
@@ -95,7 +95,7 @@ public:
 	* @param path
 	* @return output sequence or WRONG_OUTPUT if given state or path is not valid
 	*/
-	sequence_out_t getOutputAlongPath(state_t state, sequence_in_t path);
+	sequence_out_t getOutputAlongPath(state_t state, const sequence_in_t& path);
 
 	//<-- MODEL INITIALIZATION -->//
 

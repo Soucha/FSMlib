@@ -95,8 +95,8 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testingTSmethodComp(filename);
-			//testingTSmethodComp("", 1);
-			//testingCSmethodComp("");
+			testingTSmethodComp("", 1);
+			testingCSmethodComp("");
 		}
 
 		void printTS(sequence_set_t & TS) {
@@ -113,20 +113,24 @@ namespace FSMlibTest
 			}
 			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), TS.size(), len, indistinguishable.size());
-			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
-				method.c_str(), indistinguishable.size());
-			//for (auto f : indistinguishable) delete f;
-			if (printSeq) printTS(TS);
+			if (!TS.empty()) {
+				ARE_EQUAL(true, bool(indistinguishable.size() == 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
+					method.c_str(), indistinguishable.size());
+				ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
+				if (printSeq) printTS(TS);
+			}
 			return len;
 		}
 
 		seq_len_t printInfo(sequence_in_t & CS, string method, int extraStates = 0, bool printSeq = false) {
 			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, CS, extraStates);
 			DEBUG_MSG("%s\t%d\t%d\t%d\n", method.c_str(), int(!CS.empty()), CS.size(), indistinguishable.size());
-			ARE_EQUAL(true, bool(indistinguishable.size() <= 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
-				method.c_str(), indistinguishable.size());
-			//for (auto f : indistinguishable) delete f;
-			if (printSeq) DEBUG_MSG("%s\n", FSMmodel::getInSequenceAsString(CS).c_str());
+			if (!CS.empty()) {
+				ARE_EQUAL(true, bool(indistinguishable.size() == 1), "%s has not complete fault coverage, it produces %d indistinguishable FSMs.",
+					method.c_str(), indistinguishable.size());
+				ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
+				if (printSeq) DEBUG_MSG("%s\n", FSMmodel::getInSequenceAsString(CS).c_str());
+			}
 			return seq_len_t(CS.size());
 		}
 
