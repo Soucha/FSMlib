@@ -120,27 +120,28 @@ public:
 	void incNumberOfOutputs(output_t byNum);
 
 	/**
-	* Transforms given DFSM into the form without unreachable states.
-	* @param dfsm
-	* @return True if unreachable states were removed (or given had no unreachable state),
-	*         false if an error occured while unreachable states were removing
+	* Removes unreachable states.
+	* @return A collection of removed states
 	*/
-	bool removeUnreachableStates();
+	vector<state_t> removeUnreachableStates();
 
 	/**
 	* Eliminates unused rows from transition table and
 	* sets the number of inputs and outputs to the greatest
 	* input or output occurred in this model.
 	*
-	* Note that some states change their identification.
+	* @return A mapping of states that changed their labels (old -> new label)
 	*/
-	void makeCompact();
+	map<state_t, state_t> makeCompact();
 
 	/**
-	* Reduces this FSM into its minimal form.
-	* @return True on success, False if an error occurred
+	* Reduces this FSM into its minimal form. If the minimization is succesful, isReduced() is true.
+	* @return A mapping of old states to their new labels covering only states
+	*		  that was eliminated (NULL_STATE as value in the mapping), collapsed with another state,
+	*	 	  or relabelled to make model compact (see makeCompact()).
+	*		  An empty mapping is returned if there is an error or the machine is compact.
 	*/
-	bool minimize();
+	map<state_t, state_t> minimize();
 
 	/**
 	* @return a sorted colection of state IDs in use
@@ -165,7 +166,7 @@ protected:
 	bool distinguishByStateOutputs(queue<vector<state_t>>& blocks);
 	bool distinguishByTransitionOutputs(queue<vector<state_t>>& blocks);
 	bool distinguishByTransitions(queue<vector<state_t>>& blocks);
-	void mergeEquivalentStates(queue<vector<state_t>>& equivalentStates);
+	map<state_t, state_t> mergeEquivalentStates(queue<vector<state_t>>& equivalentStates);
 	
 	void clearStateOutputs();
 	void clearTransitionOutputs();

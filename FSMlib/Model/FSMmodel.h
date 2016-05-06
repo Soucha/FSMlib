@@ -46,7 +46,7 @@ namespace FSMmodel {
 	* Compares two DFSMs with same input and output alphabet and initial state 0.
 	* FSMs are isomorphic only if they differ in permutation of states.
 	*
-	* Function minimizes given FSMs if they are not in reduced form.
+	* Function minimizes given FSMs so state labelling can be changed if they are not in reduced form.
 	* @param fsm1
 	* @param fsm2
 	* @return True if given machines are isomorphic

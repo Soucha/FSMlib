@@ -63,6 +63,13 @@ public:
 	}
 
 	/**
+	* @return True if all states 0 - (N-1) are used, False otherwise.
+	*/
+	bool isCompact() const {
+		return (_numberOfStates == _usedStateIDs.size());
+	}
+
+	/**
 	* @return The number of inputs
 	*/
 	input_t getNumberOfInputs() const {

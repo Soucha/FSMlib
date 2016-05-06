@@ -73,8 +73,8 @@ namespace FSMtesting {
 	}
 
 	static bool writeLP(const vector<vector<seq_len_t>>& costs, const string& fileName) {
-		FILE * file = NULL;
-		if (!(file = fopen(fileName.c_str(), "w"))) {
+		FILE * file;
+		if (fopen_s(&file, fileName.c_str(), "w") != 0) {
 			ERROR_MESSAGE("Mstar-method: Unable to create a file for LP.");
 			return false;
 		}
@@ -128,8 +128,8 @@ namespace FSMtesting {
 
 	static sequence_set_t process_Mstar(const unique_ptr<DFSM>& fsm, int extraStates, bool resetEnabled) {
 		char* gurobiPath;
-		gurobiPath = getenv("GUROBI_HOME");
-		if (gurobiPath == NULL) {
+		size_t sz = 0;
+		if (_dupenv_s(&gurobiPath, &sz, "GUROBI_HOME") != 0) {
 			ERROR_MESSAGE("Mstar-method needs Gurobi solver to run and GUROBI_HOME is not a system variable!");
 			return sequence_set_t();
 		}
@@ -280,6 +280,7 @@ namespace FSMtesting {
 
 		if (!writeLP(costs, fileName)) return sequence_set_t();
 		string gurobiCl = string(gurobiPath) + GUROBI_SOLVER;
+		free(gurobiPath);
 		string resultFile = "ResultFile=" + fileName + ".sol";
 		auto rv = _spawnl(P_WAIT, gurobiCl.c_str(), gurobiCl.c_str(), resultFile.c_str(), fileName.c_str(), NULL);
 		if (rv != 0) {

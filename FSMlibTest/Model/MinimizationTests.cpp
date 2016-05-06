@@ -31,7 +31,7 @@ namespace FSMlibTest
 			fsm = make_unique<DFSM>();
 			fsm2 = make_unique<DFSM>();
 			create();
-			tRemoveUnreachableStates();
+			tRemoveUnreachableStates(2);
 			tMakeCompact();
 		}
 
@@ -50,7 +50,7 @@ namespace FSMlibTest
 			fsm = make_unique<Mealy>();
 			fsm2 = make_unique<Mealy>();
 			create();
-			tRemoveUnreachableStates();
+			tRemoveUnreachableStates(2);
 			tMakeCompact();
 		}
 
@@ -77,7 +77,7 @@ namespace FSMlibTest
 			fsm = make_unique<Moore>();
 			fsm2 = make_unique<Moore>();
 			create();
-			tRemoveUnreachableStates();
+			tRemoveUnreachableStates(2);
 			tMakeCompact();
 		}
 
@@ -103,7 +103,7 @@ namespace FSMlibTest
 			fsm = make_unique<DFA>();
 			fsm2 = make_unique<DFA>();
 			create();
-			tRemoveUnreachableStates();
+			tRemoveUnreachableStates(2);
 			tMakeCompact();
 		}
 
@@ -124,8 +124,9 @@ namespace FSMlibTest
 			tMinimize(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm", DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
-		void tRemoveUnreachableStates() {
-			ARE_EQUAL(true, fsm->removeUnreachableStates(), "Removal of unreachable states failed");
+		void tRemoveUnreachableStates(state_t unreachableStates) {
+			auto unStates = fsm->removeUnreachableStates();
+			ARE_EQUAL(unreachableStates, state_t(unStates.size()), "Removal of unreachable states failed");
 			auto states = fsm->getStates();
 			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states.size()), "The numbers of states are not equal.");
 			ARE_EQUAL(state_t(2), fsm->getNumberOfStates(), "The numbers of states are not equal.");
@@ -303,7 +304,8 @@ namespace FSMlibTest
 		void tMinimize(string filename1, string filename2) {
 			ARE_EQUAL(true, fsm->load(filename1), "Unable to load file %s", filename1.c_str());
 			ARE_EQUAL(true, fsm2->load(filename2), "Unable to load file %s", filename2.c_str());
-			ARE_EQUAL(true, fsm->minimize(), "FSM is not able to minimize");
+			fsm->minimize();
+			ARE_EQUAL(true, fsm->isReduced(), "FSM is not able to minimize");
 			//fsm->save(DATA_PATH);
 			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, fsm2), "Wrong reduction.");
 		}

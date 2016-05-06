@@ -101,7 +101,7 @@ sequence_out_t DFSM::getOutputAlongPath(state_t state, const sequence_in_t& path
 	return sOut;
 }
 
-bool DFSM::removeUnreachableStates() {
+vector<state_t> DFSM::removeUnreachableStates() {
 	vector<bool> isReachable(_usedStateIDs.size(), false);
 	queue<state_t> fifo;
 	isReachable[0] = true;
@@ -117,18 +117,18 @@ bool DFSM::removeUnreachableStates() {
 			}
 		}
 	}
+	vector<state_t> unreachable;
 	for (state_t s = 0; s < _usedStateIDs.size(); s++) {
 		if (_usedStateIDs[s] && !isReachable[s]) {
-			for (input_t i = 0; i < _numberOfInputs; i++) {
-				_transition[s][i] = NULL_STATE;
-				if (_isOutputTransition) _outputTransition[s][i] = DEFAULT_OUTPUT;
-			}
+			_transition[s].assign(_numberOfInputs, NULL_STATE);
+			if (_isOutputTransition) _outputTransition[s].assign(_numberOfInputs, DEFAULT_OUTPUT);
 			if (_isOutputState) _outputState[s] = DEFAULT_OUTPUT;
 			_usedStateIDs[s] = false;
 			_numberOfStates--;
+			unreachable.emplace_back(s);
 		}
 	}
-	return true;
+	return unreachable;
 }
 
 bool DFSM::distinguishByStateOutputs(queue<vector<state_t>>& blocks) {
@@ -248,7 +248,8 @@ bool DFSM::distinguishByTransitions(queue<vector<state_t>>& blocks) {
 	return true;
 }
 
-void DFSM::mergeEquivalentStates(queue<vector<state_t>>& equivalentStates) {
+map<state_t, state_t> DFSM::mergeEquivalentStates(queue<vector<state_t>>& equivalentStates) {
+	map<state_t, state_t> mapping;
 	vector<state_t> stateEquiv(_usedStateIDs.size());
 	for (state_t state = 0; state < stateEquiv.size(); state++) {
 		stateEquiv[state] = state;
@@ -257,6 +258,7 @@ void DFSM::mergeEquivalentStates(queue<vector<state_t>>& equivalentStates) {
 		auto &block = equivalentStates.front();
 		for (state_t state = 1; state < block.size(); state++) {
 			stateEquiv[block[state]] = block[0];
+			mapping[block[state]] = block[0];
 			if (_isOutputState) _outputState[block[state]] = DEFAULT_OUTPUT;
 		}
 		_numberOfStates -= state_t(block.size() - 1);
@@ -278,11 +280,12 @@ void DFSM::mergeEquivalentStates(queue<vector<state_t>>& equivalentStates) {
 			}
 		}
 	}
+	return mapping;
 }
 
-void DFSM::makeCompact() {
-	if (_numberOfStates == _usedStateIDs.size()) return;
-
+map<state_t, state_t> DFSM::makeCompact() {
+	if (isCompact()) return map<state_t, state_t>();
+	map<state_t, state_t> mapping;
 	vector<state_t> stateEquiv(_usedStateIDs.size());
 	for (state_t state = 0; state < stateEquiv.size(); state++) {
 		stateEquiv[state] = state;
@@ -296,6 +299,7 @@ void DFSM::makeCompact() {
 		_transition[newState].swap(_transition[oldState]);
 		if (_isOutputTransition) _outputTransition[newState].swap(_outputTransition[oldState]);
 		stateEquiv[oldState] = newState;
+		mapping[oldState] = newState;
 		_usedStateIDs[newState] = true;
 		_usedStateIDs[oldState] = false;
 		while (_usedStateIDs[newState]) newState++;
@@ -335,38 +339,46 @@ void DFSM::makeCompact() {
 		}
 	}
 	_numberOfOutputs = greatestOutput;
+	return mapping;
 }
 
-bool DFSM::minimize() {
-	if (!removeUnreachableStates()) return false;
-
+map<state_t, state_t> DFSM::minimize() {
+	if (_isReduced) return map<state_t, state_t>();
+	
+	auto unreachable = removeUnreachableStates();
+	map<state_t, state_t> mapping;
+	for (const auto& state : unreachable) {
+		mapping[state] = NULL_STATE;
+	}
 	queue<vector<state_t>> blocks;
 	blocks.emplace(getStates());
-
+	
 	if (_isOutputState) {
-		if (!distinguishByStateOutputs(blocks)) return false;
+		if (!distinguishByStateOutputs(blocks)) return map<state_t, state_t>();
 		if (blocks.size() == _numberOfStates) {
 			_isReduced = true;
-			return true;
 		}
 	}
-	if (_isOutputTransition) {
-		if (!distinguishByTransitionOutputs(blocks)) return false;
+	if (!_isReduced && _isOutputTransition) {
+		if (!distinguishByTransitionOutputs(blocks)) return map<state_t, state_t>();
 		if (blocks.size() == _numberOfStates) {
 			_isReduced = true;
-			return true;
 		}
 	}
-	if (!distinguishByTransitions(blocks)) return false;
-	if (blocks.empty()) {
+	if (!_isReduced) {
+		if (!distinguishByTransitions(blocks)) return map<state_t, state_t>();
+		if (blocks.empty()) {
+			_isReduced = true;
+		}
+	}
+	if (!_isReduced) {
+		auto equivStates = mergeEquivalentStates(blocks);
+		mapping.insert(equivStates.begin(), equivStates.end());
 		_isReduced = true;
-		return true;
 	}
-	mergeEquivalentStates(blocks);
-	makeCompact();
-
-	_isReduced = true;
-	return true;
+	auto compactMap = makeCompact();
+	mapping.insert(compactMap.begin(), compactMap.end());
+	return mapping;
 }
 
 void DFSM::clearTransitions() {
