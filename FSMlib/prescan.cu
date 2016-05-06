@@ -37,31 +37,33 @@
 #define LOG_NUM_BANKS 4  
 #define CONFLICT_FREE_OFFSET(n) ((n) >> NUM_BANKS + (n) >> (2 * LOG_NUM_BANKS))
 
-
 //#define DEBUG 0
 
 const int blockElements = 2 * THREADS_PER_BLOCK;
 
-static int blocks, levels, count, level, startIdx;
-static unsigned int *blockCounts = NULL, *devIdxs = NULL, *devSums = NULL, devN;
-#if DEBUG
-static unsigned int  *idxs = NULL, *sums = NULL;
-#endif
-#define IS_ERROR(error) isError(error, __FILE__, __LINE__)
-#define CHECK_ERROR(error) if (isError(error, __FILE__, __LINE__)) return false;
+struct dev_prescan_t {
+	int blocks, levels, count, startIdx;
+	unsigned int *blockCounts = nullptr, *Idxs = nullptr, *Sums = nullptr, N;
+};
 
-static void freeCuda(bool onError = true);
-static bool isError(cudaError_t error, const char *file, int line) {
+#if DEBUG
+static unsigned int  *idxs = nullptr, *sums = nullptr;
+#endif
+#define IS_ERROR(error) isError(error, __FILE__, __LINE__, dev)
+#define CHECK_ERROR(error) if (isError(error, __FILE__, __LINE__, dev)) return false;
+
+static void freeCuda(dev_prescan_t& dev, bool onError = true);
+static bool isError(cudaError_t error, const char *file, int line, dev_prescan_t& dev) {
 	if (error != cudaSuccess) {
 		ERROR_MESSAGE("prescan: %s in %s at line %d\n", cudaGetErrorString(error), file, line);
-		freeCuda();
+		freeCuda(dev);
 		return true;
 	}
 	return false;
 }
 
 int getLengthAsPowersTwoSum(int n) {
-	return (n / blockElements)*blockElements + (1 << (int)ceilf(logf(n % blockElements) / logf(2)));
+	return (n / blockElements)*blockElements + (1 << (int)ceil(log((double)(n % blockElements)) / log(2)));
 }
 
 __global__ void prescan(unsigned int *g_odata, unsigned int *g_idata, unsigned int *g_udata, int n) {
@@ -127,76 +129,75 @@ __global__ void add(unsigned int *out, unsigned int *in, int n) {
 		out[thid] += in[blockIdx.x / 2];
 }
 
-static bool initCUDA() {
-	CHECK_ERROR(cudaMalloc((void**)&(devIdxs), devN*sizeof(unsigned int)));
-	CHECK_ERROR(cudaMemset(devIdxs, 0, devN*sizeof(unsigned int)));
+static bool initCUDA(dev_prescan_t& dev) {
+	CHECK_ERROR(cudaMalloc((void**)&(dev.Idxs), dev.N*sizeof(unsigned int)));
+	CHECK_ERROR(cudaMemset(dev.Idxs, 0, dev.N*sizeof(unsigned int)));
 
-	blockCounts = (unsigned int*)malloc(levels*sizeof(unsigned int));
+	dev.blockCounts = (unsigned int*)malloc(dev.levels*sizeof(unsigned int));
 
-	count = getLengthAsPowersTwoSum(blocks);
-	blockCounts[0] = count;
-	if ((count - 1) / blockElements >= 1) {// how many times must be prescan run
-		int dx = count;
+	dev.count = getLengthAsPowersTwoSum(dev.blocks);
+	dev.blockCounts[0] = dev.count;
+	if ((dev.count - 1) / blockElements >= 1) {// how many times must be prescan run
+		int dx = dev.count;
 		int i = 1;
 		while (dx > 1) {
-			dx = dx / blockElements + (dx%blockElements>0);
+			dx = dx / blockElements + (dx % blockElements > 0);
 			dx = getLengthAsPowersTwoSum(dx);
-			blockCounts[i++] = dx;
-			count += dx;
+			dev.blockCounts[i++] = dx;
+			dev.count += dx;
 		}
 	}
 	else {
-		count++;
-		blockCounts[1] = 1;
+		dev.count++;
+		dev.blockCounts[1] = 1;
 	}
 #if DEBUG
-	for (int i = 0; i < levels; i++) {
-		printf("%d ", blockCounts[i]);
+	for (int i = 0; i < dev.levels; i++) {
+		printf("%d ", dev.blockCounts[i]);
 	}printf("\n");
 	getchar();
 
-	idxs = (unsigned int*)malloc(devN*sizeof(unsigned int));
-	sums = (unsigned int*)malloc(count*sizeof(unsigned int));
+	idxs = (unsigned int*)malloc(dev.N*sizeof(unsigned int));
+	sums = (unsigned int*)malloc(dev.count*sizeof(unsigned int));
 #endif
-	CHECK_ERROR(cudaMalloc((void**)&(devSums), count*sizeof(unsigned int)));
-	CHECK_ERROR(cudaMemset(devSums, 0, count*sizeof(unsigned int)));
+	CHECK_ERROR(cudaMalloc((void**)&(dev.Sums), dev.count*sizeof(unsigned int)));
+	CHECK_ERROR(cudaMemset(dev.Sums, 0, dev.count*sizeof(unsigned int)));
 	return true;
 }
 
-static bool callPrescan() {
-	prescan<<<blocks, THREADS_PER_BLOCK, 2 * THREADS_PER_BLOCK*sizeof(unsigned int)>>>(devIdxs, devIdxs, devSums, devN);
+static bool callPrescan(dev_prescan_t& dev) {
+	prescan<<<dev.blocks, THREADS_PER_BLOCK, 2 * THREADS_PER_BLOCK*sizeof(unsigned int)>>>(dev.Idxs, dev.Idxs, dev.Sums, dev.N);
 
 #if DEBUG
 	CHECK_ERROR(cudaDeviceSynchronize());
-	cudaMemcpy(idxs, devIdxs, devN*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-	for (int i = 0; i < devN; i++)	{
+	cudaMemcpy(idxs, dev.Idxs, dev.N*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	for (int i = 0; i < dev.N; i++)	{
 		printf("%d ", idxs[i]);
 	}printf("\n");
 	getchar();
 #endif
 
 	int dx, size, actBlocks;
-	level = 0;
-	count = blockCounts[level];
-	startIdx = 0;
-	for (level = 1; level < levels; level++) {// prescan of sums at each level
-		dx = blockCounts[level];
-		size = count - startIdx;
+	dev.count = dev.blockCounts[0];
+	dev.startIdx = 0;
+	for (int level = 1; level < dev.levels; level++) {// prescan of sums at each level
+		dx = dev.blockCounts[level];
+		size = dev.count - dev.startIdx;
 		actBlocks = size / blockElements + (size % blockElements > 0);
 #if DEBUG
-		printf("%d %d %d %d %d\n", dx, count, startIdx, size, actBlocks);
+		printf("%d %d %d %d %d\n", dx, dev.count, dev.startIdx, size, actBlocks);
 #endif
 		CHECK_ERROR(cudaDeviceSynchronize());
 		prescan<<<actBlocks, THREADS_PER_BLOCK, 2 * THREADS_PER_BLOCK*sizeof(unsigned int)>>>(
-			devSums + startIdx, devSums + startIdx, devSums + count, size);
+			dev.Sums + dev.startIdx, dev.Sums + dev.startIdx, dev.Sums + dev.count, size);
 		CHECK_ERROR(cudaGetLastError());
-		startIdx = count;
-		count += dx;
+		dev.startIdx = dev.count;
+		dev.count += dx;
 	}
 
 #if DEBUG
-	cudaMemcpy(sums, devSums, count*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-	for (int i = 0; i < count; i++)
+	cudaMemcpy(sums, dev.Sums, dev.count*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	for (int i = 0; i < dev.count; i++)
 	{
 		printf("%d ", sums[i]);
 	}printf("\n");
@@ -205,37 +206,37 @@ static bool callPrescan() {
 	return true;
 }
 
-static bool callAdd(int N) {
-	int dx;
+static bool callAdd(int N, dev_prescan_t& dev) {
+	int dx, level = dev.levels;
 	if (level > 1) {
-		count -= blockCounts[--level];
-		startIdx -= blockCounts[level - 1];
+		dev.count -= dev.blockCounts[--level];
+		dev.startIdx -= dev.blockCounts[level - 1];
 	}
 	while (level > 1) {
-		dx = blockCounts[--level];
-		count -= dx;
-		startIdx -= blockCounts[level - 1];
+		dx = dev.blockCounts[--level];
+		dev.count -= dx;
+		dev.startIdx -= dev.blockCounts[level - 1];
 #if DEBUG
 		printf("%d %d %d\n", dx, count, startIdx);
 #endif
 		CHECK_ERROR(cudaDeviceSynchronize());
-		add<<<2 * dx, THREADS_PER_BLOCK>>>(devSums + startIdx, devSums + count, count - startIdx);
+		add<<<2 * dx, THREADS_PER_BLOCK>>>(dev.Sums + dev.startIdx, dev.Sums + dev.count, dev.count - dev.startIdx);
 		CHECK_ERROR(cudaGetLastError());
 	}
-	if (blocks > 1) {// if all data are in one block, indexes are correct. otherwise add prescan sums
+	if (dev.blocks > 1) {// if all data are in one block, indexes are correct. otherwise add prescan sums
 		CHECK_ERROR(cudaDeviceSynchronize());
-		add<<<2 * blocks, THREADS_PER_BLOCK>>>(devIdxs, devSums, N);
+		add<<<2 * dev.blocks, THREADS_PER_BLOCK>>>(dev.Idxs, dev.Sums, N);
 		CHECK_ERROR(cudaGetLastError());
 	}
 
 #if DEBUG
-	cudaMemcpy(idxs, devIdxs, devN*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-	for (int i = 0; i < devN; i++) {
+	cudaMemcpy(idxs, dev.Idxs, dev.N*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	for (int i = 0; i < dev.N; i++) {
 		printf("%d ", idxs[i]);
 	}printf("\n");
 	getchar();
-	cudaMemcpy(sums, devSums, count*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-	for (int i = 0; i < count; i++) {
+	cudaMemcpy(sums, dev.Sums, dev.count*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	for (int i = 0; i < dev.count; i++) {
 		printf("%d ", sums[i]);
 	}printf("\n");
 	getchar();
@@ -243,15 +244,15 @@ static bool callAdd(int N) {
 	return true;
 }
 
-static void freeCuda(bool onError) {
+static void freeCuda(dev_prescan_t& dev, bool onError) {
 
-#define CUDA_FREE(ptr) if (ptr) {cudaFree(ptr); ptr = NULL;}
-#define MEM_FREE(ptr) if (ptr) {free(ptr); ptr = NULL;}
+#define CUDA_FREE(ptr) if (ptr) {cudaFree(ptr); ptr = nullptr;}
+#define MEM_FREE(ptr) if (ptr) {free(ptr); ptr = nullptr;}
 
-	if (onError) CUDA_FREE(devIdxs);// cannot be freed because it is returned
-	CUDA_FREE(devSums);
+	if (onError) CUDA_FREE(dev.Idxs);// cannot be freed because it is returned
+	CUDA_FREE(dev.Sums);
 
-	if (levels > 1) MEM_FREE(blockCounts);
+	if (dev.levels > 1) MEM_FREE(dev.blockCounts);
 
 #if DEBUG
 	MEM_FREE(sums);
@@ -260,18 +261,19 @@ static void freeCuda(bool onError) {
 }
 
 unsigned int * prescan(int N, unsigned int * devArrIn) {
-	blocks = (N % blockElements == 0) ? N / blockElements : N / blockElements + 1;
-	levels = ceilf(logf(N) / logf(blockElements));
-	devN = getLengthAsPowersTwoSum(N);
+	dev_prescan_t dev;
+	dev.blocks = (N % blockElements == 0) ? N / blockElements : N / blockElements + 1;
+	dev.levels = (int)ceil(log((double)N) / log((double)blockElements));
+	dev.N = getLengthAsPowersTwoSum(N);
 
-	if (!initCUDA()) return NULL;
-	cudaMemcpy(devIdxs, devArrIn, N*sizeof(unsigned int), cudaMemcpyDeviceToDevice);
+	if (!initCUDA(dev)) return nullptr;
+	cudaMemcpy(dev.Idxs, devArrIn, N*sizeof(unsigned int), cudaMemcpyDeviceToDevice);
 
-	if (!callPrescan()) return NULL;
-	if (!callAdd(N)) return NULL;
-	if (IS_ERROR(cudaDeviceSynchronize())) return NULL;
-	freeCuda(false);
+	if (!callPrescan(dev)) return nullptr;
+	if (!callAdd(N, dev)) return nullptr;
+	if (IS_ERROR(cudaDeviceSynchronize())) return nullptr;
+	freeCuda(dev, false);
 
-	return devIdxs;
+	return dev.Idxs;
 }
 
