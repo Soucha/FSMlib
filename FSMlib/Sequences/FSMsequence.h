@@ -70,13 +70,17 @@ struct LinkCell {
 #define SVS_FOUND       3
 #define CSet_FOUND      4
 
-namespace FSMsequence {
+#define RETURN_IF_NONCOMPACT(fsm, functionName, retVal) if (!fsm->isCompact()) {\
+	ERROR_MESSAGE("%s - FSM needs to be compact.", functionName)\
+	return retVal;}
+
+namespace FSMsequence {// all design functions require a compact FSM
 	/**
 	* Fills given set with input sequences that cover states.
 	* State 0 is start state and FSM goes to unique state using each sequence.
 	* Sequences are sorted by lenght and then lexicographically from the shortest.
 	* @param dfsm - Deterministic FSM
-	* @return state cover
+	* @return state cover, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm);
 
@@ -86,7 +90,7 @@ namespace FSMsequence {
 	* of state cover is extended by each input symbol.
 	* State 0 is start state for all sequences.
 	* @param dfsm - Deterministic FSM
-	* @return transition cover
+	* @return transition cover, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm);
 
@@ -94,7 +98,7 @@ namespace FSMsequence {
 	* Fills given set with all input sequences of the lenght up to depth.
 	* @param dfsm - Deterministic FSM
 	* @param depth
-	* @return traversal set
+	* @return traversal set, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth);
 
@@ -109,7 +113,7 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @return a shortest preset distinguishing sequence, or empty sequence if there is no SS
+	* @return a shortest preset distinguishing sequence, or empty sequence if there is no PDS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
 
@@ -117,7 +121,7 @@ namespace FSMsequence {
 	* Finds an adaptive distinguishing sequence if FSM has it.<br><br>
 	* Applying ADS distinguishes each state from the others.
 	*
-	* Found ADS does not have to be the shortest one but search runs
+	* Found ADS does not have to be the shortest one but the search runs
 	* in polynomial time of the number of states.
 	*
 	* Source:
@@ -127,7 +131,7 @@ namespace FSMsequence {
 	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
 	*
 	* @param dfsm - Deterministic FSM
-	* @return an Adaptive Distinguishing Sequence, or nullptr if there is no ADS
+	* @return an Adaptive Distinguishing Sequence, or nullptr if there is no ADS or the FSM is not compact
 	*/
 	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
 
@@ -136,14 +140,14 @@ namespace FSMsequence {
 	* Adaptive Distinguishing Sequence for each state.
 	* @param dfsm - Deterministic FSM
 	* @param ads - Adaptive Distinguishing Sequence
-	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS
+	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads);
 
 	/**
 	* Finds an adaptive distinguishing sequence for each state (using getAdaptiveDistinguishingSequence).
 	* @param dfsm - Deterministic FSM
-	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS 
+	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS or the FSM is not compact 
 	*/
 	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm);
 
@@ -152,7 +156,7 @@ namespace FSMsequence {
 	* Applying SVS distinguishes given state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param state
-	* @return a shortest state verifying sequence, or empty sequence if there is no SVS
+	* @return a shortest state verifying sequence, or an empty sequence if there is no SVS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& dfsm, state_t state);
 
@@ -163,37 +167,23 @@ namespace FSMsequence {
 	* Sequence VSet[i] of resulting collection belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).<br>
 	* Applying SVS distinguishes related state from the others.
 	* @param dfsm - Deterministic FSM
-	* @return Verifying Set of SVSs
+	* @return Verifying Set of SVSs, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& dfsm);
 
 	/**
-	* Fills given seq table with the shortest possible sequences
-	* that distinguish related pairs of states.\n
-	*
-	* State pair (i,j) has index in seq derived from:
-	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
-	* &nbsp; (1,2) => N-1,...
-	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
-	* &nbsp; N is number of states and for each (i,j): i<j
-	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	* Finds the shortest possible sequences that distinguish related pairs of states.
+	* See getStatePairIdx() to obtain state pair index from indexes of states.
 	*
 	* @param dfsm - Deterministic FSM
-	* @return a collection of shortest separating sequences for each state pair
+	* @return a collection of shortest separating sequences for each state pair, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences(const unique_ptr<DFSM>& dfsm);
 
 #ifdef PARALLEL_COMPUTING
 	/**
-	* Fills given seq table with the shortest possible sequences
-	* that distinguish related pairs of states.\n
-	*
-	* State pair (i,j) has index in seq derived from:
-	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
-	* &nbsp; (1,2) => N-1,...
-	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
-	* &nbsp; N is number of states and for each (i,j): i<j
-	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	* Finds the shortest possible sequences that distinguish related pairs of states.
+	* See getStatePairIdx() to obtain state pair index from indexes of states.
 	*
 	* A thread distinguishes one state pair by a different output on a common input in the first run
 	* or in a consecutive run if its next states' pair is distinguished.
@@ -204,15 +194,8 @@ namespace FSMsequence {
 	FSMLIB_API sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& dfsm);
 
 	/**
-	* Fills given seq table with the shortest possible sequences
-	* that distinguish related pairs of states.\n
-	*
-	* State pair (i,j) has index in seq derived from:
-	* &nbsp; (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
-	* &nbsp; (1,2) => N-1,...
-	* &nbsp; i, j are indexes to the vector of states dfsm->getStates()
-	* &nbsp; N is number of states and for each (i,j): i<j
-	* &nbsp; (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
+	* Finds the shortest possible sequences that distinguish related pairs of states.
+	* See getStatePairIdx() to obtain state pair index from indexes of states.
 	*
 	* At first, a thread distinguishes one state pair if it produces different outputs on an input.
 	* Otherwise, a link from next states' pair is created.
@@ -226,11 +209,11 @@ namespace FSMsequence {
 #endif
 
 	/**
-	* Fills given Characterizing table with all possible distinguishing
-	* inputs for each state pair. A distinguishing input points to successive
-	* state pair.
+	* Finds all possible distinguishing inputs for each state pair.
+	* A distinguishing input points to successive state pair.
+	* See getStatePairIdx() to obtain state pair index from indexes of states.
 	* @param dfsm - Deterministic FSM
-	* @return characterizing table
+	* @return characterizing table, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API vector<LinkCell> getSeparatingSequences(const unique_ptr<DFSM>& dfsm);
 
@@ -246,16 +229,16 @@ namespace FSMsequence {
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
-	* @return State Characterizing Set of given state
+	* @return State Characterizing Set of given state, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getStateCharacterizingSet(const unique_ptr<DFSM>& dfsm, state_t state,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM.<br>
 	* Output vector will have length of the number of states.<br>
-	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
+	* Sequence set outSCSets[i] belongs to state i (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
 	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
@@ -263,11 +246,11 @@ namespace FSMsequence {
 	* @param reduceFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
-	* @return a collection of State Charactirizing Sets of all states
+	* @return a collection of State Charactirizing Sets of all states, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API vector<sequence_set_t> getStatesCharacterizingSets(const unique_ptr<DFSM>& dfsm,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true,	void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+		bool filterPrefixes = true,	void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds state characterizing sets for all states of FSM<br>
@@ -275,17 +258,17 @@ namespace FSMsequence {
 	* same separating sequence of related states.<br>
 	* Result is thus a family of harmonized state identifiers.
 	* Output vector will have length of the number of states.<br>
-	* Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
+	* Sequence set outSCSets[i] belongs to state i (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
 	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
 	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
-	* @return a family of Harmonized State Identifiers
+	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& dfsm,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr);
+		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr);
 
 	/**
 	* Finds characterizing set for FSM.<br>
@@ -298,7 +281,7 @@ namespace FSMsequence {
 	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
-	* @return Characterizing Set
+	* @return Characterizing Set, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getCharacterizingSet(const unique_ptr<DFSM>& dfsm,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
@@ -315,7 +298,7 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @return a synchronizing sequence, or empty sequence if there is no SS
+	* @return a synchronizing sequence, or an empty sequence if there is no SS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& dfsm);
 
@@ -331,7 +314,7 @@ namespace FSMsequence {
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
-	* @return a homing sequence, or empty sequence if there is no HS
+	* @return a homing sequence, or an empty sequence if there is no HS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& dfsm);
 
@@ -364,12 +347,13 @@ namespace FSMsequence {
 	* @param reduceCSetFunc - a pointer to function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
-	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND
+	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND,
+	*			or -1 if the FSM is not compact
 	*/
 	FSMLIB_API int getDistinguishingSequences(const unique_ptr<DFSM>& dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet) = nullptr,
+		bool filterPrefixes = true, void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr,
 		void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr);
 
 	/**
@@ -381,7 +365,13 @@ namespace FSMsequence {
 	FSMLIB_API state_t getIdx(const vector<state_t>& states, state_t stateId);
 
 	/**
-	* Calculates index of given pair of states.
+	* Calculates index of given pair of states as follows:
+	* Index of state pair (i,j) is derived from:
+	*   (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
+	*   (1,2) => N-1,...
+	*   i, j are indexes to the vector of states dfsm->getStates()
+	*   N is number of states and for each (i,j): i<j
+	*   (i,j) => i * N + j - 1 - (i * (i + 3)) / 2
 	* @param s1 - the first state
 	* @param s2 - the second state
 	* @param N - the number of states
@@ -396,6 +386,8 @@ namespace FSMsequence {
 	* Next it goes from shorter to longer sequences in the set
 	* and again removes unused ones, or some distinguishable sequences could be shortened
 	* so it truncates these sequences as much as possible.
+	*
+	* An error message is produced if the FSM is not compact
 	* @param dfsm
 	* @param outCSet
 	*/
@@ -413,6 +405,8 @@ namespace FSMsequence {
 	*
 	* For each state pair, CSet needs to contain a sequence that particular state pair in the last symbol
 	* because this function does not truncate given characterizing sequences.
+	*
+	* An error message is produced if the FSM is not compact
 	* @param dfsm
 	* @param outCSet - CSet of given state to reduce (output set as well)
 	*/
@@ -422,11 +416,13 @@ namespace FSMsequence {
 	* Reduces the number of sequences in given State Characterizing set.
 	* It goes from longer sequences to shorter ones
 	* and removes unused ones (that don't distinguish any yet undistinguished pair of states).
+	*
+	* An error message is produced if the FSM is not compact
 	* @param dfsm
-	* @param stateIdx - index of state in fsm->getStates()
+	* @param state
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_LS(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	FSMLIB_API void reduceSCSet_LS(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet);
 	
 	/**
 	* Reduces the number of sequences in given State Characterizing set.
@@ -436,11 +432,13 @@ namespace FSMsequence {
 	* Next it goes from shorter to longer sequences in set
 	* and again removes unused or some distinguishable sequence could be shortened
 	* so it truncated these sequences as much as possible.
+	*
+	* An error message is produced if the FSM is not compact
 	* @param dfsm
-	* @param stateIdx - index of state in fsm->getStates()
+	* @param state
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_LS_SL(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);
+	FSMLIB_API void reduceSCSet_LS_SL(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet);
 	
 	/**
 	* Reduces the number of sequence in given State Characterizing set.
@@ -454,9 +452,11 @@ namespace FSMsequence {
 	* 
 	* For each state pair, SCSet needs to contain a sequence that particular state pair in the last symbol
 	* because this function does not truncate given characterizing sequences.
+	*
+	* An error message is produced if the FSM is not compact
 	* @param dfsm
-	* @param stateIdx - index of state in fsm->getStates()
+	* @param state
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
-	FSMLIB_API void reduceSCSet_EqualLength(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet);	
+	FSMLIB_API void reduceSCSet_EqualLength(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet);	
 }

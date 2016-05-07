@@ -95,29 +95,28 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
-			//testGetStatesCharacterizingSets("");
+			testGetStatesCharacterizingSets("");
 			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
 			testGetHarmonizedStateIdentifiers("");
 			testGetSeparatingSequences("");
 		}
 
-		void testSCSet(state_t stateIdx, sequence_set_t& sCSet) {
+		void testSCSet(state_t state, sequence_set_t& sCSet) {
 			state_t N = fsm->getNumberOfStates();
 			vector<bool> distinguished(N, false);
-			vector<state_t> states = fsm->getStates();
 			bool distinguishState, hasMinLen;
 			sequence_out_t outS, outSWithoutLast, outI;
-			//DEBUG_MSG("State Characterizing Set of state %d:\n", states[stateIdx]);
-			DEBUG_MSG("%d:", states[stateIdx]);
+			//DEBUG_MSG("State Characterizing Set of state %d:\n", states[state]);
+			DEBUG_MSG("%d:", state);
 			for (sequence_set_t::iterator sIt = sCSet.begin(); sIt != sCSet.end(); sIt++) {
 				DEBUG_MSG(" %s\n", FSMmodel::getInSequenceAsString(*sIt).c_str());
 				ARE_EQUAL(false, sIt->empty(), "Empty sequence is not possible!");
-				outSWithoutLast = outS = fsm->getOutputAlongPath(states[stateIdx], *sIt);
+				outSWithoutLast = outS = fsm->getOutputAlongPath(state, *sIt);
 				outSWithoutLast.pop_back();
 				distinguishState = hasMinLen = false;
 				for (state_t i = 0; i < N; i++) {
-					if (i != stateIdx) {
-						outI = fsm->getOutputAlongPath(states[i], *sIt);
+					if (i != state) {
+						outI = fsm->getOutputAlongPath(i, *sIt);
 						if (outS != outI) {
 							if (!distinguished[i]) {
 								distinguishState = distinguished[i] = true;
@@ -134,18 +133,16 @@ namespace FSMlibTest
 				ARE_EQUAL(true, hasMinLen, "Sequence %s could be shorter.",
 					FSMmodel::getInSequenceAsString(*sIt).c_str());
 			}
-			distinguished[stateIdx] = true;
+			distinguished[state] = true;
 			for (state_t i = 0; i < N; i++) {
-				ARE_EQUAL(true, bool(distinguished[i]), "State[%d] %d is not distinguished from fixed state[%d] %d.",
-					i, states[i], stateIdx, states[stateIdx]);
+				ARE_EQUAL(true, bool(distinguished[i]), "State %d is not distinguished from fixed state %d.", i, state);
 			}
 		}
 
-		void testGetStateCharacterizingSet(string filename, state_t stateIdx) {
+		void testGetStateCharacterizingSet(string filename, state_t state) {
 			if (!filename.empty()) fsm->load(filename);
-			vector<state_t> states = fsm->getStates();
-			auto sCSet = getStateCharacterizingSet(fsm, states[stateIdx], getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
-			testSCSet(stateIdx, sCSet);
+			auto sCSet = getStateCharacterizingSet(fsm, state, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+			testSCSet(state, sCSet);
 		}
 
 		void testGetStatesCharacterizingSets(string filename) {
@@ -161,7 +158,6 @@ namespace FSMlibTest
 			auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
-			vector<state_t> states = fsm->getStates();
 			bool distinguishState, hasMinLen;
 			sequence_out_t outS, outSWithoutLast, outI;
 			for (state_t state = 0; state < N - 1; state++) {
@@ -174,10 +170,10 @@ namespace FSMlibTest
 
 				distinguishState = hasMinLen = false;
 				for (state_t state = 0; state < N - 1; state++) {
-					outSWithoutLast = outS = fsm->getOutputAlongPath(states[state], *sIt);
+					outSWithoutLast = outS = fsm->getOutputAlongPath(state, *sIt);
 					outSWithoutLast.pop_back();
 					for (state_t i = state + 1; i < N; i++) {
-						outI = fsm->getOutputAlongPath(states[i], *sIt);
+						outI = fsm->getOutputAlongPath(i, *sIt);
 						if (outS != outI) {
 							//DEBUG_MSG("%d-%d %u %s: %s %s %s\n", state, i, (distinguished[state][i] ? 1 : 0),
 								//FSMmodel::getInSequenceAsString(*sIt).c_str(), FSMmodel::getOutSequenceAsString(outS).c_str(),
@@ -199,8 +195,7 @@ namespace FSMlibTest
 			}
 			for (state_t state = 0; state < N - 1; state++) {
 				for (state_t i = state + 1; i < N; i++) {
-					ARE_EQUAL(true, bool(distinguished[state][i]), "State[%d] %d is not distinguished from state[%d] %d.", 
-						i, states[i], state, states[state]);
+					ARE_EQUAL(true, bool(distinguished[state][i]), "State %d is not distinguished from state %d.", i, state);
 				}
 			}
 		}
@@ -213,10 +208,9 @@ namespace FSMlibTest
 			int len;
 			sequence_in_t test;
 			sequence_in_t::iterator sIt;
-			vector<state_t> states = fsm->getStates();
-
+			
 			for (state_t state = 0; state < N; state++) {
-				DEBUG_MSG("%d:", states[state]);
+				DEBUG_MSG("%d:", state);
 				pset.clear();
 				for (sequence_in_t seq : HCSet[state]) {
 					DEBUG_MSG(" %s\n", FSMmodel::getInSequenceAsString(seq).c_str());
@@ -232,14 +226,13 @@ namespace FSMlibTest
 								test.push_back(*sIt);
 								sIt++;
 							}
-							if (fsm->getOutputAlongPath(states[state], test) != fsm->getOutputAlongPath(states[i], test)) {
+							if (fsm->getOutputAlongPath(state, test) != fsm->getOutputAlongPath(i, test)) {
 								break;
 							}
 						}
 						len = -1;
 					}
-					ARE_EQUAL(true, len != -1, "States [%d] %d and [%d] %d have not common distinguishing sequence.",
-						i, states[i], state, states[state]);
+					ARE_EQUAL(true, len != -1, "States %d and %d have not common distinguishing sequence.", i, state);
 				}
 			}
 		}
@@ -247,21 +240,18 @@ namespace FSMlibTest
 		void testGetSeparatingSequences(string filename) {
 			if (!filename.empty()) fsm->load(filename);
 			auto seq = getSeparatingSequences(fsm);
-			vector<state_t> states = fsm->getStates();
 			state_t N = fsm->getNumberOfStates(), idx, nextStateI, nextStateJ, nextIdx;
 
 			for (state_t i = 0; i < N - 1; i++) {
 				for (state_t j = i + 1; j < N; j++) {
 					idx = i * N + j - 1 - (i * (i + 3)) / 2;
 					DEBUG_MSG("%u x %u (%u) - %d:\n", i, j, idx, seq[idx].minLen);
-					ARE_EQUAL(true, (seq[idx].minLen > 0), "MinLen of SepS of states [%d] %d and [%d] %d is not positive.",
-							i, states[i], j, states[j]);
+					ARE_EQUAL(true, (seq[idx].minLen > 0), "MinLen of SepS of states %d and %d is not positive.", i, j);
 					bool dist = false;
 					if (fsm->isOutputState()) {
-						if (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT)) {
+						if (fsm->getOutput(i, STOUT_INPUT) != fsm->getOutput(j, STOUT_INPUT)) {
 							ARE_EQUAL(seq_len_t(1), seq[idx].minLen,
-								"States [%d] %d and [%d] %d have different outputs but minLen is %d.",
-								i, states[i], j, states[j], seq[idx].minLen);
+								"States %d and %d have different outputs but minLen is %d.", i, j, seq[idx].minLen);
 							dist = true;
 						}
 					}
@@ -269,28 +259,25 @@ namespace FSMlibTest
 					input_t minIn = STOUT_INPUT;
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 						DEBUG_MSG("  %d -> %d\n", input, seq[idx].next[input]);
-						if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {
+						if (fsm->getOutput(i, input) != fsm->getOutput(j, input)) {
 							ARE_EQUAL(seq_len_t(1), seq[idx].minLen,
-								"States [%d] %d and [%d] %d have different outputs on %d but minLen is %d.",
-								i, states[i], j, states[j], input, seq[idx].minLen);
+								"States %d and %d have different outputs on %d but minLen is %d.", i, j, input, seq[idx].minLen);
 							ARE_EQUAL(idx, seq[idx].next[input],
-								"States [%d] %d and [%d] %d have different outputs on %d but the link goes to %d instead of their index %d.",
-								i, states[i], j, states[j], input, seq[idx].next[input], idx);
+								"States %d and %d have different outputs on %d but the link goes to %d instead of their index %d.",
+								i, j, input, seq[idx].next[input], idx);
 							dist = true;
 						}
 						else {
-							nextStateI = fsm->getNextState(states[i], input);
-							nextStateJ = fsm->getNextState(states[j], input);
+							nextStateI = fsm->getNextState(i, input);
+							nextStateJ = fsm->getNextState(j, input);
 							if (nextStateI != nextStateJ) {
-								nextStateI = getIdx(states, nextStateI);
-								nextStateJ = getIdx(states, nextStateJ);
 								nextIdx = (nextStateI < nextStateJ) ?
 									(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
 									(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
 								if (nextIdx != idx) {
 									ARE_EQUAL(nextIdx, seq[idx].next[input],
-										"Pair of states [%d] %d, [%d] %d goes on %d to %d instead of %d.",
-										i, states[i], j, states[j], input, seq[idx].next[input], nextIdx);
+										"Pair of states %d, %d goes on %d to %d instead of %d.", 
+										i, j, input, seq[idx].next[input], nextIdx);
 									if (minVal > seq[nextIdx].minLen) {
 										minVal = seq[nextIdx].minLen;
 										minIn = input;
@@ -298,25 +285,23 @@ namespace FSMlibTest
 								}
 								else {
 									ARE_EQUAL(NULL_STATE, seq[idx].next[input],
-										"Pair of states [%d] %d, [%d] %d stays in the same pair on %d but the link goes to %d instead of NULL_STATE.",
-										i, states[i], j, states[j], input, seq[idx].next[input]);
+										"Pair of states %d, %d stays in the same pair on %d but the link goes to %d instead of NULL_STATE.",
+										i, j, input, seq[idx].next[input]);
 								}
 								
 							}
 							else {
 								ARE_EQUAL(NULL_STATE, seq[idx].next[input],
-									"Pair of states [%d] %d, [%d] %d goes in the same next state [%d] on %d but the link goes to %d instead of NULL_STATE.",
-									i, states[i], j, states[j], nextStateI, input, seq[idx].next[input]);
+									"Pair of states %d, %d goes in the same next state [%d] on %d but the link goes to %d instead of NULL_STATE.",
+									i, j, nextStateI, input, seq[idx].next[input]);
 							}
 						}
 					}
 					if (seq[idx].minLen == 1) {
-						ARE_EQUAL(true, dist, "States [%d] %d and [%d] %d have same outputs on all inputs but minLen is 1.",
-							i, states[i], j, states[j]);
+						ARE_EQUAL(true, dist, "States %d and %d have same outputs on all inputs but minLen is 1.", i, j);
 					} else {
 						ARE_EQUAL(seq_len_t(minVal + 1), seq[idx].minLen,
-							"States [%d] %d and [%d] %d have incorrect minLen of %d, best next pair has only %d.",
-							i, states[i], j, states[j], seq[idx].minLen, minVal);
+							"States %d and %d have incorrect minLen of %d, best next pair has only %d.", i, j, seq[idx].minLen, minVal);
 					}
 				}
 			}

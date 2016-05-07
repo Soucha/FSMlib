@@ -161,17 +161,16 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false);
+	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t state, state_t N, bool filterPrefixes = false);
 
 	static void distinguishBN(const unique_ptr<DFSM>& fsm, const shared_ptr<block_node_t> bn, const sequence_vec_t& seq, bn_partition_t& allBN) {
 		state_t N = fsm->getNumberOfStates();
-		auto states = fsm->getStates();
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 			auto stop = false;
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// + 1 for DEFAULT_OUTPUT
 			list<output_t> actOutputs;
 			for (const auto& state : bn->states) {
-				auto output = fsm->getOutput(states[state], input);
+				auto output = fsm->getOutput(state, input);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 				if (output == WRONG_OUTPUT) {
 					// one state can be distinguished by this input but no two
@@ -183,8 +182,8 @@ namespace FSMsequence {
 					stop = true;
 				}
 				else {
-					state_t nextStateId = getIdx(states, fsm->getNextState(states[state], input));
-					if (!sameOutput[output].insert(nextStateId).second) {
+					state_t nextState = fsm->getNextState(state, input);
+					if (!sameOutput[output].insert(nextState).second) {
 						// two states are indistinguishable under this input
 						actOutputs.clear();
 						break;
@@ -214,7 +213,7 @@ namespace FSMsequence {
 							vector<pair<output_t, block_t>> outStates;
 							for (const auto& i : succBN->states) {
 								stop = false;
-								auto output = fsm->getOutput(states[i], STOUT_INPUT);
+								auto output = fsm->getOutput(i, STOUT_INPUT);
 								for (output_t outIdx = 0; outIdx < outStates.size(); outIdx++) {
 									if (output == outStates[outIdx].first) {
 										outStates[outIdx].second.emplace(i);
@@ -260,7 +259,6 @@ namespace FSMsequence {
 		multimap<state_t, bn_partition_t> closedPDS;
 		priority_queue<unique_ptr<node_pds_t>, vector<unique_ptr<node_pds_t>>, pds_heur_comp> openPDS;
 		auto N = fsm->getNumberOfStates();
-		auto states = fsm->getStates();
 		sequence_in_t outPDS;
 
 		auto rootBN = make_shared<block_node_t>();
@@ -284,7 +282,7 @@ namespace FSMsequence {
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// + 1 for DEFAULT_OUTPUT
 			// get output of all states
 			for (state_t i = 0; i < N; i++) {
-				auto output = fsm->getOutput(states[i], STOUT_INPUT);
+				auto output = fsm->getOutput(i, STOUT_INPUT);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 				sameOutput[output].emplace(i);
 			}
@@ -466,13 +464,12 @@ namespace FSMsequence {
 		sequence_in_t outSVS;
 		bool stop, stoutUsed;
 		auto N = fsm->getNumberOfStates();
-		auto states = fsm->getStates();
 		auto actSVS = make_unique<node_svs_t>();
 		actSVS->actState = refState;// refStata is a state index
 		if (fsm->isOutputState()) {
-			auto output = fsm->getOutput(states[actSVS->actState], STOUT_INPUT);
+			auto output = fsm->getOutput(actSVS->actState, STOUT_INPUT);
 			for (state_t i = 0; i < N; i++) {
-				if (fsm->getOutput(states[i], STOUT_INPUT) == output) {
+				if (fsm->getOutput(i, STOUT_INPUT) == output) {
 					actSVS->states.insert(i);
 				}
 			}
@@ -510,19 +507,19 @@ namespace FSMsequence {
 			closedSVS.emplace(actSVS->actState, actSVS->states);
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				block_t sameOutput;
-				auto output = fsm->getOutput(states[actSVS->actState], input);
-				auto nextState = fsm->getNextState(states[actSVS->actState], input);
+				auto output = fsm->getOutput(actSVS->actState, input);
+				auto nextState = fsm->getNextState(actSVS->actState, input);
 				//if (nextState == NULL_STATE) continue;
 				for (const auto& state : actSVS->states) {
-					if (output == fsm->getOutput(states[state], input)) {
+					if (output == fsm->getOutput(state, input)) {
 						// is state undistinguishable from fixed state?
-						if ((nextState == fsm->getNextState(states[state], input))
+						if ((nextState == fsm->getNextState(state, input))
 							&& (state != actSVS->actState)) {
 							// other state goes to the same state under this input
 							sameOutput.clear();
 							break;
 						}
-						sameOutput.emplace(getIdx(states, fsm->getNextState(state, input)));// NULL_STATE is allowed once
+						sameOutput.emplace(fsm->getNextState(state, input));// NULL_STATE is allowed once
 					}
 				}
 				if (sameOutput.empty()) {
@@ -532,8 +529,8 @@ namespace FSMsequence {
 				if (fsm->isOutputState() && (sameOutput.size() > 1)) {
 					block_t tmp;
 					output_t outputNS = fsm->getOutput(nextState, STOUT_INPUT);
-					for (state_t i : sameOutput) {
-						if (fsm->getOutput(states[i], STOUT_INPUT) == outputNS) {
+					for (const auto& i : sameOutput) {
+						if (fsm->getOutput(i, STOUT_INPUT) == outputNS) {
 							tmp.insert(i);
 						}
 					}
@@ -550,7 +547,6 @@ namespace FSMsequence {
 					stop = true;
 					break;
 				}
-				nextState = getIdx(states, nextState);
 				auto usedIt = closedSVS.equal_range(nextState);
 				for (auto it = usedIt.first; it != usedIt.second; it++) {
 					if (includes(sameOutput.begin(), sameOutput.end(), it->second.begin(), it->second.end())) {
@@ -588,8 +584,9 @@ namespace FSMsequence {
 	int getDistinguishingSequences(const unique_ptr<DFSM>& fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm), bool filterPrefixes,
-			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t stateIdx, sequence_set_t & outSCSet),
+			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet),
 			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet)) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getDistinguishingSequences", -1);
 		state_t N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
 		

@@ -49,17 +49,17 @@ namespace FSMsequence {
 	};
 
 	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
 		sequence_vec_t ADSet;
 		if (!ads) return ADSet;
 		stack<pair<AdaptiveDS*, sequence_in_t>> lifo;
 		lifo.emplace(ads.get(), sequence_in_t());
 		ADSet.resize(fsm->getNumberOfStates());
-		auto states = fsm->getStates();
 		while (!lifo.empty()) {
 			auto p = move(lifo.top());
 			lifo.pop();
 			if (p.first->decision.empty()) {
-				ADSet[getIdx(states, p.first->initialStates.front())] = p.second;
+				ADSet[p.first->initialStates.front()] = p.second;
 			}
 			else {
 				p.second.insert(p.second.end(), p.first->input.begin(), p.first->input.end());
@@ -72,11 +72,12 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
 		auto ads = getAdaptiveDistinguishingSequence(fsm);
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
 
-	static void distinguishSTnode(const unique_ptr<DFSM>& fsm, const shared_ptr<st_node_t>& node, const vector<state_t>& states) {
+	static void distinguishSTnode(const unique_ptr<DFSM>& fsm, const shared_ptr<st_node_t>& node) {
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 			vector<set<state_t>> sameOutput;
 			auto succCount = node->succ.size();
@@ -84,8 +85,8 @@ namespace FSMsequence {
 			// check input validity for all states in block
 			for (const state_t& state : node->block) {
 				// nextStates would contain two WRONG_STATE if there is WRONG_OUTPUT -> invalid input
-				auto nextState = fsm->getNextState(states[state], input);
-				auto output = fsm->getOutput(states[state], input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
+				auto nextState = fsm->getNextState(state, input);
+				auto output = fsm->getOutput(state, input);// possibly WRONG_OUTPUT or DEFAULT_OUTPUT
 				bool found = false;
 				for (auto i = succCount; i < node->succ.size(); i++) {
 					if (node->succ[i].first == output) {
@@ -106,7 +107,7 @@ namespace FSMsequence {
 					sameOutput.emplace_back(set<state_t>({ nextState }));
 				}
 				// add the next state in the first successor
-				node->succ[succCount].second->nextStates.emplace_back(getIdx(states, nextState));
+				node->succ[succCount].second->nextStates.emplace_back(nextState);
 			}
 			if (invalidInput) {
 				while (node->succ.size() > succCount) node->succ.pop_back();
@@ -334,13 +335,13 @@ namespace FSMsequence {
 	}
 
 	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
 		state_t N = fsm->getNumberOfStates();
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
 		auto rootST = make_shared<st_node_t>();
 		vector<shared_ptr<st_node_t>> curNode(N, rootST);
 		vector<shared_ptr<st_node_t>> distinguished(((N - 1) * N) / 2, nullptr);
 		vector<shared_ptr<st_node_t>> dependent;
-		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
 			auto node = rootST;
 			node->sequence.push_back(STOUT_INPUT);
@@ -348,7 +349,7 @@ namespace FSMsequence {
 				node->block.push_back(state);
 				node->nextStates.push_back(state);
 				bool found = false;
-				auto output = fsm->getOutput(states[state], STOUT_INPUT);
+				auto output = fsm->getOutput(state, STOUT_INPUT);
 				for (const auto &p : node->succ) {
 					if (p.first == output) {
 						p.second->block.emplace_back(state);
@@ -388,7 +389,7 @@ namespace FSMsequence {
 			auto node = partition.top();
 			partition.pop();
 			// find distinguishing input or sort out other valid inputs
-			distinguishSTnode(fsm, node, states);
+			distinguishSTnode(fsm, node);
 			if (node->succ.empty()) {// no valid input - possible only by root
 				return nullptr;
 			}

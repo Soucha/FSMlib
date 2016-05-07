@@ -107,16 +107,14 @@ namespace FSMlibTestCUDA
 			if (!filename.empty()) fsm->load(filename);
 			auto seq = (*getSepSeq)(fsm);
 			DEBUG_MSG("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
-			vector<state_t> states = fsm->getStates();
 			state_t k = 0, N = fsm->getNumberOfStates();
 			ARE_EQUAL(((N - 1) * N) / 2, state_t(seq.size()), "The number of state pairs is not equal to the number of separating sequences");
 			for (state_t i = 0; i < N - 1; i++) {
 				for (state_t j = i + 1; j < N; j++, k++) {
 					ARE_EQUAL(true,
-						fsm->getOutputAlongPath(states[i], seq[k]) != fsm->getOutputAlongPath(states[j], seq[k]),
-						"States %d [%d] and %d [%d] are not separated by %s", states[i], i, states[j], j,
-						FSMmodel::getInSequenceAsString(seq[k]).c_str());
-					DEBUG_MSG("%d[%d] x %d[%d]: %s\n", states[i], i, states[j], j, FSMmodel::getInSequenceAsString(seq[k]).c_str());
+						fsm->getOutputAlongPath(i, seq[k]) != fsm->getOutputAlongPath(j, seq[k]),
+						"States %d and %d are not separated by %s", i, j, FSMmodel::getInSequenceAsString(seq[k]).c_str());
+					DEBUG_MSG("%d x %d: %s\n", i, j, FSMmodel::getInSequenceAsString(seq[k]).c_str());
 				}
 			}
 		}

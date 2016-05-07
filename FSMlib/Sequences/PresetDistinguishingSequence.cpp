@@ -63,15 +63,15 @@ namespace FSMsequence {
 	}
 
 	sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getPresetDistinguishingSequence", sequence_in_t());
 		sequence_in_t outPDS;
 		partition_t partition;
 		sequence_in_t s;
-		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
 			set<output_t> actOutputs;
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 			// get output of all states
-			for (const auto& state : states) {
+			for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
 				auto output = fsm->getOutput(state, STOUT_INPUT);
 				if (output == DEFAULT_OUTPUT) output = fsm->getNumberOfOutputs();
 				sameOutput[output].emplace(state);
@@ -97,7 +97,11 @@ namespace FSMsequence {
 			}
 		}
 		else {
-			partition.emplace(block_t(states.begin(), states.end()));
+			block_t states;
+			for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
+				states.emplace(state);
+			}
+			partition.emplace(move(states));
 		}
 		queue<unique_ptr<pds_node_t>> fifo;
 		// <id, node's partition>, id = getSetId(node) = sum of state IDs in the first block of node's partition

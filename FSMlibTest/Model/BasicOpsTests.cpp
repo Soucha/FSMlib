@@ -524,7 +524,7 @@ namespace FSMlibTest
 			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states2.size()), "The numbers of states are not equal.");
 			ARE_EQUAL(fsm->getNumberOfStates(), state_t(states.size() - 1), "The numbers of states do not correspond.");
 			bool present = true;
-			for each (state_t state in states)
+			for (state_t& state : states)
 			{
 				if (find(states2.begin(), states2.end(), state) == states2.end()) {
 					ARE_EQUAL(state_t(3), state, "State %d was removed unintentionally", state);

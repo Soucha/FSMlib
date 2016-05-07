@@ -49,22 +49,22 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatePairsShortestSeparatingSequences", sequence_vec_t());
 		state_t M, N = fsm->getNumberOfStates();
 		M = ((N - 1) * N) / 2;
 		sequence_vec_t seq(M);
 		vector< vector< pair<state_t, input_t> > > link(M);
-		vector<state_t> states = fsm->getStates();
 		queue<state_t> unchecked;
 		for (state_t i = 0; i < N - 1; i++) {
 			for (state_t j = i + 1; j < N; j++) {
 				auto idx = getStatePairIdx(i, j, N);
-				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
+				if ((fsm->isOutputState()) && (fsm->getOutput(i, STOUT_INPUT) != fsm->getOutput(j, STOUT_INPUT))) {
 					seq[idx].push_back(STOUT_INPUT);
 					unchecked.emplace(idx);
 					continue;
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
+					if (fsm->getOutput(i, input) != fsm->getOutput(j, input)) {// TODO what about DEFAULT_OUTPUT
 						seq[idx].push_back(input);
 						unchecked.emplace(idx);
 						break;
@@ -72,13 +72,11 @@ namespace FSMsequence {
 				}
 				if (seq[idx].empty()) {// not distinguished by one symbol?
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-						auto nextStateI = fsm->getNextState(states[i], input);
-						auto nextStateJ = fsm->getNextState(states[j], input);
+						auto nextStateI = fsm->getNextState(i, input);
+						auto nextStateJ = fsm->getNextState(j, input);
 						// there are no transition -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
-							nextStateI = getIdx(states, nextStateI);
-							nextStateJ = getIdx(states, nextStateJ);
 							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
 							if (seq[nextIdx].empty()) {
 								if (nextIdx != idx)
@@ -112,12 +110,11 @@ namespace FSMsequence {
 	}
 
 	vector<LinkCell> getSeparatingSequences(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getSeparatingSequences", vector<LinkCell>());
 		state_t M, N = fsm->getNumberOfStates();
-		//state_t nextStateI, nextStateJ, nextIdx, idx;
 		queue<state_t> unchecked;
-		vector<state_t> states = fsm->getStates();
 		M = ((N - 1) * N) / 2;
-		vector< vector< pair<state_t, input_t> > > link(M);
+		vector<vector<pair<state_t, input_t>>> link(M);
 
 		// init seq
 		vector<LinkCell> seq(M);
@@ -127,12 +124,12 @@ namespace FSMsequence {
 		for (state_t i = 0; i < N - 1; i++) {
 			for (state_t j = i + 1; j < N; j++) {
 				auto idx = getStatePairIdx(i, j, N);
-				if ((fsm->isOutputState()) && (fsm->getOutput(states[i], STOUT_INPUT) != fsm->getOutput(states[j], STOUT_INPUT))) {
+				if ((fsm->isOutputState()) && (fsm->getOutput(i, STOUT_INPUT) != fsm->getOutput(j, STOUT_INPUT))) {
 					seq[idx].minLen = 1;// to correspond that STOUT_INPUT needs to be applied
 					unchecked.emplace(idx);
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-					if (fsm->getOutput(states[i], input) != fsm->getOutput(states[j], input)) {// TODO what about DEFAULT_OUTPUT
+					if (fsm->getOutput(i, input) != fsm->getOutput(j, input)) {// TODO what about DEFAULT_OUTPUT
 						seq[idx].next[input] = idx;
 						if (seq[idx].minLen == 0) {
 							seq[idx].minLen = 1;
@@ -140,13 +137,11 @@ namespace FSMsequence {
 						}
 					}
 					else {
-						auto nextStateI = fsm->getNextState(states[i], input);
-						auto nextStateJ = fsm->getNextState(states[j], input);
+						auto nextStateI = fsm->getNextState(i, input);
+						auto nextStateJ = fsm->getNextState(j, input);
 						// there are no transitions -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
-							nextStateI = getIdx(states, nextStateI);
-							nextStateJ = getIdx(states, nextStateJ);
 							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
 							if (nextIdx != idx) {
 								seq[idx].next[input] = nextIdx;
@@ -191,18 +186,17 @@ namespace FSMsequence {
 	}
 
 	static bool distinguishBySequence(const unique_ptr<DFSM>& fsm, const sequence_in_t& seq,
-		const vector<state_t>& states, vector<state_t>& dist, vector<bool>& distinguished) {
-		
+			vector<state_t>& dist, vector<bool>& distinguished) {
 		state_t N = fsm->getNumberOfStates();
 		sequence_out_t outI, outIWithoutLast, outJ;
 		bool hasMinLen = false;
 		dist.clear();
 		// goes throught all pairs of states (i,j)
 		for (state_t i = 0; i < N - 1; i++) {
-			outIWithoutLast = outI = fsm->getOutputAlongPath(states[i], seq);
+			outIWithoutLast = outI = fsm->getOutputAlongPath(i, seq);
 			outIWithoutLast.pop_back();
 			for (state_t j = i + 1; j < N; j++) {
-				outJ = fsm->getOutputAlongPath(states[j], seq);
+				outJ = fsm->getOutputAlongPath(j, seq);
 				if (outI != outJ) {
 					auto idx = getStatePairIdx(i, j, N);
 					if (!distinguished[idx]) {
@@ -224,21 +218,19 @@ namespace FSMsequence {
 		return hasMinLen;
 	}
 
-	static void truncateSeq(const unique_ptr<DFSM>& fsm, sequence_in_t& shortSeq,
-		const vector<state_t>& states, const vector<state_t>& dist, vector<bool>& distinguished,
-		bool setDistinguished, state_t stateIdx = NULL_STATE) {
-		
+	static void truncateSeq(const unique_ptr<DFSM>& fsm, sequence_in_t& shortSeq, const vector<state_t>& dist, 
+			vector<bool>& distinguished, bool setDistinguished, state_t state = NULL_STATE) {
 		state_t N = fsm->getNumberOfStates();
 		sequence_out_t outI, outJ;
 		int maxCount = 0, count; // count of needed symbol
 		shortSeq.pop_back();
-		if (stateIdx != NULL_STATE) {
-			outI = fsm->getOutputAlongPath(states[stateIdx], shortSeq);
+		if (state != NULL_STATE) {
+			outI = fsm->getOutputAlongPath(state, shortSeq);
 		}
 		for (state_t k = 0; k < dist.size(); k++) {
 			distinguished[dist[k]] = setDistinguished;
-			if (stateIdx != NULL_STATE) {// SCSet reduction
-				outJ = fsm->getOutputAlongPath(states[dist[k]], shortSeq);
+			if (state != NULL_STATE) {// SCSet reduction
+				outJ = fsm->getOutputAlongPath(dist[k], shortSeq);
 			}
 			else {// CSet reduction
 				state_t i, j;
@@ -248,8 +240,8 @@ namespace FSMsequence {
 						break;
 					}
 				}
-				outI = fsm->getOutputAlongPath(states[i], shortSeq);
-				outJ = fsm->getOutputAlongPath(states[j], shortSeq);
+				outI = fsm->getOutputAlongPath(i, shortSeq);
+				outJ = fsm->getOutputAlongPath(j, shortSeq);
 			}
 			count = compSeq(outI, outJ);
 			if (count > maxCount) {
@@ -263,12 +255,12 @@ namespace FSMsequence {
 	}
 
 	void reduceCSet_LS_SL(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::reduceCSet_LS_SL",);
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(((N - 1) * N) / 2, false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished pair of states by current sequence
-		vector<state_t> states = fsm->getStates();
 		for (sequence_set_t::reverse_iterator sIt = outCSet.rbegin(); sIt != outCSet.rend(); sIt++) {
-			if (!distinguishBySequence(fsm, *sIt, states, dist, distinguished)) {
+			if (!distinguishBySequence(fsm, *sIt, dist, distinguished)) {
 				if (dist.empty()) {
 					outCSet.erase(--sIt.base());
 					sIt--;
@@ -277,14 +269,14 @@ namespace FSMsequence {
 					sequence_in_t shortSeq(*sIt);
 					outCSet.erase(--sIt.base());
 					sIt--;
-					truncateSeq(fsm, shortSeq, states, dist, distinguished, false);
+					truncateSeq(fsm, shortSeq, dist, distinguished, false);
 					outCSet.emplace(move(shortSeq));
 				}
 			}
 		}
 		distinguished.assign(((N - 1) * N) / 2, false);
 		for (sequence_set_t::iterator sIt = outCSet.begin(); sIt != outCSet.end(); sIt++) {
-			if (!distinguishBySequence(fsm, *sIt, states, dist, distinguished)) {
+			if (!distinguishBySequence(fsm, *sIt, dist, distinguished)) {
 				if (dist.empty()) {
 					outCSet.erase(sIt--);
 				}
@@ -292,7 +284,7 @@ namespace FSMsequence {
 					sequence_in_t shortSeq(*sIt);
 					outCSet.erase(sIt--);
 					shortSeq.pop_back();
-					truncateSeq(fsm, shortSeq, states, dist, distinguished, true);
+					truncateSeq(fsm, shortSeq, dist, distinguished, true);
 					outCSet.emplace(move(shortSeq));
 				}
 			}
@@ -331,18 +323,18 @@ namespace FSMsequence {
 	}
 
 	void reduceCSet_EqualLength(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::reduceCSet_EqualLength", );
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(((N - 1) * N) / 2, false); // is already a pair of states distinguished?
 		set<seq_info_t, seq_info_t> infos;
 		sequence_out_t outI, outIWithoutLast, outJ;
-		auto states = fsm->getStates();
 		auto seqIdx = outCSet.size();
 		if (fsm->isOutputState() && (outCSet.begin()->size() == 1) && (outCSet.begin()->front() == STOUT_INPUT)) {
 			// STOUT_INPUT is the first element in outCSet
 			for (state_t i = 0; i < N - 1; i++) {
-				output_t output = fsm->getOutput(states[i], STOUT_INPUT);
+				output_t output = fsm->getOutput(i, STOUT_INPUT);
 				for (state_t j = i + 1; j < N; j++) {
-					if (output != fsm->getOutput(states[j], STOUT_INPUT)) {
+					if (output != fsm->getOutput(j, STOUT_INPUT)) {
 						auto idx = getStatePairIdx(i, j, N);
 						distinguished[idx] = true;
 					}
@@ -358,10 +350,10 @@ namespace FSMsequence {
 			seq_info_t seqInfo;
 			// goes throught all pairs of states (i,j)
 			for (state_t i = 0; i < N - 1; i++) {
-				outIWithoutLast = outI = fsm->getOutputAlongPath(states[i], *sIt);
+				outIWithoutLast = outI = fsm->getOutputAlongPath(i, *sIt);
 				outIWithoutLast.pop_back();
 				for (state_t j = i + 1; j < N; j++) {
-					outJ = fsm->getOutputAlongPath(states[j], *sIt);
+					outJ = fsm->getOutputAlongPath(j, *sIt);
 					if (outI != outJ) {
 						auto idx = getStatePairIdx(i, j, N);
 						if (!distinguished[idx]) {
@@ -393,12 +385,12 @@ namespace FSMsequence {
 			outCSet.erase(sIt++);
 			bool stoutNeeded = false;
 			for (state_t i = 0; i < N - 1; i++) {
-				output_t output = fsm->getOutput(states[i], STOUT_INPUT);
+				output_t output = fsm->getOutput(i, STOUT_INPUT);
 				for (state_t j = i + 1; j < N; j++) {
-					if (output == fsm->getOutput(states[j], STOUT_INPUT)) {
+					if (output == fsm->getOutput(j, STOUT_INPUT)) {
 						stoutNeeded = true;
 						for (auto seq : outCSet) {
-							if (fsm->getOutputAlongPath(states[i], seq) != fsm->getOutputAlongPath(states[i], seq)) {
+							if (fsm->getOutputAlongPath(i, seq) != fsm->getOutputAlongPath(i, seq)) {
 								stoutNeeded = false;
 								break;
 							}
@@ -420,6 +412,7 @@ namespace FSMsequence {
 	sequence_set_t getCharacterizingSet(const unique_ptr<DFSM>& fsm,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
 			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, sequence_set_t & outCSet)) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getCharacterizingSet", sequence_set_t());
 		sequence_set_t outCSet;
 		auto seq = (*getSeparatingSequences)(fsm);
 		if (filterPrefixes) {
@@ -439,17 +432,17 @@ namespace FSMsequence {
 		return outCSet;
 	}
 
-	static bool distinguishBySequenceFromState(const unique_ptr<DFSM>& fsm, const sequence_in_t& seq, state_t stateIdx,
-			const vector<state_t>& states, vector<state_t>& dist, vector<bool>& distinguished) {	
+	static bool distinguishBySequenceFromState(const unique_ptr<DFSM>& fsm, const sequence_in_t& seq, state_t state,
+			vector<state_t>& dist, vector<bool>& distinguished) {	
 		state_t N = fsm->getNumberOfStates();
 		bool hasMinLen = false;
 		sequence_out_t outS, outSWithoutLast, outJ;
 		dist.clear();
-		outSWithoutLast = outS = fsm->getOutputAlongPath(states[stateIdx], seq);
+		outSWithoutLast = outS = fsm->getOutputAlongPath(state, seq);
 		outSWithoutLast.pop_back();
 		for (state_t j = 0; j < N; j++) {
-			if (j != stateIdx) {
-				outJ = fsm->getOutputAlongPath(states[j], seq);
+			if (j != state) {
+				outJ = fsm->getOutputAlongPath(j, seq);
 				if (outS != outJ) {
 					if (!distinguished[j]) {
 						dist.emplace_back(j);
@@ -470,12 +463,12 @@ namespace FSMsequence {
 		return hasMinLen;
 	}
 
-	void reduceSCSet_LS_SL(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_LS_SL(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::reduceSCSet_LS_SL", );
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
-		auto states = fsm->getStates();
 		for (sequence_set_t::reverse_iterator sIt = outSCSet.rbegin(); sIt != outSCSet.rend(); sIt++) {
-			if (!distinguishBySequenceFromState(fsm, *sIt, stateIdx, states, dist, distinguished)) {
+			if (!distinguishBySequenceFromState(fsm, *sIt, state, dist, distinguished)) {
 				if (dist.empty()) {
 					outSCSet.erase(--sIt.base());
 					sIt--;
@@ -484,51 +477,51 @@ namespace FSMsequence {
 					sequence_in_t shortSeq(*sIt);
 					outSCSet.erase(--sIt.base());
 					sIt--;
-					truncateSeq(fsm, shortSeq, states, dist, distinguished, false, stateIdx);
+					truncateSeq(fsm, shortSeq, dist, distinguished, false, state);
 					outSCSet.emplace(move(shortSeq));
 				}
 			}
 		}
 		distinguished.assign(fsm->getNumberOfStates(), false);
 		for (sequence_set_t::iterator sIt = outSCSet.begin(); sIt != outSCSet.end(); sIt++) {
-			if (!distinguishBySequenceFromState(fsm, *sIt, stateIdx, states, dist, distinguished)) {
+			if (!distinguishBySequenceFromState(fsm, *sIt, state, dist, distinguished)) {
 				if (dist.empty()) {
 					outSCSet.erase(sIt--);
 				}
 				else {
 					sequence_in_t shortSeq(*sIt);
 					outSCSet.erase(sIt--);
-					truncateSeq(fsm, shortSeq, states, dist, distinguished, true, stateIdx);
+					truncateSeq(fsm, shortSeq, dist, distinguished, true, state);
 					outSCSet.emplace(move(shortSeq));
 				}
 			}
 		}
 	}
 
-	void reduceSCSet_LS(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_LS(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::reduceSCSet_LS", );
 		vector<bool> distinguished(fsm->getNumberOfStates(), false); // is already a pair of states distinguished?
 		vector<state_t> dist; // distinguished states by current sequence
-		auto states = fsm->getStates();
 		for (sequence_set_t::reverse_iterator sIt = outSCSet.rbegin(); sIt != outSCSet.rend(); sIt++) {
-			if (!distinguishBySequenceFromState(fsm, *sIt, stateIdx, states, dist, distinguished)) {
+			if (!distinguishBySequenceFromState(fsm, *sIt, state, dist, distinguished)) {
 				outSCSet.erase(--sIt.base());
 				sIt--;
 			}
 		}
 	}
 
-	void reduceSCSet_EqualLength(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet) {
+	void reduceSCSet_EqualLength(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::reduceSCSet_EqualLength", );
 		state_t N = fsm->getNumberOfStates();
 		vector<bool> distinguished(N, false); // is already a pair of states distinguished?
 		set<seq_info_t, seq_info_t> infos;
 		sequence_out_t outS, outSWithoutLast, outJ;
-		auto states = fsm->getStates();
 		auto seqIdx = outSCSet.size();
 		if (fsm->isOutputState() && (outSCSet.begin()->size() == 1) && (outSCSet.begin()->front() == STOUT_INPUT)) {
 			// STOUT_INPUT is the first element in outSCSet
-			output_t output = fsm->getOutput(states[stateIdx], STOUT_INPUT);
+			output_t output = fsm->getOutput(state, STOUT_INPUT);
 			for (state_t j = 0; j < N; j++) {
-				if ((j != stateIdx) && (output != fsm->getOutput(states[j], STOUT_INPUT))) {
+				if ((j != state) && (output != fsm->getOutput(j, STOUT_INPUT))) {
 					distinguished[j] = true;
 				}
 			}
@@ -540,11 +533,11 @@ namespace FSMsequence {
 		//printf("start %d\n",state);
 		for (; seqIdx > 0; seqIdx--) {
 			seq_info_t seqInfo;
-			outSWithoutLast = outS = fsm->getOutputAlongPath(states[stateIdx], *sIt);
+			outSWithoutLast = outS = fsm->getOutputAlongPath(state, *sIt);
 			outSWithoutLast.pop_back();
 			for (state_t j = 0; j < N; j++) {
-				if (j != stateIdx) {
-					outJ = fsm->getOutputAlongPath(states[j], *sIt);
+				if (j != state) {
+					outJ = fsm->getOutputAlongPath(j, *sIt);
 					if (outS != outJ) {
 						if (!distinguished[j]) {
 							seqInfo.dist.push_back(j);
@@ -574,12 +567,12 @@ namespace FSMsequence {
 		if (fsm->isOutputState() && (sIt->front() == STOUT_INPUT) && (outSCSet.size() > 1)) {
 			outSCSet.erase(sIt++);
 			bool stoutNeeded = false;
-			output_t output = fsm->getOutput(states[stateIdx], STOUT_INPUT);
+			output_t output = fsm->getOutput(state, STOUT_INPUT);
 			for (state_t j = 0; j < N; j++) {
-				if ((j != stateIdx) && (output != fsm->getOutput(states[j], STOUT_INPUT))) {
+				if ((j != state) && (output != fsm->getOutput(j, STOUT_INPUT))) {
 					stoutNeeded = true;
 					for (const auto& seq : outSCSet) {
-						if (fsm->getOutputAlongPath(states[stateIdx], seq) != fsm->getOutputAlongPath(states[j], seq)) {
+						if (fsm->getOutputAlongPath(state, seq) != fsm->getOutputAlongPath(j, seq)) {
 							stoutNeeded = false;
 							break;
 						}
@@ -596,13 +589,13 @@ namespace FSMsequence {
 		}
 	}
 
-	sequence_set_t getSCSet(const sequence_vec_t& distSeqs, state_t stateIdx, state_t N, bool filterPrefixes = false) {
+	sequence_set_t getSCSet(const sequence_vec_t& distSeqs, state_t state, state_t N, bool filterPrefixes = false) {
 		sequence_set_t outSCSet;
 		FSMlib::PrefixSet pset;
-		// grab sequence from table seq incident with stateIdx
+		// grab sequence from table seq incident with state
 		for (state_t j = 0; j < N; j++) {
-			if (j != stateIdx) {
-				auto idx = getStatePairIdx(j, stateIdx, N);
+			if (j != state) {
+				auto idx = getStatePairIdx(j, state, N);
 				if (filterPrefixes)
 					pset.insert(distSeqs[idx]);
 				else
@@ -616,23 +609,24 @@ namespace FSMsequence {
 
 	sequence_set_t getStateCharacterizingSet(const unique_ptr<DFSM>& fsm, state_t state,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
-			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet)) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStateCharacterizingSet", sequence_set_t());
 		auto seq = (*getSeparatingSequences)(fsm);
-		state_t stateIdx = getIdx(fsm->getStates(), state);
-		auto outSCSet = getSCSet(seq, stateIdx, fsm->getNumberOfStates(), filterPrefixes);
+		auto outSCSet = getSCSet(seq, state, fsm->getNumberOfStates(), filterPrefixes);
 		// try to reduce count of seqeunces
 		if (*reduceFunc != nullptr)
-			(*reduceFunc)(fsm, stateIdx, outSCSet);
+			(*reduceFunc)(fsm, state, outSCSet);
 		return outSCSet;
 	}
 
 	vector<sequence_set_t> getStatesCharacterizingSets(const unique_ptr<DFSM>& fsm,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
-			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet)) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatesCharacterizingSets", vector<sequence_set_t>());
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
 		vector<sequence_set_t> outSCSets(N);
-		// grab sequence from table seq incident with stateIdx i
+		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
 			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
 			// try to reduce count of seqeunces
@@ -644,7 +638,8 @@ namespace FSMsequence {
 
 	vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& fsm,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm),
-			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t stateIdx, sequence_set_t & outSCSet)) {
+			bool filterPrefixes, void(*reduceFunc)(const unique_ptr<DFSM>& fsm, state_t state, sequence_set_t & outSCSet)) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getHarmonizedStateIdentifiers", vector<sequence_set_t>());
 		state_t N = fsm->getNumberOfStates();
 		auto seq = (*getSeparatingSequences)(fsm);
 		vector<sequence_set_t> outSCSets(N);

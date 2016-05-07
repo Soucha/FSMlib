@@ -31,12 +31,16 @@ namespace FSMsequence {
 	};
 
 	sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getSynchronizingSequence", sequence_in_t());
 		sequence_in_t outSS;
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;
-		auto allStates = fsm->getStates();
-		fifo.emplace(make_unique<ss_node_t>(block_t(allStates.begin(), allStates.end()), sequence_in_t()));
-		used.emplace(block_t(allStates.begin(), allStates.end()));
+		block_t states;
+		for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
+			states.emplace(state);
+		}
+		fifo.emplace(make_unique<ss_node_t>(states, sequence_in_t()));
+		used.emplace(move(states));
 		while (!fifo.empty()) {
 			auto act = move(fifo.front());
 			fifo.pop();

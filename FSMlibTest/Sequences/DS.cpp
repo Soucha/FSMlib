@@ -295,29 +295,27 @@ namespace FSMlibTest
 			ARE_EQUAL(state_t(VSet.size()), fsm->getNumberOfStates(),
 				"FSM has %d states but only %d sequences were received.",
 				fsm->getNumberOfStates(), VSet.size());
-			auto states = fsm->getStates();
 			for (state_t state = 0; state < VSet.size(); state++) {
-				testSVS(states[state], VSet[state], mustHasSVS);
+				testSVS(state, VSet[state], mustHasSVS);
 			}
 		}
 
-		void testSCSet(state_t stateIdx, sequence_set_t& sCSet) {
+		void testSCSet(state_t state, sequence_set_t& sCSet) {
 			state_t N = fsm->getNumberOfStates();
 			vector<bool> distinguished(N, false);
-			vector<state_t> states = fsm->getStates();
 			bool distinguishState, hasMinLen;
 			sequence_out_t outS, outSWithoutLast, outI;
-			//DEBUG_MSG("State Characterizing Set of state %d:\n", states[stateIdx]);
-			DEBUG_MSG("%d:", states[stateIdx]);
+			//DEBUG_MSG("State Characterizing Set of state %d:\n", states[state]);
+			DEBUG_MSG("%d:", state);
 			for (sequence_set_t::iterator sIt = sCSet.begin(); sIt != sCSet.end(); sIt++) {
 				DEBUG_MSG(" %s\n", FSMmodel::getInSequenceAsString(*sIt).c_str());
 				ARE_EQUAL(false, sIt->empty(), "Empty sequence is not possible!");
-				outSWithoutLast = outS = fsm->getOutputAlongPath(states[stateIdx], *sIt);
+				outSWithoutLast = outS = fsm->getOutputAlongPath(state, *sIt);
 				outSWithoutLast.pop_back();
 				distinguishState = hasMinLen = false;
 				for (state_t i = 0; i < N; i++) {
-					if (i != stateIdx) {
-						outI = fsm->getOutputAlongPath(states[i], *sIt);
+					if (i != state) {
+						outI = fsm->getOutputAlongPath(i, *sIt);
 						if (outS != outI) {
 							if (!distinguished[i]) {
 								distinguishState = distinguished[i] = true;
@@ -334,10 +332,9 @@ namespace FSMlibTest
 				ARE_EQUAL(true, hasMinLen, "Sequence %s could be shorter.",
 					FSMmodel::getInSequenceAsString(*sIt).c_str());
 			}
-			distinguished[stateIdx] = true;
+			distinguished[state] = true;
 			for (state_t i = 0; i < N; i++) {
-				ARE_EQUAL(true, bool(distinguished[i]), "State[%d] %d is not distinguished from fixed state[%d] %d.",
-					i, states[i], stateIdx, states[stateIdx]);
+				ARE_EQUAL(true, bool(distinguished[i]), "State %d is not distinguished from fixed state %d.", i, state);
 			}
 		}
 
@@ -354,7 +351,6 @@ namespace FSMlibTest
 		void testCSet(sequence_set_t& CSet) {
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
-			vector<state_t> states = fsm->getStates();
 			bool distinguishState, hasMinLen;
 			sequence_out_t outS, outSWithoutLast, outI;
 			for (state_t state = 0; state < N - 1; state++) {
@@ -367,10 +363,10 @@ namespace FSMlibTest
 
 				distinguishState = hasMinLen = false;
 				for (state_t state = 0; state < N - 1; state++) {
-					outSWithoutLast = outS = fsm->getOutputAlongPath(states[state], *sIt);
+					outSWithoutLast = outS = fsm->getOutputAlongPath(state, *sIt);
 					outSWithoutLast.pop_back();
 					for (state_t i = state + 1; i < N; i++) {
-						outI = fsm->getOutputAlongPath(states[i], *sIt);
+						outI = fsm->getOutputAlongPath(i, *sIt);
 						if (outS != outI) {
 							//DEBUG_MSG("%d-%d %u %s: %s %s %s\n", state, i, (distinguished[state][i] ? 1 : 0),
 							//FSMmodel::getInSequenceAsString(*sIt).c_str(), FSMmodel::getOutSequenceAsString(outS).c_str(),
@@ -392,8 +388,7 @@ namespace FSMlibTest
 			}
 			for (state_t state = 0; state < N - 1; state++) {
 				for (state_t i = state + 1; i < N; i++) {
-					ARE_EQUAL(true, bool(distinguished[state][i]), "State[%d] %d is not distinguished from state[%d] %d.",
-						i, states[i], state, states[state]);
+					ARE_EQUAL(true, bool(distinguished[state][i]), "State %d is not distinguished from state %d.", i, state);
 				}
 			}
 		}

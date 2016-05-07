@@ -63,18 +63,15 @@ namespace FSMsequence {
 	extern float gpuLoadTime, gpuProcessTime, gpuTotalTime;
 #endif // SEQUENCES_PERFORMANCE_TEST
 
-	extern state_t getIdx(const vector<state_t>& states, state_t stateId);
-
 	static bool initCuda(const unique_ptr<DFSM>& fsm, bool useQueue, dev_ptrs_t& dev) {
 		state_t N = fsm->getNumberOfStates();
 		input_t P = fsm->getNumberOfInputs();
 		state_t M = ((N - 1) * N) / 2;
-		auto states = fsm->getStates();
 		if (fsm->isOutputState()) {
 			CHECK_ERROR(cudaMalloc((void**)&(dev.StateOutput), N * sizeof(output_t)));
 			output_t * outputs = new output_t[N];
 			for (state_t state = 0; state < N; state++) {
-				outputs[state] = fsm->getOutput(states[state], STOUT_INPUT);
+				outputs[state] = fsm->getOutput(state, STOUT_INPUT);
 			}
 			CHECK_ERROR(cudaMemcpy(dev.StateOutput, outputs, N*sizeof(output_t), cudaMemcpyHostToDevice));
 			delete outputs;
@@ -84,7 +81,7 @@ namespace FSMsequence {
 			output_t * outputs = new output_t[N*P];
 			for (state_t state = 0; state < N; state++) {
 				for (input_t input = 0; input < P; input++) {
-					outputs[state*P + input] = fsm->getOutput(states[state], input);
+					outputs[state*P + input] = fsm->getOutput(state, input);
 				}
 			}
 			CHECK_ERROR(cudaMemcpy(dev.TransitionOutput, outputs, N*P*sizeof(output_t), cudaMemcpyHostToDevice));
@@ -94,7 +91,7 @@ namespace FSMsequence {
 		state_t * nextStates = new state_t[N*P];
 		for (state_t state = 0; state < N; state++) {
 			for (input_t input = 0; input < P; input++) {
-				nextStates[state*P + input] = getIdx(states, fsm->getNextState(states[state], input));
+				nextStates[state*P + input] = fsm->getNextState(state, input);
 			}
 		}
 		CHECK_ERROR(cudaMemcpy(dev.NextState, nextStates, N*P*sizeof(state_t), cudaMemcpyHostToDevice));
@@ -374,6 +371,7 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatePairsShortestSeparatingSequences_ParallelSF", sequence_vec_t());
 		state_t N = fsm->getNumberOfStates();
 		input_t P = fsm->getNumberOfInputs();
 		state_t M = ((N - 1) * N) / 2;
@@ -435,6 +433,7 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatePairsShortestSeparatingSequences_ParallelQueue", sequence_vec_t());
 		state_t N = fsm->getNumberOfStates();
 		input_t P = fsm->getNumberOfInputs();
 		state_t M = ((N - 1) * N) / 2;

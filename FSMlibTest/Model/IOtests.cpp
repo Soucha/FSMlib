@@ -168,7 +168,7 @@ namespace FSMlibTest
 			ARE_EQUAL(states == states2, true, "The sets of states are not equal.");
 			ARE_EQUAL((find(states.begin(), states.end(), 0) != states.end()), true, "The initial state is missing.");
 
-			for each (state_t state in states) {
+			for (state_t& state : states) {
 				if (fsm->isOutputState()) {
 					ARE_EQUAL(fsm->getOutput(state, STOUT_INPUT), fsm2->getOutput(state, STOUT_INPUT), 
 						"The outputs of state %d are different.", state);

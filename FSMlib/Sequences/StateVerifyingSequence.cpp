@@ -38,17 +38,16 @@ namespace FSMsequence {
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
 	sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& fsm, state_t state) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStateVerifyingSequence", sequence_in_t());
 		sequence_in_t outSVS;
-		
-		auto allStates = fsm->getStates();
 		block_t states;
 		output_t output;
 		sequence_in_t s;
 		if (fsm->isOutputState()) {
 			output = fsm->getOutput(state, STOUT_INPUT);
-			for (auto i : allStates) {
-				if (fsm->getOutput(i, STOUT_INPUT) == output) {
-					states.insert(i);
+			for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
+				if (fsm->getOutput(state, STOUT_INPUT) == output) {
+					states.insert(state);
 				}
 			}
 			// has state unique output?
@@ -63,7 +62,9 @@ namespace FSMsequence {
 		}
 		else {// TYPE_MEALY
 			// all states are initially undistinguished
-			states.insert(allStates.begin(), allStates.end());
+			for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
+				states.emplace(state);
+			}
 		}
 		queue<unique_ptr<svs_node_t>> fifo;
 		set< pair<block_t, state_t> > used;
@@ -140,6 +141,7 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& fsm) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getVerifyingSet", sequence_vec_t());
 		sequence_vec_t outVSet;
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;
