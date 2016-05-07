@@ -253,7 +253,7 @@ namespace FSMsequence {
 		}
 	}
 
-	static sequence_in_t findPDS(const unique_ptr<DFSM>& fsm, const sequence_vec_t& seq, int& retVal, sequence_vec_t& outVSet) {
+	static sequence_in_t findPDS(const unique_ptr<DFSM>& fsm, const sequence_vec_t& seq, int& retVal, sequence_vec_t& outVSet, bool useStout) {
 		shared_ptr<block_node_t> hookBN;
 		bn_partition_t allBN;
 		multimap<state_t, bn_partition_t> closedPDS;
@@ -367,7 +367,7 @@ namespace FSMsequence {
 			
 			for (input_t i = 0; i < minValidInput; i++) {
 				stop = false;
-				auto stoutUsed = false;
+				auto stoutNeeded = false;
 				auto succPDS = make_unique<node_pds_t>();
 				succPDS->value = 0;
 				for (auto &block : actPDS->partition) {
@@ -396,7 +396,7 @@ namespace FSMsequence {
 												}
 											}
 										}
-										stoutUsed = true;
+										stoutNeeded = true;
 									}
 									else {
 										succPDS->partition.emplace(succBN);
@@ -420,7 +420,7 @@ namespace FSMsequence {
 				if (succPDS->partition.empty()) {// PDS found
 					outPDS.swap(actPDS->ds);
 					outPDS.push_back(hookBN->succ[i].first);
-					if (stoutUsed) outPDS.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) outPDS.push_back(STOUT_INPUT);
 					retVal = PDS_FOUND;
 					break;
 				}
@@ -438,7 +438,7 @@ namespace FSMsequence {
 				
 				succPDS->ds.insert(succPDS->ds.end(), actPDS->ds.begin(), actPDS->ds.end());
 				succPDS->ds.push_back(hookBN->succ[i].first);
-				if (stoutUsed) succPDS->ds.push_back(STOUT_INPUT);
+				if (stoutNeeded || useStout) succPDS->ds.push_back(STOUT_INPUT);
 				setHeuristic(succPDS);
 				//printPDS(succPDS);
 				openPDS.emplace(move(succPDS));
@@ -458,11 +458,11 @@ namespace FSMsequence {
 		return outPDS;
 	}
 
-	static sequence_in_t findSVS(const unique_ptr<DFSM>& fsm, const state_t refState, const sequence_vec_t& seq, int& retVal) {
+	static sequence_in_t findSVS(const unique_ptr<DFSM>& fsm, const state_t refState, const sequence_vec_t& seq, int& retVal, bool useStout) {
 		multimap<state_t, block_t> closedSVS;
 		priority_queue<unique_ptr<node_svs_t>, vector<unique_ptr<node_svs_t>>, svs_heur_comp> openSVS;
 		sequence_in_t outSVS;
-		bool stop, stoutUsed;
+		bool stop, stoutNeeded;
 		auto N = fsm->getNumberOfStates();
 		auto actSVS = make_unique<node_svs_t>();
 		actSVS->actState = refState;// refStata is a state index
@@ -525,7 +525,7 @@ namespace FSMsequence {
 				if (sameOutput.empty()) {
 					continue;
 				}
-				stoutUsed = false;
+				stoutNeeded = false;
 				if (fsm->isOutputState() && (sameOutput.size() > 1)) {
 					block_t tmp;
 					output_t outputNS = fsm->getOutput(nextState, STOUT_INPUT);
@@ -537,13 +537,13 @@ namespace FSMsequence {
 					// is reference state distinguished by appending STOUT_INPUT?
 					if (tmp.size() != sameOutput.size()) {
 						sameOutput.swap(tmp);
-						stoutUsed = true;
+						stoutNeeded = true;
 					}
 				}
 				if (sameOutput.size() == 1) {// SVS found
 					outSVS.swap(actSVS->svs);
 					outSVS.push_back(input);
-					if (stoutUsed) outSVS.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) outSVS.push_back(STOUT_INPUT);
 					stop = true;
 					break;
 				}
@@ -565,7 +565,7 @@ namespace FSMsequence {
 				initSVS_H(succSVS, seq, N);
 				succSVS->svs.insert(succSVS->svs.begin(), actSVS->svs.begin(), actSVS->svs.end());
 				succSVS->svs.push_back(input);
-				if (stoutUsed) succSVS->svs.push_back(STOUT_INPUT);
+				if (stoutNeeded || useStout) succSVS->svs.push_back(STOUT_INPUT);
 				//printSVS(succSVS);
 				openSVS.emplace(move(succSVS));
 			}
@@ -585,11 +585,12 @@ namespace FSMsequence {
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm), bool filterPrefixes,
 			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet),
-			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet)) {
+			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet), bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getDistinguishingSequences", -1);
 		state_t N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
-		
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
+
 		auto seq = (*getSeparatingSequences)(fsm);
 
 		outVSet.clear();
@@ -623,11 +624,11 @@ namespace FSMsequence {
 			(*reduceCSetFunc)(fsm, outCSet);
 
 		// ADS
-		outADS = move(getAdaptiveDistinguishingSequence(fsm));
+		outADS = move(getAdaptiveDistinguishingSequence(fsm, omitUnnecessaryStoutInputs));
 		if (outADS) {// can has PDS
 			retVal = ADS_FOUND;
 			// PDS
-			outPDS = findPDS(fsm, seq, retVal, outVSet);
+			outPDS = findPDS(fsm, seq, retVal, outVSet, useStout);
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		else {
@@ -647,7 +648,7 @@ namespace FSMsequence {
 		for (state_t refState = 0; refState < N; refState++) {
 			//printf("refState %d\n", refState);
 			if (outVSet[refState].empty()) {
-				outVSet[refState] = findSVS(fsm, refState, seq, retVal);
+				outVSet[refState] = findSVS(fsm, refState, seq, retVal, useStout);
 			}
 		}
 #if SEQUENCES_PERFORMANCE_TEST

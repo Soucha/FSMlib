@@ -31,22 +31,7 @@ namespace FSMtesting {
 
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		bool startWithStout = false;
-
-		if (fsm->isOutputState()) {
-			startWithStout = (DS.front() == STOUT_INPUT);
-			auto origDS = DS;
-			auto DSit = DS.begin();
-			for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-				if (*it == STOUT_INPUT) continue;
-				it++;
-				if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-					DS.insert(++DSit, STOUT_INPUT);
-					DSit--;
-				}
-				it--;
-			}
-		}
+		bool startWithStout = (DS.front() == STOUT_INPUT);
 
 		FSMlib::PrefixSet pset;
 		for (const auto& trSeq : transitionCover) {

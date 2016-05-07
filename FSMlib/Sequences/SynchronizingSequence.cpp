@@ -30,11 +30,12 @@ namespace FSMsequence {
 		}
 	};
 
-	sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& fsm) {
+	sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getSynchronizingSequence", sequence_in_t());
 		sequence_in_t outSS;
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 		block_t states;
 		for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
 			states.emplace(state);
@@ -62,11 +63,13 @@ namespace FSMsequence {
 				if (states.size() == 1) {
 					outSS.swap(act->ss);
 					outSS.push_back(input);
+					if (useStout) outSS.push_back(STOUT_INPUT);
 					return outSS;
 				}
 				if (used.find(states) == used.end()) {
 					sequence_in_t s(act->ss);
 					s.push_back(input);
+					if (useStout) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<ss_node_t>(states, s));
 					used.emplace(move(states));
 				}

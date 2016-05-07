@@ -19,12 +19,12 @@
 #include "FSMsequence.h"
 
 namespace FSMsequence {
-	sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm) {
+	sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs) {
 		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getStateCover", sequence_set_t());
 		sequence_set_t stateCover;
 		vector<bool> covered(dfsm->getNumberOfStates(), false);
 		queue<pair<state_t, sequence_in_t>> fifo;
-		
+		bool useStout = !omitStoutInputs && dfsm->isOutputState();
 		// empty sequence
 		stateCover.emplace(sequence_in_t());
 
@@ -39,7 +39,7 @@ namespace FSMsequence {
 					covered[nextState] = true;
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
-					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
+					if (useStout) newPath.push_back(STOUT_INPUT);
 					stateCover.emplace(newPath);
 					fifo.emplace(nextState, move(newPath));
 				}
@@ -48,12 +48,12 @@ namespace FSMsequence {
 		return stateCover;
 	}
 
-	sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm) {
+	sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs) {
 		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getTransitionCover", sequence_set_t());
 		sequence_set_t transitionCover;
 		vector<bool> covered(dfsm->getNumberOfStates(), false);
 		queue<pair<state_t, sequence_in_t>> fifo;
-		
+		bool useStout = !omitStoutInputs && dfsm->isOutputState();
 		// empty sequence
 		transitionCover.emplace(sequence_in_t());
 
@@ -67,7 +67,7 @@ namespace FSMsequence {
 				if (nextState != NULL_STATE) {
 					sequence_in_t newPath(current.second);
 					newPath.push_back(input);
-					if (dfsm->isOutputState()) newPath.push_back(STOUT_INPUT);
+					if (useStout) newPath.push_back(STOUT_INPUT);
 					if (!covered[nextState]) {
 						covered[nextState] = true;
 						fifo.emplace(nextState, newPath);
@@ -79,20 +79,21 @@ namespace FSMsequence {
 		return transitionCover;
 	}
 
-	sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth) {
+	sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth, bool omitStoutInputs) {
 		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getTraversalSet", sequence_set_t());
 		sequence_set_t traversalSet;
 		if (depth <= 0) return traversalSet;
+		bool useStout = !omitStoutInputs && dfsm->isOutputState();
 		queue<sequence_in_t> fifo;
 		fifo.emplace(sequence_in_t());
-		if (dfsm->isOutputState()) depth *= 2; // STOUT_INPUT follows each input
+		if (useStout) depth *= 2; // STOUT_INPUT follows each input
 		while (!fifo.empty()) {
 			auto seq = move(fifo.front());
 			fifo.pop();
 			for (input_t input = 0; input < dfsm->getNumberOfInputs(); input++) {
 				sequence_in_t extSeq(seq);
 				extSeq.push_back(input);
-				if (dfsm->isOutputState()) extSeq.push_back(STOUT_INPUT);
+				if (useStout) extSeq.push_back(STOUT_INPUT);
 				if (extSeq.size() < depth) fifo.emplace(extSeq);
 				traversalSet.emplace(move(extSeq));
 			}

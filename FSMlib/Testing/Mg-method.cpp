@@ -57,25 +57,7 @@ namespace FSMtesting {
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
-		
-		if (fsm->isOutputState()) {
-			for (state_t i = 0; i < d.size(); i++) {
-				auto origDS = d[i];
-				auto DSit = d[i].begin();
-				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-					if (*it == STOUT_INPUT) continue;
-					it++;
-					if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-						d[i].insert(++DSit, STOUT_INPUT);
-						DSit--;
-					}
-					it--;
-				}
-				if (d[i].front() == STOUT_INPUT) d[i].pop_front();
-			}
-			CS.push_back(STOUT_INPUT);// the first symbol
-		}
-
+		bool startWithStout = (d[0].front() == STOUT_INPUT);
 		seq_len_t adsLen = 0;
 		for (const auto& seq : d) {
 			if (adsLen < seq.size()) {
@@ -103,11 +85,15 @@ namespace FSMtesting {
 					continue;
 				}
 				sequence_in_t seq(d[nextState]);
-				if (fsm->isOutputState()) seq.push_front(STOUT_INPUT);
+				if (fsm->isOutputState() && !startWithStout) seq.push_front(STOUT_INPUT);
 				seq.push_front(input);
 				tests.emplace_back(move(seq));
 				counter++;
 			}
+		}
+		if (startWithStout) {
+			d[0].pop_front();
+			CS.push_back(STOUT_INPUT);// the first symbol
 		}
 		tests.emplace_back(d[0]);
 
@@ -169,7 +155,7 @@ namespace FSMtesting {
 				}
 			}
 			actState = fsm->getNextState(actState, *it);
-			if (fsm->isOutputState()) it++;
+			if (fsm->isOutputState() && (++it == tests[idx].end())) break;
 		}
 		for (state_t i = 0; i < Tsize - 1; i++) {
 			if ((costs[idx][i] == maxCost) && !tests[i].empty()) {
@@ -214,10 +200,12 @@ namespace FSMtesting {
 						CS.assign(trSeq[next[idx] / P].begin(), trSeq[next[idx] / P].end());
 					}
 					else {
+						if (fsm->isOutputState() && CS.back() != STOUT_INPUT) CS.push_back(STOUT_INPUT);
 						auto shortestPath = FSMmodel::getShortestPath(fsm, from, next[idx] / P, sp);
 						CS.insert(CS.end(), shortestPath.begin(), shortestPath.end());
 					}
 				}
+				else if (fsm->isOutputState() && CS.back() != STOUT_INPUT) CS.push_back(STOUT_INPUT);
 			}
 			else {
 				auto it = tests[idx].begin();

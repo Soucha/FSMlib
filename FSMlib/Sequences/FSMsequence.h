@@ -80,9 +80,10 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* State 0 is start state and FSM goes to unique state using each sequence.
 	* Sequences are sorted by lenght and then lexicographically from the shortest.
 	* @param dfsm - Deterministic FSM
+	* @param omitStoutInputs - STOUT_INPUT follows each transition input in all sequences if fsm->isOutputState() and false is set
 	* @return state cover, or an empty collection if the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs = false);
 
 	/**
 	* Fills given set with input sequences that cover all transitions.
@@ -90,17 +91,19 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* of state cover is extended by each input symbol.
 	* State 0 is start state for all sequences.
 	* @param dfsm - Deterministic FSM
+	* @param omitStoutInputs - STOUT_INPUT follows each transition input in all sequences if fsm->isOutputState() and false is set
 	* @return transition cover, or an empty collection if the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs = false);
 
 	/**
 	* Fills given set with all input sequences of the lenght up to depth.
 	* @param dfsm - Deterministic FSM
-	* @param depth
+	* @param depth - the length of the longest returned sequence
+	* @param omitStoutInputs - STOUT_INPUT follows each transition input in all sequences if fsm->isOutputState() and false is set
 	* @return traversal set, or an empty collection if the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth);
+	FSMLIB_API sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth, bool omitStoutInputs = false);
 
 	/**
 	* Finds a shortest preset distinguishing sequence if FSM has it.<br><br>
@@ -113,9 +116,11 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in PDS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a shortest preset distinguishing sequence, or empty sequence if there is no PDS or the FSM is not compact
 	*/
-	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds an adaptive distinguishing sequence if FSM has it.<br><br>
@@ -131,9 +136,11 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
 	*
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in ADS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return an Adaptive Distinguishing Sequence, or nullptr if there is no ADS or the FSM is not compact
 	*/
-	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Creates a distinguishing sequence that is included in given
@@ -147,18 +154,22 @@ namespace FSMsequence {// all design functions require a compact FSM
 	/**
 	* Finds an adaptive distinguishing sequence for each state (using getAdaptiveDistinguishingSequence).
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in ADS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a collection of distinguishing sequences for each state index, or empty collection if there is no ADS or the FSM is not compact 
 	*/
-	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm);
+	FSMLIB_API sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds a shortest state verifying sequence for given state.<br><br>
 	* Applying SVS distinguishes given state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param state
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in SVS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a shortest state verifying sequence, or an empty sequence if there is no SVS or the FSM is not compact
 	*/
-	FSMLIB_API sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& dfsm, state_t state);
+	FSMLIB_API sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& dfsm, state_t state, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds state verifying sequences for all states of FSM.<br>
@@ -167,9 +178,11 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Sequence VSet[i] of resulting collection belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).<br>
 	* Applying SVS distinguishes related state from the others.
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in each SVS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return Verifying Set of SVSs, or an empty collection if the FSM is not compact
 	*/
-	FSMLIB_API sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds the shortest possible sequences that distinguish related pairs of states.
@@ -298,9 +311,11 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in SS
+	*		if fsm->isOutputState() and false is set, otherwise no STOUT_INPUT occurs in SS
 	* @return a synchronizing sequence, or an empty sequence if there is no SS or the FSM is not compact
 	*/
-	FSMLIB_API sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds homing sequence of FSM if exists.<br><br>
@@ -314,9 +329,11 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Southcon/94. Conference Record, 1994, 496-501 
 	*
 	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in PHS
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a homing sequence, or an empty sequence if there is no HS or the FSM is not compact
 	*/
-	FSMLIB_API sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& dfsm);
+	FSMLIB_API sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds all distinguishing types of sequences which FSM has.<br><br>
@@ -347,6 +364,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @param reduceCSetFunc - a pointer to function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return type of the strongest found sequence, i.e. PDS_FOUND, ADS_FOUND, SVS_FOUND or CSet_FOUND,
 	*			or -1 if the FSM is not compact
 	*/
@@ -354,7 +373,7 @@ namespace FSMsequence {// all design functions require a compact FSM
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
 		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm) = getStatePairsShortestSeparatingSequences,
 		bool filterPrefixes = true, void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr,
-		void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr);
+		void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).

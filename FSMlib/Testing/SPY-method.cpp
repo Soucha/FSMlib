@@ -212,9 +212,9 @@ namespace FSMtesting {
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < H.size(); i++) {
 				sequence_set_t tmp;
-				for (auto origDS : H[i]) {
+				for (const auto& origDS : H[i]) {
 					sequence_in_t seq;
-					for (auto input : origDS) {
+					for (auto& input : origDS) {
 						if (input == STOUT_INPUT) continue;
 						seq.push_back(input);
 					}

@@ -122,6 +122,19 @@ namespace FSMlibTest
 				DEBUG_MSG("Adaptive DS of %s:\n", filename.c_str());
 				printADS(ads);
 				ARE_EQUAL(true, hasDS, "FSM has not adaptive DS but it was found.");
+				auto d = getAdaptiveDistinguishingSet(fsm, ads);
+				ARE_EQUAL(fsm->getNumberOfStates(), state_t(d.size()), "ADSet has not exactly %d sequences.", fsm->getNumberOfStates());
+				for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
+					auto out = fsm->getOutputAlongPath(state, d[state]);
+					DEBUG_MSG("%d: %s -> %s\n", state, FSMmodel::getInSequenceAsString(d[state]).c_str(), FSMmodel::getOutSequenceAsString(out).c_str());
+					for (state_t i = 0; i < fsm->getNumberOfStates(); i++) {
+						if (state != i) {
+							ARE_EQUAL(true, out != fsm->getOutputAlongPath(i, d[state]), "States %d and %d are not distinguished by %s",
+								state, i, FSMmodel::getInSequenceAsString(d[state]).c_str());
+						}
+					}
+				}
+
 				set<state_t> states;
 				vector<bool> dist(fsm->getNumberOfStates(), false);
 				// check initial and current states of root

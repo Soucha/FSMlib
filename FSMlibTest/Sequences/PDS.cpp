@@ -95,7 +95,7 @@ namespace FSMlibTest
 
 		void testGetPresetDS(string filename, bool hasDS = true) {
 			fsm->load(filename);
-			auto pDS = getPresetDistinguishingSequence(fsm);
+			auto pDS = getPresetDistinguishingSequence(fsm, true);
 			if (!pDS.empty()) {
 				DEBUG_MSG("Preset DS of %s: %s\n", filename.c_str(), FSMmodel::getInSequenceAsString(pDS).c_str());
 				ARE_EQUAL(true, hasDS, "FSM has not preset DS but it was found.");

@@ -38,7 +38,6 @@ namespace FSMtesting {
 			return sequence_set_t();
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
-		sequence_in_t CS;
 		sequence_set_t stateCover;
 		if (resetEnabled) {
 			stateCover = getStateCover(fsm);
@@ -65,43 +64,30 @@ namespace FSMtesting {
 		for (state_t i = 0; i < N; i++) {
 			verifiedTransition[i].resize(P, false);
 		}
-		
-		if (fsm->isOutputState()) {
-			for (state_t i = 0; i < E.size(); i++) {
-				auto origDS = E[i];
-				auto DSit = E[i].begin();
-				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-					if (*it == STOUT_INPUT) continue;
-					it++;
-					if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-						E[i].insert(++DSit, STOUT_INPUT);
-						DSit--;
-					}
-					it--;
-				}
-				if (E[i].front() == STOUT_INPUT) E[i].pop_front();
-			}
-			CS.push_back(STOUT_INPUT);// the first symbol
-		}
-		CS.insert(CS.end(), E[0].begin(), E[0].end());
+		sequence_in_t CS(E[0]);// identification of the initial state
 		sequence_set_t TS;
 		state_t currState = 0;
 		auto currInput = CS.begin();
-		if (fsm->isOutputState()) currInput++;
+		if (*currInput == STOUT_INPUT) currInput++;
 
 		while (counter > 0) {
 			//printf("%u %p %p %s\n", currState, currInput, CS.end(), FSMmodel::getInSequenceAsString(CS).c_str());
 			if (currInput != CS.end()) {
 				input_t input = *currInput;
 				currInput++;
-				if (fsm->isOutputState()) currInput++;
+				if (fsm->isOutputState() && (currInput != CS.end())) currInput++;
 				auto nextState = fsm->getNextState(currState, input);
 				if (!verifiedTransition[currState][input]) {
 					auto nextInput = E[nextState].begin();
+					if (*nextInput == STOUT_INPUT) nextInput++;
 					if (equalSeqPart(currInput, CS.end(), nextInput, E[nextState].end())) {
 						if (nextInput != E[nextState].end()) {
 							if (currInput == CS.end()) {
 								currInput--;
+								if (fsm->isOutputState() && (CS.back() != STOUT_INPUT)) {
+									CS.push_back(STOUT_INPUT);
+									currInput++;
+								}
 								CS.insert(CS.end(), nextInput, E[nextState].end());
 								currInput++;
 							}
@@ -126,10 +112,14 @@ namespace FSMtesting {
 						}
 						else {
 							currInput--;
+							if (fsm->isOutputState() && (CS.back() != STOUT_INPUT)) {
+								CS.push_back(STOUT_INPUT);
+								currInput++;
+							}
 							CS.push_back(input);
 							currInput++;
 						}
-						if (fsm->isOutputState()) CS.push_back(STOUT_INPUT);
+						if (fsm->isOutputState() && (E[nextState].front() != STOUT_INPUT)) CS.push_back(STOUT_INPUT);
 						CS.insert(CS.end(), E[nextState].begin(), E[nextState].end());
 						currInput++;
 						if (fsm->isOutputState()) currInput++;
@@ -156,6 +146,7 @@ namespace FSMtesting {
 							if (resetEnabled) {
 								for (const auto& trSeq : stateCover) {
 									if (trSeq.size() >= current.second.size()) {
+										if (fsm->isOutputState() && (CS.back() != STOUT_INPUT)) CS.push_back(STOUT_INPUT);
 										CS.insert(CS.end(), current.second.begin(), current.second.end());
 										CS.push_back(input);
 										if (fsm->isOutputState()) CS.push_back(STOUT_INPUT);
@@ -171,6 +162,7 @@ namespace FSMtesting {
 								}
 							}
 							else {
+								if (fsm->isOutputState() && (CS.back() != STOUT_INPUT)) CS.push_back(STOUT_INPUT);
 								CS.insert(CS.end(), current.second.begin(), current.second.end());
 								CS.push_back(input);
 								if (fsm->isOutputState()) CS.push_back(STOUT_INPUT);

@@ -37,7 +37,7 @@ namespace FSMsequence {
 	extern int closedCount, openCount;
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
-	sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& fsm, state_t state) {
+	sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& fsm, state_t state, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStateVerifyingSequence", sequence_in_t());
 		sequence_in_t outSVS;
 		block_t states;
@@ -69,7 +69,8 @@ namespace FSMsequence {
 		queue<unique_ptr<svs_node_t>> fifo;
 		set< pair<block_t, state_t> > used;
 		state_t nextState;
-		bool badInput, stoutUsed = false;
+		bool badInput, stoutNeeded = false;
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 
 		fifo.emplace(make_unique<svs_node_t>(states, s, state));
 		used.emplace(move(states), state);
@@ -97,7 +98,7 @@ namespace FSMsequence {
 				if (badInput) {
 					continue;
 				}
-				stoutUsed = false;
+				stoutNeeded = false;
 				if (fsm->isOutputState() && (states.size() > 1)) {
 					block_t tmp;
 					output = fsm->getOutput(nextState, STOUT_INPUT);
@@ -109,14 +110,14 @@ namespace FSMsequence {
 					// is reference state distinguished by appending STOUT_INPUT?
 					if (tmp.size() != states.size()) {
 						states.swap(tmp);
-						stoutUsed = true;
+						stoutNeeded = true;
 					}
 				}
 				// is SVS found?
 				if (states.size() == 1) {
 					outSVS.swap(act->svs);
 					outSVS.push_back(input);
-					if (stoutUsed) outSVS.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) outSVS.push_back(STOUT_INPUT);
 #if SEQUENCES_PERFORMANCE_TEST
 					openCount += fifo.size();
 					closedCount += used.size();
@@ -127,7 +128,7 @@ namespace FSMsequence {
 				if (used.find(make_pair(states, nextState)) == used.end()) {
 					sequence_in_t s(act->svs);
 					s.push_back(input);
-					if (stoutUsed) s.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<svs_node_t>(states, s, nextState));
 					used.emplace(move(states), nextState);
 				}
@@ -140,14 +141,14 @@ namespace FSMsequence {
 		return outSVS;
 	}
 
-	sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& fsm) {
+	sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getVerifyingSet", sequence_vec_t());
 		sequence_vec_t outVSet;
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;
 #endif // SEQUENCES_PERFORMANCE_TEST
 		for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
-			outVSet.emplace_back(getStateVerifyingSequence(fsm, state));
+			outVSet.emplace_back(getStateVerifyingSequence(fsm, state, omitUnnecessaryStoutInputs));
 		}
 #if SEQUENCES_PERFORMANCE_TEST
 		stringstream ss;

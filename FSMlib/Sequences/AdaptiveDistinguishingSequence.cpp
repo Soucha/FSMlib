@@ -71,9 +71,9 @@ namespace FSMsequence {
 		return ADSet;
 	}
 
-	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm) {
+	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
-		auto ads = getAdaptiveDistinguishingSequence(fsm);
+		auto ads = getAdaptiveDistinguishingSequence(fsm, omitUnnecessaryStoutInputs);
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
 
@@ -199,7 +199,7 @@ namespace FSMsequence {
 		vector<vector<pair<input_t, state_t>>>& link,
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp>& partition,
 		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
-		vector<shared_ptr<st_node_t>>& curNode, vector<shared_ptr<st_node_t>>& distinguished) {
+		vector<shared_ptr<st_node_t>>& curNode, vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
 		state_t N = state_t(curNode.size());
 		auto distCounter = dependent.size();
 		while (!bfsqueue.empty()) {
@@ -211,6 +211,7 @@ namespace FSMsequence {
 				// hack (input stored in place of output -> it does not have to be found in node->sequence by iteration first)
 				node->sequence.emplace_back(node->succ[node->succ.back().first].first);
 				auto next = node->succ.back().second;// best successor
+				if (useStout && (next->sequence.front() != STOUT_INPUT)) node->sequence.push_back(STOUT_INPUT);
 				node->sequence.insert(node->sequence.end(), next->sequence.begin(), next->sequence.end());
 				// update next states after the valid input
 				node->nextStates.swap(node->succ[node->succ.back().first].second->nextStates);
@@ -288,7 +289,7 @@ namespace FSMsequence {
 	}
 
 	static unique_ptr<AdaptiveDS> buildAds(const vector<state_t>& block, const state_t& N, 
-			const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
+			const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
 		auto outADS = make_unique<AdaptiveDS>();
 		outADS->initialStates = outADS->currentStates = block;
 
@@ -308,7 +309,7 @@ namespace FSMsequence {
 				}
 			}
 			// set distinguishing input sequence
-			adsNode->input = next->sequence;
+			adsNode->input.insert(adsNode->input.end(), next->sequence.begin(), next->sequence.end());
 			for (state_t sI = 0; sI < adsNode->initialStates.size(); sI++) {
 				for (const auto &p : next->succ) {
 					if (binary_search(p.second->block.begin(), p.second->block.end(), adsNode->currentStates[sI])) {
@@ -317,6 +318,7 @@ namespace FSMsequence {
 						auto outIt = adsNode->decision.find(p.first);
 						if (outIt == adsNode->decision.end()) {
 							auto adsNext = make_unique<AdaptiveDS>();
+							if (useStout && (adsNode->input.back() != STOUT_INPUT)) adsNext->input.push_back(STOUT_INPUT);
 							adsNext->initialStates.push_back(adsNode->initialStates[sI]);
 							adsNext->currentStates.push_back(next->nextStates[idx]);
 							fifo.push(adsNext.get());
@@ -334,7 +336,7 @@ namespace FSMsequence {
 		return outADS;
 	}
 
-	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm) {
+	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
 		state_t N = fsm->getNumberOfStates();
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
@@ -342,6 +344,7 @@ namespace FSMsequence {
 		vector<shared_ptr<st_node_t>> curNode(N, rootST);
 		vector<shared_ptr<st_node_t>> distinguished(((N - 1) * N) / 2, nullptr);
 		vector<shared_ptr<st_node_t>> dependent;
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 		if (fsm->isOutputState()) {
 			auto node = rootST;
 			node->sequence.push_back(STOUT_INPUT);
@@ -418,13 +421,13 @@ namespace FSMsequence {
 				priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp> bfsqueue;
 				auto link = prepareLinks(dependent, bfsqueue, curNode, distinguished);
 				// check that all dependent was divided
-				if (!processDependent(dependent, link, partition, bfsqueue, curNode, distinguished)) {
+				if (!processDependent(dependent, link, partition, bfsqueue, curNode, distinguished, useStout)) {
 					return nullptr;
 				}
 				dependent.clear();
 			}
 		}
 		// build ADS from ST
-		return buildAds(rootST->block, N, curNode, distinguished);
+		return buildAds(rootST->block, N, curNode, distinguished, useStout);
 	}
 }

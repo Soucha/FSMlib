@@ -57,7 +57,7 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& fsm) {
+	sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getPresetHomingSequence", sequence_in_t());
 		sequence_in_t outHS;
 		partition_t partition;
@@ -96,7 +96,8 @@ namespace FSMsequence {
 		queue<unique_ptr<hs_node_t>> fifo;
 		// <id, node's partition>, id = getSetId(node) = sum of state IDs in the first block of node's partition
 		multimap<state_t, partition_t> used;
-		bool stop, stoutUsed = false;
+		bool stop, stoutNeeded = false;
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 
 		fifo.emplace(make_unique<hs_node_t>(partition, s));
 		used.emplace(getSetId(*partition.begin()), move(partition));
@@ -135,7 +136,7 @@ namespace FSMsequence {
 				}
 				if (fsm->isOutputState()) {
 					partition_t tmp;
-					stoutUsed = false;
+					stoutNeeded = false;
 					for (const auto& block : partition) {
 						vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// +1 for DEFAULT_OUTPUT
 						set<output_t> actOutputs;
@@ -145,7 +146,7 @@ namespace FSMsequence {
 							sameOutput[output].emplace(state);
 							actOutputs.emplace(output);
 						}
-						if (actOutputs.size() > 1) stoutUsed = true;
+						if (actOutputs.size() > 1) stoutNeeded = true;
 						// save block with more then one state and clear sameOutput
 						for (auto out : actOutputs) {
 							if (sameOutput[out].size() > 1) {
@@ -155,7 +156,7 @@ namespace FSMsequence {
 						}
 						actOutputs.clear();
 					}
-					if (stoutUsed) {
+					if (stoutNeeded) {
 						partition.swap(tmp);
 					}
 				}
@@ -163,7 +164,7 @@ namespace FSMsequence {
 				if (partition.empty()) {
 					outHS.swap(act->hs);
 					outHS.push_back(input);
-					if (stoutUsed) outHS.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) outHS.push_back(STOUT_INPUT);
 					return outHS;
 				}
 				// go through all blocks in new partition
@@ -181,7 +182,7 @@ namespace FSMsequence {
 				if (!stop) {
 					s = act->hs;
 					s.push_back(input);
-					if (stoutUsed) s.push_back(STOUT_INPUT);
+					if (stoutNeeded || useStout) s.push_back(STOUT_INPUT);
 					fifo.emplace(make_unique<hs_node_t>(partition, s));
 					used.emplace(getSetId(*partition.begin()), move(partition));
 				}

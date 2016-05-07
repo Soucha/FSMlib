@@ -402,7 +402,7 @@ namespace FSMlibTest
 			vector<sequence_set_t> SCSets;
 			sequence_set_t CSet;
 			int retVal = getDistinguishingSequences(fsm, pDS, aDS, SVS, SCSets, CSet,
-				getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength, reduceCSet_EqualLength);
+				getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength, reduceCSet_EqualLength, true);
 			DEBUG_MSG("Found DS type of %s: %d\n", filename.c_str(), retVal);
 			if (retVal > seqVal) {
 				switch (seqVal) {
