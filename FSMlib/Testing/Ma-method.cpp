@@ -59,7 +59,6 @@ namespace FSMtesting {
 		E[4].push_back(0);
 		E[4].push_back(1);
 		//*/
-		auto states = fsm->getStates();
 		int counter = N * fsm->getNumberOfInputs();
 		vector<vector<bool>> verifiedTransition(N);
 		vector<input_t> verifiedState(N, P);
@@ -96,8 +95,7 @@ namespace FSMtesting {
 				input_t input = *currInput;
 				currInput++;
 				if (fsm->isOutputState()) currInput++;
-				auto nextState = fsm->getNextState(states[currState], input);
-				nextState = getIdx(states, nextState);
+				auto nextState = fsm->getNextState(currState, input);
 				if (!verifiedTransition[currState][input]) {
 					auto nextInput = E[nextState].begin();
 					if (equalSeqPart(currInput, CS.end(), nextInput, E[nextState].end())) {
@@ -121,8 +119,7 @@ namespace FSMtesting {
 			else if (verifiedState[currState] > 0) {
 				for (input_t input = 0; input < P; input++) {
 					if (!verifiedTransition[currState][input]) {
-						auto nextState = fsm->getNextState(states[currState], input);
-						nextState = getIdx(states, nextState);
+						auto nextState = fsm->getNextState(currState, input);
 						if (currInput == CS.begin()){
 							CS.push_back(input);
 							currInput = CS.begin();
@@ -153,9 +150,8 @@ namespace FSMtesting {
 					auto current = move(fifo.front());
 					fifo.pop_front();
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-						auto nextState = fsm->getNextState(states[current.first], input);
-						if (nextState == WRONG_STATE) continue;
-						nextState = getIdx(states, nextState);
+						auto nextState = fsm->getNextState(current.first, input);
+						if (nextState == NULL_STATE) continue;
 						if (verifiedState[nextState] > 0) {
 							if (resetEnabled) {
 								for (const auto& trSeq : stateCover) {
@@ -166,7 +162,6 @@ namespace FSMtesting {
 										break;
 									}
 									currState = fsm->getEndPathState(0, trSeq);
-									currState = getIdx(states, currState);
 									if (verifiedState[currState] > 0) {
 										nextState = currState;
 										TS.emplace(move(CS));
@@ -202,12 +197,14 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t Ma_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Ma_method", sequence_in_t());
 		auto TS = process_Ma(fsm, extraStates, false);
 		if (TS.empty()) return sequence_in_t();
 		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
 	sequence_set_t Mra_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mra_method", sequence_set_t());
 		return process_Ma(fsm, extraStates, true);
 	}
 }

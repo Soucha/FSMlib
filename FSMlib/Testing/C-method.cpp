@@ -177,11 +177,11 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t C_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::C_method", sequence_in_t());
 		auto E = getAdaptiveDistinguishingSet(fsm);
 		if (E.empty()) {
 			return sequence_in_t();
 		}
-		auto states = fsm->getStates();
 		auto N = fsm->getNumberOfStates();
 		auto P = fsm->getNumberOfInputs();
 		
@@ -226,7 +226,7 @@ namespace FSMtesting {
 			auto nextState = fsm->getNextState(currState, input);
 			outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
 			outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
-			cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, getIdx(states, nextState), outputState));
+			cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, nextState, outputState));
 			currState = nextState;
 		}
 		vector<vector<seq_len_t>> confirmedNodes(N);
@@ -251,10 +251,9 @@ namespace FSMtesting {
 					if (equalSeqPart(currIdx + 1, nextInput, E[nextState].end(), cs)) {
 						currState = cs.back()->state;
 						for (; nextInput != E[cs[currIdx]->state].end(); nextInput++) {
-							nextState = fsm->getNextState(states[currState], *nextInput);
+							nextState = fsm->getNextState(currState, *nextInput);
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], *nextInput) : DEFAULT_OUTPUT;
-							nextState = getIdx(states, nextState);
+							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, *nextInput) : DEFAULT_OUTPUT;
 							cs.emplace_back(make_unique<TestNodeC>(*nextInput, outputTransition, nextState, outputState));
 							currState = nextState;
 						}
@@ -274,10 +273,9 @@ namespace FSMtesting {
 				currState = cs.back()->state;
 				for (input_t input = 0; input < P; input++) {
 					if (!verifiedTransition[currState][input]) {
-						auto nextState = fsm->getNextState(states[currState], input);
+						auto nextState = fsm->getNextState(currState, input);
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
-						nextState = getIdx(states, nextState);
+						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
 						cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, nextState, outputState));
 						cs.back()->confirmed = true;
 						newlyConfirmed.emplace(currIdx); //cs.size()-1
@@ -287,8 +285,8 @@ namespace FSMtesting {
 						if (!E[currState].empty() && input == E[currState].front()) {
 							sequence_in_t suf(E[currState]);
 							suf.pop_front();
-							auto outSuf = fsm->getOutputAlongPath(states[nextState], suf);
-							auto outE = fsm->getOutputAlongPath(states[nextState], E[nextState]);
+							auto outSuf = fsm->getOutputAlongPath(nextState, suf);
+							auto outE = fsm->getOutputAlongPath(nextState, E[nextState]);
 							//printf("(%d,%d,%d) %s/%s %s\n", currState, input, nextState,
 							//      FSMmodel::getInSequenceAsString(suf).c_str(),
 							//    FSMmodel::getOutSequenceAsString(outSuf).c_str(),
@@ -296,7 +294,7 @@ namespace FSMtesting {
 							seq_len_t lenE = 0; //outE.size();
 							for (state_t i = 0; i < N; i++) {
 								if (i != nextState) {
-									auto outSufI = fsm->getOutputAlongPath(states[i], suf);
+									auto outSufI = fsm->getOutputAlongPath(i, suf);
 									auto osl = equalLength(outSuf.begin(), outSufI.begin(), seq_len_t(outSuf.size()));
 									if (osl != outSuf.size()) {
 										bool outConfirmed = false;
@@ -328,7 +326,7 @@ namespace FSMtesting {
 											*/
 										}
 									}
-									auto outI = fsm->getOutputAlongPath(states[i], E[nextState]);
+									auto outI = fsm->getOutputAlongPath(i, E[nextState]);
 									auto oel = 1 + equalLength(outE.begin(), outI.begin(), seq_len_t(outI.size()));
 									//printf("%s/%s x %s %d %d-%d\n", 
 									//      FSMmodel::getInSequenceAsString(E[nextState]).c_str(),
@@ -350,10 +348,9 @@ namespace FSMtesting {
 						}
 						currState = nextState;
 						for (const auto& input : seqE) {
-							nextState = fsm->getNextState(states[currState], input);
+							nextState = fsm->getNextState(currState, input);
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
-							nextState = getIdx(states, nextState);
+							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
 							cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, nextState, outputState));
 							currState = nextState;
 						}
@@ -374,23 +371,20 @@ namespace FSMtesting {
 					auto current = move(fifo.front());
 					fifo.pop_front();
 					for (input_t input = 0; input < P; input++) {
-						auto nextState = fsm->getNextState(states[current.first], input);
+						auto nextState = fsm->getNextState(current.first, input);
 						if (nextState == WRONG_STATE) continue;
-						nextState = getIdx(states, nextState);
 						if (verifiedState[nextState] > 0) {
 							for (auto nextInput = current.second.begin(); nextInput != current.second.end(); nextInput++) {
-								nextState = fsm->getNextState(states[currState], *nextInput);
+								nextState = fsm->getNextState(currState, *nextInput);
 								outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-								outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], *nextInput) : DEFAULT_OUTPUT;
-								nextState = getIdx(states, nextState);
+								outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, *nextInput) : DEFAULT_OUTPUT;
 								cs.emplace_back(make_unique<TestNodeC>(*nextInput, outputTransition, nextState, outputState));
 								cs.back()->confirmed = true;
 								currState = nextState;
 							}
-							nextState = fsm->getNextState(states[currState], input);
+							nextState = fsm->getNextState(currState, input);
 							outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[currState], input) : DEFAULT_OUTPUT;
-							nextState = getIdx(states, nextState);
+							outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(currState, input) : DEFAULT_OUTPUT;
 							lastConfIdx = seq_len_t(cs.size());
 							cs.emplace_back(make_unique<TestNodeC>(input, outputTransition, nextState, outputState));
 							cs.back()->confirmed = true;

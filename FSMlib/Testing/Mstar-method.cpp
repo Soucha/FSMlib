@@ -140,8 +140,7 @@ namespace FSMtesting {
 		}
 		state_t N = fsm->getNumberOfStates(), P = fsm->getNumberOfInputs();
 		sequence_in_t CS;
-		auto states = fsm->getStates();
-
+		
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < d.size(); i++) {
 				auto origDS = d[i];
@@ -206,9 +205,8 @@ namespace FSMtesting {
 		state_t idx = 0;
 		for (state_t state = 0; state < N; state++) {
 			for (input_t input = 0; input < P; input++, idx++) {
-				auto actState = fsm->getNextState(states[state], input);
+				auto actState = fsm->getNextState(state, input);
 				if (actState == NULL_STATE) continue;
-				actState = getIdx(states, actState);
 				auto it = tests[idx].begin();
 				seq_len_t cost = 1;
 				for (++it; it != tests[idx].end(); it++, cost++) {
@@ -224,7 +222,6 @@ namespace FSMtesting {
 						}
 					}
 					actState = fsm->getNextState(actState, *it);
-					actState = getIdx(states, actState);
 				}
 				costs[idx][Tsize - 1] = seq_len_t(tests[idx].size());
 				for (state_t i = 0; i < Tsize - 1; i++) {
@@ -255,7 +252,6 @@ namespace FSMtesting {
 				}
 			}
 			actState = fsm->getNextState(actState, *it);
-			actState = getIdx(states, actState);
 			if (fsm->isOutputState()) it++;
 		}
 		for (state_t i = 0; i < Tsize - 1; i++) {
@@ -342,12 +338,14 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t Mstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mstar_method", sequence_in_t());
 		auto TS = process_Mstar(fsm, extraStates, false);
 		if (TS.empty()) return sequence_in_t();
 		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
 	sequence_set_t Mrstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mrstar_method", sequence_set_t());
 		return process_Mstar(fsm, extraStates, true);
 	}
 }

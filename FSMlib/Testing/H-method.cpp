@@ -45,18 +45,16 @@ namespace FSMtesting {
 			vector<shared_ptr<TestNodeH>>& extNodes, int extraStates) {
 		output_t outputState, outputTransition;
 		vector<bool> covered(fsm->getNumberOfStates(), false);
-		auto states = fsm->getStates();
 		// root
 		outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
 		coreNodes.emplace_back(make_shared<TestNodeH>(0, outputState, DEFAULT_OUTPUT));
 		covered[0] = true;
 		for (state_t idx = 0; idx != coreNodes.size(); idx++) {
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				auto state = fsm->getNextState(states[coreNodes[idx]->state], input);
+				auto state = fsm->getNextState(coreNodes[idx]->state, input);
 				if (state == NULL_STATE) continue;
 				outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-				outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[coreNodes[idx]->state], input) : DEFAULT_OUTPUT;
-				state = getIdx(states, state);
+				outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(coreNodes[idx]->state, input) : DEFAULT_OUTPUT;
 				auto node = make_shared<TestNodeH>(state, outputState, outputTransition);
 				coreNodes[idx]->next[input] = node;
 				if (covered[state]) {
@@ -78,11 +76,10 @@ namespace FSMtesting {
 					auto actNode = move(lifo.top());
 					lifo.pop();
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-						auto state = fsm->getNextState(states[actNode->state], input);
+						auto state = fsm->getNextState(actNode->state, input);
 						if (state == NULL_STATE) continue;
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[actNode->state], input) : DEFAULT_OUTPUT;
-						state = getIdx(states, state);
+						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(actNode->state, input) : DEFAULT_OUTPUT;
 						auto node = make_shared<TestNodeH>(state, outputState, outputTransition);
 						if (actNode->distinguishingInput > 1) {
 							node->distinguishingInput = actNode->distinguishingInput - 1;
@@ -169,15 +166,13 @@ namespace FSMtesting {
 				}
 			}
 		}
-		auto states = fsm->getStates();
 		output_t outputState1, outputState2, outputTransition1, outputTransition2;
 		auto it = n1->next.find(input);
 		if (it == n1->next.end()) {
-			state_t state = fsm->getNextState(states[n1->state], input);
+			state_t state = fsm->getNextState(n1->state, input);
 			outputState1 = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 			outputTransition1 = (fsm->isOutputTransition()) ? 
-				fsm->getOutput(states[n1->state], input) : DEFAULT_OUTPUT;
-			state = getIdx(states, state);
+				fsm->getOutput(n1->state, input) : DEFAULT_OUTPUT;
 			n1->next[input] = make_shared<TestNodeH>(state, outputState1, outputTransition1);
 		}
 		else {
@@ -186,11 +181,10 @@ namespace FSMtesting {
 		}
 		it = n2->next.find(input);
 		if (it == n2->next.end()) {
-			state_t state = fsm->getNextState(states[n2->state], input);
+			state_t state = fsm->getNextState(n2->state, input);
 			outputState2 = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 			outputTransition2 = (fsm->isOutputTransition()) ?
-				fsm->getOutput(states[n2->state], input) : DEFAULT_OUTPUT;
-			state = getIdx(states, state);
+				fsm->getOutput(n2->state, input) : DEFAULT_OUTPUT;
 			n2->next[input] = make_shared<TestNodeH>(state, outputState2, outputTransition2);
 		}
 		else {
@@ -265,6 +259,7 @@ namespace FSMtesting {
 	}
 
 	sequence_set_t H_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::H_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}

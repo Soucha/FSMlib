@@ -23,6 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t PDS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::PDS_method", sequence_set_t());
 		auto DS = getPresetDistinguishingSequence(fsm);
 		if ((extraStates < 0) || DS.empty()) {
 			return sequence_set_t();

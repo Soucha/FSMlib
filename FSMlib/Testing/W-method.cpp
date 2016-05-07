@@ -23,6 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::W_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}

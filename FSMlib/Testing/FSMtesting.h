@@ -18,7 +18,7 @@
 
 #include "../Sequences/FSMsequence.h"
 
-namespace FSMtesting {
+namespace FSMtesting {// all testing methods require a compact FSM
 	//<-- Resettable machines -->// 
 
 	/**
@@ -34,7 +34,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if there is no PDS or negative extraStates
+	* @return a Test Suite, or an empty collection if there is no PDS, extraStates is negative, or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t PDS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -51,7 +51,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if there is no ADS or negative extraStates
+	* @return a Test Suite, or an empty collection if there is no ADS, extraStates is negative, or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -72,7 +72,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -94,7 +94,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -113,7 +113,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -130,7 +130,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -148,7 +148,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t H_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -165,7 +165,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -181,7 +181,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_set_t FF_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -196,7 +196,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if extraStates is negative
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_set_t SC_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -210,7 +210,7 @@ namespace FSMtesting {
 	*
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many states shall be considered relatively to the number of states,
-	* @return a Test Suite
+	* @return a Test Suite, or an empty collection if the FSM is not compact
 	*/
 	//FSMLIB_API sequence_set_t P_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -233,7 +233,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative
+	* @return a Test Suite, or an empty collection if there is no ADS, extraStates is negative, or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t Mra_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -257,7 +257,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative
+	* @return a Test Suite, or an empty collection if there is no ADS, extraStates is negative, or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t Mrg_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -279,7 +279,8 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
-	* @return a Test Suite, or an empty collection if there is no ADS or extraStates is negative or an error occured due to use of GUROBI
+	* @return a Test Suite, or an empty collection if there is no ADS, extraStates is negative,
+	*		 an error occured due to use of GUROBI, or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t Mrstar_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -297,7 +298,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t HrADS_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -314,7 +315,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no PDS
+	* @return a Checking Sequence, or an empty sequence if there is no PDS or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t D_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -336,7 +337,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t AD_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -351,7 +352,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence
+	* @return a Checking Sequence, or an empty sequence if the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t DW_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -366,7 +367,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence
+	* @return a Checking Sequence, or an empty sequence if the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t DWp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -388,7 +389,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is a state without SVS
+	* @return a Checking Sequence, or an empty sequence if there is a state without SVS or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t UIO_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -403,7 +404,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET(how many extra states shall be considered,
 	*		default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no PDS (? TODO ?)
+	* @return a Checking Sequence, or an empty sequence if there is no PDS or the FSM is not compact (? TODO ?)
 	*/
 	//FSMLIB_API sequence_in_t CSP_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -425,7 +426,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t C_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -441,7 +442,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	//FSMLIB_API sequence_in_t K_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
@@ -461,7 +462,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t Ma_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -482,7 +483,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS
+	* @return a Checking Sequence, or an empty sequence if there is no ADS or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t Mg_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
@@ -503,7 +504,7 @@ namespace FSMtesting {
 	* @param fsm - Deterministic FSM
 	* @param extraStates - NOT SUPPORTED YET (how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0)
-	* @return a Checking Sequence, or an empty sequence if there is no ADS or an error occured due to use of GUROBI
+	* @return a Checking Sequence, or an empty sequence if there is no ADS, an error occured due to use of GUROBI or the FSM is not compact
 	*/
 	FSMLIB_API sequence_in_t Mstar_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 }

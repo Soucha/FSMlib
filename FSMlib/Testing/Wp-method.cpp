@@ -23,10 +23,10 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Wp_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
-		auto states = fsm->getStates();
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		traversalSet.emplace(sequence_in_t());
@@ -84,7 +84,6 @@ namespace FSMtesting {
 				transferSeq.insert(transferSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, transferSeq);
 				if (state == WRONG_STATE) continue;
-				state = getIdx(states, state);
 				for (const auto& cSeq : CSet) {
 					sequence_in_t testSeq(transferSeq);
 					if (startWithStout) {
@@ -100,7 +99,6 @@ namespace FSMtesting {
 						// SCSet is sufficient for transition verification
 						state_t nextState = fsm->getNextState(state, input);
 						if (nextState == NULL_STATE) continue;
-						nextState = getIdx(states, nextState);
 						for (const auto& cSeq : SCSets[nextState]) {
 							sequence_in_t testSeq(transferSeq);
 							testSeq.push_back(input);

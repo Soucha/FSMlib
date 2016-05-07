@@ -19,7 +19,7 @@
 #include "FSMtesting.h"
 
 namespace FSMtesting {
-	namespace FaultCoverageChecker {
+	namespace FaultCoverageChecker {// FCC requires a compact DFSM
 		/**
 		* Finds all machines that cannot be distinguished using provided checking sequence. 
 		*
@@ -27,7 +27,8 @@ namespace FSMtesting {
 		* @param CS - Checking Sequence which fault coverage is to be checked
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
-		* @return a collection of FSMs that cannot be distinguished by given TS
+		* @return a collection of FSMs that cannot be distinguished by given CS,
+		*		 or an empty collection if CS is empty, an error occurred, or the FSM is not compact
 		*/ 
 		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_in_t& CS, int extraStates = 0);
 		
@@ -39,7 +40,8 @@ namespace FSMtesting {
 		* @param hint - a collection of sequences leading to reference states that can be distinguished from each other
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
-		* @return a collection of FSMs that cannot be distinguished by given TS
+		* @return a collection of FSMs that cannot be distinguished by given CS,
+		*		 or an empty collection if CS is empty, an error occurred, or the FSM is not compact
 		*/
 		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_in_t& CS, const sequence_vec_t& hint, int extraStates = 0);
 		
@@ -50,7 +52,8 @@ namespace FSMtesting {
 		* @param TS - Test Suite which fault coverage is to be checked
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
-		* @return a collection of FSMs that cannot be distinguished by given TS
+		* @return a collection of FSMs that cannot be distinguished by given TS,
+		*		 or an empty collection if TS is empty, an error occurred, or the FSM is not compact
 		*/
 		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_set_t& TS, int extraStates = 0);
 		
@@ -62,7 +65,8 @@ namespace FSMtesting {
 		* @param hint - a collection of sequences leading to reference states that can be distinguished from each other
 		* @param extraStates - how many extra states shall be considered,
 		*		 default is no extra state, needs to be positive or 0
-		* @return a collection of FSMs that cannot be distinguished by given TS
+		* @return a collection of FSMs that cannot be distinguished by given TS,
+		*		 or an empty collection if TS is empty, an error occurred, or the FSM is not compact
 		*/
 		FSMLIB_API vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& dfsm, const sequence_set_t& TS, const sequence_vec_t& hint, int extraStates = 0);
 	}

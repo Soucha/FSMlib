@@ -23,10 +23,10 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::HSI_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
-		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		auto H = getHarmonizedStateIdentifiers(fsm);
@@ -67,7 +67,6 @@ namespace FSMtesting {
 		for (const auto& trSeq : transitionCover) {
 			state_t state = fsm->getEndPathState(0, trSeq);
 			if (state == WRONG_STATE) continue;
-			state = getIdx(states, state);
 			for (const auto& cSeq : H[state]) {
 				sequence_in_t testSeq(trSeq);
 				if (startWithStout) {
@@ -80,7 +79,6 @@ namespace FSMtesting {
 			for (const auto& extSeq : traversalSet) {
 				state_t endState = fsm->getEndPathState(state, extSeq);
 				if (endState == WRONG_STATE) continue;
-				endState = getIdx(states, endState);
 				for (const auto& cSeq : H[endState]) {
 					sequence_in_t testSeq(trSeq);
 					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());

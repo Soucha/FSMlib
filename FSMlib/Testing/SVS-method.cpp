@@ -23,8 +23,8 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::SVS_method", sequence_set_t());
 		if (extraStates < 0) return sequence_set_t();
-		auto states = fsm->getStates();
 		bool startWithStout = false;
 
 		auto stateCover = getStateCover(fsm);
@@ -79,7 +79,6 @@ namespace FSMtesting {
 				transferSeq.insert(transferSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, transferSeq);
 				if (state == WRONG_STATE) continue;
-				state = getIdx(states, state);
 				for (sequence_set_t SCSet : SCSets) {// i.e. VSet
 					for (sequence_in_t cSeq : SCSet) {// usually only one seq = SVS
 						sequence_in_t testSeq(transferSeq);
@@ -98,7 +97,6 @@ namespace FSMtesting {
 						//printf("%d-%d ", fsm->getNextState(state, input), SCSets[fsm->getNextState(state, input)].size());
 						state_t nextState = fsm->getNextState(state, input);
 						if (nextState == NULL_STATE) continue;
-						nextState = getIdx(states, nextState);
 						for (const auto& cSeq : SCSets[nextState]) {
 							sequence_in_t testSeq(transferSeq);
 							testSeq.push_back(input);

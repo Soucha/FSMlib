@@ -46,7 +46,6 @@ namespace FSMtesting {
 			vector<vector<bool>>& coveredTransitions, vector<vector<shared_ptr<TestNodeSPY>>>& confirmedNodes) {
 		output_t outputState, outputTransition;
 		vector<bool> covered(fsm->getNumberOfStates(), false);
-		auto states = fsm->getStates();
 		vector<shared_ptr<TestNodeSPY>> coreNodes; // stores SC
 
 		// root
@@ -57,7 +56,7 @@ namespace FSMtesting {
 			coreNodes[idx]->isConfirmed = true;
 			confirmedNodes[coreNodes[idx]->state].emplace_back(coreNodes[idx]);
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-				auto state = fsm->getNextState(states[coreNodes[idx]->state], input);
+				auto state = fsm->getNextState(coreNodes[idx]->state, input);
 				if (state == NULL_STATE) continue;
 				if (covered[state]) {
 					uncoveredTransitions.emplace_back(coreNodes[idx]->state, input);
@@ -65,8 +64,7 @@ namespace FSMtesting {
 				else {
 					coveredTransitions[coreNodes[idx]->state][input] = true;
 					outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-					outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[coreNodes[idx]->state], input) : DEFAULT_OUTPUT;
-					state = getIdx(states, state);
+					outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(coreNodes[idx]->state, input) : DEFAULT_OUTPUT;
 					auto node = make_shared<TestNodeSPY>(state, outputState, outputTransition);
 					coreNodes[idx]->next[input] = node;
 					coreNodes.emplace_back(move(node));
@@ -79,10 +77,9 @@ namespace FSMtesting {
 				for (const auto& input : seq) {
 					auto nIt = node->next.find(input);
 					if (nIt == node->next.end()) {
-						auto state = fsm->getNextState(states[node->state], input);
+						auto state = fsm->getNextState(node->state, input);
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[node->state], input) : DEFAULT_OUTPUT;
-						state = getIdx(states, state);
+						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
 						auto nextNode = make_shared<TestNodeSPY>(state, outputState, outputTransition);
 						node->next[input] = nextNode;
 						node = move(nextNode);
@@ -98,12 +95,10 @@ namespace FSMtesting {
 
 	static void appendSequence(shared_ptr<TestNodeSPY> node, const sequence_in_t& seq, const unique_ptr<DFSM>& fsm,
 			vector<vector<bool>>& coveredTransitions, vector<vector<shared_ptr<TestNodeSPY>>>& confirmedNodes) {
-		auto states = fsm->getStates();
 		for (const auto& input : seq) {
-			state_t state = fsm->getNextState(states[node->state], input);
+			state_t state = fsm->getNextState(node->state, input);
 			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-			output_t outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(states[node->state], input) : DEFAULT_OUTPUT;
-			state = getIdx(states, state);
+			output_t outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
 			auto nextNode = make_shared<TestNodeSPY>(state, outputState, outputTransition);
 			node->next[input] = nextNode;
 			if (node->isConfirmed) {
@@ -207,6 +202,7 @@ namespace FSMtesting {
 	}
 
 	sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::SPY_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
@@ -239,26 +235,22 @@ namespace FSMtesting {
 		auto root = createBasicTree(fsm, H, uncoveredTransitions, coveredTransitions, confirmedNodes);
 		//printTStree(root);
 
-		auto states = fsm->getStates();
-
 		queue<sequence_in_t> fifo;
 		for (const auto& en : uncoveredTransitions) {
-			auto nextState = fsm->getNextState(states[en.first], en.second);
-			auto nextStateIdx = getIdx(states, nextState);
+			auto nextState = fsm->getNextState(en.first, en.second);
 			fifo.emplace(sequence_in_t());
 			while (!fifo.empty()) {
 				auto seq = move(fifo.front());
 				fifo.pop();
 				auto finalState = fsm->getEndPathState(nextState, seq);
 				if (finalState == WRONG_STATE) continue;
-				finalState = getIdx(states, finalState);
 				for (const auto& distSeq : H[finalState]) {
 					sequence_in_t extSeq(seq);
 					extSeq.push_front(en.second);
 					extSeq.insert(extSeq.end(), distSeq.begin(), distSeq.end());
 					addSeparatingSequence(en.first, extSeq, fsm, coveredTransitions, confirmedNodes);
 					extSeq.pop_front();
-					addSeparatingSequence(nextStateIdx, extSeq, fsm, coveredTransitions, confirmedNodes);
+					addSeparatingSequence(nextState, extSeq, fsm, coveredTransitions, confirmedNodes);
 				}
 				if (seq.size() < extraStates) {
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {

@@ -146,7 +146,7 @@ namespace FSMsequence {
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;
 #endif // SEQUENCES_PERFORMANCE_TEST
-		for (state_t state : fsm->getStates()) {
+		for (state_t state = 0; state < fsm->getNumberOfStates(); state++) {
 			outVSet.emplace_back(getStateVerifyingSequence(fsm, state));
 		}
 #if SEQUENCES_PERFORMANCE_TEST

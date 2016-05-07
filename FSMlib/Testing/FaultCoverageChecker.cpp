@@ -136,7 +136,6 @@ namespace FSMtesting {
 		};
 
 		static vector<shared_ptr<StateVariable>> initVar(const unique_ptr<DFSM>& fsm, const sequence_set_t& TS, int extraStates) {
-			auto states = fsm->getStates();
 			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
 			input_t P = fsm->getNumberOfInputs();
 			state_t MaxStates = fsm->getNumberOfStates() + extraStates;
@@ -151,11 +150,10 @@ namespace FSMtesting {
 						actStateVar = actStateVar->next[input];
 						continue;
 					}
-					auto nextState = fsm->getNextState(states[actStateVar->state], input);
+					auto nextState = fsm->getNextState(actStateVar->state, input);
 					outputState = (fsm->isOutputState()) ? fsm->getOutput(nextState, STOUT_INPUT) : DEFAULT_OUTPUT;
-					nextState = FSMsequence::getIdx(states, nextState);
 					actStateVar->transitionOutput[input] = (fsm->isOutputTransition()) ?
-						fsm->getOutput(states[actStateVar->state], input) : DEFAULT_OUTPUT;
+						fsm->getOutput(actStateVar->state, input) : DEFAULT_OUTPUT;
 					actStateVar->next[input] = make_shared<StateVariable>(input, nextState, outputState, P, MaxStates);
 					actStateVar = actStateVar->next[input];		
 				}
@@ -602,12 +600,12 @@ namespace FSMtesting {
 		}
 		
 		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_set_t & TS, const sequence_vec_t& hint, int extraStates) {
-			vector<unique_ptr<DFSM>> indistinguishable;
-			if (TS.empty() || (TS.begin())->empty()) return indistinguishable;
+			RETURN_IF_NONCOMPACT(fsm, "FaultCoverageChecker::getFSMs", vector<unique_ptr<DFSM>>());
+			if (TS.empty() || (TS.begin())->empty()) return vector<unique_ptr<DFSM>>();
 
 			auto partial = FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,
 				fsm->getNumberOfInputs(), fsm->getNumberOfOutputs());
-			if (!partial) return indistinguishable;
+			if (!partial) return vector<unique_ptr<DFSM>>();
 
 			auto var = initVar(fsm, TS, extraStates);
 			if (fsm->isOutputState()) {
@@ -621,20 +619,21 @@ namespace FSMtesting {
 				!processInstantiated(var, refStates, instantiated) || 
 				((idx = isSolved(0, var, refStates, instantiated)) == WRONG_STATE)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-				return indistinguishable;
+				return vector<unique_ptr<DFSM>>();
 			}
 			while (!instantiated.empty()) {
 				if (!processInstantiated(var, refStates, instantiated) ||
 					((idx = isSolved(0, var, refStates, instantiated)) == WRONG_STATE)) {
 					ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-					return indistinguishable;
+					return vector<unique_ptr<DFSM>>();
 				}
 			}
 			stack<unique_ptr<LogItemFC>> log;
 			if (!isConsistent(partial, log, var, refStates, instantiated)) {
 				ERROR_MESSAGE("FCC: Unable to reconstruct a FSM!\n");
-				return indistinguishable;
+				return vector<unique_ptr<DFSM>>();
 			}
+			vector<unique_ptr<DFSM>> indistinguishable;
 			if (idx == NULL_STATE) {
 				checkSolution(indistinguishable, partial);
 			}

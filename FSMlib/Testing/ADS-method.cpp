@@ -23,11 +23,11 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::ADS_method", sequence_set_t());
 		auto ADSet = getAdaptiveDistinguishingSet(fsm);
 		if ((extraStates < 0) || ADSet.empty()) {
 			return sequence_set_t();
 		}
-		auto states = fsm->getStates();
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		bool startWithStout = false;
@@ -54,7 +54,6 @@ namespace FSMtesting {
 			sequence_in_t testSeq(trSeq);
 			state_t state = fsm->getEndPathState(0, testSeq);
 			if (state == WRONG_STATE) continue;
-			state = getIdx(states, state);
 			if (startWithStout) {
 				testSeq.push_front(STOUT_INPUT);
 				testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
@@ -66,7 +65,6 @@ namespace FSMtesting {
 				testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, testSeq);
 				if (state == WRONG_STATE) continue;
-				state = getIdx(states, state);
 				if (startWithStout) {
 					testSeq.push_front(STOUT_INPUT);
 					testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended ADS)
