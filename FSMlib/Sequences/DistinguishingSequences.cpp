@@ -161,7 +161,7 @@ namespace FSMsequence {
 		return (subsetFirstIt == subsetLastIt);
 	}
 
-	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t state, state_t N, bool filterPrefixes = false);
+	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t state, state_t N, bool filterPrefixes = false, bool useStout = false);
 
 	static void distinguishBN(const unique_ptr<DFSM>& fsm, const shared_ptr<block_node_t> bn, const sequence_vec_t& seq, bn_partition_t& allBN) {
 		state_t N = fsm->getNumberOfStates();
@@ -583,7 +583,7 @@ namespace FSMsequence {
 
 	int getDistinguishingSequences(const unique_ptr<DFSM>& fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm), bool filterPrefixes,
+			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs), bool filterPrefixes,
 			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet),
 			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet), bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getDistinguishingSequences", -1);
@@ -591,7 +591,7 @@ namespace FSMsequence {
 		int retVal = CSet_FOUND;
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 
-		auto seq = (*getSeparatingSequences)(fsm);
+		auto seq = (*getSeparatingSequences)(fsm, omitUnnecessaryStoutInputs);
 
 		outVSet.clear();
 		outVSet.resize(N);
@@ -601,7 +601,7 @@ namespace FSMsequence {
 		outSCSets.resize(N);
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
-			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes);
+			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes, !omitUnnecessaryStoutInputs && fsm->isOutputState());
 			if (*reduceSCSetFunc != nullptr)
 				(*reduceSCSetFunc)(fsm, i, outSCSets[i]);
 		}
@@ -611,6 +611,7 @@ namespace FSMsequence {
 		if (filterPrefixes) {
 			FSMlib::PrefixSet pset;
 			for (state_t i = 0; i < seq.size(); i++) {
+				if (fsm->isOutputState() && (seq[i].front() != STOUT_INPUT)) seq[i].push_front(STOUT_INPUT);
 				pset.insert(seq[i]);
 			}
 			outCSet = pset.getMaximalSequences();

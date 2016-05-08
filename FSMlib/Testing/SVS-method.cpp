@@ -25,50 +25,20 @@ namespace FSMtesting {
 	sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::SVS_method", sequence_set_t());
 		if (extraStates < 0) return sequence_set_t();
-		bool startWithStout = false;
-
+		
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		traversalSet.emplace(sequence_in_t());
 		auto VSet = getVerifyingSet(fsm);
-		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
-		
+		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
 		for (int i = 0; i < SCSets.size(); i++) {
 			if (!VSet[i].empty()) {
 				SCSets[i].clear();
 				SCSets[i].emplace(move(VSet[i]));
 			}
 		}
-
+		bool startWithStout = (SCSets[0].begin()->front() == STOUT_INPUT);
 		if (fsm->isOutputState()) {
-			for (const auto& seq : SCSets[0]) {
-				if (seq.front() == STOUT_INPUT) {
-					startWithStout = true;
-					break;
-				}
-			}
-			for (state_t i = 0; i < SCSets.size(); i++) {
-				sequence_set_t tmp;
-				for (const auto& origDS : SCSets[i]) {
-					sequence_in_t seq(origDS);
-					auto DSit = seq.begin();
-					for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-						if (*it == STOUT_INPUT) continue;
-						it++;
-						if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-							seq.insert(++DSit, STOUT_INPUT);
-							DSit--;
-						}
-						it--;
-					}
-					if (startWithStout) {
-						if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
-					}
-					else if (seq.front() == STOUT_INPUT) seq.pop_front();
-					tmp.emplace(move(seq));
-				}
-				SCSets[i].swap(tmp);
-			}
 			extraStates *= 2; // STOUT_INPUT follows each input in traversalSet
 		}
 
@@ -79,8 +49,8 @@ namespace FSMtesting {
 				transferSeq.insert(transferSeq.end(), extSeq.begin(), extSeq.end());
 				state_t state = fsm->getEndPathState(0, transferSeq);
 				if (state == WRONG_STATE) continue;
-				for (sequence_set_t SCSet : SCSets) {// i.e. VSet
-					for (sequence_in_t cSeq : SCSet) {// usually only one seq = SVS
+				for (const auto& SCSet : SCSets) {// i.e. VSet
+					for (const auto& cSeq : SCSet) {// usually only one seq = SVS
 						sequence_in_t testSeq(transferSeq);
 						if (startWithStout) {
 							testSeq.push_front(STOUT_INPUT);

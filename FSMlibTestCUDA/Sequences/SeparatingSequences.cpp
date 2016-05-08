@@ -103,9 +103,9 @@ namespace FSMlibTestCUDA
 #endif
 		}
 
-		void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(const unique_ptr<DFSM>& dfsm), string name) {
+		void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(const unique_ptr<DFSM>& dfsm, bool omitStout), string name) {
 			if (!filename.empty()) fsm->load(filename);
-			auto seq = (*getSepSeq)(fsm);
+			auto seq = (*getSepSeq)(fsm, false);
 			DEBUG_MSG("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
 			state_t k = 0, N = fsm->getNumberOfStates();
 			ARE_EQUAL(((N - 1) * N) / 2, state_t(seq.size()), "The number of state pairs is not equal to the number of separating sequences");

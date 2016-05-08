@@ -30,50 +30,18 @@ namespace FSMtesting {
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		traversalSet.emplace(sequence_in_t());
-		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
-		bool startWithStout = false;
+		auto SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
+		bool startWithStout = (SCSets[0].begin()->front() == STOUT_INPUT);
 		FSMlib::PrefixSet pset;
 
 		if (fsm->isOutputState()) {
-			for (const auto& seq : SCSets[0]) {
-				if (seq.front() == STOUT_INPUT) {
-					startWithStout = true;
-					break;
-				}
-			}
-			for (state_t i = 0; i < SCSets.size(); i++) {
-				sequence_set_t tmp;
-				for (const auto& origDS : SCSets[i]) {
-					sequence_in_t seq(origDS);
-					auto DSit = seq.begin();
-					for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-						if (*it == STOUT_INPUT) continue;
-						it++;
-						if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-							seq.insert(++DSit, STOUT_INPUT);
-							DSit--;
-						}
-						it--;
-					}
-					if (startWithStout) {
-						if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
-					}
-					else if (seq.front() == STOUT_INPUT) seq.pop_front();
-					tmp.emplace(seq);
-					// CSet design
-					pset.insert(move(seq));
-				}
-				SCSets[i].swap(tmp);
-			}
 			extraStates *= 2; // STOUT_INPUT follows each input in traversalSet
 		}
-		else {
-			// CSet design
-			for (const auto& SCSet : SCSets) {
-				for (const auto& seq : SCSet) {
-					pset.insert(seq);
-				}
-			}	
+		// CSet design
+		for (const auto& SCSet : SCSets) {
+			for (const auto& seq : SCSet) {
+				pset.insert(seq);
+			}
 		}
 		auto CSet = pset.getMaximalSequences();
 		pset.clear();

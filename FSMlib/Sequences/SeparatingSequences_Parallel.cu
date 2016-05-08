@@ -332,7 +332,7 @@ namespace FSMsequence {
 
 	// <--- common functions --->
 
-	static sequence_vec_t getSequences(const unique_ptr<DFSM>& fsm, dev_ptrs_t& dev, state_t& M) {
+	static sequence_vec_t getSequences(const unique_ptr<DFSM>& fsm, dev_ptrs_t& dev, state_t& M, bool useStout) {
 #if SEQUENCES_PERFORMANCE_TEST
 		RETURN_ON_ERROR(cudaEventRecord(stop, 0));
 		RETURN_ON_ERROR(cudaEventSynchronize(stop));
@@ -352,7 +352,10 @@ namespace FSMsequence {
 			seq[idx].push_back(outDistinguishing[nextIdx]);
 			while (nextIdx != outNextDistIdx[nextIdx]) {
 				nextIdx = outNextDistIdx[nextIdx];
-				if (fsm->isOutputTransition() || (outDistinguishing[nextIdx] != STOUT_INPUT)) // filter last STOUT for Moore and DFA
+				if (outDistinguishing[nextIdx] != STOUT_INPUT) {
+					if (useStout && seq[idx].back() != STOUT_INPUT) seq[idx].push_back(STOUT_INPUT);
+					seq[idx].push_back(outDistinguishing[nextIdx]);
+				} else if (fsm->isOutputTransition()) // filter last STOUT for Moore and DFA
 					seq[idx].push_back(outDistinguishing[nextIdx]);
 			}
 		}
@@ -370,7 +373,7 @@ namespace FSMsequence {
 		return seq;
 	}
 
-	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& fsm) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelSF(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatePairsShortestSeparatingSequences_ParallelSF", sequence_vec_t());
 		state_t N = fsm->getNumberOfStates();
 		input_t P = fsm->getNumberOfInputs();
@@ -429,10 +432,10 @@ namespace FSMsequence {
 			//printf("distinguished: %d\n", count);
 			//getchar();
 		}
-		return getSequences(fsm, dev, M);
+		return getSequences(fsm, dev, M, !omitUnnecessaryStoutInputs && fsm->isOutputState());
 	}
 
-	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& fsm) {
+	sequence_vec_t getStatePairsShortestSeparatingSequences_ParallelQueue(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStatePairsShortestSeparatingSequences_ParallelQueue", sequence_vec_t());
 		state_t N = fsm->getNumberOfStates();
 		input_t P = fsm->getNumberOfInputs();
@@ -540,6 +543,6 @@ namespace FSMsequence {
 			getchar();
 #endif
 		}
-		return getSequences(fsm, dev, M);
+		return getSequences(fsm, dev, M, !omitUnnecessaryStoutInputs && fsm->isOutputState());
 	}
 }

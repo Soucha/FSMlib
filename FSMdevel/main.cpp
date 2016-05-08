@@ -71,9 +71,9 @@ int getCSet() {
 	return 0;
 }
 
-void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(const unique_ptr<DFSM>& dfsm), string name) {
+void testGetSeparatingSequences(string filename, sequence_vec_t(*getSepSeq)(const unique_ptr<DFSM>& dfsm, bool), string name) {
 	if (!filename.empty()) fsm->load(filename);
-	auto seq = (*getSepSeq)(fsm);
+	auto seq = (*getSepSeq)(fsm, false);
 	printf("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
 	vector<state_t> states = fsm->getStates();
 	state_t k = 0, N = fsm->getNumberOfStates();
@@ -156,7 +156,7 @@ void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 }
 
 int main(int argc, char** argv) {
-	
+	getCSet();
 	fsm = make_unique<DFSM>();
 	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	auto ads = getAdaptiveDistinguishingSequence(fsm);

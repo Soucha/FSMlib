@@ -30,37 +30,9 @@ namespace FSMtesting {
 
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
-		bool startWithStout = false;
-
-		if (fsm->isOutputState()) {
-			for (const auto& seq : CSet) {
-				if (seq.front() == STOUT_INPUT) {
-					startWithStout = true;
-					break;
-				}
-			}
-			sequence_set_t tmp;
-			for (const auto& origDS : CSet) {
-				sequence_in_t seq(origDS);
-				auto DSit = seq.begin();
-				for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-					if (*it == STOUT_INPUT) continue;
-					it++;
-					if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-						seq.insert(++DSit, STOUT_INPUT);
-						DSit--;
-					}
-					it--;
-				}
-				if (startWithStout) {
-					if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
-				}
-				tmp.emplace(move(seq));
-			}
-			CSet.swap(tmp);
-		}
-
+		auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
+		bool startWithStout = (CSet.begin()->front() == STOUT_INPUT);
+		
 		FSMlib::PrefixSet pset;
 		for (const auto& trSeq : transitionCover) {
 			if (fsm->getEndPathState(0, trSeq) == WRONG_STATE) continue;

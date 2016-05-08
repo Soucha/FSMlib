@@ -30,39 +30,8 @@ namespace FSMtesting {
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		auto H = getHarmonizedStateIdentifiers(fsm);
-		bool startWithStout = false;
-
-		if (fsm->isOutputState()) {
-			for (const auto& seq : H[0]) {
-				if (seq.front() == STOUT_INPUT) {
-					startWithStout = true;
-					break;
-				}
-			}
-			for (state_t i = 0; i < H.size(); i++) {
-				sequence_set_t tmp;
-				for (const auto& origDS : H[i]) {
-					sequence_in_t seq(origDS);
-					auto DSit = seq.begin();
-					for (auto it = origDS.begin(); it != origDS.end(); it++, DSit++) {
-						if (*it == STOUT_INPUT) continue;
-						it++;
-						if ((it == origDS.end()) || (*it != STOUT_INPUT)) {
-							seq.insert(++DSit, STOUT_INPUT);
-							DSit--;
-						}
-						it--;
-					}
-					if (startWithStout) {
-						if (seq.front() != STOUT_INPUT) seq.push_front(STOUT_INPUT);
-					}
-					else if (seq.front() == STOUT_INPUT) seq.pop_front();
-					tmp.emplace(move(seq));
-				}
-				H[i].swap(tmp);
-			}
-		}
-
+		bool startWithStout = (H[0].begin()->front() == STOUT_INPUT);
+		
 		FSMlib::PrefixSet pset;
 		for (const auto& trSeq : transitionCover) {
 			state_t state = fsm->getEndPathState(0, trSeq);

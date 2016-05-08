@@ -96,9 +96,9 @@ namespace FSMlibTest
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
 			testGetStatesCharacterizingSets("");
-			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
+			testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
 			testGetHarmonizedStateIdentifiers("");
-			testGetSeparatingSequences("");
+			//testGetSeparatingSequences("");
 		}
 
 		void testSCSet(state_t state, sequence_set_t& sCSet) {
@@ -147,7 +147,7 @@ namespace FSMlibTest
 
 		void testGetStatesCharacterizingSets(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			auto sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+			auto sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
 			for (state_t i = 0; i < fsm->getNumberOfStates(); i++) {
 				testSCSet(i, sCSets[i]);
 			}
@@ -155,7 +155,7 @@ namespace FSMlibTest
 
 		void testGetCharacterizingSet(string filename) {
 			if (!filename.empty()) fsm->load(filename);
-			auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
+			auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
 			bool distinguishState, hasMinLen;
@@ -208,7 +208,7 @@ namespace FSMlibTest
 			int len;
 			sequence_in_t test;
 			sequence_in_t::iterator sIt;
-			
+			DEBUG_MSG("HSI family of %s:\n", filename.c_str());
 			for (state_t state = 0; state < N; state++) {
 				DEBUG_MSG("%d:", state);
 				pset.clear();
