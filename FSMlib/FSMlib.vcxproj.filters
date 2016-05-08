@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Testing">
       <UniqueIdentifier>{b2d46ebd-51ab-4c12-93cb-0ec7eb1b66ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Learning">
+      <UniqueIdentifier>{3aba69e3-f5d4-40c0-a673-a1d7eb6aa046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Learning">
+      <UniqueIdentifier>{cb5c86f6-fe7e-444f-bc5f-b0b9ec164331}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -80,6 +86,15 @@
     </ClInclude>
     <ClInclude Include="Testing\FaultCoverageChecker.h">
       <Filter>Header Files\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\BlackBox.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\Teacher.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\FSMlearning.h">
+      <Filter>Header Files\Learning</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

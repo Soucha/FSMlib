@@ -583,15 +583,15 @@ namespace FSMsequence {
 
 	int getDistinguishingSequences(const unique_ptr<DFSM>& fsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 			sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-			sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs), bool filterPrefixes,
-			void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet),
-			void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet), bool omitUnnecessaryStoutInputs) {
+			function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences, bool filterPrefixes,
+			function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet,
+			function<void(const unique_ptr<DFSM>& dfsm, sequence_set_t& outCSet)> reduceCSet, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getDistinguishingSequences", -1);
 		state_t N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 
-		auto seq = (*getSeparatingSequences)(fsm, omitUnnecessaryStoutInputs);
+		auto seq = getSeparatingSequences(fsm, omitUnnecessaryStoutInputs);
 
 		outVSet.clear();
 		outVSet.resize(N);
@@ -602,8 +602,8 @@ namespace FSMsequence {
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
 			outSCSets[i] = getSCSet(seq, i, N, filterPrefixes, !omitUnnecessaryStoutInputs && fsm->isOutputState());
-			if (*reduceSCSetFunc != nullptr)
-				(*reduceSCSetFunc)(fsm, i, outSCSets[i]);
+			if (reduceSCSet)
+				reduceSCSet(fsm, i, outSCSets[i]);
 		}
 		
 		// CSet
@@ -621,8 +621,8 @@ namespace FSMsequence {
 				outCSet.emplace(seq[i]);
 			}
 		}
-		if (*reduceCSetFunc != nullptr)
-			(*reduceCSetFunc)(fsm, outCSet);
+		if (reduceCSet)
+			reduceCSet(fsm, outCSet);
 
 		// ADS
 		outADS = move(getAdaptiveDistinguishingSequence(fsm, omitUnnecessaryStoutInputs));

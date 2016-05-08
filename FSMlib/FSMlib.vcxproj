@@ -140,6 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FSMlib.h" />
+    <ClInclude Include="Learning\BlackBox.h" />
+    <ClInclude Include="Learning\FSMlearning.h" />
+    <ClInclude Include="Learning\Teacher.h" />
     <ClInclude Include="Model\DFA.h" />
     <ClInclude Include="Model\DFSM.h" />
     <ClInclude Include="Model\FSM.h" />

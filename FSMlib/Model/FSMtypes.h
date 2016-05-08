@@ -29,6 +29,7 @@
 #include <queue>
 #include <stack>
 #include <memory>
+#include <functional>
 #include <time.h>
 
 #include "../FSMlib.h"

@@ -242,10 +242,10 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Applying all of sequences distinguishes state from the others.
 	* @param dfsm - Deterministic FSM
 	* @param state
-	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
-	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param getSeparatingSequences - function that finds a separating sequence for each state pair,
+	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true
-	* @param reduceFunc - a pointer to function that can reduce the size of resulted SCSet additionally,
+	* @param reduceSCSet - function that can reduce the size of resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
@@ -253,8 +253,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @return State Characterizing Set of given state, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getStateCharacterizingSet(const unique_ptr<DFSM>& dfsm, state_t state,
-		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr, 
+		function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet = nullptr,
 		bool omitUnnecessaryStoutInputs = false);
 
 	/**
@@ -262,10 +262,10 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Output vector will have length of the number of states.<br>
 	* Sequence set outSCSets[i] belongs to state i (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
-	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
-	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param getSeparatingSequences - function that finds a separating sequence for each state pair,
+	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
-	* @param reduceFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
+	* @param reduceSCSet - function that can reduce the size of each resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
@@ -273,8 +273,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @return a collection of State Charactirizing Sets of all states, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API vector<sequence_set_t> getStatesCharacterizingSets(const unique_ptr<DFSM>& dfsm,
-		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr, 
+		function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet = nullptr,
 		bool omitUnnecessaryStoutInputs = false);
 
 	/**
@@ -285,17 +285,17 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Output vector will have length of the number of states.<br>
 	* Sequence set outSCSets[i] belongs to state i (for all i < dfsm->getNumberOfStates()).
 	* @param dfsm - Deterministic FSM
-	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
-	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param getSeparatingSequences - function that finds a separating sequence for each state pair,
+	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
-	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally
+	* @param reduceSCSet - function that can reduce the size of each resulted HSI additionally,
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& dfsm,
-		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr, 
+		function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet = nullptr,
 		bool omitUnnecessaryStoutInputs = false);
 
 	/**
@@ -303,10 +303,10 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Such a set always exists!<br><br>
 	* Applying all of sequences distinguishes each state from the others.
 	* @param dfsm - Deterministic FSM
-	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
-	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param getSeparatingSequences - function that finds a separating sequence for each state pair,
+	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted CSet is a prefix of another one if true
-	* @param reduceFunc - a pointer to function that can reduce the size of resulted CSet additionally,
+	* @param reduceCSet - function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
@@ -314,8 +314,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @return Characterizing Set, or an empty collection if the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t getCharacterizingSet(const unique_ptr<DFSM>& dfsm,
-		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr, 
+		function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, function<void(const unique_ptr<DFSM>& dfsm, sequence_set_t& outCSet)> reduceCSet = nullptr,
 		bool omitUnnecessaryStoutInputs = false);
 
 	/**
@@ -373,13 +373,13 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @param outSCSets - it is always filled
 	*   Sequence set outSCSets[i] belongs to state dfsm->getStates()[i] (for all i < dfsm->getNumberOfStates()).
 	* @param outCSet - it is always filled
-	* @param getSeparatingSequences - a pointer to function that fills provided vector with a separating
-	*			sequence for each state pair, see default function getStatePairsShortestSeparatingSequences
+	* @param getSeparatingSequences - function that finds a separating sequence for each state pair,
+	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true, same for CSet
-	* @param reduceSCSetFunc - a pointer to function that can reduce the size of each resulted SCSet additionally,
+	* @param reduceSCSet - function that can reduce the size of each resulted SCSet additionally,
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
-	* @param reduceCSetFunc - a pointer to function that can reduce the size of resulted CSet additionally,
+	* @param reduceCSet - function that can reduce the size of resulted CSet additionally,
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
 	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
@@ -389,9 +389,9 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*/
 	FSMLIB_API int getDistinguishingSequences(const unique_ptr<DFSM>& dfsm, sequence_in_t& outPDS, unique_ptr<AdaptiveDS>& outADS,
 		sequence_vec_t& outVSet, vector<sequence_set_t>& outSCSets, sequence_set_t& outCSet,
-		sequence_vec_t(*getSeparatingSequences)(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs) = getStatePairsShortestSeparatingSequences,
-		bool filterPrefixes = true, void(*reduceSCSetFunc)(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet) = nullptr,
-		void(*reduceCSetFunc)(const unique_ptr<DFSM>& dfsm, sequence_set_t & outCSet) = nullptr, bool omitUnnecessaryStoutInputs = false);
+		function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences = getStatePairsShortestSeparatingSequences,
+		bool filterPrefixes = true, function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet = nullptr,
+		function<void(const unique_ptr<DFSM>& dfsm, sequence_set_t& outCSet)> reduceCSet = nullptr, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Finds index of given state in given sorted collection of state Ids in logarithmic time (in the number of states).
