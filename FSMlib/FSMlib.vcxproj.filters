@@ -96,6 +96,15 @@
     <ClInclude Include="Learning\FSMlearning.h">
       <Filter>Header Files\Learning</Filter>
     </ClInclude>
+    <ClInclude Include="Learning\BlackBoxDFSM.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\TeacherDFSM.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\TeacherBB.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -190,6 +199,15 @@
     </ClCompile>
     <ClCompile Include="Testing\FaultCoverageChecker.cpp">
       <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\BlackBoxDFSM.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherBB.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherDFSM.cpp">
+      <Filter>Source Files\Learning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

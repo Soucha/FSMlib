@@ -141,8 +141,11 @@
   <ItemGroup>
     <ClInclude Include="FSMlib.h" />
     <ClInclude Include="Learning\BlackBox.h" />
+    <ClInclude Include="Learning\BlackBoxDFSM.h" />
     <ClInclude Include="Learning\FSMlearning.h" />
     <ClInclude Include="Learning\Teacher.h" />
+    <ClInclude Include="Learning\TeacherBB.h" />
+    <ClInclude Include="Learning\TeacherDFSM.h" />
     <ClInclude Include="Model\DFA.h" />
     <ClInclude Include="Model\DFSM.h" />
     <ClInclude Include="Model\FSM.h" />
@@ -174,6 +177,9 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="FSMlib.cpp" />
+    <ClCompile Include="Learning\BlackBoxDFSM.cpp" />
+    <ClCompile Include="Learning\TeacherBB.cpp" />
+    <ClCompile Include="Learning\TeacherDFSM.cpp" />
     <ClCompile Include="Model\DFA.cpp" />
     <ClCompile Include="Model\DFSM.cpp" />
     <ClCompile Include="Model\FSMmodel.cpp" />
