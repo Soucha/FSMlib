@@ -124,5 +124,5 @@ sequence_in_t TeacherDFSM::equivalenceQuery(const unique_ptr<DFSM>& conjecture) 
 			}
 		}
 	}
-	return sequence_out_t();
+	return sequence_in_t();
 }

@@ -29,6 +29,7 @@
 #include "Sequences\FSMsequence.h"
 #include "Testing\FSMtesting.h"
 #include "Testing\FaultCoverageChecker.h"
+#include "Learning\FSMlearning.h"
 
 #include "PrefixSet.h"
 #include "UnionFind.h"

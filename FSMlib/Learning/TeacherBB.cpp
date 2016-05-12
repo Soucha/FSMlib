@@ -21,13 +21,20 @@
 
 #define MAX_DEPTH 3
 
-struct bb_node_t {
+struct TeacherBB::bb_node_t {
 	output_t incomingOutput;
 	output_t stateOutput = WRONG_OUTPUT;
 	map<input_t, shared_ptr<bb_node_t>> succ;
 	weak_ptr<bb_node_t> parent;
 	input_t incomingInput;
 };
+
+TeacherBB::TeacherBB(unique_ptr<BlackBox>&& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
+Teacher(),
+_bb(move(blackBox)),
+_testingMethod(testingMethod) {
+	_initialState = _bbState = _currState = make_shared<bb_node_t>();
+}
 
 bool TeacherBB::isBlackBoxResettable() {
 	return _bb->isResettable();
@@ -123,5 +130,5 @@ sequence_in_t TeacherBB::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
 		}
 	}
 	_currState = tmp;
-	return sequence_out_t();
+	return sequence_in_t();
 }

@@ -56,3 +56,13 @@ namespace FSMlibTest
 		Logger::WriteMessage(errorMsg); 
 	}
 }
+
+namespace Microsoft{
+	namespace VisualStudio {
+		namespace CppUnitTestFramework
+		{
+			template<> static std::wstring ToString<sequence_out_t>(const sequence_out_t& t) { RETURN_WIDE_STRING(FSMmodel::getOutSequenceAsString(t).c_str()); }
+			template<> static std::wstring ToString<sequence_in_t>(const sequence_in_t& t) { RETURN_WIDE_STRING(FSMmodel::getInSequenceAsString(t).c_str()); }
+		}
+	}
+}

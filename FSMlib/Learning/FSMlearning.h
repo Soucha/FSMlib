@@ -16,6 +16,12 @@
 */
 #pragma once
 
+#include "BlackBoxDFSM.h"
+#include "BlackBox.h"
+#include "TeacherBB.h"
+#include "TeacherDFSM.h"
+#include "Teacher.h"
+
 namespace FSMlearning {
 
 }

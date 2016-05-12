@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Testing">
       <UniqueIdentifier>{b4082bf1-be64-4e73-b4d0-76198b38767e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Learning">
+      <UniqueIdentifier>{2f09b780-54a1-43af-b00a-1a5a90d10974}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -136,6 +139,12 @@
     </ClCompile>
     <ClCompile Include="UnionFindTests.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\BlackBoxTests.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherTests.cpp">
+      <Filter>Source Files\Learning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

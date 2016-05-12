@@ -19,19 +19,12 @@
 #include "Teacher.h"
 #include "../Testing/FSMtesting.h"
 
-struct bb_node_t;
-
 /**
 * A derived class describing behaviour of a Teacher that interacts with a given BlackBox.
 */
 class FSMLIB_API TeacherBB : public Teacher {
 public:
-	TeacherBB(unique_ptr<BlackBox>&& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
-		Teacher(),
-		_bb(move(blackBox)),
-		_testingMethod(testingMethod) {
-		_initialState = _bbState = _currState = make_shared<bb_node_t>();
-	}
+	TeacherBB(unique_ptr<BlackBox>&& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod);
 
 	bool isBlackBoxResettable();
 
@@ -48,6 +41,7 @@ public:
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 
 private:
+	struct bb_node_t;
 	unique_ptr<BlackBox> _bb;
 	function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> _testingMethod;
 	shared_ptr<bb_node_t> _initialState, _currState, _bbState;

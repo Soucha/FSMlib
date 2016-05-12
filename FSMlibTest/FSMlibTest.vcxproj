@@ -156,6 +156,8 @@
     <ClInclude Include="TestUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Learning\BlackBoxTests.cpp" />
+    <ClCompile Include="Learning\TeacherTests.cpp" />
     <ClCompile Include="Model\BasicOpsTests.cpp" />
     <ClCompile Include="Model\GenerateTests.cpp" />
     <ClCompile Include="Model\IOtests.cpp" />

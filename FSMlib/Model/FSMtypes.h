@@ -78,7 +78,7 @@ static const char* machineTypeNames[] = {
 #define WRONG_STATE		state_t(-2)
 
 typedef unsigned int state_t;
-typedef unsigned int input_t;
+typedef unsigned long input_t;
 typedef unsigned int output_t;
 typedef unsigned int seq_len_t;
 
