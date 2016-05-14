@@ -30,23 +30,20 @@ void BlackBoxDFSM::reset() {
 
 output_t BlackBoxDFSM::query(input_t input) {
 	_querySymbolCounter++;
-	auto output = _fsm->getOutput(_currState, input);
-	if (output != WRONG_OUTPUT) _currState = _fsm->getNextState(_currState, input);
+	auto ns = _fsm->getNextState(_currState, input);
+	auto output = WRONG_OUTPUT;
+	if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {
+		output = _fsm->getOutput(_currState, input);
+		_currState = ns;
+	}
 	return output;
 }
 
 sequence_out_t BlackBoxDFSM::query(sequence_in_t inputSequence) {
 	if (inputSequence.empty()) return sequence_out_t();
-	auto output = _fsm->getOutputAlongPath(_currState, inputSequence);
-	if (output.empty() || (output.front() == WRONG_OUTPUT)) {
-		output.clear();
-		for (const auto& input : inputSequence) {
-			output.emplace_back(query(input));
-		}
-	}
-	else {
-		_querySymbolCounter += seq_len_t(inputSequence.size());
-		_currState = _fsm->getEndPathState(_currState, inputSequence);
+	sequence_out_t output;
+	for (const auto& input : inputSequence) {
+		output.emplace_back(query(input));
 	}
 	return output;
 }

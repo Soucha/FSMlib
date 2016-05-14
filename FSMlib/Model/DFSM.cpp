@@ -160,15 +160,16 @@ bool DFSM::distinguishByTransitionOutputs(queue<vector<state_t>>& blocks) {
 		do {
 			vector<vector<state_t>> sameOutput(_numberOfOutputs + 2);
 			for (auto &state : blocks.front()) {
-				auto output = this->getOutput(state, input);
-				if (output == WRONG_OUTPUT) {// there is no transition
-					sameOutput[_numberOfOutputs + 1].emplace_back(state);
-				} else if (output == DEFAULT_OUTPUT) {
-					sameOutput[_numberOfOutputs].emplace_back(state);
+				auto ns = this->getNextState(state, input);
+				output_t output;
+				if (ns == NULL_STATE) {// there is no transition
+					output = _numberOfOutputs + 1;
+				} else {
+					output = this->getOutput(state, input);
+					if (output == DEFAULT_OUTPUT) 
+						output = _numberOfOutputs;
 				}
-				else {
-					sameOutput[output].emplace_back(state);
-				}
+				sameOutput[output].emplace_back(state);
 			}
 			blocks.pop();
 			for (output_t output = 0; output < _numberOfOutputs + 2; output++) {

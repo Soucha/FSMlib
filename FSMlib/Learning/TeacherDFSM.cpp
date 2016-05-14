@@ -35,25 +35,22 @@ void TeacherDFSM::resetBlackBox() {
 output_t TeacherDFSM::outputQuery(input_t input) {
 	_outputQueryCounter++;
 	_querySymbolCounter++;
-	auto output = _fsm->getOutput(_currState, input);
-	if (output != WRONG_OUTPUT) _currState = _fsm->getNextState(_currState, input);
+	auto ns = _fsm->getNextState(_currState, input);
+	auto output = WRONG_OUTPUT; 
+	if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {
+		output = _fsm->getOutput(_currState, input);
+		_currState = ns;
+	}
 	return output;
 }
 
 sequence_out_t TeacherDFSM::outputQuery(sequence_in_t inputSequence) {
 	_outputQueryCounter++;
 	if (inputSequence.empty()) return sequence_out_t();
-	auto output = _fsm->getOutputAlongPath(_currState, inputSequence);
-	if (output.empty() || (output.front() == WRONG_OUTPUT)) {
-		output.clear();
-		for (const auto& input : inputSequence) {
-			output.emplace_back(outputQuery(input));
-			_outputQueryCounter--;
-		}
-	}
-	else {
-		_querySymbolCounter += seq_len_t(inputSequence.size());
-		_currState = _fsm->getEndPathState(_currState, inputSequence);
+	sequence_out_t output;
+	for (const auto& input : inputSequence) {
+		output.emplace_back(outputQuery(input));
+		_outputQueryCounter--;
 	}
 	return output;
 }
@@ -68,59 +65,45 @@ sequence_out_t TeacherDFSM::resetAndOutputQuery(sequence_in_t inputSequence) {
 	return outputQuery(inputSequence);
 }
 
-sequence_in_t TeacherDFSM::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
+sequence_in_t TeacherDFSM::equivalenceQuery(const unique_ptr<DFSM>& model) {
 	_equivalenceQueryCounter++;
-	auto model = FSMmodel::duplicateFSM(conjecture);
-	if (!model->isReduced()) model->minimize();
-	if ((_fsm->getNumberOfStates() == conjecture->getNumberOfStates())
-		&& (FSMmodel::areIsomorphic(_fsm, model)))
-		return sequence_in_t();
-
-	vector<state_t> stateEq(_fsm->getNumberOfStates(), NULL_STATE);
-	vector<bool> used(_fsm->getNumberOfStates(), false);
-	queue<pair<state_t,sequence_in_t>> fifo;
-
-	stateEq[0] = 0;
-	used[0] = true;
-	fifo.emplace(0, sequence_in_t());
+	
+	vector<set<state_t>> stateEq(_fsm->getNumberOfStates());
+	queue<pair<pair<state_t,state_t>,sequence_in_t>> fifo;
+	fifo.emplace(make_pair(0, 0), sequence_in_t());
 	while (!fifo.empty()) {
 		auto p = move(fifo.front());
 		fifo.pop();
+		auto & bbState = p.first.first;
+		auto & state = p.first.second;
+		if (!stateEq[bbState].insert(state).second) continue;
 		if (_fsm->isOutputState() &&
-			(_fsm->getOutput(p.first, STOUT_INPUT) != model->getOutput(stateEq[p.first], STOUT_INPUT))) {
+			(_fsm->getOutput(bbState, STOUT_INPUT) != model->getOutput(state, STOUT_INPUT))) {
 			p.second.push_back(STOUT_INPUT);
 			return p.second;
 		}
 		for (input_t input = 0; input < _fsm->getNumberOfInputs(); input++) {
-			if (_fsm->isOutputTransition() &&
-				(_fsm->getOutput(p.first, input) != model->getOutput(stateEq[p.first], input))) {
+			auto nextBbState = _fsm->getNextState(bbState, input);
+			auto nextState = model->getNextState(state, input);
+			if ((nextBbState == WRONG_STATE) || (nextState == WRONG_STATE)) {
 				p.second.push_back(input);
 				return p.second;
 			}
-			auto nextState1 = _fsm->getNextState(p.first, input);
-			auto nextState2 = model->getNextState(stateEq[p.first], input);
-			if ((nextState1 == WRONG_STATE) || (nextState2 == WRONG_STATE)) {
-				p.second.push_back(input);
-				return p.second;
-			}
-			else if ((nextState1 == NULL_STATE) || (nextState2 == NULL_STATE)) {
-				if (nextState1 != nextState2) {
+			else if ((nextBbState == NULL_STATE) || (nextState == NULL_STATE)) {
+				if (nextBbState != nextState) {
 					p.second.push_back(input);
 					return p.second;
 				}
 			}
-			else if (used[nextState1]) {
-				if (stateEq[nextState1] != nextState2) {
-					p.second.push_back(input);
-					return p.second;
-				}
+			else if (_fsm->isOutputTransition() &&
+				(_fsm->getOutput(bbState, input) != model->getOutput(state, input))) {
+				p.second.push_back(input);
+				return p.second;
 			}
-			else {
-				stateEq[nextState1] = nextState2;
-				used[nextState1] = true;
+			else if (!stateEq[nextBbState].count(nextState)) {
 				sequence_in_t s(p.second);
 				s.push_back(input);
-				fifo.emplace(move(nextState1), move(s));
+				fifo.emplace(make_pair(move(nextBbState), move(nextState)), move(s));
 			}
 		}
 	}

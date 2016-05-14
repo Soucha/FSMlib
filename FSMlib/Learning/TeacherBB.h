@@ -24,7 +24,7 @@
 */
 class FSMLIB_API TeacherBB : public Teacher {
 public:
-	TeacherBB(unique_ptr<BlackBox>&& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod);
+	TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod);
 
 	bool isBlackBoxResettable();
 
@@ -42,7 +42,7 @@ public:
 
 private:
 	struct bb_node_t;
-	unique_ptr<BlackBox> _bb;
+	shared_ptr<BlackBox> _bb;
 	function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> _testingMethod;
 	shared_ptr<bb_node_t> _initialState, _currState, _bbState;
 };

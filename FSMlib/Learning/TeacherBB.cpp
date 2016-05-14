@@ -29,9 +29,9 @@ struct TeacherBB::bb_node_t {
 	input_t incomingInput;
 };
 
-TeacherBB::TeacherBB(unique_ptr<BlackBox>&& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
+TeacherBB::TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
 Teacher(),
-_bb(move(blackBox)),
+_bb(blackBox),
 _testingMethod(testingMethod) {
 	_initialState = _bbState = _currState = make_shared<bb_node_t>();
 }
@@ -109,19 +109,22 @@ sequence_out_t TeacherBB::resetAndOutputQuery(sequence_in_t inputSequence) {
 sequence_in_t TeacherBB::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
 	_equivalenceQueryCounter++;
 	auto tmp = _currState;
+	auto model = FSMmodel::duplicateFSM(conjecture);
+	if (!model->isReduced()) model->minimize();
 	for (int extraStates = 0; extraStates < MAX_DEPTH; extraStates++) {
-		auto TS = _testingMethod(conjecture, extraStates);
+		auto TS = _testingMethod(model, extraStates);
 		for (const auto& test : TS) {
 			auto bbOut = resetAndOutputQuery(test);
 			_outputQueryCounter--;
-			auto modelOut = conjecture->getOutputAlongPath(0, test);
-			if (modelOut.empty() || (modelOut.front() == WRONG_OUTPUT)) {
-				modelOut.clear();
-				state_t state = 0;
-				for (const auto& input : test) {
-					modelOut.emplace_back(conjecture->getOutput(state, input));
-					if (modelOut.back() != WRONG_OUTPUT) state = conjecture->getNextState(state, input);
+			sequence_out_t modelOut;
+			state_t state = 0;
+			for (const auto& input : test) {
+				auto ns = model->getNextState(state, input);
+				if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {
+					modelOut.emplace_back(model->getOutput(state, input));
+					state = ns;
 				}
+				else modelOut.emplace_back(WRONG_OUTPUT);
 			}
 			if (bbOut != modelOut) {
 				_currState = tmp;

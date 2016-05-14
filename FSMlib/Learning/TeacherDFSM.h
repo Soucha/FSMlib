@@ -23,9 +23,9 @@
 */
 class FSMLIB_API TeacherDFSM : public Teacher {
 public:
-	TeacherDFSM(unique_ptr<DFSM>&& blackBox, bool isResettable) :
+	TeacherDFSM(const unique_ptr<DFSM>& blackBox, bool isResettable) :
 		Teacher(),
-		_fsm(move(blackBox)),
+		_fsm(FSMmodel::duplicateFSM(blackBox)),
 		_isResettable(isResettable),
 		_currState(0) {
 	}

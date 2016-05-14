@@ -64,7 +64,9 @@ namespace FSMsequence {
 					continue;
 				}
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-					if (fsm->getOutput(i, input) != fsm->getOutput(j, input)) {// TODO what about DEFAULT_OUTPUT
+					output_t outputI = (fsm->getNextState(i, input) == NULL_STATE) ? WRONG_OUTPUT : fsm->getOutput(i, input);
+					output_t outputJ = (fsm->getNextState(j, input) == NULL_STATE) ? WRONG_OUTPUT : fsm->getOutput(j, input);
+					if (outputI != outputJ) {// TODO what about DEFAULT_OUTPUT
 						seq[idx].push_back(input);
 						unchecked.emplace(idx);
 						break;

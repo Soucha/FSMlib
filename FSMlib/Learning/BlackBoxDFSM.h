@@ -23,9 +23,9 @@
 */
 class FSMLIB_API BlackBoxDFSM : public BlackBox {
 public:
-	BlackBoxDFSM(unique_ptr<DFSM>&& blackBoxModel, bool isResettable) :
+	BlackBoxDFSM(const unique_ptr<DFSM>& blackBoxModel, bool isResettable) :
 		BlackBox(isResettable),
-		_fsm(move(blackBoxModel)),
+		_fsm(FSMmodel::duplicateFSM(blackBoxModel)),
 		_currState(0) {
 		_fsm->minimize();
 	}

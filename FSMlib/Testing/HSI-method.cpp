@@ -47,7 +47,17 @@ namespace FSMtesting {
 			}
 			for (const auto& extSeq : traversalSet) {
 				state_t endState = fsm->getEndPathState(state, extSeq);
-				if (endState == WRONG_STATE) continue;
+				if (endState == WRONG_STATE) {
+					if (extSeq.size() == (1 + fsm->isOutputState())) {
+						sequence_in_t testSeq(trSeq);
+						testSeq.emplace_back(extSeq.front());
+						if (startWithStout) {
+							testSeq.push_front(STOUT_INPUT);
+						}
+						pset.insert(move(testSeq));
+					}
+					continue;
+				}
 				for (const auto& cSeq : H[endState]) {
 					sequence_in_t testSeq(trSeq);
 					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());

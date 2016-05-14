@@ -32,7 +32,7 @@ namespace FSMlibTest
 		{
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
-			teacher = make_unique<TeacherDFSM>(FSMmodel::duplicateFSM(fsm), true);
+			teacher = make_unique<TeacherDFSM>(fsm, true);
 			testTeacher(true);
 			teacher->resetBlackBox();
 			testTeacherDFSM(true);
@@ -43,8 +43,8 @@ namespace FSMlibTest
 		{
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
-			auto bb = make_unique<BlackBoxDFSM>(FSMmodel::duplicateFSM(fsm), true);
-			teacher = make_unique<TeacherBB>(move(bb), HSI_method);
+			auto bb = make_shared<BlackBoxDFSM>(fsm, true);
+			teacher = make_unique<TeacherBB>(bb, HSI_method);
 			testTeacher(true, true);
 			teacher->resetBlackBox();
 			testTeacherDFSM(true);
@@ -121,17 +121,21 @@ namespace FSMlibTest
 			teacher->resetBlackBox();
 			bool covered = false;
 			state_t state = 0;
+			output_t output;
 			for (const auto& input : ce) {
-				if (model->getOutput(state, input) != teacher->outputQuery(input)) {
-					covered = true;
-					break;
-				}
 				auto ns = model->getNextState(state, input);
 				ARE_EQUAL(false, ns == WRONG_STATE, "CE contains invalid input %d", input);
-				if (ns != NULL_STATE) state = ns;
+				if (ns != NULL_STATE) {
+					output = model->getOutput(state, input);
+					state = ns;
+				}
+				else output = WRONG_OUTPUT;
+				if (output != teacher->outputQuery(input)) {
+					covered = true;
+					break;
+				}				
 			}
 			ARE_EQUAL(true, covered, "Counterexample %s does not reveal the difference.", FSMmodel::getInSequenceAsString(ce).c_str());
-
 
 			model->removeTransition(4, 0);
 			ce = teacher->equivalenceQuery(model);
@@ -142,18 +146,21 @@ namespace FSMlibTest
 			covered = false;
 			state = 0;
 			for (const auto& input : ce) {
-				if (model->getOutput(state, input) != teacher->outputQuery(input)) {
+				auto ns = model->getNextState(state, input);
+				ARE_EQUAL(false, ns == WRONG_STATE, "CE contains invalid input %d", input);
+				if (ns != NULL_STATE) {
+					output = model->getOutput(state, input);
+					state = ns;
+				}
+				else output = WRONG_OUTPUT;
+				if (output != teacher->outputQuery(input)) {
 					covered = true;
 					break;
 				}
-				auto ns = model->getNextState(state, input);
-				ARE_EQUAL(false, ns == WRONG_STATE, "CE contains invalid input %d", input);
-				if (ns != NULL_STATE) state = ns;
 			}
 			ARE_EQUAL(true, covered, "Counterexample %s does not reveal the difference.", FSMmodel::getInSequenceAsString(ce).c_str());
 
 			model->removeState(3);
-			model->minimize();
 			ce = teacher->equivalenceQuery(model);
 			ARE_EQUAL(seq_len_t(4), teacher->getEquivalenceQueryCount(), "The number of equivalence queries does not match.");
 			ARE_EQUAL(false, ce.empty(), "A counterexample was not found");
@@ -162,16 +169,19 @@ namespace FSMlibTest
 			covered = false;
 			state = 0;
 			for (const auto& input : ce) {
-				if (model->getOutput(state, input) != teacher->outputQuery(input)) {
+				auto ns = model->getNextState(state, input);
+				ARE_EQUAL(false, ns == WRONG_STATE, "CE contains invalid input %d", input);
+				if (ns != NULL_STATE) {
+					output = model->getOutput(state, input);
+					state = ns;
+				}
+				else output = WRONG_OUTPUT;
+				if (output != teacher->outputQuery(input)) {
 					covered = true;
 					break;
 				}
-				auto ns = model->getNextState(state, input);
-				ARE_EQUAL(false, ns == WRONG_STATE, "CE contains invalid input %d", input);
-				if (ns != NULL_STATE) state = ns;
 			}
 			ARE_EQUAL(true, covered, "Counterexample %s does not reveal the difference.", FSMmodel::getInSequenceAsString(ce).c_str());
-
 		}
 
 		void create(const unique_ptr<DFSM>& fsm) {
