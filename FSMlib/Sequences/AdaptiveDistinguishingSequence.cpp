@@ -49,7 +49,7 @@ namespace FSMsequence {
 	};
 
 	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
 		sequence_vec_t ADSet;
 		if (!ads) return ADSet;
 		stack<pair<AdaptiveDS*, sequence_in_t>> lifo;
@@ -72,7 +72,7 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getAdaptiveDistinguishingSet", sequence_vec_t());
 		auto ads = getAdaptiveDistinguishingSequence(fsm, omitUnnecessaryStoutInputs);
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
@@ -337,7 +337,7 @@ namespace FSMsequence {
 	}
 
 	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
 		state_t N = fsm->getNumberOfStates();
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
 		auto rootST = make_shared<st_node_t>();

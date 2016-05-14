@@ -38,7 +38,7 @@ namespace FSMsequence {
 #endif // SEQUENCES_PERFORMANCE_TEST
 	
 	sequence_in_t getStateVerifyingSequence(const unique_ptr<DFSM>& fsm, state_t state, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getStateVerifyingSequence", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getStateVerifyingSequence", sequence_in_t());
 		sequence_in_t outSVS;
 		block_t states;
 		output_t output;
@@ -142,7 +142,7 @@ namespace FSMsequence {
 	}
 
 	sequence_vec_t getVerifyingSet(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getVerifyingSet", sequence_vec_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getVerifyingSet", sequence_vec_t());
 		sequence_vec_t outVSet;
 #if SEQUENCES_PERFORMANCE_TEST
 		openCount = closedCount = 0;

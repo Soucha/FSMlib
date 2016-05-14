@@ -189,14 +189,14 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t Ma_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Ma_method", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Ma_method", sequence_in_t());
 		auto TS = process_Ma(fsm, extraStates, false);
 		if (TS.empty()) return sequence_in_t();
 		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
 	sequence_set_t Mra_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mra_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Mra_method", sequence_set_t());
 		return process_Ma(fsm, extraStates, true);
 	}
 }

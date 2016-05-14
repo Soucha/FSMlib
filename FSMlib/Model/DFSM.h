@@ -91,9 +91,10 @@ public:
 
 	/**
 	* Gets output sequence observed after applying given input sequence from given state.
+	* State is not changed and WRONG_OUTPUT is inserted into the resulted sequence if input is not valid.
 	* @param state
 	* @param path
-	* @return output sequence or WRONG_OUTPUT if given state or path is not valid
+	* @return output sequence
 	*/
 	sequence_out_t getOutputAlongPath(state_t state, const sequence_in_t& path);
 

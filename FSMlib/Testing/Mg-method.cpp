@@ -223,14 +223,14 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t Mg_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mg_method", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Mg_method", sequence_in_t());
 		auto TS = process_Mg(fsm, extraStates, false);
 		if (TS.empty()) return sequence_in_t();
 		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
 	sequence_set_t Mrg_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mrg_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Mrg_method", sequence_set_t());
 		return process_Mg(fsm, extraStates, true);
 	}
 }

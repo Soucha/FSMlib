@@ -23,7 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t SVS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::SVS_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::SVS_method", sequence_set_t());
 		if (extraStates < 0) return sequence_set_t();
 		
 		auto stateCover = getStateCover(fsm);

@@ -57,7 +57,10 @@ namespace FSMtesting {
 			confirmedNodes[coreNodes[idx]->state].emplace_back(coreNodes[idx]);
 			for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 				auto state = fsm->getNextState(coreNodes[idx]->state, input);
-				if (state == NULL_STATE) continue;
+				if (state == NULL_STATE) {
+					coreNodes[idx]->next[input] = make_shared<TestNodeSPY>(state, WRONG_OUTPUT, WRONG_OUTPUT);
+					continue;
+				}
 				if (covered[state]) {
 					uncoveredTransitions.emplace_back(coreNodes[idx]->state, input);
 				}
@@ -78,6 +81,10 @@ namespace FSMtesting {
 					auto nIt = node->next.find(input);
 					if (nIt == node->next.end()) {
 						auto state = fsm->getNextState(node->state, input);
+						if (state == NULL_STATE) {
+							node->next[input] = make_shared<TestNodeSPY>(state, WRONG_OUTPUT, WRONG_OUTPUT);
+							continue;
+						}
 						outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 						outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
 						auto nextNode = make_shared<TestNodeSPY>(state, outputState, outputTransition);
@@ -97,10 +104,13 @@ namespace FSMtesting {
 			vector<vector<bool>>& coveredTransitions, vector<vector<shared_ptr<TestNodeSPY>>>& confirmedNodes) {
 		for (const auto& input : seq) {
 			state_t state = fsm->getNextState(node->state, input);
-			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-			output_t outputTransition = (fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
+			output_t outputState = (state == NULL_STATE) ? WRONG_OUTPUT: 
+				(fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
+			output_t outputTransition = (state == NULL_STATE) ? WRONG_OUTPUT : 
+				(fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
 			auto nextNode = make_shared<TestNodeSPY>(state, outputState, outputTransition);
 			node->next[input] = nextNode;
+			if (state == NULL_STATE) continue;
 			if (node->isConfirmed) {
 				if (coveredTransitions[node->state][input]) {
 					nextNode->isConfirmed = true;
@@ -202,7 +212,7 @@ namespace FSMtesting {
 	}
 
 	sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::SPY_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::SPY_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}

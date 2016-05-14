@@ -23,7 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::HSI_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::HSI_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}

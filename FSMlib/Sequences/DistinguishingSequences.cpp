@@ -586,7 +586,7 @@ namespace FSMsequence {
 			function<sequence_vec_t(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs)> getSeparatingSequences, bool filterPrefixes,
 			function<void(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t& outSCSet)> reduceSCSet,
 			function<void(const unique_ptr<DFSM>& dfsm, sequence_set_t& outCSet)> reduceCSet, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getDistinguishingSequences", -1);
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getDistinguishingSequences", -1);
 		state_t N = fsm->getNumberOfStates();
 		int retVal = CSet_FOUND;
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();

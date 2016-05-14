@@ -23,7 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Wp_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Wp_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
@@ -66,7 +66,15 @@ namespace FSMtesting {
 					for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 						// SCSet is sufficient for transition verification
 						state_t nextState = fsm->getNextState(state, input);
-						if (nextState == NULL_STATE) continue;
+						if (nextState == NULL_STATE) {
+							sequence_in_t testSeq(transferSeq);
+							testSeq.push_back(input);
+							if (startWithStout) {
+								testSeq.push_front(STOUT_INPUT);
+							}
+							pset.insert(move(testSeq)); 
+							continue;
+						}
 						for (const auto& cSeq : SCSets[nextState]) {
 							sequence_in_t testSeq(transferSeq);
 							testSeq.push_back(input);

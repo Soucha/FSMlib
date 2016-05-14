@@ -58,7 +58,7 @@ namespace FSMsequence {
 	}
 
 	sequence_in_t getPresetHomingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getPresetHomingSequence", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getPresetHomingSequence", sequence_in_t());
 		sequence_in_t outHS;
 		partition_t partition;
 		sequence_in_t s;

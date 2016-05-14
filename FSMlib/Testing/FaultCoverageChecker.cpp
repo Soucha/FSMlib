@@ -600,7 +600,7 @@ namespace FSMtesting {
 		}
 		
 		vector<unique_ptr<DFSM>> getFSMs(const unique_ptr<DFSM>& fsm, const sequence_set_t & TS, const sequence_vec_t& hint, int extraStates) {
-			RETURN_IF_NONCOMPACT(fsm, "FaultCoverageChecker::getFSMs", vector<unique_ptr<DFSM>>());
+			RETURN_IF_UNREDUCED(fsm, "FaultCoverageChecker::getFSMs", vector<unique_ptr<DFSM>>());
 			if (TS.empty() || (TS.begin())->empty()) return vector<unique_ptr<DFSM>>();
 
 			auto partial = FSMmodel::createFSM(fsm->getType(), fsm->getNumberOfStates() + extraStates,

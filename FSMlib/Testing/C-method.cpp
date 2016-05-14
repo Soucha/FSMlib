@@ -177,7 +177,7 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t C_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::C_method", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::C_method", sequence_in_t());
 		auto E = getAdaptiveDistinguishingSet(fsm);
 		if (E.empty()) {
 			return sequence_in_t();

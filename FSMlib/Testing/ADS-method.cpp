@@ -23,7 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t ADS_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::ADS_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::ADS_method", sequence_set_t());
 		auto ADSet = getAdaptiveDistinguishingSet(fsm);
 		if ((extraStates < 0) || ADSet.empty()) {
 			return sequence_set_t();

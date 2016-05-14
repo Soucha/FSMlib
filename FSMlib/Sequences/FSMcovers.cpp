@@ -20,7 +20,7 @@
 
 namespace FSMsequence {
 	sequence_set_t getStateCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs) {
-		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getStateCover", sequence_set_t());
+		//RETURN_IF_UNREDUCED(dfsm, "FSMsequence::getStateCover", sequence_set_t());
 		sequence_set_t stateCover;
 		vector<bool> covered(dfsm->getNumberOfStates(), false);
 		queue<pair<state_t, sequence_in_t>> fifo;
@@ -49,7 +49,7 @@ namespace FSMsequence {
 	}
 
 	sequence_set_t getTransitionCover(const unique_ptr<DFSM>& dfsm, bool omitStoutInputs) {
-		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getTransitionCover", sequence_set_t());
+		//RETURN_IF_UNREDUCED(dfsm, "FSMsequence::getTransitionCover", sequence_set_t());
 		sequence_set_t transitionCover;
 		vector<bool> covered(dfsm->getNumberOfStates(), false);
 		queue<pair<state_t, sequence_in_t>> fifo;
@@ -80,7 +80,7 @@ namespace FSMsequence {
 	}
 
 	sequence_set_t getTraversalSet(const unique_ptr<DFSM>& dfsm, seq_len_t depth, bool omitStoutInputs) {
-		RETURN_IF_NONCOMPACT(dfsm, "FSMsequence::getTraversalSet", sequence_set_t());
+		//RETURN_IF_UNREDUCED(dfsm, "FSMsequence::getTraversalSet", sequence_set_t());
 		sequence_set_t traversalSet;
 		if (depth <= 0) return traversalSet;
 		bool useStout = !omitStoutInputs && dfsm->isOutputState();

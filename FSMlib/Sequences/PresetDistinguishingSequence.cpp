@@ -63,7 +63,7 @@ namespace FSMsequence {
 	}
 
 	sequence_in_t getPresetDistinguishingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getPresetDistinguishingSequence", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getPresetDistinguishingSequence", sequence_in_t());
 		sequence_in_t outPDS;
 		partition_t partition;
 		sequence_in_t s;

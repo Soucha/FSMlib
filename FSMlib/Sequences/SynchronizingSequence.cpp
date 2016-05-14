@@ -31,7 +31,7 @@ namespace FSMsequence {
 	};
 
 	sequence_in_t getSynchronizingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMsequence::getSynchronizingSequence", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getSynchronizingSequence", sequence_in_t());
 		sequence_in_t outSS;
 		queue<unique_ptr<ss_node_t>> fifo;
 		set<block_t> used;

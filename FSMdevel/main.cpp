@@ -156,9 +156,11 @@ void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 }
 
 int main(int argc, char** argv) {
-	getCSet();
-	fsm = make_unique<DFSM>();
-	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	//getCSet();
+	fsm = make_unique<Moore>();
+	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
+	auto m = fsm->minimize();
+	cout << fsm->getNumberOfStates() << endl;
 	auto ads = getAdaptiveDistinguishingSequence(fsm);
 	if (ads) {
 		printADS(ads);

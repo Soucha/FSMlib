@@ -326,14 +326,14 @@ namespace FSMtesting {
 	}
 
 	sequence_in_t Mstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mstar_method", sequence_in_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Mstar_method", sequence_in_t());
 		auto TS = process_Mstar(fsm, extraStates, false);
 		if (TS.empty()) return sequence_in_t();
 		return sequence_in_t(TS.begin()->begin(), TS.begin()->end());
 	}
 
 	sequence_set_t Mrstar_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::Mrstar_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Mrstar_method", sequence_set_t());
 		return process_Mstar(fsm, extraStates, true);
 	}
 }

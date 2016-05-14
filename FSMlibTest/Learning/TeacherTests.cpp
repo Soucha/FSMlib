@@ -26,8 +26,6 @@ namespace FSMlibTest
 	public:
 		unique_ptr<Teacher> teacher;
 
-		// TODO EQs
-
 		TEST_METHOD(TestTeacherDFSM)
 		{
 			auto fsm = make_unique<DFSM>();
@@ -44,7 +42,7 @@ namespace FSMlibTest
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
 			auto bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, HSI_method);
+			teacher = make_unique<TeacherBB>(bb, H_method);
 			testTeacher(true, true);
 			teacher->resetBlackBox();
 			testTeacherDFSM(true);

@@ -70,8 +70,8 @@ struct LinkCell {
 #define SVS_FOUND       3
 #define CSet_FOUND      4
 
-#define RETURN_IF_NONCOMPACT(fsm, functionName, retVal) if (!fsm->isCompact()) {\
-	ERROR_MESSAGE("%s - FSM needs to be compact.", functionName)\
+#define RETURN_IF_UNREDUCED(fsm, functionName, retVal) if (!fsm->isReduced()) {\
+	ERROR_MESSAGE("%s - DFSM needs to be minimized and compact.", functionName)\
 	return retVal;}
 
 namespace FSMsequence {// all design functions require a compact FSM

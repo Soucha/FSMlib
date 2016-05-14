@@ -44,6 +44,7 @@ namespace FSMlibTest
 			fsm->setTransition(0, 1, 1, 0);
 			fsm->setTransition(1, 0, 0, 1);
 			fsm->setTransition(1, 1, 1, 0);
+			fsm->minimize();
 			sequence_set_t TS;
 			sequence_in_t test1{ 0, 0 };
 			sequence_in_t test2{ 1, 0, 0 };

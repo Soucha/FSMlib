@@ -90,13 +90,11 @@ output_t DFSM::getOutput(state_t state, input_t input) {
 sequence_out_t DFSM::getOutputAlongPath(state_t state, const sequence_in_t& path) {
 	sequence_out_t sOut;
 	for (const auto& input : path) {
-		sOut.push_back(this->getOutput(state, input));
-		state = this->getNextState(state, input);
-		if ((state == WRONG_STATE) || (sOut.back() == WRONG_OUTPUT)) {
-			sOut.clear();
-			sOut.push_back(WRONG_OUTPUT);
-			return sOut;
-		}
+		auto ns = this->getNextState(state, input);
+		if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {
+			sOut.emplace_back(this->getOutput(state, input));
+			state = ns;
+		} else sOut.emplace_back(WRONG_OUTPUT);
 	}
 	return sOut;
 }

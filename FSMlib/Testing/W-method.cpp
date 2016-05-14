@@ -23,7 +23,7 @@ using namespace FSMsequence;
 
 namespace FSMtesting {
 	sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates) {
-		RETURN_IF_NONCOMPACT(fsm, "FSMtesting::W_method", sequence_set_t());
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::W_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
@@ -35,7 +35,7 @@ namespace FSMtesting {
 		
 		FSMlib::PrefixSet pset;
 		for (const auto& trSeq : transitionCover) {
-			if (fsm->getEndPathState(0, trSeq) == WRONG_STATE) continue;
+			auto state = fsm->getEndPathState(0, trSeq);
 			for (const auto& cSeq : CSet) {
 				sequence_in_t testSeq(trSeq);
 				if (startWithStout) {
@@ -46,10 +46,20 @@ namespace FSMtesting {
 				pset.insert(move(testSeq));
 			}
 			for (const auto& extSeq : traversalSet) {
+				if (fsm->getEndPathState(state, extSeq) == WRONG_STATE) {
+					if (extSeq.size() == (1 + fsm->isOutputState())) {
+						sequence_in_t testSeq(trSeq);
+						testSeq.emplace_back(extSeq.front());
+						if (startWithStout) {
+							testSeq.push_front(STOUT_INPUT);
+						}
+						pset.insert(move(testSeq));
+					}
+					continue;
+				}
 				for (const auto& cSeq : CSet) {
 					sequence_in_t testSeq(trSeq);
 					testSeq.insert(testSeq.end(), extSeq.begin(), extSeq.end());
-					if (fsm->getEndPathState(0, testSeq) == WRONG_STATE) continue;
 					if (startWithStout) {
 						testSeq.push_front(STOUT_INPUT);
 						testSeq.pop_back();// the last STOUT_INPUT (it will be at the beginning of appended cSeq)
