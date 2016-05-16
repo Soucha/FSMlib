@@ -170,8 +170,10 @@ int main(int argc, char** argv) {
 	fsm = make_unique<DFSM>();
 	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	auto model = Lstar(teacher, addSuffixToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << endl;
+	auto model = Lstar(teacher, addSuffixToE, showConjecture, true);
+	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
+	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
+	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
 	char c;
 	cin >> c;
 	return 0;
