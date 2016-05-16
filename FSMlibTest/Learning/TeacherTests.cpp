@@ -42,7 +42,7 @@ namespace FSMlibTest
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
 			auto bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, H_method);
+			teacher = make_unique<TeacherBB>(bb, HSI_method);
 			testTeacher(true, true);
 			teacher->resetBlackBox();
 			testTeacherDFSM(true);
@@ -85,16 +85,32 @@ namespace FSMlibTest
 		}
 
 		void testTeacherDFSM(bool resettable) {
+			auto initAlphabet = teacher->getNextPossibleInputs();
+			ARE_EQUAL(teacher->getNumberOfInputs(), input_t(initAlphabet.size()), "The initial state has not transition for each input.");
+			for (input_t i = 0; i < initAlphabet.size(); i++) {
+				ARE_EQUAL(i, initAlphabet[i], "Provided next inputs do not match");
+			}
+			
 			auto out = teacher->outputQuery(STOUT_INPUT);
 			ARE_EQUAL(output_t(0), out, "Received output does not match");
+			ARE_EQUAL(true, initAlphabet == teacher->getNextPossibleInputs(), "Different collections of next inputs were obtained for the initial state");
+			
 			auto outSeq = teacher->outputQuery({ 0, STOUT_INPUT, 1, 0, STOUT_INPUT, 2, 2 });
 			sequence_out_t expOutSeq({ 1, 0, 0, 1, DEFAULT_OUTPUT, 1, DEFAULT_OUTPUT });
 			ARE_EQUAL(expOutSeq, outSeq, "Received output does not match");
 			// current state is 2
+			auto alphabet2 = teacher->getNextPossibleInputs();
+			ARE_EQUAL(input_t(1), input_t(alphabet2.size()), "State 2 has transition on one input only.");
+			ARE_EQUAL(input_t(1), alphabet2[0], "State 2 has transition on input 1 only.");
+
 			outSeq = teacher->outputQuery({ STOUT_INPUT, 0, STOUT_INPUT, 2, 1 });
 			expOutSeq = { 0, WRONG_OUTPUT, 0, WRONG_OUTPUT, 0 };
 			ARE_EQUAL(expOutSeq, outSeq, "Received output does not match");
 			// current state is 4
+			auto alphabet4 = teacher->getNextPossibleInputs();
+			ARE_EQUAL(input_t(1), input_t(alphabet4.size()), "State 4 has transition on one input only.");
+			ARE_EQUAL(input_t(0), alphabet4[0], "State 4 has transition on input 0 only.");
+
 			outSeq = teacher->resetAndOutputQuery({ 2, 1, 0 });
 			if (resettable) expOutSeq = { DEFAULT_OUTPUT, 0, 0 };
 			else expOutSeq = { WRONG_OUTPUT, WRONG_OUTPUT, 0 };
@@ -104,6 +120,9 @@ namespace FSMlibTest
 			ARE_EQUAL(output_t(0), out, "Received output does not match");
 			out = teacher->outputQuery(0);
 			ARE_EQUAL(output_t(resettable ? 1 : WRONG_OUTPUT), out, "Received output does not match");
+
+			ARE_EQUAL(input_t(3), teacher->getNumberOfInputs(), "The number of inputs cannot change.");
+			ARE_EQUAL(output_t(2), teacher->getNumberOfOutputs(), "The number of outputs is not correct.");
 		}
 
 		void testEQ(const unique_ptr<DFSM>& model) {

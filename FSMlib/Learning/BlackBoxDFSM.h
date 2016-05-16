@@ -24,21 +24,31 @@
 class FSMLIB_API BlackBoxDFSM : public BlackBox {
 public:
 	BlackBoxDFSM(const unique_ptr<DFSM>& blackBoxModel, bool isResettable) :
-		BlackBox(isResettable),
+		BlackBox(isResettable, blackBoxModel->getType()),
 		_fsm(FSMmodel::duplicateFSM(blackBoxModel)),
 		_currState(0) {
 		_fsm->minimize();
+	}
+
+	vector<input_t> getNextPossibleInputs();
+
+	input_t getNumberOfInputs() {
+		return _fsm->getNumberOfInputs();
+	}
+
+	output_t getNumberOfOutputs() {
+		return _fsm->getNumberOfOutputs();
 	}
 
 	void reset();
 
 	output_t query(input_t input);
 
-	sequence_out_t query(sequence_in_t inputSequence);
+	sequence_out_t query(const sequence_in_t& inputSequence);
 
 	output_t resetAndQuery(input_t input);
 
-	sequence_out_t resetAndQuery(sequence_in_t inputSequence);
+	sequence_out_t resetAndQuery(const sequence_in_t& inputSequence);
 
 private:
 	unique_ptr<DFSM> _fsm;

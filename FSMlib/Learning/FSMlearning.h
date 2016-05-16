@@ -23,5 +23,12 @@
 #include "Teacher.h"
 
 namespace FSMlearning {
+	FSMLIB_API void addSuffixToE(const sequence_in_t& ce, const map<sequence_in_t, vector<sequence_out_t>>& ot,
+		vector<sequence_in_t>& S, vector<sequence_in_t>& E);
 
+	FSMLIB_API unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher, 
+		function<void(const sequence_in_t& ce, const map<sequence_in_t, vector<sequence_out_t>>& ot,
+			vector<sequence_in_t>& S, vector<sequence_in_t>& E)> processCounterexample,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
+		bool checkConsistency = false);
 }

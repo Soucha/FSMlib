@@ -30,7 +30,7 @@ namespace FSMlibTest
 		{
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
-			bb = make_unique<BlackBoxDFSM>(FSMmodel::duplicateFSM(fsm), true);
+			bb = make_unique<BlackBoxDFSM>(fsm, true);
 			testBB(true);
 			bb->reset();
 			testBB_DFSM(true);
@@ -62,16 +62,32 @@ namespace FSMlibTest
 		}
 
 		void testBB_DFSM(bool resettable) {
+			auto initAlphabet = bb->getNextPossibleInputs();
+			ARE_EQUAL(bb->getNumberOfInputs(), input_t(initAlphabet.size()), "The initial state has not transition for each input.");
+			for (input_t i = 0; i < initAlphabet.size(); i++) {
+				ARE_EQUAL(i, initAlphabet[i], "Provided next inputs do not match");
+			}
+
 			auto out = bb->query(STOUT_INPUT);
 			ARE_EQUAL(output_t(0), out, "Received output does not match");
+			ARE_EQUAL(true, initAlphabet == bb->getNextPossibleInputs(), "Different collections of next inputs were obtained for the initial state");
+
 			auto outSeq = bb->query({0, STOUT_INPUT, 1, 0, STOUT_INPUT, 2, 2});
 			sequence_out_t expOutSeq({1, 0, 0, 1, DEFAULT_OUTPUT, 1, DEFAULT_OUTPUT});
 			ARE_EQUAL(expOutSeq, outSeq, "Received output does not match");
 			// current state is 2
+			auto alphabet2 = bb->getNextPossibleInputs();
+			ARE_EQUAL(input_t(1), input_t(alphabet2.size()), "State 2 has transition on one input only.");
+			ARE_EQUAL(input_t(1), alphabet2[0], "State 2 has transition on input 1 only.");
+
 			outSeq = bb->query({ STOUT_INPUT, 0, STOUT_INPUT, 2, 1 });
 			expOutSeq = {0, WRONG_OUTPUT, 0, WRONG_OUTPUT, 0};
 			ARE_EQUAL(expOutSeq, outSeq, "Received output does not match");
 			// current state is 4
+			auto alphabet4 = bb->getNextPossibleInputs();
+			ARE_EQUAL(input_t(1), input_t(alphabet4.size()), "State 4 has transition on one input only.");
+			ARE_EQUAL(input_t(0), alphabet4[0], "State 4 has transition on input 0 only.");
+
 			outSeq = bb->resetAndQuery({ 2, 1, 0 });
 			if (resettable) expOutSeq = { DEFAULT_OUTPUT, 0, 0 };
 			else expOutSeq = {WRONG_OUTPUT, WRONG_OUTPUT, 0};
@@ -81,6 +97,9 @@ namespace FSMlibTest
 			ARE_EQUAL(output_t(0), out, "Received output does not match");
 			out = bb->query(0);
 			ARE_EQUAL(output_t(resettable ? 1 : WRONG_OUTPUT), out, "Received output does not match");
+
+			ARE_EQUAL(input_t(3), bb->getNumberOfInputs(), "The number of inputs cannot change.");
+			ARE_EQUAL(output_t(2), bb->getNumberOfOutputs(), "The number of outputs is not correct.");
 		}
 
 		void create(const unique_ptr<DFSM>& fsm) {

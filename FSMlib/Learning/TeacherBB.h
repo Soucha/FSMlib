@@ -26,17 +26,27 @@ class FSMLIB_API TeacherBB : public Teacher {
 public:
 	TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod);
 
+	machine_type_t getBlackBoxModelType() {
+		return _bb->getModelType();
+	}
+
+	vector<input_t> getNextPossibleInputs();
+
+	input_t getNumberOfInputs();
+
+	output_t getNumberOfOutputs();
+
 	bool isBlackBoxResettable();
 
 	void resetBlackBox();
 
 	output_t outputQuery(input_t input);
 
-	sequence_out_t outputQuery(sequence_in_t inputSequence);
+	sequence_out_t outputQuery(const sequence_in_t& inputSequence);
 
 	output_t resetAndOutputQuery(input_t input);
 
-	sequence_out_t resetAndOutputQuery(sequence_in_t inputSequence);
+	sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence);
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 
@@ -45,4 +55,6 @@ private:
 	shared_ptr<BlackBox> _bb;
 	function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> _testingMethod;
 	shared_ptr<bb_node_t> _initialState, _currState, _bbState;
+	input_t _greatestInput;
+	output_t _greatestOutput;
 };

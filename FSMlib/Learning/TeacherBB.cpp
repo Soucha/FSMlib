@@ -24,16 +24,45 @@
 struct TeacherBB::bb_node_t {
 	output_t incomingOutput;
 	output_t stateOutput = WRONG_OUTPUT;
+	vector<input_t> possibleInputs;
 	map<input_t, shared_ptr<bb_node_t>> succ;
 	weak_ptr<bb_node_t> parent;
 	input_t incomingInput;
 };
 
+static void updateNumberOfInputs(input_t& greatestInput, const vector<input_t>& inputs) {
+	for (const auto& i : inputs) {
+		if (greatestInput < i + 1) {
+			greatestInput = i + 1;
+		}
+	}
+}
+
 TeacherBB::TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
 Teacher(),
 _bb(blackBox),
-_testingMethod(testingMethod) {
+_testingMethod(testingMethod),
+_greatestInput(0),
+_greatestOutput(0) {
 	_initialState = _bbState = _currState = make_shared<bb_node_t>();
+	_currState->possibleInputs = _bb->getNextPossibleInputs();
+	updateNumberOfInputs(_greatestInput, _currState->possibleInputs);
+}
+
+vector<input_t> TeacherBB::getNextPossibleInputs() {
+	return _currState->possibleInputs;
+}
+
+input_t TeacherBB::getNumberOfInputs() {
+	auto ni = _bb->getNumberOfInputs();
+	if (ni != STOUT_INPUT) return ni;
+	return _greatestInput;
+}
+
+output_t TeacherBB::getNumberOfOutputs() {
+	auto no = _bb->getNumberOfOutputs();
+	if (no != WRONG_OUTPUT) return no;
+	return _greatestOutput;
 }
 
 bool TeacherBB::isBlackBoxResettable() {
@@ -72,6 +101,9 @@ output_t TeacherBB::outputQuery(input_t input) {
 		_bb->query(move(inSeq));
 	}
 	auto output = _bb->query(input);
+	if (_greatestOutput < output + 1) {
+		_greatestOutput = output + 1;
+	}
 	if (input == STOUT_INPUT) {
 		_currState->stateOutput = output;
 	} else {
@@ -79,13 +111,17 @@ output_t TeacherBB::outputQuery(input_t input) {
 		_currState->succ[input]->parent = _currState;
 		_currState->succ[input]->incomingInput = input;
 		_currState->succ[input]->incomingOutput = output;
-		if (output != WRONG_OUTPUT) _currState = _currState->succ[input];
+		if (output != WRONG_OUTPUT) {
+			_currState = _currState->succ[input];
+			_currState->possibleInputs = _bb->getNextPossibleInputs();
+			updateNumberOfInputs(_greatestInput, _currState->possibleInputs);
+		}
 	}
 	_bbState = _currState;
 	return output;
 }
 
-sequence_out_t TeacherBB::outputQuery(sequence_in_t inputSequence) {
+sequence_out_t TeacherBB::outputQuery(const sequence_in_t& inputSequence) {
 	_outputQueryCounter++;
 	if (inputSequence.empty()) return sequence_out_t();
 	sequence_out_t output;
@@ -101,7 +137,7 @@ output_t TeacherBB::resetAndOutputQuery(input_t input) {
 	return outputQuery(input);
 }
 
-sequence_out_t TeacherBB::resetAndOutputQuery(sequence_in_t inputSequence) {
+sequence_out_t TeacherBB::resetAndOutputQuery(const sequence_in_t& inputSequence) {
 	resetBlackBox();
 	return outputQuery(inputSequence);
 }

@@ -14,10 +14,18 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "stdafx.h"
 
 #include "BlackBoxDFSM.h"
+
+vector<input_t> BlackBoxDFSM::getNextPossibleInputs() {
+	vector<input_t> inputs;
+	for (input_t i = 0; i < _fsm->getNumberOfInputs(); i++) {
+		if (_fsm->getNextState(_currState, i) != NULL_STATE)
+			inputs.push_back(i);
+	}
+	return inputs;
+}
 
 void BlackBoxDFSM::reset() {
 	if (!_isResettable) {
@@ -39,7 +47,7 @@ output_t BlackBoxDFSM::query(input_t input) {
 	return output;
 }
 
-sequence_out_t BlackBoxDFSM::query(sequence_in_t inputSequence) {
+sequence_out_t BlackBoxDFSM::query(const sequence_in_t& inputSequence) {
 	if (inputSequence.empty()) return sequence_out_t();
 	sequence_out_t output;
 	for (const auto& input : inputSequence) {
@@ -53,7 +61,7 @@ output_t BlackBoxDFSM::resetAndQuery(input_t input) {
 	return query(input);
 }
 
-sequence_out_t BlackBoxDFSM::resetAndQuery(sequence_in_t inputSequence) {
+sequence_out_t BlackBoxDFSM::resetAndQuery(const sequence_in_t& inputSequence) {
 	reset();
 	return query(inputSequence);
 }

@@ -64,6 +64,34 @@ public:
 	}
 
 	/**
+	* Returns the type of model of the Black Box.
+	* @return machine type
+	*/
+	virtual machine_type_t getBlackBoxModelType() = 0;
+
+	/**
+	* Observes and provides a collection of inputs that can be applied next (excluding STOUT_INPUT).
+	* @return a collection of next inputs
+	*/
+	virtual vector<input_t> getNextPossibleInputs() = 0;
+
+	/**
+	* Provides the number of inputs observed so far.
+	* Assumes that all inputs are mapped from 0 to this number minus 1.
+	* The number can increase during learning as new inputs are observed.
+	* @return the number of inputs
+	*/
+	virtual input_t getNumberOfInputs() = 0;
+
+	/**
+	* Provides the number of outputs observed so far.
+	* Assumes that all inputs are mapped from 0 to this number minus 1.
+	* The number can increase during learning as new outputs are observed.
+	* @return the number of outputs
+	*/
+	virtual output_t getNumberOfOutputs() = 0;
+	
+	/**
 	* Resets the BlackBox to its initial state.
 	* An error message is produced and reset fails if isBlackBoxResettable() is false.
 	*/
@@ -81,7 +109,7 @@ public:
 	* @param input sequence to query
 	* @return Output sequence as a response to the given input sequence from the current state
 	*/
-	virtual sequence_out_t outputQuery(sequence_in_t inputSequence) = 0;
+	virtual sequence_out_t outputQuery(const sequence_in_t& inputSequence) = 0;
 
 	/**
 	* Provides a response of the BlackBox on the given input symbol in its initial state.
@@ -95,7 +123,7 @@ public:
 	* @param input sequence to query
 	* @return Output sequence as a response to the given input sequence from the initial state
 	*/
-	virtual sequence_out_t resetAndOutputQuery(sequence_in_t inputSequence) = 0;
+	virtual sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence) = 0;
 	
 	/**
 	* Checks the equivalance of the given model and the BlackBox.

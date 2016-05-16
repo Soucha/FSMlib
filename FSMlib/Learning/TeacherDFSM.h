@@ -30,17 +30,33 @@ public:
 		_currState(0) {
 	}
 
-	bool isBlackBoxResettable();
+	machine_type_t getBlackBoxModelType() {
+		return _fsm->getType();
+	}
+
+	vector<input_t> getNextPossibleInputs();
+
+	input_t getNumberOfInputs() {
+		return _fsm->getNumberOfInputs();
+	}
+
+	output_t getNumberOfOutputs() {
+		return _fsm->getNumberOfOutputs();
+	}
+	
+	bool isBlackBoxResettable() {
+		return _isResettable;
+	}
 
 	void resetBlackBox();
 
 	output_t outputQuery(input_t input);
 
-	sequence_out_t outputQuery(sequence_in_t inputSequence);
+	sequence_out_t outputQuery(const sequence_in_t& inputSequence);
 
 	output_t resetAndOutputQuery(input_t input);
 
-	sequence_out_t resetAndOutputQuery(sequence_in_t inputSequence);
+	sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence);
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 

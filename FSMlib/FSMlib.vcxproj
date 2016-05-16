@@ -178,6 +178,7 @@
     </ClCompile>
     <ClCompile Include="FSMlib.cpp" />
     <ClCompile Include="Learning\BlackBoxDFSM.cpp" />
+    <ClCompile Include="Learning\Lstar.cpp" />
     <ClCompile Include="Learning\TeacherBB.cpp" />
     <ClCompile Include="Learning\TeacherDFSM.cpp" />
     <ClCompile Include="Model\DFA.cpp" />

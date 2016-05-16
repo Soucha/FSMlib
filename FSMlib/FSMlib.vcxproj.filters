@@ -209,6 +209,9 @@
     <ClCompile Include="Learning\TeacherDFSM.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Learning\Lstar.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

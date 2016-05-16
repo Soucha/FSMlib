@@ -32,6 +32,7 @@ wchar_t message[200];
 
 using namespace FSMsequence;
 using namespace FSMtesting;
+using namespace FSMlearning;
 
 static void printSeqSet(sequence_set_t& seqSet) {
 	for (auto seq : seqSet) {
@@ -108,7 +109,6 @@ void testSepSeqs() {
 static void testAllMethod(string filename) {
 	sequence_vec_t hint;
 	sequence_in_t CS;
-	int len;
 	int extraStates = 0;
 	
 	fsm->load(filename);
@@ -116,8 +116,8 @@ static void testAllMethod(string filename) {
 		fsm->getType(), (int)fsm->isReduced(), extraStates);
 
 	auto TS = SPY_method(fsm, extraStates);
-	len = 0;
-	for (sequence_in_t seq : TS) len += seq.size() + 1;
+	seq_len_t len = 0;
+	for (sequence_in_t seq : TS) len += seq_len_t(seq.size() + 1);
 	auto indist = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
 	printf("%d;%d;", len, indist.size());
 }
@@ -155,17 +155,23 @@ void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 	}
 }
 
+#define OUTPUT_GV string(string(DATA_PATH) + "tmp/output.gv").c_str()
+
+bool showConjecture(const unique_ptr<DFSM>& conjecture) {
+	auto fn = conjecture->writeDOTfile(string(DATA_PATH) + "tmp/");
+	char c;	cin >> c;
+	remove(OUTPUT_GV);
+	rename(fn.c_str(), OUTPUT_GV);
+	return true;
+}
+
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
-	auto m = fsm->minimize();
-	cout << fsm->getNumberOfStates() << endl;
-	auto ads = getAdaptiveDistinguishingSequence(fsm);
-	if (ads) {
-		printADS(ads);
-	}
-	
+	fsm = make_unique<DFSM>();
+	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+	auto model = Lstar(teacher, addSuffixToE, showConjecture);
+	cout << FSMmodel::areIsomorphic(fsm, model) << endl;
 	char c;
 	cin >> c;
 	return 0;

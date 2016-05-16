@@ -19,8 +19,13 @@
 
 #include "TeacherDFSM.h"
 
-bool TeacherDFSM::isBlackBoxResettable() {
-	return _isResettable;
+vector<input_t> TeacherDFSM::getNextPossibleInputs() {
+	vector<input_t> inputs;
+	for (input_t i = 0; i < _fsm->getNumberOfInputs(); i++) {
+		if (_fsm->getNextState(_currState, i) != NULL_STATE)
+			inputs.push_back(i);
+	}
+	return inputs;
 }
 
 void TeacherDFSM::resetBlackBox() {
@@ -44,7 +49,7 @@ output_t TeacherDFSM::outputQuery(input_t input) {
 	return output;
 }
 
-sequence_out_t TeacherDFSM::outputQuery(sequence_in_t inputSequence) {
+sequence_out_t TeacherDFSM::outputQuery(const sequence_in_t& inputSequence) {
 	_outputQueryCounter++;
 	if (inputSequence.empty()) return sequence_out_t();
 	sequence_out_t output;
@@ -60,7 +65,7 @@ output_t TeacherDFSM::resetAndOutputQuery(input_t input) {
 	return outputQuery(input);
 }
 
-sequence_out_t TeacherDFSM::resetAndOutputQuery(sequence_in_t inputSequence) {
+sequence_out_t TeacherDFSM::resetAndOutputQuery(const sequence_in_t& inputSequence) {
 	resetBlackBox();
 	return outputQuery(inputSequence);
 }
