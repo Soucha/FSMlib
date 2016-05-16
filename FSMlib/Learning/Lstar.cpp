@@ -39,12 +39,16 @@ namespace FSMlearning {
 	}
 
 	static void fillOTonS(const unique_ptr<Teacher>& teacher, ObservationTable& ot, sequence_in_t& newRowSeq) {
-		vector<sequence_out_t> row;
-		for (const auto& seq : ot.E) {
-			teacher->resetAndOutputQuery(newRowSeq);
-			row.emplace_back(teacher->outputQuery(seq));
-		}
-		ot.T.emplace(newRowSeq, move(row));
+		for (input_t i = 0; i < ot.numberOfInputs; i++) {
+			newRowSeq.push_back(i);
+			vector<sequence_out_t> row;
+			for (const auto& seq : ot.E) {
+				teacher->resetAndOutputQuery(newRowSeq);
+				row.emplace_back(teacher->outputQuery(seq));
+			}
+			ot.T.emplace(newRowSeq, move(row));
+			newRowSeq.pop_back();
+		}		
 	}
 
 	static void extendOTbyNewInputs(const unique_ptr<Teacher>& teacher, ObservationTable& ot) {
@@ -62,6 +66,46 @@ namespace FSMlearning {
 		}
 	}
 
+	static void makeConsistent(const unique_ptr<Teacher>& teacher, ObservationTable& ot) {
+		for (state_t s1 = 0; s1 < ot.S.size(); s1++) {
+			for (state_t s2 = s1 + 1; s2 < ot.S.size(); s2++) {
+				if (areDistinguished(ot.S[s1], ot.S[s2], ot) == -1) {
+					sequence_in_t ns1(ot.S[s1]), ns2(ot.S[s2]);
+					for (input_t input = 0; input < ot.numberOfInputs; input++) {
+						ns1.push_back(input); ns2.push_back(input);
+						auto idx = areDistinguished(ns1, ns2, ot);
+						if (idx != -1) {
+							sequence_in_t dist(ot.E[idx]);
+							dist.push_front(input);
+							ot.E.emplace_back(move(dist));
+							fillOTonE(teacher, ot);
+							break;
+						}
+						ns1.pop_back(); ns2.pop_back();
+					}
+				}
+			}
+		}
+	}
+
+	static bool isClosed(ObservationTable& ot) {
+		for (state_t state = 0; state < ot.S.size(); state++) {
+			for (input_t input = 0; input < ot.numberOfInputs; input++) {
+				sequence_in_t nextStateSeq(ot.S[state]);
+				nextStateSeq.push_back(input);
+				state_t nextState = NULL_STATE;
+				for (state_t refState = 0; refState < ot.S.size(); refState++) {
+					if (areDistinguished(nextStateSeq, ot.S[refState], ot) == -1) {
+						nextState = refState;
+						break;
+					}
+				}
+				if (nextState == NULL_STATE) return false;
+			}
+		}
+		return true;
+	}
+
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, output_t& numberOfOutputs, const unique_ptr<DFSM>& conjecture) {
 		if (numberOfOutputs != teacher->getNumberOfOutputs()) {
 			conjecture->incNumberOfOutputs(teacher->getNumberOfOutputs() - numberOfOutputs);
@@ -69,7 +113,44 @@ namespace FSMlearning {
 		}
 	}
 
-	void addSuffixToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
+	static void addTransition(const unique_ptr<DFSM>& conjecture, state_t& from, input_t& input, state_t& to, ObservationTable& ot) {
+		output_t output = DEFAULT_OUTPUT;
+		if (conjecture->isOutputTransition()) {
+			if (conjecture->getNextState(from, input) == NULL_STATE) {
+				for (size_t i = input + conjecture->isOutputState(); i < ot.E.size(); i++) {
+					if (ot.E[i].front() == input) {
+						output = ot.T[ot.S[from]][i].front();
+						break;
+					}
+				}
+			}
+			else output = conjecture->getOutput(from, input);
+		}
+		conjecture->setTransition(from, input, to, output);
+	}
+
+	void addAllPrefixesToS(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
+		sequence_in_t prefix;
+		bool add = false;
+		for (const auto& input : ce) {
+			prefix.emplace_back(input);
+			if (add) {
+				ot.S.emplace_back(prefix);
+			}
+			else {
+				if (find(ot.S.begin(), ot.S.end(), prefix) == ot.S.end()) {
+					add = true;
+					ot.S.emplace_back(prefix);
+				}
+			}
+		}
+	}
+
+	void addSuffixToE_binarySearch(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
+
+	}
+
+	void addSuffixAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		for (const auto& input : ce) {
 			prefix.push_back(input);
@@ -77,6 +158,35 @@ namespace FSMlearning {
 			suffix.pop_front();
 		}
 		ot.E.emplace_back(move(suffix));
+	}
+
+	void addAllSuffixesAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
+		sequence_in_t prefix, suffix(ce);
+		for (const auto& input : ce) {
+			prefix.push_back(input);
+			if (!ot.T.count(prefix)) break;
+			suffix.pop_front();
+		}
+		while (find(ot.E.begin(), ot.E.end(), suffix) == ot.E.end()) {
+			ot.E.emplace_back(suffix);
+			suffix.pop_front();
+		}
+	}
+
+	void addSuffix1by1ToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
+		sequence_in_t suffix;
+		bool add = false;
+		for (auto input = ce.rbegin(); input != ce.rend(); input++) {
+			suffix.emplace_front(*input);
+			if (!add && (find(ot.E.begin(), ot.E.end(), suffix) == ot.E.end())) {
+				add = true;
+			}
+			if (add) {
+				ot.E.emplace_back(suffix);
+				fillOTonE(teacher, ot);
+				if (!isClosed(ot)) break;
+			}
+		}
 	}
 
 	unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher,
@@ -91,8 +201,7 @@ namespace FSMlearning {
 		/// observation table (S,E,T)
 		ObservationTable ot;
 		ot.numberOfInputs = teacher->getNumberOfInputs();
-		//auto numberOfOutputs = teacher->getNumberOfOutputs();
-		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, ot.numberOfInputs);
+		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, ot.numberOfInputs);// numberOfOutputs could produce error message
 		auto numberOfOutputs = conjecture->getNumberOfOutputs();
 		
 		ot.S.emplace_back(sequence_in_t());
@@ -100,13 +209,13 @@ namespace FSMlearning {
 		for (input_t i = 0; i < ot.numberOfInputs; i++) {
 			ot.T.emplace(sequence_in_t({ i }), vector<sequence_out_t>());
 		}
-		if (!conjecture->isOutputState()) {
+		if (conjecture->isOutputState()) {
+			ot.E.emplace_back(sequence_in_t({ STOUT_INPUT }));
+		}
+		if (conjecture->isOutputTransition()) {
 			for (input_t i = 0; i < ot.numberOfInputs; i++) {
 				ot.E.emplace_back(sequence_in_t({ i }));
 			}
-		}
-		else {
-			ot.E.emplace_back(sequence_in_t({ STOUT_INPUT }));
 		}
 		fillOTonE(teacher, ot);
 		if (conjecture->isOutputState()) {
@@ -116,25 +225,7 @@ namespace FSMlearning {
 		bool unlearned = true;
 		while (unlearned) {
 			if (checkConsistency) {
-				for (state_t s1 = 0; s1 < ot.S.size(); s1++) {
-					for (state_t s2 = s1 + 1; s2 < ot.S.size(); s2++) {
-						if (areDistinguished(ot.S[s1], ot.S[s2], ot) == -1) {
-							sequence_in_t ns1(ot.S[s1]), ns2(ot.S[s2]);
-							for (input_t input = 0; input < ot.numberOfInputs; input++) {
-								ns1.push_back(input); ns2.push_back(input);
-								auto idx = areDistinguished(ns1, ns2, ot);
-								if (idx != -1) {
-									sequence_in_t dist(ot.E[idx]);
-									dist.push_front(input);
-									ot.E.emplace_back(move(dist));
-									fillOTonE(teacher, ot);
-									break;
-								}
-								ns1.pop_back(); ns2.pop_back();
-							}
-						}
-					}
-				}
+				makeConsistent(teacher, ot);
 			}
 			// make closed
 			for (state_t state = 0; state < ot.S.size(); state++) {
@@ -148,54 +239,37 @@ namespace FSMlearning {
 							break;
 						}
 					}
-					if (nextState == NULL_STATE) {
-						for (input_t i = 0; i < ot.numberOfInputs; i++) {
-							nextStateSeq.push_back(i);
-							fillOTonS(teacher, ot, nextStateSeq);
-							nextStateSeq.pop_back();
-						}
+					if (nextState == NULL_STATE) {// new state
+						fillOTonS(teacher, ot, nextStateSeq);
 						// conjecture
 						checkNumberOfOutputs(teacher, numberOfOutputs, conjecture);
 						auto id = conjecture->addState(conjecture->isOutputState() ? ot.T[nextStateSeq][0].front() : DEFAULT_OUTPUT);
-						output_t output = DEFAULT_OUTPUT;
-						if (conjecture->isOutputTransition()) {
-							if (conjecture->getNextState(state, input) == NULL_STATE) {
-								teacher->resetAndOutputQuery(ot.S[state]);
-								output = teacher->outputQuery(input);
-								checkNumberOfOutputs(teacher, numberOfOutputs, conjecture);
-							}
-							else output = conjecture->getOutput(state, input);
-						}
-						conjecture->setTransition(state, input, id, output);
+						addTransition(conjecture, state, input, id, ot);
 
 						ot.S.emplace_back(move(nextStateSeq));
 						if (provideTentativeModel) {
 							unlearned = provideTentativeModel(conjecture);
 						}
 					}
-					else if (conjecture->getNextState(state, input) == NULL_STATE) {
-						output_t output = DEFAULT_OUTPUT;
-						if (conjecture->isOutputTransition()) {
-							teacher->resetAndOutputQuery(ot.S[state]);
-							output = teacher->outputQuery(input);
-							checkNumberOfOutputs(teacher, numberOfOutputs, conjecture);
-						}
-						conjecture->setTransition(state, input, nextState, output);
+					else if (conjecture->getNextState(state, input) != nextState) {// set/update transition
+						addTransition(conjecture, state, input, nextState, ot);
 						if (provideTentativeModel) {
 							unlearned = provideTentativeModel(conjecture);
 						}
 					}
-					else if (conjecture->getNextState(state, input) != nextState) {
-						conjecture->setTransition(state, input, nextState, 
-							conjecture->isOutputTransition() ? conjecture->getOutput(state, input) : DEFAULT_OUTPUT);
-						if (provideTentativeModel) {
-							unlearned = provideTentativeModel(conjecture);
-						}
-					}
+					if (!unlearned) break;
 				}
+				if (!unlearned) break;
 			}
+			if (!unlearned) break;
 			if (ot.numberOfInputs != teacher->getNumberOfInputs()) {
 				extendOTbyNewInputs(teacher, ot);
+				if (conjecture->isOutputTransition()) {
+					for (input_t i = ot.numberOfInputs; i < teacher->getNumberOfInputs(); i++) {
+						ot.E.emplace_back(sequence_in_t({ i }));
+					}
+					fillOTonE(teacher, ot);
+				}
 				conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - ot.numberOfInputs); 
 				ot.numberOfInputs = teacher->getNumberOfInputs();
 			}
@@ -208,17 +282,21 @@ namespace FSMlearning {
 					// processCE
 					auto ssize = ot.S.size();
 					processCounterexample(ce, ot, teacher);
-
 					if (ssize != ot.S.size()) {
-						for (auto i = ssize; i < ot.S.size(); i++) {
+						for (auto i = ssize; i < ot.S.size(); i++) {// increasing order of prefixes is supposed
 							fillOTonS(teacher, ot, ot.S[i]);
-							//conjecture
+							//conjecture is updated in making OT closed
+							conjecture->addState(conjecture->isOutputState() ? ot.T[ot.S[i]][0].front() : DEFAULT_OUTPUT);
 						}
 					}
 					if (ot.T.begin()->second.size() != ot.E.size())
 						fillOTonE(teacher, ot);
 				}
 			}
+		}
+		conjecture->minimize();
+		if (provideTentativeModel) {
+			provideTentativeModel(conjecture);
 		}
 		return conjecture;
 	}

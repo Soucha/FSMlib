@@ -159,7 +159,7 @@ void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 
 bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 	auto fn = conjecture->writeDOTfile(string(DATA_PATH) + "tmp/");
-	char c;	cin >> c;
+	//char c;	cin >> c;
 	remove(OUTPUT_GV);
 	rename(fn.c_str(), OUTPUT_GV);
 	return true;
@@ -170,10 +170,26 @@ int main(int argc, char** argv) {
 	fsm = make_unique<DFSM>();
 	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	auto model = Lstar(teacher, addSuffixToE, showConjecture, true);
+	auto model = Lstar(teacher, addAllPrefixesToS, showConjecture, true);
 	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
 	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
 	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
+	teacher = make_unique<TeacherDFSM>(fsm, true);
+	model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture);
+	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
+	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
+	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
+	teacher = make_unique<TeacherDFSM>(fsm, true);
+	model = Lstar(teacher, addAllSuffixesAfterLastStateToE, showConjecture);
+	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
+	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
+	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
+	teacher = make_unique<TeacherDFSM>(fsm, true);
+	model = Lstar(teacher, addSuffix1by1ToE, showConjecture);
+	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
+	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
+	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
+
 	char c;
 	cin >> c;
 	return 0;
