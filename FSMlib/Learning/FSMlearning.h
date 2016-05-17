@@ -27,7 +27,7 @@ namespace FSMlearning {
 		vector<sequence_in_t> S;
 		vector<sequence_in_t> E;
 		map<sequence_in_t, vector<sequence_out_t>> T;
-		input_t numberOfInputs;
+		unique_ptr<DFSM> conjecture;
 	};
 
 	/**

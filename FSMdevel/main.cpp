@@ -167,8 +167,8 @@ bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<DFSM>();
-	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	fsm = make_unique<Moore>();
+	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
 	auto model = Lstar(teacher, addAllPrefixesToS, showConjecture, true);
 	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();

@@ -424,8 +424,10 @@ void DFSM::create(state_t numberOfStates, input_t numberOfInputs, output_t numbe
 	*/
 	output_t maxOutputs = getMaxOutputs(numberOfStates, numberOfInputs);
 	if (numberOfOutputs > maxOutputs) {
-		ERROR_MESSAGE("%s::create - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs); 
-		numberOfOutputs = maxOutputs;
+		ERROR_MESSAGE("%s::create - the number of outputs %d is greater than the maximum value of %d. Consider minimization!",
+			machineTypeNames[_type], numberOfOutputs, maxOutputs); 
+		//ERROR_MESSAGE("%s::create - the number of outputs reduced to the maximum of %d", machineTypeNames[_type], maxOutputs);
+		//numberOfOutputs = maxOutputs;
 	}
 	
 	_numberOfStates = numberOfStates;
