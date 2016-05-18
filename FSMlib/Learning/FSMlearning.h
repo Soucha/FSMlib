@@ -20,6 +20,7 @@
 #include "BlackBox.h"
 #include "TeacherBB.h"
 #include "TeacherDFSM.h"
+#include "TeacherRL.h"
 #include "Teacher.h"
 
 namespace FSMlearning {

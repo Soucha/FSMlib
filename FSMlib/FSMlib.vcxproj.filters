@@ -105,6 +105,9 @@
     <ClInclude Include="Learning\TeacherBB.h">
       <Filter>Header Files\Learning</Filter>
     </ClInclude>
+    <ClInclude Include="Learning\TeacherRL.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -210,6 +213,9 @@
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
     <ClCompile Include="Learning\Lstar.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherRL.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
   </ItemGroup>

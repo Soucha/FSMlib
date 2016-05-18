@@ -37,6 +37,17 @@ namespace FSMlibTest
 			testEQ(fsm);
 		}
 
+		TEST_METHOD(TestTeacherRL)
+		{
+			auto fsm = make_unique<DFSM>();
+			create(fsm);
+			teacher = make_unique<TeacherRL>(fsm);
+			testTeacher(true);
+			teacher->resetBlackBox();
+			//testTeacherDFSM(true);
+			testEQ(fsm);
+		}
+
 		TEST_METHOD(TestTeacherBB)
 		{
 			auto fsm = make_unique<DFSM>();

@@ -132,6 +132,7 @@ namespace FSMlearning {
 		sequence_in_t prefix;
 		bool add = false;
 		for (const auto& input : ce) {
+			if (input == STOUT_INPUT) continue;
 			prefix.emplace_back(input);
 			if (add) {
 				ot.S.emplace_back(prefix);
@@ -154,10 +155,12 @@ namespace FSMlearning {
 			prefix.push_back(suffix.front());
 			suffix.pop_front();
 		}
-		while (len > 1) {
-			teacher->resetAndOutputQuery(ot.S[ot.conjecture->getEndPathState(0, prefix)]);
-			auto output = teacher->outputQuery(suffix);
-			if (output.back() == refOutput) {
+		teacher->resetAndOutputQuery(ot.S[ot.conjecture->getEndPathState(0, prefix)]);
+		auto output = teacher->outputQuery(suffix);
+		bool sameOutput = (output.back() == refOutput);
+		while (len + mod > 1) {
+			if (sameOutput) {
+				if (len == 1) break;
 				mod = len % 2;
 				len /= 2;
 				for (size_t i = 0; i < len; i++) {
@@ -166,8 +169,7 @@ namespace FSMlearning {
 				}
 			}
 			else {
-				len -= mod;
-				if (len == 1) break;
+				len += mod;
 				mod = len % 2;
 				len /= 2;
 				for (size_t i = 0; i < len; i++) {
@@ -175,8 +177,11 @@ namespace FSMlearning {
 					suffix.pop_front();
 				}
 			}
+			teacher->resetAndOutputQuery(ot.S[ot.conjecture->getEndPathState(0, prefix)]);
+			auto output = teacher->outputQuery(suffix);
+			sameOutput = (output.back() == refOutput);
 		}
-		if (suffix.size() > 1) suffix.pop_front();
+		if (!sameOutput) suffix.pop_front();
 		ot.E.emplace_back(move(suffix));
 	}
 
@@ -193,8 +198,10 @@ namespace FSMlearning {
 	void addAllSuffixesAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		for (const auto& input : ce) {
-			prefix.push_back(input);
-			if (!ot.T.count(prefix)) break;
+			if (input != STOUT_INPUT) {
+				prefix.push_back(input);
+				if (!ot.T.count(prefix)) break;
+			}
 			suffix.pop_front();
 		}
 		while (!suffix.empty() && (find(ot.E.begin(), ot.E.end(), suffix) == ot.E.end())) {
