@@ -165,79 +165,56 @@ bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 	return true;
 }
 
-int main(int argc, char** argv) {
-	//getCSet();
+#define GET_NAME(fn) #fn
+
+static void testLstar(const unique_ptr<Teacher>& teacher,
+	function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCE,
+	string fnName, bool checkConsistency = false) {
+	auto model = Lstar(teacher, processCE, showConjecture, checkConsistency);
+	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
+	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
+	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << fnName << endl;
+}
+
+static void testLStarAllVariants() {
 	fsm = make_unique<Moore>();
 	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
+
+	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
+	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
+	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
+	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
+	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
+	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
+
+	for (size_t i = 0; i < ceFunc.size(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
+	}
+
+	for (size_t i = 0; i < ceFunc.size(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
+	}
+
+	for (size_t i = 0; i < ceFunc.size(); i++) {
+		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, SPY_method);
+		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
+	}
+}
+
+int main(int argc, char** argv) {
+	//getCSet();
+	//testLStarAllVariants();
+	fsm = make_unique<DFSM>();
+	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm");
+	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	auto model = Lstar(teacher, addAllPrefixesToS, showConjecture, true);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherDFSM>(fsm, true);
-	model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherDFSM>(fsm, true);
-	model = Lstar(teacher, addAllSuffixesAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherDFSM>(fsm, true);
-	model = Lstar(teacher, addSuffix1by1ToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-
-	teacher = make_unique<TeacherRL>(fsm);
-	model = Lstar(teacher, addAllPrefixesToS, showConjecture, true);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherRL>(fsm);
-	model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherRL>(fsm);
-	model = Lstar(teacher, addAllSuffixesAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherRL>(fsm);
-	model = Lstar(teacher, addSuffix1by1ToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherRL>(fsm);
-	model = Lstar(teacher, addSuffixToE_binarySearch, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-
-
-	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	teacher = make_unique<TeacherBB>(bb, SPY_method);
-	model = Lstar(teacher, addAllPrefixesToS, showConjecture, true);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherBB>(bb, SPY_method);
-	model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherBB>(bb, SPY_method);
-	model = Lstar(teacher, addAllSuffixesAfterLastStateToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
-	teacher = make_unique<TeacherBB>(bb, SPY_method);
-	model = Lstar(teacher, addSuffix1by1ToE, showConjecture);
-	cout << FSMmodel::areIsomorphic(fsm, model) << ", reset:" << teacher->getAppliedResetCount();
-	cout << ", OQ:" << teacher->getOutputQueryCount() << ", EQ:" << teacher->getEquivalenceQueryCount();
-	cout << ", symbols:" << teacher->getQueriedSymbolsCount() << endl;
+	auto model = DiscriminationTreeAlgorithm(teacher, showConjecture);
+	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
+	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
+	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 
 	char c;
 	cin >> c;

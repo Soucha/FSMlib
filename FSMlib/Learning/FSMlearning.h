@@ -131,4 +131,17 @@ namespace FSMlearning {
 		function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
 		bool checkConsistency = false);
+
+	FSMLIB_API unique_ptr<DFSM> DiscriminationTreeAlgorithm(const unique_ptr<Teacher>& teacher,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
+
+	FSMLIB_API unique_ptr<DFSM> ObservationPackAlgorithm(const unique_ptr<Teacher>& teacher,
+		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
+		bool checkConsistency = false);
+
+	FSMLIB_API unique_ptr<DFSM> TTT(const unique_ptr<Teacher>& teacher,
+		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
+		bool checkConsistency = false);
 }

@@ -298,17 +298,7 @@ namespace FSMlearning {
 				if (!unlearned) break;
 			}
 			if (!unlearned) break;
-			if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
-				extendOTbyNewInputs(teacher, ot);
-				if (conjecture->isOutputTransition()) {
-					for (input_t i = conjecture->getNumberOfInputs(); i < teacher->getNumberOfInputs(); i++) {
-						ot.E.emplace_back(sequence_in_t({ i }));
-					}
-					fillOTonE(teacher, ot);
-				}
-				conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - conjecture->getNumberOfInputs());
-			}
-			else {// EQ -> CE or stop
+			if (conjecture->getNumberOfInputs() == teacher->getNumberOfInputs()) {// EQ -> CE or stop
 				ce = teacher->equivalenceQuery(conjecture);
 				if (ce.empty()) unlearned = false;
 				else {
@@ -327,6 +317,16 @@ namespace FSMlearning {
 					if (ot.T.begin()->second.size() != ot.E.size())
 						fillOTonE(teacher, ot);
 				}
+			}
+			if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
+				extendOTbyNewInputs(teacher, ot);
+				if (conjecture->isOutputTransition()) {
+					for (input_t i = conjecture->getNumberOfInputs(); i < teacher->getNumberOfInputs(); i++) {
+						ot.E.emplace_back(sequence_in_t({ i }));
+					}
+					fillOTonE(teacher, ot);
+				}
+				conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - conjecture->getNumberOfInputs());
 			}
 		}
 		conjecture->minimize();
