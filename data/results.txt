@@ -1,0 +1,200 @@
+../../data/tests/sequences/Moore_R100.fsm, TeacherDFSM
+
+Reset: 5196,	OQ: 10392,	symbols: 40742,	EQ: 10,	addAllPrefixesToS
+
+Reset: 4010,	OQ: 8020,	symbols: 28618,	EQ: 10,	addSuffixAfterLastStateToE
+
+Reset: 4010,	OQ: 8020,	symbols: 27816,	EQ: 9,	addAllSuffixesAfterLastStateToE
+
+Reset: 4010,	OQ: 8020,	symbols: 27415,	EQ: 10,	addSuffix1by1ToE
+
+Reset: 4027,	OQ: 8054,	symbols: 27494,	EQ: 10,	addSuffixToE_binarySearch
+
+../../data/tests/sequences/Moore_R100.fsm, TeacherRL
+
+Reset: 5196,	OQ: 10392,	symbols: 40742,	EQ: 10,	addAllPrefixesToS
+
+Reset: 4010,	OQ: 8020,	symbols: 27816,	EQ: 10,	addSuffixAfterLastStateToE
+
+Reset: 4010,	OQ: 8020,	symbols: 27816,	EQ: 9,	addAllSuffixesAfterLastStateToE
+
+Reset: 4010,	OQ: 8020,	symbols: 27415,	EQ: 10,	addSuffix1by1ToE
+
+Reset: 4027,	OQ: 8054,	symbols: 27494,	EQ: 10,	addSuffixToE_binarySearch
+
+../../data/tests/sequences/Moore_R100.fsm, BlackBoxDFSM, TeacherBB:SPY_method
+
+Reset: 14883,	OQ: 7794,	symbols: 77479,	EQ: 7,	addAllPrefixesToS
+
+Reset: 14404,	OQ: 5614,	symbols: 74942,	EQ: 7,	addSuffixAfterLastStateToE
+
+Reset: 14109,	OQ: 6416,	symbols: 74381,	EQ: 2,	addAllSuffixesAfterLastStateToE
+
+Reset: 17171,	OQ: 10426,	symbols: 73609,	EQ: 9,	addSuffix1by1ToE
+
+../../data/tests/sequences/Moore_R100_PDS.fsm, TeacherDFSM
+
+Reset: 11039,	OQ: 22078,	symbols: 250240,	EQ: 8,	addAllPrefixesToS
+
+Reset: 2005,	OQ: 4010,	symbols: 52581,	EQ: 5,	addSuffixAfterLastStateToE
+
+Reset: 7619,	OQ: 15238,	symbols: 173422,	EQ: 5,	addAllSuffixesAfterLastStateToE
+
+Reset: 7619,	OQ: 15238,	symbols: 173422,	EQ: 5,	addSuffix1by1ToE
+
+Reset: 2021,	OQ: 4042,	symbols: 52826,	EQ: 5,	addSuffixToE_binarySearch
+
+../../data/tests/sequences/Moore_R100_PDS.fsm, TeacherRL
+
+Reset: 53634,	OQ: 107268,	symbols: 1266400,	EQ: 30,	addAllPrefixesToS
+
+
+
+Reset: 31,	OQ: 63,	symbols: 115,	EQ: 3,	TeacherDFSM	../../data/examples/DFA_R4_ADS.fsm
+
+Reset: 31,	OQ: 63,	symbols: 115,	EQ: 3,	TeacherRL	../../data/examples/DFA_R4_ADS.fsm
+
+Reset: 68,	OQ: 63,	symbols: 149,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R4_ADS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 93,	EQ: 3,	TeacherDFSM	../../data/examples/DFA_R4_HS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 93,	EQ: 3,	TeacherRL	../../data/examples/DFA_R4_HS.fsm
+
+Reset: 74,	OQ: 63,	symbols: 177,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R4_HS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 107,	EQ: 3,	TeacherDFSM	../../data/examples/DFA_R4_PDS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 107,	EQ: 3,	TeacherRL	../../data/examples/DFA_R4_PDS.fsm
+
+Reset: 76,	OQ: 65,	symbols: 161,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R4_PDS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 112,	EQ: 3,	TeacherDFSM	../../data/examples/DFA_R4_SCSet.fsm
+
+Reset: 32,	OQ: 65,	symbols: 112,	EQ: 3,	TeacherRL	../../data/examples/DFA_R4_SCSet.fsm
+
+Reset: 80,	OQ: 65,	symbols: 183,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R4_SCSet.fsm
+
+Reset: 29,	OQ: 59,	symbols: 101,	EQ: 3,	TeacherDFSM	../../data/examples/DFA_R4_SS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 101,	EQ: 3,	TeacherRL	../../data/examples/DFA_R4_SS.fsm
+
+Reset: 72,	OQ: 59,	symbols: 159,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R4_SS.fsm
+
+Reset: 53,	OQ: 107,	symbols: 200,	EQ: 4,	TeacherDFSM	../../data/examples/DFA_R5_SVS.fsm
+
+Reset: 53,	OQ: 107,	symbols: 200,	EQ: 4,	TeacherRL	../../data/examples/DFA_R5_SVS.fsm
+
+Reset: 118,	OQ: 107,	symbols: 203,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFA_R5_SVS.fsm
+
+Reset: 31,	OQ: 63,	symbols: 115,	EQ: 3,	TeacherDFSM	../../data/examples/Moore_R4_ADS.fsm
+
+Reset: 31,	OQ: 63,	symbols: 115,	EQ: 3,	TeacherRL	../../data/examples/Moore_R4_ADS.fsm
+
+Reset: 68,	OQ: 63,	symbols: 149,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R4_ADS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 93,	EQ: 3,	TeacherDFSM	../../data/examples/Moore_R4_HS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 93,	EQ: 3,	TeacherRL	../../data/examples/Moore_R4_HS.fsm
+
+Reset: 74,	OQ: 63,	symbols: 177,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R4_HS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 107,	EQ: 3,	TeacherDFSM	../../data/examples/Moore_R4_PDS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 107,	EQ: 3,	TeacherRL	../../data/examples/Moore_R4_PDS.fsm
+
+Reset: 76,	OQ: 65,	symbols: 161,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R4_PDS.fsm
+
+Reset: 32,	OQ: 65,	symbols: 112,	EQ: 3,	TeacherDFSM	../../data/examples/Moore_R4_SCSet.fsm
+
+Reset: 32,	OQ: 65,	symbols: 112,	EQ: 3,	TeacherRL	../../data/examples/Moore_R4_SCSet.fsm
+
+Reset: 80,	OQ: 65,	symbols: 183,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R4_SCSet.fsm
+
+Reset: 29,	OQ: 59,	symbols: 101,	EQ: 3,	TeacherDFSM	../../data/examples/Moore_R4_SS.fsm
+
+Reset: 29,	OQ: 59,	symbols: 101,	EQ: 3,	TeacherRL	../../data/examples/Moore_R4_SS.fsm
+
+Reset: 72,	OQ: 59,	symbols: 159,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R4_SS.fsm
+
+Reset: 53,	OQ: 107,	symbols: 200,	EQ: 4,	TeacherDFSM	../../data/examples/Moore_R5_SVS.fsm
+
+Reset: 53,	OQ: 107,	symbols: 200,	EQ: 4,	TeacherRL	../../data/examples/Moore_R5_SVS.fsm
+
+Reset: 118,	OQ: 107,	symbols: 203,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Moore_R5_SVS.fsm
+
+Reset: 47,	OQ: 80,	symbols: 162,	EQ: 3,	TeacherDFSM	../../data/examples/DFSM_R4_ADS.fsm
+
+Reset: 47,	OQ: 80,	symbols: 162,	EQ: 3,	TeacherRL	../../data/examples/DFSM_R4_ADS.fsm
+
+Reset: 88,	OQ: 83,	symbols: 173,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFSM_R4_ADS.fsm
+
+Reset: 42,	OQ: 72,	symbols: 114,	EQ: 3,	TeacherDFSM	../../data/examples/DFSM_R4_SCSet.fsm
+
+Reset: 42,	OQ: 72,	symbols: 114,	EQ: 3,	TeacherRL	../../data/examples/DFSM_R4_SCSet.fsm
+
+Reset: 89,	OQ: 78,	symbols: 165,	EQ: 3,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFSM_R4_SCSet.fsm
+
+Reset: 77,	OQ: 132,	symbols: 226,	EQ: 4,	TeacherDFSM	../../data/examples/DFSM_R5_PDS.fsm
+
+Reset: 77,	OQ: 132,	symbols: 226,	EQ: 4,	TeacherRL	../../data/examples/DFSM_R5_PDS.fsm
+
+Reset: 230,	OQ: 135,	symbols: 856,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFSM_R5_PDS.fsm
+
+Reset: 65,	OQ: 113,	symbols: 196,	EQ: 4,	TeacherDFSM	../../data/examples/DFSM_R5_SVS.fsm
+
+Reset: 65,	OQ: 113,	symbols: 196,	EQ: 4,	TeacherRL	../../data/examples/DFSM_R5_SVS.fsm
+
+Reset: 119,	OQ: 113,	symbols: 157,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/DFSM_R5_SVS.fsm
+
+Reset: 46,	OQ: 75,	symbols: 155,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_ADS.fsm
+
+Reset: 46,	OQ: 75,	symbols: 155,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_ADS.fsm
+
+Reset: 107,	OQ: 78,	symbols: 135,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_ADS.fsm
+
+Reset: 41,	OQ: 67,	symbols: 115,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_HS.fsm
+
+Reset: 41,	OQ: 67,	symbols: 115,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_HS.fsm
+
+Reset: 113,	OQ: 76,	symbols: 139,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_HS.fsm
+
+Reset: 38,	OQ: 61,	symbols: 98,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_PDS.fsm
+
+Reset: 38,	OQ: 61,	symbols: 98,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_PDS.fsm
+
+Reset: 91,	OQ: 61,	symbols: 100,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_PDS.fsm
+
+Reset: 42,	OQ: 69,	symbols: 123,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_SCSet.fsm
+
+Reset: 42,	OQ: 69,	symbols: 123,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_SCSet.fsm
+
+Reset: 111,	OQ: 69,	symbols: 127,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_SCSet.fsm
+
+Reset: 35,	OQ: 55,	symbols: 85,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_SS.fsm
+
+Reset: 35,	OQ: 55,	symbols: 85,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_SS.fsm
+
+Reset: 92,	OQ: 55,	symbols: 119,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_SS.fsm
+
+Reset: 41,	OQ: 67,	symbols: 115,	EQ: 4,	TeacherDFSM	../../data/examples/Mealy_R4_SVS.fsm
+
+Reset: 41,	OQ: 67,	symbols: 115,	EQ: 4,	TeacherRL	../../data/examples/Mealy_R4_SVS.fsm
+
+Reset: 113,	OQ: 76,	symbols: 139,	EQ: 4,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/examples/Mealy_R4_SVS.fsm
+
+
+Reset: 2701,	OQ: 4749,	symbols: 13149,	EQ: 58,	TeacherDFSM	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 2701,	OQ: 4749,	symbols: 13149,	EQ: 58,	TeacherRL	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 17292,	OQ: 4285,	symbols: 33556,	EQ: 46,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 2682,	OQ: 4715,	symbols: 12777,	EQ: 57,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 2682,	OQ: 4715,	symbols: 12777,	EQ: 57,	TeacherRL	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 17413,	OQ: 4270,	symbols: 33595,	EQ: 47,	BlackBoxDFSM, TeacherBB:SPY_method	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 181796,	OQ: 358443,	symbols: 9533596,	EQ: 100,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 181796,	OQ: 358443,	symbols: 9533596,	EQ: 100,	TeacherRL	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm

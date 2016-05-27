@@ -216,6 +216,9 @@ namespace FSMtesting {
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
+		if (fsm->getNumberOfStates() == 1) {
+			return getTraversalSet(fsm, extraStates);
+		}
 				
 		auto H = getHarmonizedStateIdentifiers(fsm);
 

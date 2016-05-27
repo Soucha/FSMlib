@@ -92,7 +92,7 @@ namespace FSMlearning {
 	static void extendInputs(input_t byNumInputs, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		bool newState = false;
-		auto numStates = stateNodes.size();
+		auto numStates = state_t(stateNodes.size());
 		for (state_t state = 0; state < numStates; state++) {
 			for (input_t i = conjecture->getNumberOfInputs(); i < conjecture->getNumberOfInputs() + byNumInputs; i++) {
 				sequence_in_t prefix(stateNodes[state]->sequence);

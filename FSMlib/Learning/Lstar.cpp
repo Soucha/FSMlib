@@ -188,8 +188,10 @@ namespace FSMlearning {
 	void addSuffixAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		for (const auto& input : ce) {
-			prefix.push_back(input);
-			if (!ot.T.count(prefix)) break;
+			if (input != STOUT_INPUT) {
+				prefix.push_back(input);
+				if (!ot.T.count(prefix)) break;
+			}
 			suffix.pop_front();
 		}
 		ot.E.emplace_back(move(suffix));

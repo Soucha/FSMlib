@@ -109,7 +109,7 @@ namespace FSMlearning {
 	FSMLIB_API void addSuffix1by1ToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher);
 
 	/**
-	* The L* algorithm
+	* The L* algorithm using an Observation Table
 	*
 	* Source:
 	* Article (angluin1987learning) 
@@ -132,16 +132,76 @@ namespace FSMlearning {
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
 		bool checkConsistency = false);
 
+	/**
+	* The learning algorithm based on a Discrimination Tree
+	*
+	* Source:
+	* Book (kearns1994introduction) 
+	* Kearns, M. & Vazirani, U. V. 
+	* An introduction to computational learning theory 
+	* The MIT Press, 1994
+	*
+	* @param Teacher
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
 	FSMLIB_API unique_ptr<DFSM> DiscriminationTreeAlgorithm(const unique_ptr<Teacher>& teacher,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
+	/**
+	* The Observation Pack algorithm combining a Discrimination Tree with Observation Tables
+	*
+	* Source:
+	* Article (howar2012active)
+	* Howar, F. M. 
+	* Active learning of interface programs 
+	* 2012 
+	*
+	* @param Teacher
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
 	FSMLIB_API unique_ptr<DFSM> ObservationPackAlgorithm(const unique_ptr<Teacher>& teacher,
 		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
 		bool checkConsistency = false);
 
+	/**
+	* The TTT algorithm using a spanning Tree, a Discrimination Tree and a Discriminator Trie
+	*
+	* Source:
+	* InProceedings (isberner2014ttt) 
+	* Isberner, M.; Howar, F. & Steffen, B. 
+	* The TTT algorithm: a redundancy-free approach to active automata learning 
+	* Runtime Verification, 2014, 307-322
+	*
+	* @param Teacher
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
 	FSMLIB_API unique_ptr<DFSM> TTT(const unique_ptr<Teacher>& teacher,
 		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
 		bool checkConsistency = false);
+
+	/**
+	* The learning algorithm based on testing theory (W-method)
+	*
+	* Source:
+	* InProceedings (petrenko2014inferring) 
+	* Petrenko, A.; Li, K.; Groz, R.; Hossen, K. & Oriat, C. 
+	* Inferring approximated models for systems engineering 
+	* High-Assurance Systems Engineering (HASE), 2014 IEEE 15th International Symposium on, 2014, 249-253 
+	*
+	* @param Teacher
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
+	FSMLIB_API unique_ptr<DFSM> QuotientAlgorithm(const unique_ptr<Teacher>& teacher,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
+
 }

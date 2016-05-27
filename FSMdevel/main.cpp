@@ -165,8 +165,6 @@ bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 	return true;
 }
 
-#define GET_NAME(fn) #fn
-
 static void testLstar(const unique_ptr<Teacher>& teacher,
 	function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCE,
 	string fnName, bool checkConsistency = false) {
@@ -177,8 +175,8 @@ static void testLstar(const unique_ptr<Teacher>& teacher,
 }
 
 static void testLStarAllVariants() {
-	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
+	//fsm = make_unique<Moore>();
+	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
@@ -206,11 +204,14 @@ static void testLStarAllVariants() {
 
 int main(int argc, char** argv) {
 	//getCSet();
+	fsm = make_unique<Mealy>();
+	fsm->load(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm");
+	//fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	//testLStarAllVariants();
-	fsm = make_unique<DFSM>();
-	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm");
-	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
-	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
+
+	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
 	auto model = DiscriminationTreeAlgorithm(teacher, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
