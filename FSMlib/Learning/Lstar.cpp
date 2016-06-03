@@ -163,7 +163,7 @@ namespace FSMlearning {
 				if (len == 1) break;
 				mod = len % 2;
 				len /= 2;
-				for (size_t i = 0; i < len; i++) {
+				for (size_t i = 0; i < len + mod; i++) {
 					suffix.push_front(prefix.back());
 					prefix.pop_back();
 				}
@@ -187,11 +187,21 @@ namespace FSMlearning {
 
 	void addSuffixAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
+		auto bbOutput = teacher->resetAndOutputQuery(ce);
+		state_t state = 0;
 		for (const auto& input : ce) {
 			if (input != STOUT_INPUT) {
 				prefix.push_back(input);
-				if (!ot.T.count(prefix)) break;
+				if (!ot.T.count(prefix)) {
+					teacher->resetAndOutputQuery(ot.S[state]);
+					auto output = teacher->outputQuery(suffix);
+					if (bbOutput != output) {
+						break;
+					}
+				}
+				state = ot.conjecture->getNextState(state, input);
 			}
+			if (bbOutput.size() > 1) bbOutput.pop_front();
 			suffix.pop_front();
 		}
 		ot.E.emplace_back(move(suffix));

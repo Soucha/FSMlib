@@ -24,7 +24,8 @@
 */
 class FSMLIB_API TeacherBB : public Teacher {
 public:
-	TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod);
+	TeacherBB(const shared_ptr<BlackBox>& blackBox, 
+		function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod, state_t maxExtraStates = 3);
 
 	machine_type_t getBlackBoxModelType() {
 		return _bb->getModelType();
@@ -54,6 +55,7 @@ private:
 	struct bb_node_t;
 	shared_ptr<BlackBox> _bb;
 	function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> _testingMethod;
+	state_t _maxExtraStates;
 	shared_ptr<bb_node_t> _initialState, _currState, _bbState;
 	input_t _greatestInput;
 	output_t _greatestOutput;

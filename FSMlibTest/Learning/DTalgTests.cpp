@@ -32,7 +32,7 @@ namespace FSMlibTest
 		
 		// TODO: incomplete machines
 
-		TEST_METHOD(TestLStar_DFSM)
+		TEST_METHOD(TestDT_DFSM)
 		{
 			fsm = make_unique<DFSM>();
 			testDTalg(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
@@ -41,10 +41,10 @@ namespace FSMlibTest
 			testDTalg(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
 		}
 
-		TEST_METHOD(TestLStar_Mealy)
+		TEST_METHOD(TestDT_Mealy)
 		{
 			fsm = make_unique<Mealy>();
-			//*
+			/*
 			testDTalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			testDTalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testDTalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm");
@@ -63,7 +63,7 @@ namespace FSMlibTest
 			//*/
 		}
 
-		TEST_METHOD(TestLStar_Moore)
+		TEST_METHOD(TestDT_Moore)
 		{
 			fsm = make_unique<Moore>();
 			/*
@@ -86,7 +86,7 @@ namespace FSMlibTest
 			//*/
 		}
 
-		TEST_METHOD(TestLStar_DFA)
+		TEST_METHOD(TestDT_DFA)
 		{
 			fsm = make_unique<DFA>();
 			testDTalg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_ADS.fsm");
@@ -99,10 +99,10 @@ namespace FSMlibTest
 
 		void testDTalgorithm(const unique_ptr<Teacher>& teacher, string teacherName, string filename) {
 			auto model = DiscriminationTreeAlgorithm(teacher, showConjecture);
-			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, model), "Learned model is different to the specification.");
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\t%s\t%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(),
 				teacherName.c_str(), filename.c_str());
+			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, model), "Learned model is different to the specification.");
 		}
 
 		void testDTalg(string filename) {
@@ -115,8 +115,8 @@ namespace FSMlibTest
 			testDTalgorithm(teacher, "TeacherRL", filename);
 			
 			shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-			testDTalgorithm(teacher, "BlackBoxDFSM, TeacherBB:SPY_method", filename);
+			teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+			testDTalgorithm(teacher, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename);
 		}
 	};
 }

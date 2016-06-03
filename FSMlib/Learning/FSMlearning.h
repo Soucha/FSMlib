@@ -33,6 +33,7 @@ namespace FSMlearning {
 
 	/**
 	* Original L* counterexample processing that adds all prefixes of CE to set S.
+	* A consistency check of OT is then required.
 	*
 	* Source:
 	* Article (angluin1987learning) 
@@ -65,8 +66,8 @@ namespace FSMlearning {
 	FSMLIB_API void addSuffixToE_binarySearch(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher);
 
 	/**
-	* Finds the longest prefix of CE that is in S.X (a row of OT),
-	* then adds the rest (suffix of CE) to set E as one distinguishing sequence.
+	* Finds the longest prefix of CE that is not in S and the rest of CE reveal a new state,
+	* then adds the suffix of CE to set E as one distinguishing sequence.
 	* It does not reveal all possible information of CE so CE could be used again.
 	*
 	* @param counterexample

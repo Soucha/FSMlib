@@ -19,8 +19,6 @@
 
 #include "TeacherBB.h"
 
-#define MAX_DEPTH 3
-
 struct TeacherBB::bb_node_t {
 	output_t incomingOutput;
 	output_t stateOutput = WRONG_OUTPUT;
@@ -38,10 +36,12 @@ static void updateNumberOfInputs(input_t& greatestInput, const vector<input_t>& 
 	}
 }
 
-TeacherBB::TeacherBB(const shared_ptr<BlackBox>& blackBox, function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod) :
+TeacherBB::TeacherBB(const shared_ptr<BlackBox>& blackBox, 
+	function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod, state_t maxExtraStates) :
 Teacher(),
 _bb(blackBox),
 _testingMethod(testingMethod),
+_maxExtraStates(maxExtraStates),
 _greatestInput(0),
 _greatestOutput(0) {
 	_initialState = _bbState = _currState = make_shared<bb_node_t>();
@@ -147,7 +147,7 @@ sequence_in_t TeacherBB::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
 	auto tmp = _currState;
 	auto model = FSMmodel::duplicateFSM(conjecture);
 	if (!model->isReduced()) model->minimize();
-	for (int extraStates = 0; extraStates < MAX_DEPTH; extraStates++) {
+	for (int extraStates = 0; extraStates < _maxExtraStates; extraStates++) {
 		auto TS = _testingMethod(model, extraStates);
 		for (const auto& test : TS) {
 			auto bbOut = resetAndOutputQuery(test);
