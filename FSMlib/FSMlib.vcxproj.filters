@@ -221,6 +221,9 @@
     <ClCompile Include="Learning\DiscriminationTreeAlgorithm.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Learning\ObservationPackAlgorithm.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

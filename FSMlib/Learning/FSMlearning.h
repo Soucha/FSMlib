@@ -166,8 +166,7 @@ namespace FSMlearning {
 	*/
 	FSMLIB_API unique_ptr<DFSM> ObservationPackAlgorithm(const unique_ptr<Teacher>& teacher,
 		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
-		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
-		bool checkConsistency = false);
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 	/**
 	* The TTT algorithm using a spanning Tree, a Discrimination Tree and a Discriminator Trie
@@ -185,8 +184,7 @@ namespace FSMlearning {
 	*/
 	FSMLIB_API unique_ptr<DFSM> TTT(const unique_ptr<Teacher>& teacher,
 		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
-		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
-		bool checkConsistency = false);
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 	/**
 	* The learning algorithm based on testing theory (W-method)

@@ -204,17 +204,17 @@ static void testLStarAllVariants() {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");
-	//fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	fsm = make_unique<DFSM>();
+	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
+	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	//testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
-	unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-	auto model = Lstar(teacher, addSuffixToE_binarySearch, showConjecture);
+	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+	//auto model = Lstar(teacher, addSuffixToE_binarySearch, showConjecture);
 
-	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	//auto model = DiscriminationTreeAlgorithm(teacher, showConjecture);
+	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+	auto model = ObservationPackAlgorithm(teacher, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;

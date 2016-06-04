@@ -112,7 +112,7 @@ namespace FSMlearning {
 		}
 	}
 
-	static void addTransition(const unique_ptr<DFSM>& conjecture, state_t& from, input_t& input, state_t& to, ObservationTable& ot) {
+	static void addTransition(const unique_ptr<DFSM>& conjecture, const state_t& from, const input_t& input, const state_t& to, ObservationTable& ot) {
 		output_t output = DEFAULT_OUTPUT;
 		if (conjecture->isOutputTransition()) {
 			if (conjecture->getNextState(from, input) == NULL_STATE) {

@@ -458,6 +458,8 @@ Reset: 14109,	OQ: 6416,	symbols: 74381,	EQ: 2,	addAllSuffixesAfterLastStateToE	B
 
 Reset: 17171,	OQ: 10426,	symbols: 73609,	EQ: 9,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100.fsm
 
+Reset: 15594,	OQ: 7272,	symbols: 73610,	EQ: 9,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100.fsm
+
 Reset: 11039,	OQ: 22078,	symbols: 250240,	EQ: 8,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS.fsm
 
 Reset: 2013,	OQ: 4022,	symbols: 52712,	EQ: 5,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS.fsm
@@ -485,6 +487,8 @@ Reset: 160,	OQ: 26,	symbols: 425,	EQ: 1,	addSuffixAfterLastStateToE	BlackBoxDFSM
 Reset: 160,	OQ: 26,	symbols: 425,	EQ: 1,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
 
 Reset: 160,	OQ: 26,	symbols: 425,	EQ: 1,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
+
+Reset: 160,	OQ: 26,	symbols: 425,	EQ: 1,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
 
 Reset: 10197,	OQ: 20394,	symbols: 1029897,	EQ: 9,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
 
@@ -534,6 +538,8 @@ Reset: 1529,	OQ: 820,	symbols: 7940,	EQ: 7,	addAllSuffixesAfterLastStateToE	Blac
 
 Reset: 1529,	OQ: 820,	symbols: 7940,	EQ: 7,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS.fsm
 
+Reset: 1422,	OQ: 606,	symbols: 7940,	EQ: 7,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS.fsm
+
 Reset: 41,	OQ: 82,	symbols: 141,	EQ: 1,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS_E.fsm
 
 Reset: 41,	OQ: 82,	symbols: 141,	EQ: 1,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS_E.fsm
@@ -561,6 +567,8 @@ Reset: 284,	OQ: 82,	symbols: 1481,	EQ: 1,	addSuffixAfterLastStateToE	BlackBoxDFS
 Reset: 284,	OQ: 82,	symbols: 1481,	EQ: 1,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
 
 Reset: 284,	OQ: 82,	symbols: 1481,	EQ: 1,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 284,	OQ: 82,	symbols: 1481,	EQ: 1,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
 
 Reset: 39,	OQ: 78,	symbols: 155,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R4_HS.fsm
 
@@ -590,6 +598,8 @@ Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBo
 
 Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_HS.fsm
 
+Reset: 75,	OQ: 64,	symbols: 184,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_HS.fsm
+
 Reset: 39,	OQ: 78,	symbols: 168,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R4_PDS.fsm
 
 Reset: 31,	OQ: 60,	symbols: 82,	EQ: 3,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/tests/sequences/Moore_R4_PDS.fsm
@@ -617,6 +627,8 @@ Reset: 75,	OQ: 60,	symbols: 165,	EQ: 3,	addSuffixAfterLastStateToE	BlackBoxDFSM,
 Reset: 107,	OQ: 126,	symbols: 165,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
 
 Reset: 71,	OQ: 54,	symbols: 161,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 77,	OQ: 66,	symbols: 165,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
 
 Reset: 33,	OQ: 66,	symbols: 138,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R4_SS.fsm
 
@@ -646,6 +658,8 @@ Reset: 126,	OQ: 180,	symbols: 201,	EQ: 2,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 72,	OQ: 72,	symbols: 160,	EQ: 2,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_SS.fsm
 
+Reset: 57,	OQ: 42,	symbols: 199,	EQ: 2,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_SS.fsm
+
 Reset: 95,	OQ: 190,	symbols: 647,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/tests/sequences/Moore_R6_ADS.fsm
 
 Reset: 73,	OQ: 142,	symbols: 361,	EQ: 5,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/tests/sequences/Moore_R6_ADS.fsm
@@ -673,6 +687,8 @@ Reset: 135,	OQ: 117,	symbols: 301,	EQ: 4,	addSuffixAfterLastStateToE	BlackBoxDFS
 Reset: 155,	OQ: 182,	symbols: 296,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
 
 Reset: 153,	OQ: 156,	symbols: 301,	EQ: 4,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 136,	OQ: 122,	symbols: 301,	EQ: 4,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
 
 Reset: 27,	OQ: 54,	symbols: 105,	EQ: 2,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R4_ADS.fsm
 
@@ -702,6 +718,8 @@ Reset: 73,	OQ: 72,	symbols: 150,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBox
 
 Reset: 73,	OQ: 72,	symbols: 150,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_ADS.fsm
 
+Reset: 69,	OQ: 64,	symbols: 174,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_ADS.fsm
+
 Reset: 39,	OQ: 78,	symbols: 155,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R4_HS.fsm
 
 Reset: 31,	OQ: 60,	symbols: 83,	EQ: 3,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/Moore_R4_HS.fsm
@@ -729,6 +747,8 @@ Reset: 74,	OQ: 60,	symbols: 184,	EQ: 3,	addSuffixAfterLastStateToE	BlackBoxDFSM,
 Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_HS.fsm
 
 Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_HS.fsm
+
+Reset: 75,	OQ: 64,	symbols: 184,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_HS.fsm
 
 Reset: 39,	OQ: 78,	symbols: 168,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R4_PDS.fsm
 
@@ -758,6 +778,8 @@ Reset: 107,	OQ: 126,	symbols: 165,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 71,	OQ: 54,	symbols: 161,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_PDS.fsm
 
+Reset: 77,	OQ: 66,	symbols: 165,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_PDS.fsm
+
 Reset: 33,	OQ: 66,	symbols: 138,	EQ: 2,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R4_SCSet.fsm
 
 Reset: 31,	OQ: 60,	symbols: 93,	EQ: 3,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/Moore_R4_SCSet.fsm
@@ -785,6 +807,8 @@ Reset: 79,	OQ: 60,	symbols: 188,	EQ: 3,	addSuffixAfterLastStateToE	BlackBoxDFSM,
 Reset: 120,	OQ: 144,	symbols: 189,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_SCSet.fsm
 
 Reset: 84,	OQ: 72,	symbols: 183,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_SCSet.fsm
+
+Reset: 80,	OQ: 64,	symbols: 188,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_SCSet.fsm
 
 Reset: 33,	OQ: 66,	symbols: 138,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R4_SS.fsm
 
@@ -814,6 +838,8 @@ Reset: 126,	OQ: 180,	symbols: 201,	EQ: 2,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 72,	OQ: 72,	symbols: 160,	EQ: 2,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_SS.fsm
 
+Reset: 57,	OQ: 42,	symbols: 199,	EQ: 2,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R4_SS.fsm
+
 Reset: 76,	OQ: 152,	symbols: 368,	EQ: 4,	addAllPrefixesToS	TeacherDFSM	../../data/examples/Moore_R5_SVS.fsm
 
 Reset: 50,	OQ: 97,	symbols: 158,	EQ: 4,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/Moore_R5_SVS.fsm
@@ -841,6 +867,8 @@ Reset: 115,	OQ: 97,	symbols: 216,	EQ: 4,	addSuffixAfterLastStateToE	BlackBoxDFSM
 Reset: 186,	OQ: 242,	symbols: 216,	EQ: 4,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R5_SVS.fsm
 
 Reset: 120,	OQ: 110,	symbols: 203,	EQ: 4,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R5_SVS.fsm
+
+Reset: 117,	OQ: 104,	symbols: 203,	EQ: 4,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/Moore_R5_SVS.fsm
 
 Reset: 27,	OQ: 54,	symbols: 105,	EQ: 2,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R4_ADS.fsm
 
@@ -870,6 +898,8 @@ Reset: 73,	OQ: 72,	symbols: 150,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBox
 
 Reset: 73,	OQ: 72,	symbols: 150,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_ADS.fsm
 
+Reset: 69,	OQ: 64,	symbols: 174,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_ADS.fsm
+
 Reset: 39,	OQ: 78,	symbols: 155,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R4_HS.fsm
 
 Reset: 31,	OQ: 60,	symbols: 83,	EQ: 3,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/DFA_R4_HS.fsm
@@ -897,6 +927,8 @@ Reset: 74,	OQ: 60,	symbols: 184,	EQ: 3,	addSuffixAfterLastStateToE	BlackBoxDFSM,
 Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_HS.fsm
 
 Reset: 97,	OQ: 108,	symbols: 184,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_HS.fsm
+
+Reset: 75,	OQ: 64,	symbols: 184,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_HS.fsm
 
 Reset: 39,	OQ: 78,	symbols: 168,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R4_PDS.fsm
 
@@ -926,6 +958,8 @@ Reset: 107,	OQ: 126,	symbols: 165,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 71,	OQ: 54,	symbols: 161,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_PDS.fsm
 
+Reset: 77,	OQ: 66,	symbols: 165,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_PDS.fsm
+
 Reset: 33,	OQ: 66,	symbols: 138,	EQ: 2,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R4_SCSet.fsm
 
 Reset: 31,	OQ: 60,	symbols: 93,	EQ: 3,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/DFA_R4_SCSet.fsm
@@ -953,6 +987,8 @@ Reset: 79,	OQ: 60,	symbols: 188,	EQ: 3,	addSuffixAfterLastStateToE	BlackBoxDFSM,
 Reset: 120,	OQ: 144,	symbols: 189,	EQ: 3,	addAllSuffixesAfterLastStateToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_SCSet.fsm
 
 Reset: 84,	OQ: 72,	symbols: 183,	EQ: 3,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_SCSet.fsm
+
+Reset: 80,	OQ: 64,	symbols: 188,	EQ: 3,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_SCSet.fsm
 
 Reset: 33,	OQ: 66,	symbols: 138,	EQ: 3,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R4_SS.fsm
 
@@ -982,6 +1018,8 @@ Reset: 126,	OQ: 180,	symbols: 201,	EQ: 2,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 72,	OQ: 72,	symbols: 160,	EQ: 2,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_SS.fsm
 
+Reset: 57,	OQ: 42,	symbols: 199,	EQ: 2,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R4_SS.fsm
+
 Reset: 76,	OQ: 152,	symbols: 368,	EQ: 4,	addAllPrefixesToS	TeacherDFSM	../../data/examples/DFA_R5_SVS.fsm
 
 Reset: 50,	OQ: 97,	symbols: 158,	EQ: 4,	addSuffixAfterLastStateToE	TeacherDFSM	../../data/examples/DFA_R5_SVS.fsm
@@ -1010,3 +1048,4 @@ Reset: 186,	OQ: 242,	symbols: 216,	EQ: 4,	addAllSuffixesAfterLastStateToE	BlackB
 
 Reset: 120,	OQ: 110,	symbols: 203,	EQ: 4,	addSuffix1by1ToE	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R5_SVS.fsm
 
+Reset: 117,	OQ: 104,	symbols: 203,	EQ: 4,	addSuffixToE_binarySearch	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/examples/DFA_R5_SVS.fsm
