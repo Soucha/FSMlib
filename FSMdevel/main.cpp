@@ -214,7 +214,7 @@ int main(int argc, char** argv) {
 	//auto model = Lstar(teacher, addSuffixToE_binarySearch, showConjecture);
 
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	auto model = ObservationPackAlgorithm(teacher, showConjecture);
+	auto model = ObservationPackAlgorithm(teacher, OneLocally, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;

@@ -228,7 +228,7 @@ namespace FSMsequence {
 			vector<bool>& distinguished, bool setDistinguished, state_t state = NULL_STATE) {
 		state_t N = fsm->getNumberOfStates();
 		sequence_out_t outI, outJ;
-		int maxCount = 0, count; // count of needed symbol
+		seq_len_t maxCount = 0, count; // count of needed symbol
 		shortSeq.pop_back();
 		if (state != NULL_STATE) {
 			outI = fsm->getOutputAlongPath(state, shortSeq);

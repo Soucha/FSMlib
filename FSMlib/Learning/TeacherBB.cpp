@@ -147,7 +147,7 @@ sequence_in_t TeacherBB::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
 	auto tmp = _currState;
 	auto model = FSMmodel::duplicateFSM(conjecture);
 	if (!model->isReduced()) model->minimize();
-	for (int extraStates = 0; extraStates < _maxExtraStates; extraStates++) {
+	for (state_t extraStates = 0; extraStates < _maxExtraStates; extraStates++) {
 		auto TS = _testingMethod(model, extraStates);
 		for (const auto& test : TS) {
 			auto bbOut = resetAndOutputQuery(test);

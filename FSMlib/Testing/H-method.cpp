@@ -98,7 +98,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static int getEstimate(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2, const input_t& input,
+	static seq_len_t getEstimate(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2, const input_t& input,
 			const vector<LinkCell>& sepSeq, const state_t& N) {
 		auto idx = getStatePairIdx(n1->state, n2->state, N);
 		auto nextIdx = sepSeq[idx].next[input];
@@ -107,9 +107,9 @@ namespace FSMtesting {
 		return 2 * sepSeq[nextIdx].minLen + 1;
 	}
 
-	static int getMinLenToDistinguish(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
+	static seq_len_t getMinLenToDistinguish(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
 			const vector<LinkCell>& sepSeq, const state_t& N, const input_t& P) {
-		int minVal = N;
+		seq_len_t minVal = N;
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < P; i++) {
 			auto sIt1 = n1->next.find(i);
@@ -128,7 +128,7 @@ namespace FSMtesting {
 				}
 				else {
 					auto est = getEstimate(n1, n2, i, sepSeq, N);
-					if ((minVal > est) && (est > 0)) {
+					if (minVal > est) {
 						minVal = est;
 						input = i;
 					}
@@ -137,14 +137,14 @@ namespace FSMtesting {
 			else {
 				if (sIt2 != n2->next.end()) {
 					auto est = getEstimate(n2, n1, i, sepSeq, N);
-					if ((minVal > est) && (est > 0)) {
+					if (minVal > est) {
 						minVal = est;
 						input = i;
 					}
 				}
 				else {
 					auto est = getEstimate(n2, n1, i, sepSeq, N);
-					if ((minVal > est + 1) && (est > 0)) {
+					if (minVal > est + 1) {
 						minVal = est + 1;
 						input = i;
 					}

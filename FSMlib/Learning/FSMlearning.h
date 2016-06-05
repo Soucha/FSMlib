@@ -31,6 +31,12 @@ namespace FSMlearning {
 		unique_ptr<DFSM> conjecture;
 	};
 
+	enum OP_CEprocessing {
+		AllGlobally,
+		OneGlobally,
+		OneLocally
+	};
+
 	/**
 	* Original L* counterexample processing that adds all prefixes of CE to set S.
 	* A consistency check of OT is then required.
@@ -165,7 +171,7 @@ namespace FSMlearning {
 	* @return A learned model
 	*/
 	FSMLIB_API unique_ptr<DFSM> ObservationPackAlgorithm(const unique_ptr<Teacher>& teacher,
-		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
+		OP_CEprocessing processCounterexample = OneLocally,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 	/**
