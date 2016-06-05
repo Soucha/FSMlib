@@ -102,7 +102,7 @@ namespace FSMtesting {
 			const vector<LinkCell>& sepSeq, const state_t& N) {
 		auto idx = getStatePairIdx(n1->state, n2->state, N);
 		auto nextIdx = sepSeq[idx].next[input];
-		if (nextIdx == NULL_STATE) return -1;
+		if (nextIdx == NULL_STATE) return seq_len_t(-1);
 		if (nextIdx == idx) return 1;
 		return 2 * sepSeq[nextIdx].minLen + 1;
 	}
@@ -144,7 +144,7 @@ namespace FSMtesting {
 				}
 				else {
 					auto est = getEstimate(n2, n1, i, sepSeq, N);
-					if (minVal > est + 1) {
+					if (minVal - 1 > est) {
 						minVal = est + 1;
 						input = i;
 					}

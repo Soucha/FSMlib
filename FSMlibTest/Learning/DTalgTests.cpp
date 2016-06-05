@@ -101,7 +101,7 @@ namespace FSMlibTest
 			auto model = DiscriminationTreeAlgorithm(teacher, showConjecture);
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\t%s\t%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(),
-				teacherName.c_str(), filename.c_str());
+				teacherName.c_str(), filename.c_str());// , (FSMmodel::areIsomorphic(fsm, model) ? "" : "\tNOT LEARNED")
 			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, model), "Learned model is different to the specification.");
 		}
 
