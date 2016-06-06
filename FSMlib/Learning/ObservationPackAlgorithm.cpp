@@ -84,7 +84,7 @@ namespace FSMlearning {
 			size_t startColumn, size_t& sepSeqIdx, const unique_ptr<Teacher>& teacher) {
 		bool undististinguished = true;
 		auto& refRow = ot.T.at(ot.S);
-		for (size_t e = startColumn; e < ot.E.size(); e++) {
+		for (auto e = startColumn; e < ot.E.size(); e++) {
 			teacher->resetAndOutputQuery(prefix);
 			row.emplace_back(teacher->outputQuery(ot.E[e]));
 			if (undististinguished && (row.back() != refRow[e])) {
@@ -113,25 +113,87 @@ namespace FSMlearning {
 		dtNode = leaf;
 	}
 
+	static void separateRow(vector<sequence_out_t>& row, sequence_in_t accessSeq, shared_ptr<dt_node_t> currentNode, 
+		const state_t& state, const size_t& sepSeqIdx, vector<shared_ptr<dt_node_t>>& stateNodes,
+		vector<componentOT>& components, vector<componentOT>& newComponents,
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		while (currentNode->state == NULL_STATE) {
+			auto it = currentNode->succ.find(row[currentNode->level]);
+			if (it == currentNode->succ.end()) {
+				currentNode = createNode(currentNode, accessSeq, row[currentNode->level]);
+				break;
+			}
+			currentNode = it->second;
+		}
+		if (currentNode->state == NULL_STATE) {// new state
+			addState(currentNode, stateNodes, conjecture, teacher);
+			currentNode->level = sepSeqIdx;
+			auto E = components[state].E;
+			newComponents.emplace_back(accessSeq, move(E), move(row));
+		}
+		else {
+			auto& otherOT = (currentNode->state < components.size()) ?
+				components[currentNode->state] : newComponents[currentNode->state - components.size()];
+			auto& refOtherRow = otherOT.T.at(otherOT.S);
+			auto sepIdx = otherOT.E.size();
+			if (currentNode->state == state) {
+				sepIdx = sepSeqIdx;
+			}
+			else {
+				for (auto e = min(currentNode->level, sepSeqIdx); e < otherOT.E.size(); e++) {
+					if (row[e] != refOtherRow[e]) {
+						sepIdx = e;
+						break;
+					}
+				}
+			}
+			if (sepIdx == otherOT.E.size()) {// not distinguished
+				otherOT.T.emplace(accessSeq, row);
+			}
+			else {// new state/component/dt_node
+				split(currentNode, stateNodes, newComponents, otherOT.E, sepIdx, refOtherRow[sepIdx],
+					accessSeq, row, sepSeqIdx, conjecture, teacher);
+			}
+		}
+		// updateConjecture
+		input_t input = accessSeq.back();
+		accessSeq.pop_back();
+		for (auto sn : stateNodes) {
+			if (sn->sequence == accessSeq) {
+				auto output = conjecture->isOutputTransition() ? conjecture->getOutput(sn->state, input) : DEFAULT_OUTPUT;
+				conjecture->setTransition(sn->state, input, currentNode->state, output);
+				break;
+			}
+		}
+	}
+
 	static void extendStateByInput(state_t state, input_t input, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
-			vector<componentOT>& components, vector<componentOT>& newComponents,
+			vector<componentOT>& components, vector<componentOT>& newComponents, const OP_CEprocessing& processCE,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix(stateNodes[state]->sequence);
 		prefix.emplace_back(input);
 		auto dtNode = sift(dt, prefix, teacher);// what state is the next state?
 		if (dtNode->state == NULL_STATE) {// new state
 			addState(dtNode, stateNodes, conjecture, teacher);
-
 			vector<sequence_in_t> E;
 			vector<sequence_out_t> row;
-			for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
-				teacher->resetAndOutputQuery(prefix);
-				row.emplace_back(sequence_out_t({ teacher->outputQuery(i) }));
-				E.emplace_back(sequence_in_t({ i }));
+			if (processCE == OneLocally) {
+				for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
+					teacher->resetAndOutputQuery(prefix);
+					row.emplace_back(sequence_out_t({ teacher->outputQuery(i) }));
+					E.emplace_back(sequence_in_t({ i }));
+				}
+				if (conjecture->isOutputState()) {
+					row.emplace_back(sequence_out_t({ conjecture->getOutput(dtNode->state, STOUT_INPUT) }));
+					E.emplace_back(sequence_in_t({ STOUT_INPUT }));
+				}
 			}
-			if (conjecture->isOutputState()) {
-				row.emplace_back(sequence_out_t({ conjecture->getOutput(dtNode->state, STOUT_INPUT) }));
-				E.emplace_back(sequence_in_t({ STOUT_INPUT }));
+			else {// AllGlobally, OneGlobally - global set of suffixes
+				E = components.front().E;
+				for (auto& seq : E) {
+					teacher->resetAndOutputQuery(prefix);
+					row.emplace_back(teacher->outputQuery(seq));
+				}
 			}
 			newComponents.emplace_back(move(prefix), move(E), move(row));
 		}
@@ -231,63 +293,17 @@ namespace FSMlearning {
 						refRow.emplace_back(teacher->outputQuery(ot.E[e]));
 					}
 					auto refNode = stateNodes[state];
-					for (auto itRow = ot.T.begin(); itRow != ot.T.end(); itRow++) {
+					bool rowErased = false;// the first row can be erased so the iterator can't be incremented
+					for (auto itRow = ot.T.begin(); itRow != ot.T.end(); (rowErased) ? itRow : ++itRow) {
+						rowErased = false;
 						if (itRow->first == ot.S) continue;
 						size_t sepSeqIdx;
 						if (!isRowClosed(itRow->second, itRow->first, ot, itRow->second.size(), sepSeqIdx, teacher)) {
-							auto& row = itRow->second;
-							sequence_in_t accessSeq(itRow->first);
-							auto currentNode = refNode;
-							while (currentNode->state == NULL_STATE) {
-								auto it = currentNode->succ.find(row[currentNode->level]);
-								if (it == currentNode->succ.end()) {
-									currentNode = createNode(currentNode, accessSeq, row[currentNode->level]);
-									break;
-								}
-								currentNode = it->second;
-							}
-							if (currentNode->state == NULL_STATE) {// new state
-								addState(currentNode, stateNodes, conjecture, teacher);
-								currentNode->level = sepSeqIdx;
-								auto E = ot.E;
-								newComponents.emplace_back(accessSeq, move(E), move(row));
-							}
-							else {
-								auto& otherOT = (currentNode->state < components.size()) ? 
-									components[currentNode->state] : newComponents[currentNode->state - components.size()];
-								auto& refOtherRow = otherOT.T.at(otherOT.S);
-								auto sepIdx = otherOT.E.size();
-								if (currentNode->state == state) {
-									sepIdx = sepSeqIdx;
-								} else {
-									for (auto e = min(currentNode->level, sepSeqIdx); e < otherOT.E.size(); e++) {
-										if (row[e] != refOtherRow[e]) {
-											sepIdx = e;
-											break;
-										}
-									}
-								}
-								if (sepIdx == otherOT.E.size()) {// not distinguished
-									otherOT.T.emplace(accessSeq, row);
-								}
-								else {// new state/component/dt_node
-									split(currentNode, stateNodes, newComponents, otherOT.E, sepIdx, refOtherRow[sepIdx],
-										accessSeq, row, sepSeqIdx, conjecture, teacher);
-								}
-							}
-							// updateConjecture
-							input_t input = accessSeq.back();
-							accessSeq.pop_back();
-							for (auto sn : stateNodes) {
-								if (sn->sequence == accessSeq) {
-									auto output = conjecture->isOutputTransition() ? conjecture->getOutput(sn->state, input) : DEFAULT_OUTPUT;
-									conjecture->setTransition(sn->state, input, currentNode->state, output);
-									break;
-								}
-							}
+							separateRow(itRow->second, itRow->first, refNode, state, sepSeqIdx, 
+								stateNodes, components, newComponents, conjecture, teacher);
 							// erase row from ot
 							itRow = ot.T.erase(itRow);
-							itRow--;
+							rowErased = true;
 							if (provideTentativeModel) {
 								unlearned = provideTentativeModel(conjecture);
 								if (!unlearned) break;
@@ -301,7 +317,7 @@ namespace FSMlearning {
 			if (deltaInputs != 0) {// inputs were extended
 				for (state_t state = 0; state < components.size(); state++) {
 					for (input_t input = conjecture->getNumberOfInputs() - deltaInputs; input < conjecture->getNumberOfInputs(); input++) {
-						extendStateByInput(state, input, dt, stateNodes, components, newComponents, conjecture, teacher);
+						extendStateByInput(state, input, dt, stateNodes, components, newComponents, processCounterexample, conjecture, teacher);
 						if (provideTentativeModel) {
 							unlearned = provideTentativeModel(conjecture);
 							if (!unlearned) break;
@@ -320,7 +336,7 @@ namespace FSMlearning {
 			newComponents.clear();
 			for (state_t state = numberOfOldComponents; state < components.size(); state++) {
 				for (input_t input = 0; input < conjecture->getNumberOfInputs(); input++) {
-					extendStateByInput(state, input, dt, stateNodes, components, components, conjecture, teacher);
+					extendStateByInput(state, input, dt, stateNodes, components, components, processCounterexample, conjecture, teacher);
 					if (provideTentativeModel) {
 						unlearned = provideTentativeModel(conjecture);
 						if (!unlearned) break;
@@ -329,9 +345,10 @@ namespace FSMlearning {
 				if (!unlearned) break;
 			}
 			if (!unlearned) break;
+			// EQ
 			ce = teacher->equivalenceQuery(conjecture);
 			if (ce.empty()) unlearned = false;
-			else {
+			else {// process CE
 				if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
 					deltaInputs = teacher->getNumberOfInputs() - conjecture->getNumberOfInputs();
 					for (auto& ot : components) {

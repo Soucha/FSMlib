@@ -1,0 +1,306 @@
+Reset: 4437,	OQ: 8870,	symbols: 28804,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 4041,	OQ: 8075,	symbols: 23734,	EQ: 4,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 2927,	OQ: 5840,	symbols: 16419,	EQ: 11,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 4437,	OQ: 8870,	symbols: 28804,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 4041,	OQ: 8075,	symbols: 23734,	EQ: 4,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 2927,	OQ: 5840,	symbols: 16419,	EQ: 11,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 14847,	OQ: 9672,	symbols: 36020,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 13872,	OQ: 7270,	symbols: 33925,	EQ: 3,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 15472,	OQ: 5840,	symbols: 33287,	EQ: 11,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100.fsm
+
+Reset: 4432,	OQ: 8860,	symbols: 28773,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 4036,	OQ: 8065,	symbols: 23703,	EQ: 4,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 2922,	OQ: 5830,	symbols: 16389,	EQ: 11,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 4432,	OQ: 8860,	symbols: 28773,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 4036,	OQ: 8065,	symbols: 23703,	EQ: 4,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 2922,	OQ: 5830,	symbols: 16389,	EQ: 11,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 14863,	OQ: 9662,	symbols: 36082,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 13889,	OQ: 7260,	symbols: 33989,	EQ: 3,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 15496,	OQ: 5830,	symbols: 33351,	EQ: 11,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_1.fsm
+
+Reset: 10593,	OQ: 21185,	symbols: 1070575,	EQ: 3,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 600,	OQ: 1197,	symbols: 50500,	EQ: 3,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 404,	OQ: 805,	symbols: 30515,	EQ: 3,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 15155,	OQ: 30309,	symbols: 1687707,	EQ: 3,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 15048,	OQ: 29997,	symbols: 1652340,	EQ: 99,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 10100,	OQ: 20101,	symbols: 1304883,	EQ: 99,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm
+
+Reset: 24,	OQ: 37,	symbols: 7,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 18,	OQ: 24,	symbols: 7,	EQ: 2,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 17,	OQ: 22,	symbols: 7,	EQ: 2,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 632,	OQ: 1260,	symbols: 4008,	EQ: 5,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 569,	OQ: 1127,	symbols: 3658,	EQ: 8,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 413,	OQ: 814,	symbols: 2516,	EQ: 9,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 806,	OQ: 1608,	symbols: 5507,	EQ: 6,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 612,	OQ: 1212,	symbols: 3981,	EQ: 9,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 413,	OQ: 814,	symbols: 2516,	EQ: 9,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 2153,	OQ: 1072,	symbols: 5775,	EQ: 4,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 2314,	OQ: 925,	symbols: 6367,	EQ: 6,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 2228,	OQ: 688,	symbols: 6109,	EQ: 7,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R10_PDS.fsm
+
+Reset: 46,	OQ: 90,	symbols: 168,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 39,	OQ: 75,	symbols: 127,	EQ: 2,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 41,	OQ: 78,	symbols: 134,	EQ: 3,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 46,	OQ: 90,	symbols: 168,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 39,	OQ: 75,	symbols: 127,	EQ: 2,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 41,	OQ: 78,	symbols: 134,	EQ: 3,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 111,	OQ: 126,	symbols: 150,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 86,	OQ: 75,	symbols: 140,	EQ: 2,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 103,	OQ: 84,	symbols: 139,	EQ: 3,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_HS.fsm
+
+Reset: 56,	OQ: 110,	symbols: 218,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 40,	OQ: 77,	symbols: 127,	EQ: 2,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 35,	OQ: 67,	symbols: 108,	EQ: 2,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 56,	OQ: 110,	symbols: 218,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 40,	OQ: 77,	symbols: 127,	EQ: 2,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 35,	OQ: 67,	symbols: 108,	EQ: 2,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 100,	OQ: 110,	symbols: 108,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 84,	OQ: 77,	symbols: 101,	EQ: 2,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 79,	OQ: 67,	symbols: 101,	EQ: 2,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_PDS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 29,	OQ: 56,	symbols: 86,	EQ: 1,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 71,	OQ: 56,	symbols: 119,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 71,	OQ: 56,	symbols: 119,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 71,	OQ: 56,	symbols: 119,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R4_SS.fsm
+
+Reset: 136,	OQ: 270,	symbols: 871,	EQ: 3,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 103,	OQ: 200,	symbols: 572,	EQ: 5,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 70,	OQ: 134,	symbols: 363,	EQ: 5,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 136,	OQ: 270,	symbols: 871,	EQ: 3,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 103,	OQ: 200,	symbols: 572,	EQ: 5,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 70,	OQ: 134,	symbols: 363,	EQ: 5,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 210,	OQ: 272,	symbols: 303,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 216,	OQ: 204,	symbols: 257,	EQ: 5,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 183,	OQ: 138,	symbols: 235,	EQ: 5,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Mealy_R6_ADS.fsm
+
+Reset: 5692,	OQ: 11379,	symbols: 38309,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 5708,	OQ: 11406,	symbols: 36662,	EQ: 6,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 3982,	OQ: 7932,	symbols: 24080,	EQ: 28,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 8128,	OQ: 16251,	symbols: 60584,	EQ: 3,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 5708,	OQ: 11406,	symbols: 36662,	EQ: 6,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 3982,	OQ: 7932,	symbols: 24080,	EQ: 28,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 19568,	OQ: 17009,	symbols: 77720,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 17591,	OQ: 11412,	symbols: 73853,	EQ: 6,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 20595,	OQ: 7740,	symbols: 73198,	EQ: 20,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100.fsm
+
+Reset: 11946,	OQ: 23887,	symbols: 290339,	EQ: 4,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 4690,	OQ: 9371,	symbols: 107710,	EQ: 5,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 4091,	OQ: 8132,	symbols: 79101,	EQ: 46,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 99968,	OQ: 199931,	symbols: 2807675,	EQ: 29,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 21439,	OQ: 42830,	symbols: 527122,	EQ: 44,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 6309,	OQ: 12539,	symbols: 133916,	EQ: 75,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS.fsm
+
+Reset: 226,	OQ: 153,	symbols: 425,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
+
+Reset: 226,	OQ: 153,	symbols: 425,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
+
+Reset: 224,	OQ: 149,	symbols: 425,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS.fsm	NOT LEARNED
+
+Reset: 10796,	OQ: 21590,	symbols: 1080884,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 698,	OQ: 1393,	symbols: 55346,	EQ: 2,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 502,	OQ: 1001,	symbols: 35458,	EQ: 2,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 15356,	OQ: 30710,	symbols: 1697812,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 15146,	OQ: 30193,	symbols: 1657186,	EQ: 98,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 10198,	OQ: 20297,	symbols: 1309730,	EQ: 98,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R100_PDS_l99.fsm
+
+Reset: 17,	OQ: 26,	symbols: 13,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 17,	OQ: 26,	symbols: 13,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 16,	OQ: 24,	symbols: 13,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R100_PDS_l99.fsm	NOT LEARNED
+
+Reset: 621,	OQ: 1237,	symbols: 3009,	EQ: 3,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 504,	OQ: 999,	symbols: 2342,	EQ: 5,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 379,	OQ: 749,	symbols: 1586,	EQ: 5,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 905,	OQ: 1805,	symbols: 5016,	EQ: 5,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 504,	OQ: 999,	symbols: 2342,	EQ: 5,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 379,	OQ: 749,	symbols: 1586,	EQ: 5,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 1838,	OQ: 1655,	symbols: 8395,	EQ: 3,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 1596,	OQ: 1015,	symbols: 8336,	EQ: 5,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 1472,	OQ: 767,	symbols: 8181,	EQ: 5,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS.fsm
+
+Reset: 254,	OQ: 503,	symbols: 869,	EQ: 1,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 254,	OQ: 503,	symbols: 869,	EQ: 1,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 245,	OQ: 485,	symbols: 845,	EQ: 1,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 254,	OQ: 503,	symbols: 869,	EQ: 1,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 254,	OQ: 503,	symbols: 869,	EQ: 1,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 245,	OQ: 485,	symbols: 845,	EQ: 1,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 497,	OQ: 503,	symbols: 1512,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 497,	OQ: 503,	symbols: 1512,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 488,	OQ: 485,	symbols: 1512,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R10_PDS_E.fsm
+
+Reset: 42,	OQ: 81,	symbols: 119,	EQ: 1,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 42,	OQ: 81,	symbols: 119,	EQ: 1,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 41,	OQ: 79,	symbols: 117,	EQ: 1,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 42,	OQ: 81,	symbols: 119,	EQ: 1,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 42,	OQ: 81,	symbols: 119,	EQ: 1,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 41,	OQ: 79,	symbols: 117,	EQ: 1,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 74,	OQ: 81,	symbols: 177,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 74,	OQ: 81,	symbols: 177,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 73,	OQ: 79,	symbols: 177,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_HS.fsm
+
+Reset: 45,	OQ: 87,	symbols: 130,	EQ: 1,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 45,	OQ: 87,	symbols: 130,	EQ: 1,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 44,	OQ: 85,	symbols: 128,	EQ: 1,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 45,	OQ: 87,	symbols: 130,	EQ: 1,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 45,	OQ: 87,	symbols: 130,	EQ: 1,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 44,	OQ: 85,	symbols: 128,	EQ: 1,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 77,	OQ: 87,	symbols: 161,	EQ: 1,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 77,	OQ: 87,	symbols: 161,	EQ: 1,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 76,	OQ: 85,	symbols: 161,	EQ: 1,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_PDS.fsm
+
+Reset: 68,	OQ: 133,	symbols: 252,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 52,	OQ: 100,	symbols: 171,	EQ: 2,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 48,	OQ: 92,	symbols: 154,	EQ: 2,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 68,	OQ: 133,	symbols: 252,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 52,	OQ: 100,	symbols: 171,	EQ: 2,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 48,	OQ: 92,	symbols: 154,	EQ: 2,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 185,	OQ: 295,	symbols: 241,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 88,	OQ: 100,	symbols: 195,	EQ: 2,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 84,	OQ: 92,	symbols: 179,	EQ: 2,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R4_SS.fsm
+
+Reset: 130,	OQ: 257,	symbols: 777,	EQ: 2,	CE: AllGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 108,	OQ: 210,	symbols: 574,	EQ: 4,	CE: OneGlobally,	TeacherDFSM	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 79,	OQ: 152,	symbols: 390,	EQ: 4,	CE: OneLocally,	TeacherDFSM	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 130,	OQ: 257,	symbols: 772,	EQ: 2,	CE: AllGlobally,	TeacherRL	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 108,	OQ: 210,	symbols: 574,	EQ: 4,	CE: OneGlobally,	TeacherRL	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 79,	OQ: 152,	symbols: 390,	EQ: 4,	CE: OneLocally,	TeacherRL	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 253,	OQ: 387,	symbols: 349,	EQ: 2,	CE: AllGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 163,	OQ: 183,	symbols: 305,	EQ: 3,	CE: OneGlobally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
+
+Reset: 156,	OQ: 152,	symbols: 305,	EQ: 4,	CE: OneLocally,	BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)	../../data/tests/sequences/Moore_R6_ADS.fsm
+
