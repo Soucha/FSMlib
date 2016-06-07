@@ -193,13 +193,19 @@ namespace FSMlearning {
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 	/**
-	* The learning algorithm based on testing theory (W-method)
+	* The learning algorithm based on testing theory (W-method).
 	*
 	* Source:
 	* InProceedings (petrenko2014inferring) 
 	* Petrenko, A.; Li, K.; Groz, R.; Hossen, K. & Oriat, C. 
 	* Inferring approximated models for systems engineering 
 	* High-Assurance Systems Engineering (HASE), 2014 IEEE 15th International Symposium on, 2014, 249-253 
+	*
+	* The algorithm generalizes the Direct Hypothesis Construction (DHC) algorithm:
+	* InCollection (steffen2011introduction) 
+	* Steffen, B.; Howar, F. & Merten, M. 
+	* Introduction to active automata learning from a practical perspective 
+	* Formal Methods for Eternal Networked Software Systems, Springer, 2011, 256-296
 	*
 	* @param Teacher
 	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.

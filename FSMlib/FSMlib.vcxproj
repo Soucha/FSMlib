@@ -182,6 +182,7 @@
     <ClCompile Include="Learning\DiscriminationTreeAlgorithm.cpp" />
     <ClCompile Include="Learning\Lstar.cpp" />
     <ClCompile Include="Learning\ObservationPackAlgorithm.cpp" />
+    <ClCompile Include="Learning\QuotientAlgorithm.cpp" />
     <ClCompile Include="Learning\TeacherBB.cpp" />
     <ClCompile Include="Learning\TeacherDFSM.cpp" />
     <ClCompile Include="Learning\TeacherRL.cpp" />

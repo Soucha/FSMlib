@@ -202,22 +202,104 @@ static void testLStarAllVariants() {
 	}
 }
 
+static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, const string& description) {
+	printf("%d;%d;%d;%d;%d;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
+		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), description.c_str());
+}
+
+static void compareLearningAlgorithms(const string fnName) {
+	printf("Correct;#Resets;#OQs;#EQs;#symbols;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
+
+	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
+	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
+	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
+	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
+	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
+	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
+	vector<pair<OP_CEprocessing, string>> opCeFunc;
+	opCeFunc.emplace_back(PTRandSTR(AllGlobally));
+	opCeFunc.emplace_back(PTRandSTR(OneGlobally));
+	opCeFunc.emplace_back(PTRandSTR(OneLocally));
+
+	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherDFSM;;";
+		printCSV(teacher, model, desc);
+	}
+	{
+		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+		auto model = DiscriminationTreeAlgorithm(teacher, nullptr);
+		string desc = fnName + ";DT;;TeacherDFSM;;";
+		printCSV(teacher, model, desc);
+	}
+	for (size_t i = 0; i < opCeFunc.size(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+		auto model = ObservationPackAlgorithm(teacher, opCeFunc[i].first, nullptr);
+		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherDFSM;;";
+		printCSV(teacher, model, desc);
+	}
+
+	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherRL;;";
+		printCSV(teacher, model, desc);
+	}
+	{
+		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+		auto model = DiscriminationTreeAlgorithm(teacher, nullptr);
+		string desc = fnName + ";DT;;TeacherRL;;";
+		printCSV(teacher, model, desc);
+	}
+	for (size_t i = 0; i < opCeFunc.size(); i++) {
+		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+		auto model = ObservationPackAlgorithm(teacher, opCeFunc[i].first, nullptr);
+		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherRL;;";
+		printCSV(teacher, model, desc);
+	}
+	
+	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
+		printCSV(teacher, model, desc);
+	}
+	{
+		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+		auto model = DiscriminationTreeAlgorithm(teacher, nullptr);
+		string desc = fnName + ";DT;;TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
+		printCSV(teacher, model, desc);
+	}
+	for (size_t i = 0; i < opCeFunc.size(); i++) {
+		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+		auto model = ObservationPackAlgorithm(teacher, opCeFunc[i].first, nullptr);
+		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
+		printCSV(teacher, model, desc);
+	}
+}
+
 int main(int argc, char** argv) {
 	//getCSet();
 	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
+	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 	//fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	//testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixToE_binarySearch, showConjecture);
-
-	unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);//, true
-	auto model = ObservationPackAlgorithm(teacher, AllGlobally, showConjecture);
+	//*
+	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
+	auto model = QuotientAlgorithm(teacher, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
+	//*/
+	//compareLearningAlgorithms(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 
 	char c;
 	cin >> c;
