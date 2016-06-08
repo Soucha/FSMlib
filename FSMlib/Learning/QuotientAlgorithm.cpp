@@ -167,14 +167,12 @@ namespace FSMlearning {
 
 						for (auto& succ : node->succ) {
 							auto nextState = conjecture->getNextState(node->state, succ.first);
-							if (succ.second->state != nextState) {
-								if (areDistinguished(succ.second, stateNodes[nextState])) {// inconsistency
-									pset.insert(getDistinguishingSeq(succ.second, stateNodes[nextState], conjecture->isOutputState()));
-									consistent = false;
-									break;
-								}
-								succ.second->state = nextState;
+							if (areDistinguished(succ.second, stateNodes[nextState])) {// inconsistency
+								pset.insert(getDistinguishingSeq(succ.second, stateNodes[nextState], conjecture->isOutputState()));
+								consistent = false;
+								break;
 							}
+							succ.second->state = nextState;
 							openNodes.emplace(succ.second);
 						}
 						if (!consistent) break;

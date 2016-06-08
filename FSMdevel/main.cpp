@@ -239,6 +239,12 @@ static void compareLearningAlgorithms(const string fnName) {
 		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherDFSM;;";
 		printCSV(teacher, model, desc);
 	}
+	{
+		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+		auto model = QuotientAlgorithm(teacher, nullptr);
+		string desc = fnName + ";Quotient;;TeacherDFSM;;";
+		printCSV(teacher, model, desc);
+	}
 
 	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
@@ -258,7 +264,13 @@ static void compareLearningAlgorithms(const string fnName) {
 		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherRL;;";
 		printCSV(teacher, model, desc);
 	}
-	
+	{
+		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+		auto model = QuotientAlgorithm(teacher, nullptr);
+		string desc = fnName + ";Quotient;;TeacherRL;;";
+		printCSV(teacher, model, desc);
+	}
+
 	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
 		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
@@ -280,12 +292,20 @@ static void compareLearningAlgorithms(const string fnName) {
 		string desc = fnName + ";OP;" + opCeFunc[i].second + ";TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
 		printCSV(teacher, model, desc);
 	}
+	{
+		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+		auto model = QuotientAlgorithm(teacher, nullptr);
+		string desc = fnName + ";Quotient;;TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
+		printCSV(teacher, model, desc);
+	}
+
 }
 
 int main(int argc, char** argv) {
 	//getCSet();
 	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
+	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm");
 	//fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	//testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);

@@ -73,10 +73,10 @@ namespace FSMlibTest
 			printMaxSeq(out);
 			ARE_EQUAL(1, count, "%d maximal sequences were obtained instead of 1", count);
 			
-			count = pset.contains(tc);
+			count = int(pset.contains(tc));
 			ARE_EQUAL(int(tc.size()), count, "PS contains only %d symbols of sequence %s", count,
 				FSMmodel::getInSequenceAsString(tc).c_str());
-			count = pset.contains(td);
+			count = int(pset.contains(td));
 			ARE_EQUAL(2, count, "PS contains only %d symbols of sequence %s", count,
 				FSMmodel::getInSequenceAsString(td).c_str());
 			

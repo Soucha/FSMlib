@@ -160,6 +160,7 @@
     <ClCompile Include="Learning\DTalgTests.cpp" />
     <ClCompile Include="Learning\LstarTests.cpp" />
     <ClCompile Include="Learning\OPalgTests.cpp" />
+    <ClCompile Include="Learning\QuotientAlgTests.cpp" />
     <ClCompile Include="Learning\TeacherTests.cpp" />
     <ClCompile Include="Model\BasicOpsTests.cpp" />
     <ClCompile Include="Model\GenerateTests.cpp" />

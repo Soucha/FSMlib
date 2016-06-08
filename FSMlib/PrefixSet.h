@@ -68,7 +68,7 @@ namespace FSMlib {
 		* The length of the longest prefix is returned.<br>
 		* That is, 0 if given sequence is not in the Prefixset,<br>
 		* and the size of seq is returned if the set contains the entire seq.<br>
-		* Empty seq produces the result -1.
+		* Empty seq produces the result of seq_len_t(-1).
 		* @param seq
 		* @return the length of the longest prefix
 		*/

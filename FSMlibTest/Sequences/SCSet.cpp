@@ -205,7 +205,7 @@ namespace FSMlibTest
 			auto HCSet = getHarmonizedStateIdentifiers(fsm);
 			state_t N = fsm->getNumberOfStates();
 			FSMlib::PrefixSet pset;
-			int len;
+			seq_len_t len;
 			sequence_in_t test;
 			sequence_in_t::iterator sIt;
 			DEBUG_MSG("HSI family of %s:\n", filename.c_str());
@@ -219,10 +219,10 @@ namespace FSMlibTest
 				for (state_t i = state + 1; i < N; i++) {
 					for (sequence_in_t seq : HCSet[i]) {
 						len = pset.contains(seq);
-						if (len > 0) {
+						if ((len > 0) && (len != seq_len_t(-1))) {
 							sIt = seq.begin();
 							test.clear();
-							for (int l = 0; l < len; l++) {
+							for (seq_len_t l = 0; l < len; l++) {
 								test.push_back(*sIt);
 								sIt++;
 							}
@@ -230,9 +230,9 @@ namespace FSMlibTest
 								break;
 							}
 						}
-						len = -1;
+						len = seq_len_t(-1);
 					}
-					ARE_EQUAL(true, len != -1, "States %d and %d have not common distinguishing sequence.", i, state);
+					ARE_EQUAL(true, len != seq_len_t(-1), "States %d and %d have not common distinguishing sequence.", i, state);
 				}
 			}
 		}
