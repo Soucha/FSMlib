@@ -238,9 +238,47 @@ namespace FSMlearning {
 		}
 	}
 
+	static bool isSemanticSuffixClosed(ObservationTable& ot) {
+		queue<vector<state_t>> blocks;
+		blocks.emplace(ot.conjecture->getStates());
+		if (ot.conjecture->isOutputState()) {
+			ot.conjecture->distinguishByStateOutputs(blocks);
+			if (blocks.size() == ot.conjecture->getNumberOfStates()) {
+				return true;
+			}
+		}
+		if (ot.conjecture->isOutputTransition()) {
+			ot.conjecture->distinguishByTransitionOutputs(blocks);
+			if (blocks.size() == ot.conjecture->getNumberOfStates()) {
+				return true;
+			}
+		}
+		ot.conjecture->distinguishByTransitions(blocks);
+		if (blocks.empty()) {
+			return true;
+		}
+		sequence_in_t distSeq;
+		state_t s1 = blocks.front().at(0);
+		state_t s2 = blocks.front().at(1);
+		const auto& row1 = ot.T.at(ot.S.at(s1));
+		const auto& row2 = ot.T.at(ot.S.at(s2));
+		for (size_t i = 0; i < ot.E.size(); i++) {
+			if (row1[i] != row2[i]) {
+				distSeq = ot.E[i];
+			}
+		}
+		while (s1 != s2) {
+			s1 = ot.conjecture->getNextState(s1, distSeq.front());
+			s2 = ot.conjecture->getNextState(s2, distSeq.front());
+			distSeq.pop_front();
+		}
+		ot.E.emplace_back(move(distSeq));
+		return false;
+	}
+
 	unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher,
 		function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCounterexample,
-			function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool checkConsistency) {
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool checkConsistency, bool checkSemanticSuffixClosedness) {
 		if (!teacher->isBlackBoxResettable()) {
 			ERROR_MESSAGE("FSMlearning::Lstar - the Black Box needs to be resettable");
 			return nullptr;
@@ -310,6 +348,11 @@ namespace FSMlearning {
 				if (!unlearned) break;
 			}
 			if (!unlearned) break;
+			if (checkSemanticSuffixClosedness) {
+				if (!isSemanticSuffixClosed(ot)) {
+					continue;
+				}
+			}
 			if (conjecture->getNumberOfInputs() == teacher->getNumberOfInputs()) {// EQ -> CE or stop
 				ce = teacher->equivalenceQuery(conjecture);
 				if (ce.empty()) unlearned = false;

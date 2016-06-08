@@ -153,6 +153,10 @@ public:
 	* @return a standard file name of this machine
 	*/
 	string getFilename();
+
+	bool distinguishByStateOutputs(queue<vector<state_t>>& blocks);
+	bool distinguishByTransitionOutputs(queue<vector<state_t>>& blocks);
+	bool distinguishByTransitions(queue<vector<state_t>>& blocks);
 protected:
 	bool _isReduced;
 	bool _isOutputState;
@@ -164,9 +168,6 @@ protected:
 	
 	virtual output_t getMaxOutputs(state_t numberOfStates, input_t numberOfInputs);
 
-	bool distinguishByStateOutputs(queue<vector<state_t>>& blocks);
-	bool distinguishByTransitionOutputs(queue<vector<state_t>>& blocks);
-	bool distinguishByTransitions(queue<vector<state_t>>& blocks);
 	map<state_t, state_t> mergeEquivalentStates(queue<vector<state_t>>& equivalentStates);
 	
 	void clearStateOutputs();

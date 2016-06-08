@@ -122,7 +122,13 @@ namespace FSMlearning {
 	* Article (angluin1987learning) 
 	* Angluin, D. 
 	* Learning regular sets from queries and counterexamples 
-	* Information and computation, Elsevier, 1987, 75, 87-106 
+	* Information and computation, Elsevier, 1987, 75, 87-106
+	*
+	* Semantic Suffix Closedness is proposed in:
+	* InCollection (steffen2011introduction) 
+	* Steffen, B.; Howar, F. & Merten, M. 
+	* Introduction to active automata learning from a practical perspective 
+	* Formal Methods for Eternal Networked Software Systems, Springer, 2011, 256-296
 	*
 	* @param Teacher
 	* @param processCounterexample - a function proccessing an obtained counterexample, see examples above.
@@ -132,12 +138,13 @@ namespace FSMlearning {
 	*							If the function returns false, then the learning stops immediately.
 	* @param checkConsistency - the OT is checked for inconsistency (S contains indistinguished states) if sets to true 
 	*							(needed for addAllPrefixesToS as processCounterexample function)
+	* @param checkSemanticSuffixClosedness - the suffix set E is extended by suffixes that make the conjecture minimal if sets to true
 	* @return A learned model
 	*/
 	FSMLIB_API unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher,
 		function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
-		bool checkConsistency = false);
+		bool checkConsistency = false, bool checkSemanticSuffixClosedness = false);
 
 	/**
 	* The learning algorithm based on a Discrimination Tree
