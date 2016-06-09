@@ -165,13 +165,21 @@ bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 	return true;
 }
 
+static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, const string& description) {
+	printf("%d;%d;%d;%d;%d;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
+		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), description.c_str());
+}
+
 static void testLstar(const unique_ptr<Teacher>& teacher,
 	function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCE,
 	string fnName, bool checkConsistency = false) {
-	auto model = Lstar(teacher, processCE, showConjecture, checkConsistency);
+	auto model = Lstar(teacher, processCE, showConjecture, false, true);
+	string desc = ";L*;" + fnName + ";;;";
+	printCSV(teacher, model, desc);
+	/*
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
-	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << fnName << endl;
+	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << fnName << endl;*/
 }
 
 static void testLStarAllVariants() {
@@ -179,10 +187,10 @@ static void testLStarAllVariants() {
 	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
-	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
+	//ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
+	//ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
+	//ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
 	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
 	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
 
 	for (size_t i = 0; i < ceFunc.size(); i++) {
@@ -200,11 +208,6 @@ static void testLStarAllVariants() {
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, SPY_method);
 		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
 	}
-}
-
-static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, const string& description) {
-	printf("%d;%d;%d;%d;%d;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
-		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), description.c_str());
 }
 
 static void compareLearningAlgorithms(const string fnName) {
@@ -304,22 +307,23 @@ static void compareLearningAlgorithms(const string fnName) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Moore>();
-	fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
-	//fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	fsm = make_unique<DFSM>();
+	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
+	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 	//testLStarAllVariants();
-	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-	auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*
+	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
+	/*
 	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 	//*/
-	//compareLearningAlgorithms(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
+	//compareLearningAlgorithms(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
+	compareLearningAlgorithms(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
 
 	char c;
 	cin >> c;
