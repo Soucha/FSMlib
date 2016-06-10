@@ -29,6 +29,10 @@ public:
 		_currState(0) {
 	}
 
+	bool isProvidedOnlyMQ() {
+		return true;
+	}
+
 	machine_type_t getBlackBoxModelType() {
 		return _fsm->getType();
 	}
@@ -56,6 +60,8 @@ public:
 	output_t resetAndOutputQuery(input_t input);
 
 	sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence);
+
+	sequence_out_t resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix);
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 

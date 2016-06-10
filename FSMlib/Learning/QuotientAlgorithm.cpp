@@ -76,9 +76,9 @@ namespace FSMlearning {
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t accessSeq(node->accessSeq);
 		teacher->resetAndOutputQuery(accessSeq);
-		auto outputSeq = teacher->outputQuery(seq);
-		bool isRL = (outputSeq.size() != seq.size());// TeacherRL gives only the last output
-		if (isRL) teacher->resetAndOutputQuery(accessSeq);
+		sequence_out_t outputSeq;
+		bool isRL = teacher->isProvidedOnlyMQ();// TeacherRL gives only the last output
+		if (!isRL) outputSeq = teacher->outputQuery(seq);
 		auto outIt = outputSeq.begin();
 		for (auto& input : seq) {
 			if (input == STOUT_INPUT) {
@@ -187,6 +187,10 @@ namespace FSMlearning {
 
 	unique_ptr<DFSM> QuotientAlgorithm(const unique_ptr<Teacher>& teacher,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
+		if (!teacher->isBlackBoxResettable()) {
+			ERROR_MESSAGE("FSMlearning::ObservationPackAlgorithm - the Black Box needs to be resettable");
+			return nullptr;
+		}
 
 		/// counterexample
 		sequence_in_t ce;

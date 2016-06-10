@@ -70,6 +70,12 @@ sequence_out_t TeacherDFSM::resetAndOutputQuery(const sequence_in_t& inputSequen
 	return outputQuery(inputSequence);
 }
 
+sequence_out_t TeacherDFSM::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) {
+	resetAndOutputQuery(prefix);
+	_outputQueryCounter--;
+	return outputQuery(suffix);
+}
+
 sequence_in_t TeacherDFSM::equivalenceQuery(const unique_ptr<DFSM>& model) {
 	_equivalenceQueryCounter++;
 	

@@ -128,6 +128,21 @@ namespace FSMlearning {
 		conjecture->setTransition(from, input, to, output);
 	}
 
+	static void shortenCE(sequence_in_t& ce, sequence_out_t& bbOutput, 
+			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		if (bbOutput.empty()) bbOutput = teacher->resetAndOutputQuery(ce);
+		auto output = conjecture->getOutputAlongPath(0, ce);
+		while (output.back() == bbOutput.back()) {
+			ce.pop_back();
+			output.pop_back();
+			if (teacher->isProvidedOnlyMQ()) {
+				bbOutput = teacher->resetAndOutputQuery(ce);
+			} else {
+				bbOutput.pop_back();
+			}
+		}
+	}
+
 	void addAllPrefixesToS(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix;
 		bool add = false;
@@ -147,17 +162,13 @@ namespace FSMlearning {
 	}
 
 	void addSuffixToE_binarySearch(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
-		auto refOutput = ot.conjecture->getOutput(ot.conjecture->getEndPathState(0, ce), STOUT_INPUT);
-		sequence_in_t suffix(ce), prefix;
-		size_t len = ce.size() / 2;
-		size_t mod = ce.size() % 2;
-		for (size_t i = 0; i < len; i++) {
-			prefix.push_back(suffix.front());
-			suffix.pop_front();
-		}
-		teacher->resetAndOutputQuery(ot.S[ot.conjecture->getEndPathState(0, prefix)]);
-		auto output = teacher->outputQuery(suffix);
-		bool sameOutput = (output.back() == refOutput);
+		sequence_in_t prefix, suffix(ce);
+		auto bbOutput = teacher->resetAndOutputQuery(ce);
+		shortenCE(suffix, bbOutput, ot.conjecture, teacher);
+		auto refOutput = ot.conjecture->getOutputAlongPath(0, suffix).back();
+		size_t len = suffix.size();
+		size_t mod = 0;
+		bool sameOutput = (bbOutput.back() == refOutput);
 		while (len + mod > 1) {
 			if (sameOutput) {
 				if (len == 1) break;
@@ -181,15 +192,17 @@ namespace FSMlearning {
 			auto output = teacher->outputQuery(suffix);
 			sameOutput = (output.back() == refOutput);
 		}
-		if (!sameOutput) suffix.pop_front();
+		if (!sameOutput || (suffix.front() == STOUT_INPUT)) suffix.pop_front();
 		ot.E.emplace_back(move(suffix));
 	}
 
 	void addSuffixAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		auto bbOutput = teacher->resetAndOutputQuery(ce);
+		shortenCE(suffix, bbOutput, ot.conjecture, teacher);
 		state_t state = 0;
-		for (const auto& input : ce) {
+		while (!suffix.empty()) {
+			auto& input = suffix.front();
 			if (input != STOUT_INPUT) {
 				prefix.push_back(input);
 				if (!ot.T.count(prefix)) {
@@ -209,7 +222,10 @@ namespace FSMlearning {
 
 	void addAllSuffixesAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
-		for (const auto& input : ce) {
+		sequence_out_t bbOutput;
+		shortenCE(suffix, bbOutput, ot.conjecture, teacher);
+		while (!suffix.empty()) {
+			auto& input = suffix.front();
 			if (input != STOUT_INPUT) {
 				prefix.push_back(input);
 				if (!ot.T.count(prefix)) break;
@@ -265,6 +281,7 @@ namespace FSMlearning {
 		for (size_t i = 0; i < ot.E.size(); i++) {
 			if (row1[i] != row2[i]) {
 				distSeq = ot.E[i];
+				break;
 			}
 		}
 		while (s1 != s2) {
@@ -350,6 +367,7 @@ namespace FSMlearning {
 			if (!unlearned) break;
 			if (checkSemanticSuffixClosedness) {
 				if (!isSemanticSuffixClosed(ot)) {
+					fillOTonE(teacher, ot);
 					continue;
 				}
 			}
@@ -357,8 +375,14 @@ namespace FSMlearning {
 				ce = teacher->equivalenceQuery(conjecture);
 				if (ce.empty()) unlearned = false;
 				else {
-					if (conjecture->isOutputState() && !conjecture->isOutputTransition() // Moore and DFA
-						&& (ce.back() == STOUT_INPUT)) ce.pop_back();
+					if (conjecture->isOutputState() && !conjecture->isOutputTransition()) {// Moore and DFA
+						sequence_in_t newCE;
+						for (auto& input : ce) {
+							if (input == STOUT_INPUT) continue;
+							newCE.emplace_back(input);
+						}
+						ce.swap(newCE);
+					}
 					// processCE
 					auto ssize = ot.S.size();
 					processCounterexample(ce, ot, teacher);

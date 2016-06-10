@@ -31,6 +31,12 @@ public:
 	}
 
 	/**
+	* @return True if the Teacher replies with the last output symbol, i.e. Output Query = Membership Query,
+	*		  False if the Teacher replies with all outputs along the input sequence asked in OQ.
+	*/
+	virtual bool isProvidedOnlyMQ() = 0;
+
+	/**
 	* @return True if the BlackBox can be reset, False otherwise.
 	*/
 	virtual bool isBlackBoxResettable() = 0;
@@ -124,6 +130,14 @@ public:
 	* @return Output sequence as a response to the given input sequence from the initial state
 	*/
 	virtual sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence) = 0;
+
+	/**
+	* Provides a response of the BlackBox on the given input sequence in the state reached by the given access sequence.
+	* @param input sequence to access a particular state
+	* @param input sequence to query
+	* @return Output sequence as a response to the given input sequence from the particular state
+	*/
+	virtual sequence_out_t resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) = 0;
 	
 	/**
 	* Checks the equivalance of the given model and the BlackBox.

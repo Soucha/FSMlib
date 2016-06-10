@@ -65,6 +65,12 @@ sequence_out_t TeacherRL::resetAndOutputQuery(const sequence_in_t& inputSequence
 	return outputQuery(inputSequence);
 }
 
+sequence_out_t TeacherRL::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) {
+	resetAndOutputQuery(prefix);
+	_outputQueryCounter--;
+	return outputQuery(suffix);
+}
+
 sequence_in_t TeacherRL::equivalenceQuery(const unique_ptr<DFSM>& model) {
 	_equivalenceQueryCounter++;
 

@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Learning">
       <UniqueIdentifier>{2f09b780-54a1-43af-b00a-1a5a90d10974}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\experiments">
+      <UniqueIdentifier>{c3963f02-4d93-4acc-8460-c529d9a90f7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -349,6 +352,24 @@
     </None>
     <None Include="..\data\examples\DFSM_R5_PDS.fsm">
       <Filter>Resource Files\examples</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R50_peterson2.fsm">
+      <Filter>Resource Files\experiments</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R97_sched4.fsm">
+      <Filter>Resource Files\experiments</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R241_sched5.fsm">
+      <Filter>Resource Files\experiments</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R664_pots2.fsm">
+      <Filter>Resource Files\experiments</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R1328_peterson3.fsm">
+      <Filter>Resource Files\experiments</Filter>
+    </None>
+    <None Include="..\data\experiments\DFA_R39974_pots3.fsm">
+      <Filter>Resource Files\experiments</Filter>
     </None>
   </ItemGroup>
 </Project>

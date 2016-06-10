@@ -142,6 +142,12 @@ sequence_out_t TeacherBB::resetAndOutputQuery(const sequence_in_t& inputSequence
 	return outputQuery(inputSequence);
 }
 
+sequence_out_t TeacherBB::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) {
+	resetAndOutputQuery(prefix);
+	_outputQueryCounter--;
+	return outputQuery(suffix);
+}
+
 sequence_in_t TeacherBB::equivalenceQuery(const unique_ptr<DFSM>& conjecture) {
 	_equivalenceQueryCounter++;
 	auto tmp = _currState;

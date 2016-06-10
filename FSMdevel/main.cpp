@@ -22,10 +22,11 @@
 #endif // !PARALLEL_COMPUTING
 #include "../FSMlib/FSMlib.h"
 
-#define DATA_PATH			"../data/"
+#define DATA_PATH			string("../data/")
 #define MINIMIZATION_DIR	string("tests/minimization/")
 #define SEQUENCES_DIR		string("tests/sequences/")
 #define EXAMPLES_DIR		string("examples/")
+#define EXPERIMENTS_DIR		string("experiments/")
 
 unique_ptr<DFSM> fsm, fsm2;
 wchar_t message[200];
@@ -155,10 +156,10 @@ void printADS(const unique_ptr<AdaptiveDS>& node, int base = 0) {
 	}
 }
 
-#define OUTPUT_GV string(string(DATA_PATH) + "tmp/output.gv").c_str()
+#define OUTPUT_GV string(DATA_PATH + "tmp/output.gv").c_str()
 
 bool showConjecture(const unique_ptr<DFSM>& conjecture) {
-	auto fn = conjecture->writeDOTfile(string(DATA_PATH) + "tmp/");
+	auto fn = conjecture->writeDOTfile(DATA_PATH + "tmp/");
 	//char c;	cin >> c;
 	remove(OUTPUT_GV);
 	rename(fn.c_str(), OUTPUT_GV);
@@ -215,18 +216,18 @@ static void compareLearningAlgorithms(const string fnName) {
 
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
-	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
 	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
 	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
+	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
 	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
 	vector<pair<OP_CEprocessing, string>> opCeFunc;
 	opCeFunc.emplace_back(PTRandSTR(AllGlobally));
 	opCeFunc.emplace_back(PTRandSTR(OneGlobally));
 	opCeFunc.emplace_back(PTRandSTR(OneLocally));
 
-	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+	for (size_t i = 0; i < ceFunc.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0), (i > 2));
 		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherDFSM;;";
 		printCSV(teacher, model, desc);
 	}
@@ -249,9 +250,9 @@ static void compareLearningAlgorithms(const string fnName) {
 		printCSV(teacher, model, desc);
 	}
 
-	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+	for (size_t i = 0; i < ceFunc.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0), (i > 2));
 		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherRL;;";
 		printCSV(teacher, model, desc);
 	}
@@ -274,10 +275,10 @@ static void compareLearningAlgorithms(const string fnName) {
 		printCSV(teacher, model, desc);
 	}
 
-	for (size_t i = 0; i < ceFunc.size() - fsm->isOutputTransition(); i++) {
+	for (size_t i = 0; i < ceFunc.size(); i++) {
 		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0));
+		auto model = Lstar(teacher, ceFunc[i].first, nullptr, (i == 0), (i > 2));
 		string desc = fnName + ";L*;" + ceFunc[i].second + ";TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;";
 		printCSV(teacher, model, desc);
 	}
@@ -305,25 +306,53 @@ static void compareLearningAlgorithms(const string fnName) {
 
 }
 
+static void translateLearnLibDFAtoFSMformat(string fileName) {
+	fsm = make_unique<DFA>();
+	ifstream is(fileName);
+	state_t numStates;
+	input_t numInputs;
+	output_t output;
+	is >> numStates >> numInputs;
+	fsm->create(numStates, numInputs, 2);
+	for (state_t state = 0; state < numStates; state++) {
+		is >> output;
+		fsm->setOutput(state, output);
+	}
+	state_t ns;
+	for (state_t state = 0; state < numStates; state++) {
+		for (input_t i = 0; i < numInputs; i++) {
+			is >> ns;
+			fsm->setTransition(state, i, ns);
+		}
+	}
+	fsm->minimize();
+	fsm->save(DATA_PATH + "experiments/");
+	
+}
+
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<DFSM>();
-	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
-	fsm->load(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	fsm = make_unique<DFA>();
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm";
+	fsm->load(fileName);
 	//testLStarAllVariants();
-	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	/*
+	auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
+	//*
 	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 	//*/
-	//compareLearningAlgorithms(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
-	compareLearningAlgorithms(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
+	//compareLearningAlgorithms(fileName);
+	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;
 	cin >> c;

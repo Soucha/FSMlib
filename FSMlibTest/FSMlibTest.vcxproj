@@ -231,6 +231,12 @@
     <None Include="..\data\examples\Moore_R4_SCSet.fsm" />
     <None Include="..\data\examples\Moore_R4_SS.fsm" />
     <None Include="..\data\examples\Moore_R5_SVS.fsm" />
+    <None Include="..\data\experiments\DFA_R1328_peterson3.fsm" />
+    <None Include="..\data\experiments\DFA_R241_sched5.fsm" />
+    <None Include="..\data\experiments\DFA_R39974_pots3.fsm" />
+    <None Include="..\data\experiments\DFA_R50_peterson2.fsm" />
+    <None Include="..\data\experiments\DFA_R664_pots2.fsm" />
+    <None Include="..\data\experiments\DFA_R97_sched4.fsm" />
     <None Include="..\data\tests\minimization\DFA_R4.fsm" />
     <None Include="..\data\tests\minimization\DFA_R4_BP.fsm" />
     <None Include="..\data\tests\minimization\DFA_R4_P.fsm" />
