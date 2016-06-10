@@ -75,10 +75,10 @@ namespace FSMlearning {
 	static void addNodes(shared_ptr<ot_node_t> node, sequence_in_t& seq,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t accessSeq(node->accessSeq);
-		teacher->resetAndOutputQuery(accessSeq);
 		sequence_out_t outputSeq;
 		bool isRL = teacher->isProvidedOnlyMQ();// TeacherRL gives only the last output
-		if (!isRL) outputSeq = teacher->outputQuery(seq);
+		if (!isRL) outputSeq = teacher->resetAndOutputQueryOnSuffix(accessSeq, seq);
+		else teacher->resetAndOutputQuery(accessSeq);
 		auto outIt = outputSeq.begin();
 		for (auto& input : seq) {
 			if (input == STOUT_INPUT) {

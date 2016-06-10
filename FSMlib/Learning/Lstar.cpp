@@ -32,8 +32,7 @@ namespace FSMlearning {
 	static void fillOTonE(const unique_ptr<Teacher>& teacher, ObservationTable& ot) {
 		for (auto& p : ot.T) {
 			for (auto i = p.second.size(); i < ot.E.size(); i++) {
-				teacher->resetAndOutputQuery(p.first);
-				p.second.emplace_back(teacher->outputQuery(ot.E[i]));
+				p.second.emplace_back(teacher->resetAndOutputQueryOnSuffix(p.first, ot.E[i]));
 			}
 		}
 	}
@@ -43,8 +42,7 @@ namespace FSMlearning {
 			newRowSeq.push_back(i);
 			vector<sequence_out_t> row;
 			for (const auto& seq : ot.E) {
-				teacher->resetAndOutputQuery(newRowSeq);
-				row.emplace_back(teacher->outputQuery(seq));
+				row.emplace_back(teacher->resetAndOutputQueryOnSuffix(newRowSeq, seq));
 			}
 			ot.T.emplace(newRowSeq, move(row));
 			newRowSeq.pop_back();
@@ -58,8 +56,7 @@ namespace FSMlearning {
 				nextState.push_back(i);
 				vector<sequence_out_t> row;
 				for (const auto& seq : ot.E) {
-					teacher->resetAndOutputQuery(nextState);
-					row.emplace_back(teacher->outputQuery(seq));
+					row.emplace_back(teacher->resetAndOutputQueryOnSuffix(nextState, seq));
 				}
 				ot.T.emplace(move(nextState), move(row));
 			}
@@ -188,8 +185,7 @@ namespace FSMlearning {
 					suffix.pop_front();
 				}
 			}
-			teacher->resetAndOutputQuery(ot.S[ot.conjecture->getEndPathState(0, prefix)]);
-			auto output = teacher->outputQuery(suffix);
+			auto output = teacher->resetAndOutputQueryOnSuffix(ot.S[ot.conjecture->getEndPathState(0, prefix)], suffix);
 			sameOutput = (output.back() == refOutput);
 		}
 		if (!sameOutput || (suffix.front() == STOUT_INPUT)) suffix.pop_front();
@@ -206,8 +202,7 @@ namespace FSMlearning {
 			if (input != STOUT_INPUT) {
 				prefix.push_back(input);
 				if (!ot.T.count(prefix)) {
-					teacher->resetAndOutputQuery(ot.S[state]);
-					auto output = teacher->outputQuery(suffix);
+					auto output = teacher->resetAndOutputQueryOnSuffix(ot.S[state], suffix);
 					if (bbOutput != output) {
 						break;
 					}

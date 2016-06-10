@@ -59,18 +59,16 @@ namespace FSMlearning {
 		node->state = conjecture->addState();
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
-			teacher->resetAndOutputQuery(node->sequence);
-			auto output = teacher->outputQuery(STOUT_INPUT);
+			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, sequence_in_t({ STOUT_INPUT }));
 			checkNumberOfOutputs(teacher, conjecture);
-			conjecture->setOutput(node->state, output);
+			conjecture->setOutput(node->state, output.back());
 		}
 	}
 
 	static shared_ptr<dt_node_t> sift(const shared_ptr<dt_node_t>& dt, const sequence_in_t& s, const unique_ptr<Teacher>& teacher) {
 		auto currentNode = dt;
 		while (currentNode->state == NULL_STATE) {
-			teacher->resetAndOutputQuery(s);
-			auto output = teacher->outputQuery(currentNode->sequence);
+			auto output = teacher->resetAndOutputQueryOnSuffix(s, currentNode->sequence);
 			auto it = currentNode->succ.find(output);
 			if (it == currentNode->succ.end()) {
 				return createNode(currentNode, s, move(output));
@@ -85,8 +83,7 @@ namespace FSMlearning {
 		bool undististinguished = true;
 		auto& refRow = ot.T.at(ot.S);
 		for (auto e = startColumn; e < ot.E.size(); e++) {
-			teacher->resetAndOutputQuery(prefix);
-			row.emplace_back(teacher->outputQuery(ot.E[e]));
+			row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, ot.E[e]));
 			if (undististinguished && (row.back() != refRow[e])) {
 				sepSeqIdx = e;
 				undististinguished = false;
@@ -179,9 +176,9 @@ namespace FSMlearning {
 			vector<sequence_out_t> row;
 			if (processCE == OneLocally) {
 				for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
-					teacher->resetAndOutputQuery(prefix);
-					row.emplace_back(sequence_out_t({ teacher->outputQuery(i) }));
-					E.emplace_back(sequence_in_t({ i }));
+					sequence_in_t seq({ i });
+					row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, seq));
+					E.emplace_back(move(seq));
 				}
 				if (conjecture->isOutputState()) {
 					row.emplace_back(sequence_out_t({ conjecture->getOutput(dtNode->state, STOUT_INPUT) }));
@@ -191,8 +188,7 @@ namespace FSMlearning {
 			else {// AllGlobally, OneGlobally - global set of suffixes
 				E = components.front().E;
 				for (auto& seq : E) {
-					teacher->resetAndOutputQuery(prefix);
-					row.emplace_back(teacher->outputQuery(seq));
+					row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, seq));
 				}
 			}
 			newComponents.emplace_back(move(prefix), move(E), move(row));
@@ -251,8 +247,9 @@ namespace FSMlearning {
 		vector<sequence_out_t> row;
 		// add all transitions
 		for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
-			row.emplace_back(sequence_out_t({ teacher->resetAndOutputQuery(i) }));
-			E.emplace_back(sequence_in_t({ i }));
+			sequence_in_t seq({ i });
+			row.emplace_back(teacher->resetAndOutputQuery(seq));
+			E.emplace_back(move(seq));
 			conjecture->setTransition(0, i, 0, DEFAULT_OUTPUT);
 			if (conjecture->isOutputTransition()) {
 				checkNumberOfOutputs(teacher, conjecture);
@@ -289,8 +286,7 @@ namespace FSMlearning {
 					// reference row
 					auto& refRow = ot.T[ot.S];
 					for (auto e = refRow.size(); e < ot.E.size(); e++) {
-						teacher->resetAndOutputQuery(ot.S);
-						refRow.emplace_back(teacher->outputQuery(ot.E[e]));
+						refRow.emplace_back(teacher->resetAndOutputQueryOnSuffix(ot.S, ot.E[e]));
 					}
 					auto refNode = stateNodes[state];
 					bool rowErased = false;// the first row can be erased so the iterator can't be incremented
@@ -378,8 +374,7 @@ namespace FSMlearning {
 					for (const auto& input : ce) {
 						if (input != STOUT_INPUT) {
 							if (prefix != stateNodes[state]->sequence) {
-								teacher->resetAndOutputQuery(stateNodes[state]->sequence);
-								auto output = teacher->outputQuery(suffix);
+								auto output = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->sequence, suffix);
 								if (bbOutput != output) {
 									break;
 								}

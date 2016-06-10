@@ -48,18 +48,16 @@ namespace FSMlearning {
 		node->state = conjecture->addState();
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
-			teacher->resetAndOutputQuery(node->sequence);
-			auto output = teacher->outputQuery(STOUT_INPUT);
+			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, sequence_in_t({ STOUT_INPUT }));
 			checkNumberOfOutputs(teacher, conjecture);
-			conjecture->setOutput(node->state, output);
+			conjecture->setOutput(node->state, output.back());
 		}
 	}
 
 	static shared_ptr<dt_node_t> sift(const shared_ptr<dt_node_t>& dt, const sequence_in_t& s, const unique_ptr<Teacher>& teacher) {
 		auto currentNode = dt;
 		while (currentNode->state == NULL_STATE) {
-			teacher->resetAndOutputQuery(s);
-			auto output = teacher->outputQuery(currentNode->sequence);
+			auto output = teacher->resetAndOutputQueryOnSuffix(s, currentNode->sequence);
 			auto it = currentNode->succ.find(output);
 			if (it == currentNode->succ.end()) {
 				return createNode(currentNode, s, move(output));
@@ -125,8 +123,7 @@ namespace FSMlearning {
 					sequence_in_t prefix(stateNodes[state]->sequence);
 					prefix.emplace_back(i);
 					//auto dtNode = sift(dt, prefix, teacher);// similar to what follows but with more effort
-					teacher->resetAndOutputQuery(prefix);
-					auto output = teacher->outputQuery(distNode->sequence);
+					auto output = teacher->resetAndOutputQueryOnSuffix(prefix, distNode->sequence);
 					auto it = distNode->succ.find(output);
 					if (it == distNode->succ.end()) {// new state
 						auto leaf = createNode(distNode, move(prefix), move(output));
@@ -192,14 +189,12 @@ namespace FSMlearning {
 				distSequence.push_front(input);
 
 				auto refNode = stateNodes[currState];
-				teacher->resetAndOutputQuery(refNode->sequence);// access sequence
-				auto leaf = createNode(refNode, move(refNode->sequence), teacher->outputQuery(distSequence));
+				auto leaf = createNode(refNode, move(refNode->sequence), teacher->resetAndOutputQueryOnSuffix(refNode->sequence, distSequence));
 				leaf->state = currState;
 				stateNodes[currState] = leaf;
 	
 				prefix.pop_back();
-				teacher->resetAndOutputQuery(prefix);
-				leaf = createNode(refNode, move(prefix), teacher->outputQuery(distSequence));
+				leaf = createNode(refNode, move(prefix), teacher->resetAndOutputQueryOnSuffix(prefix, distSequence));
 				addState(leaf, stateNodes, conjecture, teacher);
 				
 				refNode->sequence = move(distSequence);
