@@ -19,13 +19,14 @@
 #include "FSMlearning.h"
 
 namespace FSMlearning {
+	/*
 	struct dt_node_t {
 		sequence_in_t sequence;// access or distinguishing if state == NULL_STATE
 		state_t state;
 		map<sequence_out_t, shared_ptr<dt_node_t>> succ;
 		weak_ptr<dt_node_t> parent;
 		seq_len_t level;	
-	};
+	};*/
 
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
 		if (conjecture->getNumberOfOutputs() != teacher->getNumberOfOutputs()) {
@@ -122,6 +123,12 @@ namespace FSMlearning {
 				if (conjecture->getNextState(state, i) == splittedState) {
 					sequence_in_t prefix(stateNodes[state]->sequence);
 					prefix.emplace_back(i);
+					if (prefix == stateNodes[splittedState]->sequence) continue;
+					if (prefix == stateNodes[newState]->sequence) {
+						conjecture->setTransition(state, i, newState,
+							conjecture->isOutputTransition() ? conjecture->getOutput(state, i) : DEFAULT_OUTPUT);
+						continue;
+					}
 					//auto dtNode = sift(dt, prefix, teacher);// similar to what follows but with more effort
 					auto output = teacher->resetAndOutputQueryOnSuffix(prefix, distNode->sequence);
 					auto it = distNode->succ.find(output);
@@ -189,12 +196,14 @@ namespace FSMlearning {
 				distSequence.push_front(input);
 
 				auto refNode = stateNodes[currState];
-				auto leaf = createNode(refNode, move(refNode->sequence), teacher->resetAndOutputQueryOnSuffix(refNode->sequence, distSequence));
+				auto output = teacher->resetAndOutputQueryOnSuffix(refNode->sequence, distSequence);
+				auto leaf = createNode(refNode, move(refNode->sequence), move(output));
 				leaf->state = currState;
 				stateNodes[currState] = leaf;
 	
 				prefix.pop_back();
-				leaf = createNode(refNode, move(prefix), teacher->resetAndOutputQueryOnSuffix(prefix, distSequence));
+				output = teacher->resetAndOutputQueryOnSuffix(prefix, distSequence);
+				leaf = createNode(refNode, move(prefix), move(output));
 				addState(leaf, stateNodes, conjecture, teacher);
 				
 				refNode->sequence = move(distSequence);

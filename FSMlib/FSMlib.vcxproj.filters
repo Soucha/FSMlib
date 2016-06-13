@@ -227,6 +227,9 @@
     <ClCompile Include="Learning\QuotientAlgorithm.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Learning\TTT.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

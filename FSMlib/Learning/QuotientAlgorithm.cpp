@@ -205,7 +205,7 @@ namespace FSMlearning {
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
 
 		if (conjecture->isOutputState()) {
-			ot->stateOutput = teacher->outputQuery(STOUT_INPUT);
+			ot->stateOutput = teacher->resetAndOutputQuery(STOUT_INPUT);
 		}
 		for (input_t input = 0; input < conjecture->getNumberOfInputs(); input++) {
 			sequence_in_t seq({ input });

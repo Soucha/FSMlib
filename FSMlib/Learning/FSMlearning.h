@@ -31,6 +31,15 @@ namespace FSMlearning {
 		unique_ptr<DFSM> conjecture;
 	};
 
+	struct dt_node_t {// Discrimination Tree node
+		sequence_in_t sequence;// access or distinguishing if state == NULL_STATE
+		state_t state;
+		map<sequence_out_t, shared_ptr<dt_node_t>> succ;
+		weak_ptr<dt_node_t> parent;
+		sequence_out_t incomingOutput;
+		size_t level;
+	};
+
 	enum OP_CEprocessing {
 		AllGlobally,
 		OneGlobally,

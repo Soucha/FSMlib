@@ -19,13 +19,14 @@
 #include "FSMlearning.h"
 
 namespace FSMlearning {
+	/*
 	struct dt_node_t {
 		sequence_in_t sequence;// access or distinguishing if state == NULL_STATE
 		state_t state;
 		map<sequence_out_t, shared_ptr<dt_node_t>> succ;
 		weak_ptr<dt_node_t> parent;
 		size_t level;
-	};
+	};*/
 
 	struct componentOT {
 		sequence_in_t S;
