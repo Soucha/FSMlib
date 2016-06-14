@@ -309,45 +309,65 @@ namespace FSMlearning {
 
 	static pair<input_t, shared_ptr<dt_node_t>> findSplitter(shared_ptr<dt_node_t> node, const vector<shared_ptr<dt_node_t>>& stateNodes,
 			const unique_ptr<DFSM>& conjecture) {
-
-		vector<shared_ptr<dt_node_t>> lca;
-		vector<output_t> outputs;
+		vector<state_t> states;
 		stack<shared_ptr<dt_node_t>> dtLifo;
 		dtLifo.push(node);
 		while (!dtLifo.empty()) {// find all states in the subtree of the given node
 			node = move(dtLifo.top());
 			dtLifo.pop();
-
 			for (auto& p : node->succ) {
 				if (p.second->state == WRONG_STATE) {// inner node with temporal discriminator
 					dtLifo.push(p.second);
 				} else {// leaf -> state
-					for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
-						if (lca.size() <= i) {// the first state
-							lca.emplace_back(stateNodes[conjecture->getNextState(p.second->state, i)]);
-							if (conjecture->isOutputTransition()) {
-								outputs.emplace_back(conjecture->getOutput(p.second->state, i));
-							}
-						} else {
-							if (conjecture->isOutputTransition() && (outputs[i] != conjecture->getOutput(p.second->state, i)))
-								return make_pair(i, nullptr);
-							lca[i] = getLeastCommonAncestor(lca[i], stateNodes[conjecture->getNextState(p.second->state, i)]);
-						}
-					}
+					states.push_back(p.second->state);
 				}
 			}
 		}
+
 		input_t bestInput = STOUT_INPUT;
-		seq_len_t minLen;
+		seq_len_t minLen = 1;
+		// distinguishing by an input
 		for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
-			if (lca[i]->state == NULL_STATE) {// inner node with a permanent discriminator
-				if ((bestInput == STOUT_INPUT) || (minLen > lca[i]->sequence.size())) {
+			set<output_t> outputs;
+			for (auto& state : states) {
+				outputs.insert(conjecture->getOutput(state, i));
+			}
+			if (outputs.size() > minLen) {
+				minLen = outputs.size();
+				bestInput = i;
+			}
+		}
+		if (bestInput != STOUT_INPUT) return make_pair(bestInput, nullptr);
+		
+		// find the best successor
+		shared_ptr<dt_node_t> bestSucc;
+		size_t maxDist;
+		for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
+			set<state_t> nextStates;
+			for (auto& state : states) {
+				nextStates.insert(conjecture->getNextState(state, i));
+			}
+			shared_ptr<dt_node_t> lca = stateNodes[*nextStates.begin()];
+			for (auto& state : nextStates) {
+				lca = getLeastCommonAncestor(lca, stateNodes[state]);
+			}
+			if (lca->state == NULL_STATE) {// inner node with a permanent discriminator
+				set<sequence_out_t> outputs;
+				for (auto& state : nextStates) {
+					auto node = stateNodes[state];
+					while (node->level > lca->level + 1) node = node->parent.lock();
+					outputs.insert(node->incomingOutput);
+				}
+				if ((bestInput == STOUT_INPUT) || (maxDist < outputs.size()) ||
+					((maxDist == outputs.size()) && (minLen > lca->sequence.size()))) {
 					bestInput = i;
-					minLen = lca[i]->sequence.size();
+					bestSucc = lca;
+					maxDist = outputs.size();
+					minLen = lca->sequence.size();
 				}
 			}
 		}
-		return make_pair(bestInput, (bestInput == STOUT_INPUT) ? nullptr : lca[bestInput]);
+		return make_pair(bestInput, bestSucc);
 	}
 
 	static bool findDiscriminator(shared_ptr<dt_node_t>& br, pair<input_t, shared_ptr<dt_node_t>>& bestSplitter,
@@ -358,9 +378,11 @@ namespace FSMlearning {
 		for (auto it = blockRoots.begin(); it != blockRoots.end(); it++) {
 			auto splitter = findSplitter(*it, stateNodes, conjecture);
 			if (splitter.first != STOUT_INPUT) {// splitter found
-				if ((bestRoot == blockRoots.end()) || (bestSplitter.second->sequence.size() > splitter.second->sequence.size())) {
+				if ((bestRoot == blockRoots.end()) || (!splitter.second) ||
+					(bestSplitter.second->sequence.size() > splitter.second->sequence.size())) {
 					bestRoot = it;
 					bestSplitter = move(splitter);
+					if (!bestSplitter.second) break;
 				}
 			}
 		}
@@ -390,10 +412,13 @@ namespace FSMlearning {
 					}
 					else {// another child has the same output
 						if ((it->second->state != WRONG_STATE) || (it->second->sequence != original->sequence)) {// lower the child
-							auto succ = move(it->second->succ);
-							auto leaf = createNode(it->second, move(it->second->sequence), outputs[it->second->level]);
-							leaf->state = it->second->state;
-							leaf->succ = move(succ);
+							auto leaf = it->second;
+							it->second = make_shared<dt_node_t>();
+							it->second->incomingOutput = leaf->incomingOutput;
+							it->second->parent = newNode;
+							leaf->incomingOutput = outputs[leaf->level];
+							leaf->parent = it->second;
+							it->second->succ.emplace(leaf->incomingOutput, leaf);
 							it->second->sequence = original->sequence;
 							it->second->state = WRONG_STATE;
 						}
@@ -414,10 +439,13 @@ namespace FSMlearning {
 				}
 				else {// another child has the same output
 					if ((it->second->state != WRONG_STATE) || (it->second->sequence != original->sequence)) {// lower the child
-						auto succ = move(it->second->succ);
-						auto leaf = createNode(it->second, move(it->second->sequence), outputs[it->second->level]);
-						leaf->state = it->second->state;
-						leaf->succ = move(succ);
+						auto leaf = it->second;
+						it->second = make_shared<dt_node_t>();
+						it->second->incomingOutput = leaf->incomingOutput;
+						it->second->parent = newNode;
+						leaf->incomingOutput = outputs[leaf->level];
+						leaf->parent = it->second;
+						it->second->succ.emplace(leaf->incomingOutput, leaf);
 						it->second->sequence = original->sequence;
 						it->second->state = WRONG_STATE;
 					}
@@ -519,7 +547,7 @@ namespace FSMlearning {
 				if ((discriminator.back() == STOUT_INPUT) && conjecture->isOutputState() && !conjecture->isOutputTransition()) {// Moore and DFA
 					discriminator.pop_back();
 				}
-				if (blockRoot->sequence != discriminator) {
+				if ((blockRoot->sequence != discriminator) && (blockRoot->sequence.size() > discriminator.size())) {
 					map<sequence_out_t, vector<shared_ptr<dt_node_t>>> statesDirection;
 					auto node = getSubtree(blockRoot, statesDirection, [&](state_t state){
 						return findOutput(stateNodes[state], discriminator, stateNodes[state]->sequence, teacher);
@@ -532,6 +560,7 @@ namespace FSMlearning {
 					});
 					node->level = blockRoot->level;
 					updateLevels(node);
+					node->state = WRONG_STATE;
 					node->incomingOutput = move(blockRoot->incomingOutput);
 					node->sequence = move(discriminator);
 					node->parent = blockRoot->parent;
@@ -574,7 +603,7 @@ namespace FSMlearning {
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
 		if (conjecture->isOutputState()) {
 			dt->sequence.emplace_back(STOUT_INPUT);
-			auto output = teacher->outputQuery(STOUT_INPUT);
+			auto output = teacher->resetAndOutputQuery(STOUT_INPUT);
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(0, output);
 			auto leaf = createNode(dt, sequence_in_t(), sequence_out_t({ output }));// the initial state -> empty access sequence

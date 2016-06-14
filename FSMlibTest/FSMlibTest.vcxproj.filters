@@ -161,6 +161,9 @@
     <ClCompile Include="Learning\QuotientAlgTests.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Learning\TTTalgTests.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
