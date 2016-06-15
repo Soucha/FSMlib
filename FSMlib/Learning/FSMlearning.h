@@ -182,6 +182,7 @@ namespace FSMlearning {
 	* 2012 
 	*
 	* @param Teacher
+	* @param processCounterexample specifies which of OP_CEprocessing functions is used
 	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
 	*							If the function returns false, then the learning stops immediately.
 	* @return A learned model
@@ -205,7 +206,6 @@ namespace FSMlearning {
 	* @return A learned model
 	*/
 	FSMLIB_API unique_ptr<DFSM> TTT(const unique_ptr<Teacher>& teacher,
-		//function<void(const sequence_in_t& ce, ObservationPack& op, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 	/**
@@ -231,4 +231,23 @@ namespace FSMlearning {
 	FSMLIB_API unique_ptr<DFSM> QuotientAlgorithm(const unique_ptr<Teacher>& teacher,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
+	/**
+	* The algorithm learns without the need of equivalence queries using random choices of distinguishing sequences.
+	* It was proposed for the ZULU competition when an unknown DFA should be learned
+	* using a restricted number of membership queries.
+	*
+	* Source:
+	* InProceedings (eisenstat2010learning) 
+	* Eisenstat, S. & Angluin, D. 
+	* Learning random DFAs with membership queries: the GoodSplit algorithm 
+	* 2010
+	*
+	* @param Teacher
+	* @param maxDistinguishingLength - the learning stops when a distinguishing of such length shall be asked
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
+	FSMLIB_API unique_ptr<DFSM> GoodSplit(const unique_ptr<Teacher>& teacher, seq_len_t maxDistinguishingLength,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 }

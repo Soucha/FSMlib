@@ -44,28 +44,28 @@ public:
 	/**
 	* @return How many input symbols were queried.
 	*/
-	seq_len_t getQueriedSymbolsCount() const {
+	size_t getQueriedSymbolsCount() const {
 		return _querySymbolCounter;
 	}
 
 	/**
 	* @return How many times reset was applied.
 	*/
-	seq_len_t getAppliedResetCount() const {
+	size_t getAppliedResetCount() const {
 		return _resetCounter;
 	}
 	
 	/**
 	* @return How many Output Queries were asked.
 	*/
-	seq_len_t getOutputQueryCount() const {
+	size_t getOutputQueryCount() const {
 		return _outputQueryCounter;
 	}
 	
 	/**
 	* @return How many Equivalence Queries were asked.
 	*/
-	seq_len_t getEquivalenceQueryCount() const {
+	size_t getEquivalenceQueryCount() const {
 		return _equivalenceQueryCounter;
 	}
 
@@ -134,6 +134,14 @@ public:
 	/**
 	* Provides a response of the BlackBox on the given input sequence in the state reached by the given access sequence.
 	* @param input sequence to access a particular state
+	* @param input to query
+	* @return Output symbol as a response to the given input symbol from the particular state
+	*/
+	virtual output_t resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, input_t input) = 0;
+	
+	/**
+	* Provides a response of the BlackBox on the given input sequence in the state reached by the given access sequence.
+	* @param input sequence to access a particular state
 	* @param input sequence to query
 	* @return Output sequence as a response to the given input sequence from the particular state
 	*/
@@ -147,8 +155,8 @@ public:
 	*/
 	virtual sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture) = 0;
 protected:
-	seq_len_t _querySymbolCounter;
-	seq_len_t _resetCounter;
-	seq_len_t _outputQueryCounter;
-	seq_len_t _equivalenceQueryCounter;
+	size_t _querySymbolCounter;
+	size_t _resetCounter;
+	size_t _outputQueryCounter;
+	size_t _equivalenceQueryCounter;
 };

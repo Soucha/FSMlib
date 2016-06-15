@@ -19,15 +19,6 @@
 #include "FSMlearning.h"
 
 namespace FSMlearning {
-	/*
-	struct dt_node_t {
-		sequence_in_t sequence;// access or distinguishing if state == NULL_STATE
-		state_t state;
-		map<sequence_out_t, shared_ptr<dt_node_t>> succ;
-		weak_ptr<dt_node_t> parent;
-		seq_len_t level;	
-	};*/
-
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
 		if (conjecture->getNumberOfOutputs() != teacher->getNumberOfOutputs()) {
 			conjecture->incNumberOfOutputs(teacher->getNumberOfOutputs() - conjecture->getNumberOfOutputs());
@@ -49,9 +40,9 @@ namespace FSMlearning {
 		node->state = conjecture->addState();
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
-			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, sequence_in_t({ STOUT_INPUT }));
+			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, STOUT_INPUT);
 			checkNumberOfOutputs(teacher, conjecture);
-			conjecture->setOutput(node->state, output.back());
+			conjecture->setOutput(node->state, output);
 		}
 	}
 
@@ -232,7 +223,7 @@ namespace FSMlearning {
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
 		if (conjecture->isOutputState()) {
 			dt->sequence.emplace_back(STOUT_INPUT);
-			auto output = teacher->outputQuery(STOUT_INPUT);
+			auto output = teacher->resetAndOutputQuery(STOUT_INPUT);
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(0, output);
 			auto leaf = createNode(dt, sequence_in_t(), sequence_out_t({ output }));// the initial state -> empty access sequence

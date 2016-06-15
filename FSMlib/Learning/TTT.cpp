@@ -57,9 +57,9 @@ namespace FSMlearning {
 		node->state = conjecture->addState();
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
-			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, sequence_in_t({ STOUT_INPUT }));
+			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, STOUT_INPUT);
 			checkNumberOfOutputs(teacher, conjecture);
-			conjecture->setOutput(node->state, output.back());
+			conjecture->setOutput(node->state, output);
 		}
 	}
 
@@ -98,7 +98,6 @@ namespace FSMlearning {
 
 	static void extendInputs(input_t byNumInputs, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
-		bool newState = false;
 		auto numStates = state_t(stateNodes.size());
 		for (state_t state = 0; state < numStates; state++) {
 			for (input_t i = conjecture->getNumberOfInputs(); i < conjecture->getNumberOfInputs() + byNumInputs; i++) {
@@ -106,7 +105,6 @@ namespace FSMlearning {
 				prefix.emplace_back(i);
 				auto dtNode = sift(dt, prefix, teacher);
 				if (dtNode->state == NULL_STATE) {// new state
-					newState = true;
 					addState(dtNode, stateNodes, conjecture, teacher);
 				}
 				conjecture->setTransition(state, i, dtNode->state);
@@ -116,7 +114,7 @@ namespace FSMlearning {
 				}
 			}
 		}
-		if (newState) {
+		if (numStates != state_t(stateNodes.size())) {
 			addNewTransitions(numStates, dt, stateNodes, conjecture, teacher);
 		}
 	}
@@ -260,18 +258,18 @@ namespace FSMlearning {
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 
 		auto oldOut = ce.outputs[ce.prefix.size()];
-		if (oldOut.empty()) 
+		if (oldOut.empty()) // should not happen
 			oldOut = teacher->resetAndOutputQueryOnSuffix(stateNodes[conjecture->getEndPathState(ce.startState, ce.prefix)]->sequence, ce.suffix);
 		auto lastInput = ce.prefix.back();
 		ce.prefix.pop_back();		
 		auto newOut = ce.outputs[ce.prefix.size()];
-		if (newOut.empty()) {
+		if (newOut.empty()) {// should not happen
 			ce.suffix.push_front(lastInput);
 			newOut = teacher->resetAndOutputQueryOnSuffix(stateNodes[conjecture->getEndPathState(ce.startState, ce.prefix)]->sequence, ce.suffix);
 			ce.suffix.pop_front();
 		}
 		if (!teacher->isProvidedOnlyMQ()) newOut.pop_front();
-		if (lastInput == STOUT_INPUT) {
+		if (lastInput == STOUT_INPUT) {// can this happen?
 			lastInput = ce.prefix.back();
 			ce.prefix.pop_back();
 		}

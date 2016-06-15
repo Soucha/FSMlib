@@ -62,6 +62,8 @@ public:
 
 	sequence_out_t resetAndOutputQuery(const sequence_in_t& inputSequence);
 
+	output_t resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, input_t input);
+
 	sequence_out_t resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix);
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);

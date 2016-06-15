@@ -70,6 +70,12 @@ sequence_out_t TeacherDFSM::resetAndOutputQuery(const sequence_in_t& inputSequen
 	return outputQuery(inputSequence);
 }
 
+output_t TeacherDFSM::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, input_t input) {
+	resetAndOutputQuery(prefix);
+	_outputQueryCounter--;
+	return outputQuery(input);
+}
+
 sequence_out_t TeacherDFSM::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) {
 	resetAndOutputQuery(prefix);
 	_outputQueryCounter--;

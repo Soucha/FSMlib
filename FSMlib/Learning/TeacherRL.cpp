@@ -65,6 +65,12 @@ sequence_out_t TeacherRL::resetAndOutputQuery(const sequence_in_t& inputSequence
 	return outputQuery(inputSequence);
 }
 
+output_t TeacherRL::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, input_t input) {
+	resetAndOutputQuery(prefix);
+	_outputQueryCounter--;
+	return outputQuery(input);
+}
+
 sequence_out_t TeacherRL::resetAndOutputQueryOnSuffix(const sequence_in_t& prefix, const sequence_in_t& suffix) {
 	resetAndOutputQuery(prefix);
 	_outputQueryCounter--;

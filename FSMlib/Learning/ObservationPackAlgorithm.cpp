@@ -19,15 +19,6 @@
 #include "FSMlearning.h"
 
 namespace FSMlearning {
-	/*
-	struct dt_node_t {
-		sequence_in_t sequence;// access or distinguishing if state == NULL_STATE
-		state_t state;
-		map<sequence_out_t, shared_ptr<dt_node_t>> succ;
-		weak_ptr<dt_node_t> parent;
-		size_t level;
-	};*/
-
 	struct componentOT {
 		sequence_in_t S;
 		vector<sequence_in_t> E;
@@ -60,9 +51,9 @@ namespace FSMlearning {
 		node->state = conjecture->addState();
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
-			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, sequence_in_t({ STOUT_INPUT }));
+			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, STOUT_INPUT);
 			checkNumberOfOutputs(teacher, conjecture);
-			conjecture->setOutput(node->state, output.back());
+			conjecture->setOutput(node->state, output);
 		}
 	}
 
