@@ -304,11 +304,20 @@ int main(int argc, char** argv) {
 	//getCSet();
 	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
+	/* // to determine maxLen for GoodSplit
+	auto vec = getStatePairsShortestSeparatingSequences(fsm, true);
+	seq_len_t len = 0;
+	for (auto& seq : vec) {
+		if (len < seq.size()) len = seq.size();
+	}
+	cout << len << endl;
+	//*/
 	//testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
@@ -317,7 +326,7 @@ int main(int argc, char** argv) {
 	//*
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
-	auto model = GoodSplit(teacher, 2, nullptr);// showAndStop);
+	auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;

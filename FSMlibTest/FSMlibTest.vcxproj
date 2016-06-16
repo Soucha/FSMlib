@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="Learning\BlackBoxTests.cpp" />
     <ClCompile Include="Learning\DTalgTests.cpp" />
+    <ClCompile Include="Learning\GoodSplitTests.cpp" />
     <ClCompile Include="Learning\LstarTests.cpp" />
     <ClCompile Include="Learning\OPalgTests.cpp" />
     <ClCompile Include="Learning\QuotientAlgTests.cpp" />

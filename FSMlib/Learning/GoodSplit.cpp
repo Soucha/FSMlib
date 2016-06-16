@@ -263,9 +263,20 @@ namespace FSMlearning {
 					// update node->consistentStates;
 					auto refOutput = getOutput(node, *bestSeqIt, !conjecture->isOutputTransition());
 					for (int sn = 0; sn < node->consistentStates.size(); sn++) {
-						bool distinguished = (teacher->isProvidedOnlyMQ() ? 
-							(refOutput.back() != getLastOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition())) :
-							(refOutput != getOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition())));
+						bool distinguished;
+						if(teacher->isProvidedOnlyMQ()) {
+							auto output = getLastOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition());
+							distinguished = (output != DEFAULT_OUTPUT) && (output != refOutput.back());
+						} else {
+							auto output = getOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition());
+							distinguished = false;
+							for (auto itRef = refOutput.begin(), it = output.begin(); it != output.end(); ++itRef, ++it) {
+								if ((*it != DEFAULT_OUTPUT) && (*it != *itRef)) {
+									distinguished = true;
+									break;
+								}
+							}
+						}
 						if (distinguished) {
 							node->consistentStates[sn] = node->consistentStates.back();
 							node->consistentStates.pop_back();
@@ -331,7 +342,7 @@ namespace FSMlearning {
 					remainingSeq -= (distSequences.size() - node->counter);
 				}
 			}
-			if (remainingSeq <= 0) break;
+			if (remainingSeq == 0) break;
 			numQueries--;
 		}
 	}
@@ -395,6 +406,7 @@ namespace FSMlearning {
 							if (sn->succ[i]->state == NULL_STATE) sn->succ[i]->counter = 0;
 						}
 					}
+					totalApplied = 0;
 				}
 				extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
 				totalDistSeq = distSequences.size() * (conjecture->getNumberOfStates() * (conjecture->getNumberOfInputs() - 1) + 1);
