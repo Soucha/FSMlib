@@ -213,7 +213,7 @@ namespace FSMlearning {
 						}
 					} else {}
 					if (node->consistentStates.empty()) {
-						node->counter = distSequences.size();
+						totalSeqApplied += distSequences.size() - node->counter;
 					}
 				}
 				totalSeqApplied += node->counter;
@@ -265,7 +265,7 @@ namespace FSMlearning {
 				(getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition()) == DEFAULT_OUTPUT))
 				|| (!teacher->isProvidedOnlyMQ() && false)) {
 				query(node->consistentStates.front(), distSequences[seqIdx], teacher, !conjecture->isOutputTransition());
-				// possible remaining--
+				if (teacher->isProvidedOnlyMQ()) remainingSeq--;// some state's next node was extended
 			}
 			if (teacher->isProvidedOnlyMQ()) {
 				if (getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
@@ -310,7 +310,7 @@ namespace FSMlearning {
 		longestDistSequences.emplace_back(sequence_in_t());
 		extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
 		seq_len_t len = 1;
-		while (len < maxDistinguishingLength) {
+		while (len <= maxDistinguishingLength) {
 			// 1. step - make the tree closed and update conjecture accordingly
 			auto endState = state_t(stateNodes.size());
 			while (makeClosed(endState, stateNodes, conjecture, teacher));
@@ -330,7 +330,7 @@ namespace FSMlearning {
 			// 3. step - the increase of len
 			if (10 * totalApplied >= 9 * totalDistSeq) {// totalApplied needs to be at least 90 % of totalDistSeq
 				len++;
-				if (len == maxDistinguishingLength) break;
+				if (len > maxDistinguishingLength) break;
 				// extend distSequences
 				extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
 				totalDistSeq = distSequences.size() * (conjecture->getNumberOfStates() * (conjecture->getNumberOfInputs() - 1) + 1);

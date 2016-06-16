@@ -166,6 +166,13 @@ bool showConjecture(const unique_ptr<DFSM>& conjecture) {
 	return true;
 }
 
+bool showAndStop(const unique_ptr<DFSM>& conjecture) {
+	showConjecture(conjecture);
+	unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+	auto ce = teacher->equivalenceQuery(conjecture);
+	return !ce.empty();
+}
+
 static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, const string& description) {
 	printf("%d;%d;%d;%d;%d;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
 		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), description.c_str());
@@ -295,11 +302,11 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Mealy>();
+	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
-	string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	fsm->load(fileName);
 	//testLStarAllVariants();
@@ -310,7 +317,7 @@ int main(int argc, char** argv) {
 	//*
 	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
-	auto model = GoodSplit(teacher, 4, showConjecture);
+	auto model = GoodSplit(teacher, 1, nullptr);// showAndStop);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
