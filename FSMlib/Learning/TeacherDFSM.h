@@ -68,7 +68,7 @@ public:
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 
-private:
+protected:
 	unique_ptr<DFSM> _fsm;
 	bool _isResettable;
 	state_t _currState;
