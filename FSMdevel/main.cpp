@@ -302,20 +302,20 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<DFSM>();
+	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
-	string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	fsm->load(fileName);
 	//testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
-	unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	//*
-	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
+	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	auto model = GoodSplit(teacher, 2, nullptr);// showAndStop);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();

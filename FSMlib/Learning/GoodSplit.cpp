@@ -36,6 +36,11 @@ namespace FSMlearning {
 		}
 	};
 
+	struct out_node_t {
+		size_t counter;
+		map<output_t, shared_ptr<out_node_t>> succ;
+	};
+
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
 		if (conjecture->getNumberOfOutputs() != teacher->getNumberOfOutputs()) {
 			conjecture->incNumberOfOutputs(teacher->getNumberOfOutputs() - conjecture->getNumberOfOutputs());
@@ -122,6 +127,24 @@ namespace FSMlearning {
 		return ((sequence.back() == STOUT_INPUT) || getStateOutput) ? curr->stateOutput : curr->incomingOutput;
 	}
 
+	static sequence_out_t getOutput(const shared_ptr<gs_node_t >& node, const sequence_in_t& sequence, bool getStateOutput) {
+		auto curr = node;
+		sequence_out_t output;
+		for (auto& input : sequence) {
+			if (input == STOUT_INPUT) {
+				output.emplace_back(curr->stateOutput);
+			} else {
+				if (!curr->succ[input]) {
+					output.emplace_back(DEFAULT_OUTPUT);
+					return output;
+				}
+				curr = curr->succ[input];
+				output.emplace_back(getStateOutput ? curr->stateOutput : curr->incomingOutput);
+			}
+		}
+		return output;
+	}
+
 	static void query(const shared_ptr<gs_node_t >& node, const sequence_in_t& sequence, const unique_ptr<Teacher>& teacher, bool setStateOutput) {
 		auto output = teacher->resetAndOutputQueryOnSuffix(node->accessSequence, sequence);
 		node->counter++;
@@ -155,6 +178,32 @@ namespace FSMlearning {
 		}
 	}
 
+	static void addOutputToOutTree(const shared_ptr<out_node_t>& root, const sequence_out_t& output) {
+		auto node = root;
+		for (auto& out : output) {
+			if (out == DEFAULT_OUTPUT) break;
+			auto it = node->succ.find(out);
+			if (it == node->succ.end()) {
+				auto next = make_shared<out_node_t>();
+				node->succ.emplace(out, next);
+				next->counter = 0;
+				node = next;
+			} else {
+				node = it->second;
+			}
+		}
+		node->counter++;
+	}
+
+	static size_t getNumOfEqualOutputs(const shared_ptr<out_node_t>& node) {
+		size_t maxNum = 0;
+		for (auto& p : node->succ) {
+			auto num = getNumOfEqualOutputs(p.second);
+			if (maxNum < num) maxNum = num;
+		}
+		return maxNum + node->counter;
+	}
+
 	static size_t closeNextStates(const vector<shared_ptr<gs_node_t>>& stateNodes, const sequence_vec_t& distSequences,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		size_t totalSeqApplied = 0;
@@ -166,52 +215,63 @@ namespace FSMlearning {
 					auto bestSeqIt = distSequences.end();
 					size_t maxDist = 0, notIdentified = node->consistentStates.size();
 					for (auto it = distSequences.begin(); it != distSequences.end(); ++it) {
+						if (getLastOutput(node, *it, !conjecture->isOutputTransition()) != DEFAULT_OUTPUT) continue;
+						size_t withoutSeq = 0, distinguishedNum;
 						if (teacher->isProvidedOnlyMQ()) {
-							if (getLastOutput(node, *it, !conjecture->isOutputTransition()) != DEFAULT_OUTPUT) continue;
-							map<output_t, state_t> stat;
-							size_t withoutSeq = 0;
+							map<output_t, state_t> outCounter;
 							for (auto& cn : node->consistentStates) {
 								auto output = getLastOutput(cn, *it, !conjecture->isOutputTransition());
 								if (output == DEFAULT_OUTPUT) {
 									withoutSeq++;
 									continue;
 								}
-								auto statIt = stat.find(output);
-								if (statIt == stat.end()) {
-									stat.emplace(move(output), 1);
+								auto statIt = outCounter.find(output);
+								if (statIt == outCounter.end()) {
+									outCounter.emplace(move(output), 1);
 								} else {
 									statIt->second++;
 								}
 							}
-							if (stat.empty()) continue;
-							size_t minNum = stat.begin()->second;
-							for (auto& p : stat) {
-								if (minNum > p.second) minNum = p.second;
-							}
-							minNum *= (stat.size() - 1);// minimum of distinguished states after applying this distSeq
-							if ((minNum > maxDist) || ((minNum == maxDist) && (withoutSeq < notIdentified))) {
-								maxDist = minNum;
-								notIdentified = withoutSeq;
-								bestSeqIt = it;
+							if (outCounter.empty()) continue;
+							// find the largest group of states with the same output
+							distinguishedNum = outCounter.begin()->second;
+							for (auto& p : outCounter) {
+								if (distinguishedNum < p.second) distinguishedNum = p.second;
 							}
 						}
 						else {
-
+							auto outputTree = make_shared<out_node_t>();
+							outputTree->counter = 0;
+							for (auto& cn : node->consistentStates) {
+								auto output = getOutput(cn, *it, !conjecture->isOutputTransition());
+								addOutputToOutTree(outputTree, output);
+							}
+							withoutSeq = outputTree->counter;
+							if (withoutSeq == node->consistentStates.size()) continue;
+							distinguishedNum = getNumOfEqualOutputs(outputTree) - withoutSeq;
+						}
+						// minimum of distinguished states after applying this distSeq
+						distinguishedNum = node->consistentStates.size() - withoutSeq - distinguishedNum;
+						if ((distinguishedNum > maxDist) || ((distinguishedNum == maxDist) && (withoutSeq < notIdentified))) {
+							maxDist = distinguishedNum;
+							notIdentified = withoutSeq;
+							bestSeqIt = it;
 						}
 					}
 					query(node, *bestSeqIt, teacher, !conjecture->isOutputTransition());
 					
 					// update node->consistentStates;
-					if (teacher->isProvidedOnlyMQ()) {
-						auto refOutput = getLastOutput(node, *bestSeqIt, !conjecture->isOutputTransition());
-						for (int sn = 0; sn < node->consistentStates.size(); sn++) {
-							if (refOutput != getLastOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition())) {
-								node->consistentStates[sn] = node->consistentStates.back();
-								node->consistentStates.pop_back();
-								sn--;
-							}
+					auto refOutput = getOutput(node, *bestSeqIt, !conjecture->isOutputTransition());
+					for (int sn = 0; sn < node->consistentStates.size(); sn++) {
+						bool distinguished = (teacher->isProvidedOnlyMQ() ? 
+							(refOutput.back() != getLastOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition())) :
+							(refOutput != getOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition())));
+						if (distinguished) {
+							node->consistentStates[sn] = node->consistentStates.back();
+							node->consistentStates.pop_back();
+							sn--;
 						}
-					} else {}
+					}
 					if (node->consistentStates.empty()) {
 						totalSeqApplied += distSequences.size() - node->counter;
 					}
@@ -225,7 +285,6 @@ namespace FSMlearning {
 	static void extendDistinguishingSequences(sequence_vec_t& distSequences, list<sequence_in_t>& longestDistSequences,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		list<sequence_in_t> tmpLongest;
-		if (!teacher->isProvidedOnlyMQ()) distSequences.clear();
 		for (input_t input = 0; input < conjecture->getNumberOfInputs(); input++) {
 			for (auto seq : longestDistSequences) {
 				seq.emplace_back(input);
@@ -248,33 +307,29 @@ namespace FSMlearning {
 		auto numQueries = numStates / 2 + numStates % 2;
 		shared_ptr<gs_node_t> node;
 		size_t seqIdx;
-		bool queried;
 		while (numQueries > 0) {
 			do {
 				node = stateNodes[rand() % numStates]->succ[rand() % numInputs];
 			} while ((node->state != NULL_STATE) || (node->consistentStates.empty()) || (node->counter == distSequences.size()));
 			do {
 				seqIdx = rand() % distSequences.size();
-				if (teacher->isProvidedOnlyMQ()) {
-					queried = (getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) != DEFAULT_OUTPUT);
-				} else {}
-			} while (queried);
+			} while (getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) != DEFAULT_OUTPUT);// queried?
 			query(node, distSequences[seqIdx], teacher, !conjecture->isOutputTransition());
 			remainingSeq--;
-			if ((teacher->isProvidedOnlyMQ() &&
-				(getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition()) == DEFAULT_OUTPUT))
-				|| (!teacher->isProvidedOnlyMQ() && false)) {
+			if (getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
 				query(node->consistentStates.front(), distSequences[seqIdx], teacher, !conjecture->isOutputTransition());
 				if (teacher->isProvidedOnlyMQ()) remainingSeq--;// some state's next node was extended
 			}
-			if (teacher->isProvidedOnlyMQ()) {
-				if (getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
-					getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())) {
-					node->consistentStates.pop_back();// -> new state
+			bool distinguished = (teacher->isProvidedOnlyMQ() ?
+				(getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
+					getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())) :
+				(getOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
+					getOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())));
+			if (distinguished) {
+				node->consistentStates.pop_back();// -> new state (or consistent with a new state)
+				if (node->consistentStates.empty()) {
+					remainingSeq -= (distSequences.size() - node->counter);
 				}
-			} else {}
-			if (node->consistentStates.empty()) {
-				remainingSeq -= (distSequences.size() - node->counter);
 			}
 			if (remainingSeq <= 0) break;
 			numQueries--;
@@ -332,6 +387,15 @@ namespace FSMlearning {
 				len++;
 				if (len > maxDistinguishingLength) break;
 				// extend distSequences
+				if (!teacher->isProvidedOnlyMQ()) {
+					distSequences.clear();
+					// clear all counters
+					for (auto& sn : stateNodes) {
+						for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
+							if (sn->succ[i]->state == NULL_STATE) sn->succ[i]->counter = 0;
+						}
+					}
+				}
 				extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
 				totalDistSeq = distSequences.size() * (conjecture->getNumberOfStates() * (conjecture->getNumberOfInputs() - 1) + 1);
 			}
