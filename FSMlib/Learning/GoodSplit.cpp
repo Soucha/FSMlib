@@ -356,6 +356,10 @@ namespace FSMlearning {
 
 	unique_ptr<DFSM> GoodSplit(const unique_ptr<Teacher>& teacher, seq_len_t maxDistinguishingLength,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
+		if (!teacher->isBlackBoxResettable()) {
+			ERROR_MESSAGE("FSMlearning::GoodSplit - the Black Box needs to be resettable");
+			return nullptr;
+		}
 
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
 

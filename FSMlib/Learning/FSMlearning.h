@@ -250,4 +250,16 @@ namespace FSMlearning {
 	*/
 	FSMLIB_API unique_ptr<DFSM> GoodSplit(const unique_ptr<Teacher>& teacher, seq_len_t maxDistinguishingLength,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
+
+	/**
+	*
+	* @param Teacher
+	* @param maxExtraStates - the learning stops when the conjecture is correct with the assumption of given number of extra states
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @return A learned model
+	*/
+	FSMLIB_API unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
+
 }

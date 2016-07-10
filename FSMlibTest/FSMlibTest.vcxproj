@@ -227,6 +227,7 @@
     <None Include="..\data\examples\Mealy_R4_SS.fsm" />
     <None Include="..\data\examples\Mealy_R4_SVS.fsm" />
     <None Include="..\data\examples\Mealy_R4_Zhu1993.fsm" />
+    <None Include="..\data\examples\Mealy_R5.fsm" />
     <None Include="..\data\examples\Moore_R4_ADS.fsm" />
     <None Include="..\data\examples\Moore_R4_HS.fsm" />
     <None Include="..\data\examples\Moore_R4_PDS.fsm" />

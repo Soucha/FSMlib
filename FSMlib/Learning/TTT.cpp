@@ -588,7 +588,7 @@ namespace FSMlearning {
 
 	unique_ptr<DFSM> TTT(const unique_ptr<Teacher>& teacher, function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
 		if (!teacher->isBlackBoxResettable()) {
-			ERROR_MESSAGE("FSMlearning::DiscriminationTreeAlgorithm - the Black Box needs to be resettable");
+			ERROR_MESSAGE("FSMlearning::TTT - the Black Box needs to be resettable");
 			return nullptr;
 		}
 		/// counterexample

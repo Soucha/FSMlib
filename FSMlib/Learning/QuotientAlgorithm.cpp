@@ -20,22 +20,22 @@
 #include "../PrefixSet.h"
 
 namespace FSMlearning {
-	struct ot_node_t {
+	struct qa_ot_node_t {
 		output_t incomingOutput;
 		state_t state;
 		output_t stateOutput;
 		sequence_in_t accessSeq;
-		map<input_t, shared_ptr<ot_node_t>> succ;
+		map<input_t, shared_ptr<qa_ot_node_t>> succ;
 
 		input_t distInput;
 
-		ot_node_t(output_t incomingOutput, sequence_in_t accessSeq) :
+		qa_ot_node_t(output_t incomingOutput, sequence_in_t accessSeq) :
 			incomingOutput(incomingOutput), state(NULL_STATE),
 			stateOutput(DEFAULT_OUTPUT), accessSeq(accessSeq) {
 		}
 	};
 	
-	static void printTree(const shared_ptr<ot_node_t>& node, string prefix) {
+	static void printTree(const shared_ptr<qa_ot_node_t>& node, string prefix) {
 		printf("%d/%s %s\n", 
 			node->state, FSMmodel::getOutSequenceAsString(sequence_out_t({ node->stateOutput })).c_str(),
 			FSMmodel::getInSequenceAsString(sequence_in_t({ node->accessSeq })).c_str());
@@ -46,7 +46,7 @@ namespace FSMlearning {
 		}
 	}
 
-	static bool areDistinguished(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
+	static bool areDistinguished(const shared_ptr<qa_ot_node_t>& n1, const shared_ptr<qa_ot_node_t>& n2) {
 		if (n1->stateOutput != n2->stateOutput) return true;
 		for (auto& p : n1->succ) {
 			auto it = n2->succ.find(p.first);
@@ -61,7 +61,7 @@ namespace FSMlearning {
 		return false;
 	}
 
-	static sequence_in_t getDistinguishingSeq(shared_ptr<ot_node_t> n1, shared_ptr<ot_node_t> n2, bool isStateOutput) {
+	static sequence_in_t getDistinguishingSeq(shared_ptr<qa_ot_node_t> n1, shared_ptr<qa_ot_node_t> n2, bool isStateOutput) {
 		sequence_in_t distSeq;
 		do {
 			distSeq.emplace_back(n1->distInput);
@@ -72,7 +72,7 @@ namespace FSMlearning {
 		return distSeq;
 	}
 
-	static void addNodes(shared_ptr<ot_node_t> node, sequence_in_t& seq,
+	static void addNodes(shared_ptr<qa_ot_node_t> node, sequence_in_t& seq,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t accessSeq(node->accessSeq);
 		sequence_out_t outputSeq;
@@ -86,14 +86,14 @@ namespace FSMlearning {
 			}
 			else {
 				accessSeq.push_back(input);
-				node->succ.emplace(input, make_shared<ot_node_t>(isRL ? teacher->outputQuery(input) : *outIt, accessSeq));
+				node->succ.emplace(input, make_shared<qa_ot_node_t>(isRL ? teacher->outputQuery(input) : *outIt, accessSeq));
 				node = node->succ.at(input);
 			}
 			if (!isRL) ++outIt;
 		}
 	}
 
-	static void extendNode(const shared_ptr<ot_node_t>& node, sequence_in_t& seq, 
+	static void extendNode(const shared_ptr<qa_ot_node_t>& node, sequence_in_t& seq, 
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 
 		auto it = node->succ.find(seq.front());
@@ -107,18 +107,18 @@ namespace FSMlearning {
 		}
 	}
 
-	static void extendNode(const shared_ptr<ot_node_t>& node, const sequence_set_t& D, 
+	static void extendNode(const shared_ptr<qa_ot_node_t>& node, const sequence_set_t& D, 
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		for (auto seq : D) {
 			extendNode(node, seq, conjecture, teacher);
 		}
 	}
 
-	static bool buildQuotient(const shared_ptr<ot_node_t>& root, FSMlib::PrefixSet& pset, vector<shared_ptr<ot_node_t>>& stateNodes,
+	static bool buildQuotient(const shared_ptr<qa_ot_node_t>& root, FSMlib::PrefixSet& pset, vector<shared_ptr<qa_ot_node_t>>& stateNodes,
 			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		
 		auto D = pset.getMaximalSequences();
-		queue<shared_ptr<ot_node_t>> openNodes;
+		queue<shared_ptr<qa_ot_node_t>> openNodes;
 		openNodes.emplace(root);
 		while (!openNodes.empty()) {
 			auto node = move(openNodes.front());
@@ -188,15 +188,15 @@ namespace FSMlearning {
 	unique_ptr<DFSM> QuotientAlgorithm(const unique_ptr<Teacher>& teacher,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
 		if (!teacher->isBlackBoxResettable()) {
-			ERROR_MESSAGE("FSMlearning::ObservationPackAlgorithm - the Black Box needs to be resettable");
+			ERROR_MESSAGE("FSMlearning::QuotientAlgorithm - the Black Box needs to be resettable");
 			return nullptr;
 		}
 
 		/// counterexample
 		sequence_in_t ce;
 		/// Observation Tree root
-		auto ot = make_shared<ot_node_t>(DEFAULT_OUTPUT, sequence_in_t());
-		vector<shared_ptr<ot_node_t>> stateNodes;
+		auto ot = make_shared<qa_ot_node_t>(DEFAULT_OUTPUT, sequence_in_t());
+		vector<shared_ptr<qa_ot_node_t>> stateNodes;
 
 		/// distinguishing sequences
 		FSMlib::PrefixSet pset;

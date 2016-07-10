@@ -377,5 +377,8 @@
     <None Include="..\data\experiments\DFA_R39974_pots3.fsm">
       <Filter>Resource Files\experiments</Filter>
     </None>
+    <None Include="..\data\examples\Mealy_R5.fsm">
+      <Filter>Resource Files\examples</Filter>
+    </None>
   </ItemGroup>
 </Project>
