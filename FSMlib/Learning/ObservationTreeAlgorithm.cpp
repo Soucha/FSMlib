@@ -94,6 +94,14 @@ namespace FSMlearning {
 		return (n1->stateOutput != n2->stateOutput) || (n1->incomingOutput != n2->incomingOutput)
 			|| (n1->nextInputs != n2->nextInputs) || (n2->consistentNodes.find(n1.get()) == n2->consistentNodes.end());
 	}
+	
+	static vector<shared_ptr<ot_ads_t>> createADSforeachInput(const input_t& numInputs) {
+		vector<shared_ptr<ot_ads_t>> ads;
+		for (input_t input = 0; input < numInputs; input++) {
+			ads.emplace_back(make_shared<ot_ads_t>(input));
+		}
+		return ads;
+	}
 
 	static void findConsistentNodes(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		stack<shared_ptr<ot_node_t>> nodes;
@@ -144,6 +152,14 @@ namespace FSMlearning {
 
 	static void addADS(shared_ptr<ot_node_t> node, ObservationTree& ot) {
 		state_t refState = node->state;
+		if (node->distInputIdx == STOUT_INPUT) {
+			auto adsDec = make_shared<ads_node_t>();
+			adsDec->initialStates.push_back(refState);
+			adsDec->currentNode.emplace_back(node);
+			adsDec->next = createADSforeachInput(ot.conjecture->getNumberOfInputs());
+			ot.ads->decision.emplace(node->stateOutput, move(adsDec));
+			return;
+		}
 		auto& adsVec = ot.ads->decision.at(node->stateOutput)->next;
 		for (input_t i = 0; i < node->nextInputs.size(); i++) {
 			if (node->next[i] && (i != node->distInputIdx)) {
@@ -290,13 +306,23 @@ namespace FSMlearning {
 					(*cnIt)->consistentNodes.erase(node.get());
 					if (node->state != NULL_STATE) {// is this possible? there needs to be the same path from the consistent node and the path was not from this stateNode
 						(*cnIt)->refStates.erase(node->state);
-						auto cnPtr = shared_ptr<ot_node_t>(*cnIt);
+						auto parent = (*cnIt)->parent.lock();// it must have parent
+						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
+						// update distinguishing input
+						auto nn = node;
+						auto cnNextPtr = cnPtr;
+						do {
+							auto cnIdx = getNextIdx(cnNextPtr, nn->nextInputs[nn->distInputIdx]);
+							//if (cnIdx == STOUT_INPUT);
+							if (!cnNextPtr->next[cnIdx]) break;
+							cnNextPtr->distInputIdx = cnIdx;
+							nn = nn->next[nn->distInputIdx];
+							cnNextPtr = cnNextPtr->next[cnIdx];
+						} while (nn->distInputIdx != STOUT_INPUT);
+
 						checkNode(cnPtr, ot);
-						auto parent = cnPtr->parent.lock();
-						if (parent) {
-							parent->distInputIdx = cnPtr->incomingInputIdx;
-							checkPrevious(parent, ot);
-						}
+						parent->distInputIdx = cnPtr->incomingInputIdx;
+						checkPrevious(parent, ot);
 					}
 					else if ((*cnIt)->state != NULL_STATE) {
 						node->refStates.erase((*cnIt)->state);
@@ -492,14 +518,6 @@ namespace FSMlearning {
 		checkAndQueryNext(currNode, ot);
 	}
 
-	static vector<shared_ptr<ot_ads_t>> createADSforeachInput(const input_t& numInputs) {
-		vector<shared_ptr<ot_ads_t>> ads;
-		for (input_t input = 0; input < numInputs; input++) {
-			ads.emplace_back(make_shared<ot_ads_t>(input));
-		}
-		return ads;
-	}
-
 	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
 		if (!teacher->isBlackBoxResettable()) {
@@ -527,7 +545,7 @@ namespace FSMlearning {
 		adsDec->currentNode.emplace_back(node);
 		adsDec->next = createADSforeachInput(ot.conjecture->getNumberOfInputs());
 		ot.ads = make_shared<ot_ads_t>(STOUT_INPUT);
-		ot.ads->decision.emplace(node->stateOutput, adsDec);
+		ot.ads->decision.emplace(node->stateOutput, move(adsDec));
 
 		ot.uncheckedNodes.emplace_back(node);
 		ot.bbNode = node;
@@ -580,7 +598,7 @@ namespace FSMlearning {
 			if (provideTentativeModel) {
 				if (!provideTentativeModel(ot.conjecture)) break;
 			}
-		}	
+		}
 		return move(ot.conjecture);
 	}
 }

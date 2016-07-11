@@ -218,11 +218,11 @@ static void testLStarAllVariants() {
 	}
 }
 
-static void compareLearningAlgorithms(const string fnName) {
+static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates = 1, seq_len_t maxDistLen = 2) {
 	printf("Correct;#Resets;#OQs;#EQs;#symbols;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
 	vector<string> descriptions;
 	vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
-#if 0 // L*
+#if 1 // L*
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
 	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
@@ -238,7 +238,7 @@ static void compareLearningAlgorithms(const string fnName) {
 	descriptions.emplace_back(fnName + ";DT;;");
 	algorithms.emplace_back(bind(DiscriminationTreeAlgorithm, placeholders::_1, nullptr));
 #endif
-#if 0 // OP
+#if 1 // OP
 	vector<pair<OP_CEprocessing, string>> opCeFunc;
 	opCeFunc.emplace_back(PTRandSTR(AllGlobally));
 	opCeFunc.emplace_back(PTRandSTR(OneGlobally));
@@ -252,11 +252,18 @@ static void compareLearningAlgorithms(const string fnName) {
 	descriptions.emplace_back(fnName + ";TTT;;");
 	algorithms.emplace_back(bind(TTT, placeholders::_1, nullptr));
 #endif
-#if 0 // Quotient
+#if 1 // Quotient
 	descriptions.emplace_back(fnName + ";Quotient;;");
 	algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
 #endif
-
+#if 1 // GoodSplit
+	descriptions.emplace_back(fnName + ";GoodSplit;maxDistLen:" + to_string(maxDistLen) + ";");
+	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr));
+#endif
+#if 1 // ObservationTreeAlgorithm
+	descriptions.emplace_back(fnName + ";OTree;ExtraStates:" + to_string(maxExtraStates) + ";");
+	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr));
+#endif
 
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
@@ -307,8 +314,8 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm";
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
 	/* // to determine maxLen for GoodSplit
@@ -324,7 +331,7 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*
+	/*
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
@@ -333,7 +340,7 @@ int main(int argc, char** argv) {
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 	//*/
-	//compareLearningAlgorithms(fileName);
+	compareLearningAlgorithms(fileName);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;

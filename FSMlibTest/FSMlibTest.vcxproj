@@ -161,6 +161,7 @@
     <ClCompile Include="Learning\GoodSplitTests.cpp" />
     <ClCompile Include="Learning\LstarTests.cpp" />
     <ClCompile Include="Learning\OPalgTests.cpp" />
+    <ClCompile Include="Learning\OTreeAlgTests.cpp" />
     <ClCompile Include="Learning\QuotientAlgTests.cpp" />
     <ClCompile Include="Learning\TeacherTests.cpp" />
     <ClCompile Include="Learning\TTTalgTests.cpp" />
