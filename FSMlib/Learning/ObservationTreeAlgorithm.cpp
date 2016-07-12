@@ -57,6 +57,7 @@ namespace FSMlearning {
 		list<shared_ptr<ot_node_t>> uncheckedNodes;
 		state_t numberOfExtraStates;
 		unique_ptr<DFSM> conjecture;
+		bool spaceEfficient = true;
 	};
 
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
@@ -72,6 +73,26 @@ namespace FSMlearning {
 			return input_t(std::distance(node->nextInputs.begin(), lower));
 		}
 		return STOUT_INPUT;
+	}
+
+	static bool areNodesDifferent(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
+		if ((n1->stateOutput != n2->stateOutput) || (n1->nextInputs != n2->nextInputs)) return true;
+		for (input_t i = 0; i < n1->nextInputs.size(); i++) {
+			if ((n1->next[i]) && (n2->next[i]) && ((n1->next[i]->incomingOutput != n2->next[i]->incomingOutput)
+				|| areNodesDifferent(n1->next[i], n2->next[i])))
+				return true;
+		}
+		return false;
+	}
+
+	static bool areNodesDifferentUnder(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
+		if ((n1->stateOutput != n2->stateOutput) || (n1->nextInputs != n2->nextInputs)) return true;
+		if (n1->distInputIdx == STOUT_INPUT) return false;
+		auto& idx = n1->distInputIdx;
+		if ((n2->next[idx]) && ((n1->next[idx]->incomingOutput != n2->next[idx]->incomingOutput)
+				|| areNodesDifferentUnder(n1->next[idx], n2->next[idx])))
+				return true;
+		return false;
 	}
 
 	static bool areNextNodesDifferent(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
@@ -100,13 +121,42 @@ namespace FSMlearning {
 		}
 	}
 
+	static void findConsistentStateNodes(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
+		for (const auto& sn : ot.stateNodes) {
+			if ((node->stateOutput == sn->stateOutput) && (node->nextInputs == sn->nextInputs)) {
+				node->refStates.emplace(sn->state);
+			}
+		}
+	}
+
+	static void addNewStateToConsistentNodes(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
+		stack<shared_ptr<ot_node_t>> nodes;
+		for (const auto& sn : ot.stateNodes) {
+			nodes.emplace(sn);
+			while (!nodes.empty()) {
+				auto otNode = move(nodes.top());
+				nodes.pop();
+				if ((node != otNode) && (otNode->state == NULL_STATE) && !areNodesDifferent(node, otNode)) {
+					otNode->refStates.emplace(node->state);
+				}
+				for (const auto& nn : otNode->next) {
+					if (nn && (nn->state == NULL_STATE)) nodes.emplace(nn);
+				}
+			}
+		}
+	}
+
 	static void checkNode(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		if (node->refStates.empty()) {// new state
 			node->state = ot.conjecture->addState(node->stateOutput);
 			node->extraStateLevel = 0;
 			ot.stateNodes.emplace_back(node);
-			for (auto& cn : node->consistentNodes) {
-				cn->refStates.emplace(node->state);
+			if (ot.spaceEfficient) {
+				addNewStateToConsistentNodes(node, ot);
+			} else {
+				for (auto& cn : node->consistentNodes) {
+					cn->refStates.emplace(node->state);
+				}
 			}
 			node->refStates.emplace(node->state);
 			
@@ -150,35 +200,29 @@ namespace FSMlearning {
 	static void checkPrevious(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		auto& idx = node->distInputIdx;
 		if (idx != STOUT_INPUT) {
-			for (auto cnIt = node->consistentNodes.begin(); cnIt != node->consistentNodes.end();) {
-				if ((*cnIt)->next[idx] && (areNextNodesDifferent(node->next[idx], (*cnIt)->next[idx]))) {
-					(*cnIt)->consistentNodes.erase(node.get());
-					if (node->state != NULL_STATE) {// is this possible? there needs to be the same path from the consistent node and the path was not from this stateNode
-						(*cnIt)->refStates.erase(node->state);
-						auto parent = (*cnIt)->parent.lock();// it must have parent
-						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
-						/*/ update distinguishing input
-						auto nn = node;
-						auto cnNextPtr = cnPtr;
-						do {
-							auto cnIdx = getNextIdx(cnNextPtr, nn->nextInputs[nn->distInputIdx]);
-							//if (cnIdx == STOUT_INPUT);
-							if (!cnNextPtr->next[cnIdx]) break;
-							cnNextPtr->distInputIdx = cnIdx;
-							nn = nn->next[nn->distInputIdx];
-							cnNextPtr = cnNextPtr->next[cnIdx];
-						} while (nn->distInputIdx != STOUT_INPUT);
-						*/
-						checkNode(cnPtr, ot);
-						//parent->distInputIdx = cnPtr->incomingInputIdx;
-						//checkPrevious(parent, ot);
-					}
-					else if ((*cnIt)->state != NULL_STATE) {
-						node->refStates.erase((*cnIt)->state);
-					}
-					cnIt = node->consistentNodes.erase(cnIt);
+			if (ot.spaceEfficient) {
+				for (auto snIt = node->refStates.begin(); snIt != node->refStates.end();) {
+					if (areNodesDifferentUnder(node, ot.stateNodes[*snIt])) {
+						snIt = node->refStates.erase(snIt);
+					} else ++snIt;
 				}
-				else ++cnIt;
+			} else {
+				for (auto cnIt = node->consistentNodes.begin(); cnIt != node->consistentNodes.end();) {
+					if ((*cnIt)->next[idx] && (areNextNodesDifferent(node->next[idx], (*cnIt)->next[idx]))) {
+						(*cnIt)->consistentNodes.erase(node.get());
+						if (node->state != NULL_STATE) {
+							(*cnIt)->refStates.erase(node->state);
+							auto parent = (*cnIt)->parent.lock();// it must have parent
+							auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
+							checkNode(cnPtr, ot);
+						}
+						else if ((*cnIt)->state != NULL_STATE) {
+							node->refStates.erase((*cnIt)->state);
+						}
+						cnIt = node->consistentNodes.erase(cnIt);
+					}
+					else ++cnIt;
+				}
 			}
 		}
 		checkNode(node, ot);
@@ -214,7 +258,11 @@ namespace FSMlearning {
 			ot.conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - ot.conjecture->getNumberOfInputs());
 		}
 		node->next[idx] = leaf;
-		findConsistentNodes(leaf, ot);
+		if (ot.spaceEfficient) {
+			findConsistentStateNodes(leaf, ot);
+		} else {
+			findConsistentNodes(leaf, ot);
+		}
 		ot.bbNode = leaf;
 	}
 
@@ -257,14 +305,18 @@ namespace FSMlearning {
 		return f1.first * f2.second < f2.first * f1.second;
 	}
 
-	static bool areDistinguished(vector<shared_ptr<ot_node_t>>& nodes) {
+	static bool areDistinguished(vector<shared_ptr<ot_node_t>>& nodes, bool spaceEfficient) {
 		for (auto it1 = nodes.begin(); it1 != nodes.end(); ++it1) {
 			auto it2 = it1;
 			for (++it2; it2 != nodes.end(); ++it2) {
-				if ((*it1)->consistentNodes.size() < (*it2)->consistentNodes.size()) {
-					if ((*it1)->consistentNodes.find((*it2).get()) == (*it1)->consistentNodes.end()) return true;
+				if (spaceEfficient) {
+					if (areNodesDifferent(*it1, *it2)) return true;
+				} else {
+					if ((*it1)->consistentNodes.size() < (*it2)->consistentNodes.size()) {
+						if ((*it1)->consistentNodes.find((*it2).get()) == (*it1)->consistentNodes.end()) return true;
+					}
+					else if ((*it2)->consistentNodes.find((*it1).get()) == (*it2)->consistentNodes.end()) return true;
 				}
-				else if ((*it2)->consistentNodes.find((*it1).get()) == (*it2)->consistentNodes.end()) return true;
 			}
 		}
 		return false;
@@ -296,7 +348,7 @@ namespace FSMlearning {
 			auto adsVal = currVal;
 			subtreeLen = 0;
 			for (auto p : next) {
-				if ((p.second.size() == 1) || (!areDistinguished(p.second))) {
+				if ((p.second.size() == 1) || (!areDistinguished(p.second, ot.spaceEfficient))) {
 					p.second.front()->distInputIdx = STOUT_INPUT;
 					adsVal = fracSum(adsVal, frac_t(p.second.size() + undistinguishedStates - 1, prob * next.size() * (numStates - 1)));
 					subtreeLen += (currLength * (p.second.size() + undistinguishedStates));// (currLength * p.second.size());//
@@ -444,17 +496,3 @@ namespace FSMlearning {
 		return move(ot.conjecture);
 	}
 }
-
-/*
-
-static bool areNodesDifferent(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
-if ((n1->stateOutput != n2->stateOutput) || (n1->nextInputs != n2->nextInputs)) return true;
-for (input_t i = 0; i < n1->nextInputs.size(); i++) {
-if ((n1->next[i]) && (n2->next[i]) && ((n1->next[i]->incomingOutput != n2->next[i]->incomingOutput)
-|| areNodesDifferent(n1->next[i], n2->next[i])))
-return true;
-}
-return false;
-}
-
-*/

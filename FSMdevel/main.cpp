@@ -314,6 +314,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
@@ -331,7 +332,7 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	/*
+	//*
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
@@ -340,7 +341,7 @@ int main(int argc, char** argv) {
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 	//*/
-	compareLearningAlgorithms(fileName);
+	//compareLearningAlgorithms(fileName);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;
