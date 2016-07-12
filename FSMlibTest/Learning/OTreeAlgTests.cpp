@@ -48,11 +48,11 @@ namespace FSMlibTest
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm", 99);
-			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm", 3);
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_HS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_PDS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_SS.fsm");
-			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm", 4);
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm");
 			/*/
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm");

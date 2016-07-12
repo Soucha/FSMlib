@@ -51,26 +51,10 @@ namespace FSMlearning {
 		}
 	};
 
-	struct ot_ads_t;
-	struct ads_node_t {
-		vector<state_t> initialStates;
-		vector<shared_ptr<ot_node_t>> currentNode;
-		input_t currIdx;
-		vector<shared_ptr<ot_ads_t>> next;
-	};
-
-	struct ot_ads_t {
-		input_t input;
-		map<output_t, shared_ptr<ads_node_t>> decision;
-
-		ot_ads_t(input_t input) : input(input) {}
-	};
-
 	struct ObservationTree {
 		vector<shared_ptr<ot_node_t>> stateNodes;
 		shared_ptr<ot_node_t> bbNode;
 		list<shared_ptr<ot_node_t>> uncheckedNodes;
-		shared_ptr<ot_ads_t> ads;
 		state_t numberOfExtraStates;
 		unique_ptr<DFSM> conjecture;
 	};
@@ -95,14 +79,6 @@ namespace FSMlearning {
 			|| (n1->nextInputs != n2->nextInputs) || (n2->consistentNodes.find(n1.get()) == n2->consistentNodes.end());
 	}
 	
-	static vector<shared_ptr<ot_ads_t>> createADSforeachInput(const input_t& numInputs) {
-		vector<shared_ptr<ot_ads_t>> ads;
-		for (input_t input = 0; input < numInputs; input++) {
-			ads.emplace_back(make_shared<ot_ads_t>(input));
-		}
-		return ads;
-	}
-
 	static void findConsistentNodes(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		stack<shared_ptr<ot_node_t>> nodes;
 		for (const auto& sn : ot.stateNodes) {
@@ -124,130 +100,6 @@ namespace FSMlearning {
 		}
 	}
 
-	static shared_ptr<ads_node_t> updateADSdecision(const shared_ptr<ot_ads_t>& ads, const state_t& refState, const shared_ptr<ot_node_t>& node) {
-		auto it = ads->decision.find(node->incomingOutput);
-		if (it == ads->decision.end()) {
-			auto adsDec = make_shared<ads_node_t>();
-			adsDec->initialStates.push_back(refState);
-			adsDec->currentNode.emplace_back(node);
-			adsDec->currIdx = STOUT_INPUT;
-			ads->decision.emplace(node->incomingOutput, adsDec);
-			return adsDec;
-		}
-		it->second->initialStates.emplace_back(refState);
-		it->second->currentNode.emplace_back(node);
-		return it->second;
-	}
-
-	static void updateADSwithState(shared_ptr<ot_ads_t> ads, const state_t& refState, const shared_ptr<ot_node_t>& node) {
-		auto idx = getNextIdx(node, ads->input);
-		//if (idx == STOUT_INPUT);
-		if (node->next[idx]) {
-			auto adsDec = updateADSdecision(ads, refState, node->next[idx]);
-			for (auto& nn : adsDec->next) {
-				updateADSwithState(nn, refState, node->next[idx]);
-			}
-		}
-	}
-
-	static void addADS(shared_ptr<ot_node_t> node, ObservationTree& ot) {
-		state_t refState = node->state;
-		if (node->distInputIdx == STOUT_INPUT) {
-			auto adsDec = make_shared<ads_node_t>();
-			adsDec->initialStates.push_back(refState);
-			adsDec->currentNode.emplace_back(node);
-			adsDec->next = createADSforeachInput(ot.conjecture->getNumberOfInputs());
-			ot.ads->decision.emplace(node->stateOutput, move(adsDec));
-			return;
-		}
-		auto& adsVec = ot.ads->decision.at(node->stateOutput)->next;
-		for (input_t i = 0; i < node->nextInputs.size(); i++) {
-			if (node->next[i] && (i != node->distInputIdx)) {
-				updateADSwithState(adsVec[node->nextInputs[i]], refState, node);
-			}
-		}
-		auto ads = adsVec[node->nextInputs[node->distInputIdx]];
-		do {
-			node = node->next[node->distInputIdx];
-			auto adsDec = updateADSdecision(ads, refState, node);
-			if (adsDec->initialStates.size() == 1) {// new node
-				break;
-			}
-			if (node->distInputIdx == STOUT_INPUT) {
-				break; // the end of the new sequence
-			}
-			ads = nullptr;
-			for (auto& nn : adsDec->next) {
-				if (nn->input == node->nextInputs[node->distInputIdx]) {
-					ads = nn;
-				}
-				else {
-					updateADSwithState(nn, refState, node);
-				}
-			}
-			if (!ads) {
-				auto& input = node->nextInputs[node->distInputIdx];
-				ads = make_shared<ot_ads_t>(input);
-				for (state_t sIdx = 0; sIdx < adsDec->initialStates.size() - 1; sIdx++) {// all but the current refState
-					updateADSwithState(ads, adsDec->initialStates[sIdx], adsDec->currentNode[sIdx]);
-				}
-				adsDec->next.emplace_back(ads);
-			}
-
-		} while (node->distInputIdx != STOUT_INPUT);
-	}
-
-	static void checkADS(shared_ptr<ot_node_t> node, ObservationTree& ot) {
-		state_t refState = node->state;
-		auto ads = ot.ads->decision.at(node->stateOutput)->next[node->nextInputs[node->distInputIdx]];
-		do {
-			node = node->next[node->distInputIdx];
-			auto it = ads->decision.find(node->incomingOutput);
-			if (it == ads->decision.end()) {
-				auto adsDec = make_shared<ads_node_t>();
-				adsDec->initialStates.push_back(refState);
-				adsDec->currentNode.emplace_back(node);
-				ads->decision.emplace(node->incomingOutput, adsDec);
-				return;
-			}
-			auto& adsDec = it->second;
-			if (adsDec->initialStates.end() == find(adsDec->initialStates.begin(), adsDec->initialStates.end(), refState)) {
-				adsDec->initialStates.emplace_back(refState);
-				adsDec->currentNode.emplace_back(node);
-			}
-			if (node->distInputIdx == STOUT_INPUT) {
-				return;
-			}
-			ads = nullptr;
-			auto& input = node->nextInputs[node->distInputIdx];
-			for (auto& nn : adsDec->next) {
-				if (nn->input == input) {
-					ads = nn;
-					break;
-				}
-			}
-			if (!ads) {
-				for (state_t sIdx = 0; sIdx < adsDec->initialStates.size(); sIdx++) {// all but the current refState
-					if (adsDec->currentNode[sIdx] != node) {
-						auto cnIdx = getNextIdx(adsDec->currentNode[sIdx], input);
-						//if (cnIdx == STOUT_INPUT) continue;
-						auto& nn = adsDec->currentNode[sIdx]->next[cnIdx];
-						if (nn && areNextNodesDifferent(node->next[node->distInputIdx], nn)) {
-							ads = make_shared<ot_ads_t>(input);
-							break;
-						}
-					}
-				}
-				if (ads) {
-					for (state_t sIdx = 0; sIdx < adsDec->initialStates.size(); sIdx++) {
-						updateADSwithState(ads, adsDec->initialStates[sIdx], adsDec->currentNode[sIdx]);
-					}
-					adsDec->next.emplace_back(ads);
-				}
-			}
-		} while (ads && (node->distInputIdx != STOUT_INPUT));
-	}
-
 	static void checkNode(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		if (node->refStates.empty()) {// new state
 			node->state = ot.conjecture->addState(node->stateOutput);
@@ -265,8 +117,7 @@ namespace FSMlearning {
 				if (currNode->state != NULL_STATE) break;
 				currNode->extraStateLevel = ++level;
 			}
-			addADS(node, ot);
-
+			
 			auto parent = node->parent.lock();
 			if (parent && (parent->state != NULL_STATE)) {
 				ot.conjecture->setTransition(parent->state, parent->nextInputs[node->incomingInputIdx], node->state, 
@@ -281,8 +132,6 @@ namespace FSMlearning {
 			
 			ot.uncheckedNodes.clear();// the sign of new state was found
 		} else if (node->state != NULL_STATE) {
-			checkADS(node, ot);
-
 			if (node->next[node->distInputIdx]->refStates.size() == 1) {
 				ot.conjecture->setTransition(node->state, node->nextInputs[node->distInputIdx],
 					*(node->next[node->distInputIdx]->refStates.begin()), 
@@ -308,7 +157,7 @@ namespace FSMlearning {
 						(*cnIt)->refStates.erase(node->state);
 						auto parent = (*cnIt)->parent.lock();// it must have parent
 						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
-						// update distinguishing input
+						/*/ update distinguishing input
 						auto nn = node;
 						auto cnNextPtr = cnPtr;
 						do {
@@ -319,10 +168,10 @@ namespace FSMlearning {
 							nn = nn->next[nn->distInputIdx];
 							cnNextPtr = cnNextPtr->next[cnIdx];
 						} while (nn->distInputIdx != STOUT_INPUT);
-
+						*/
 						checkNode(cnPtr, ot);
-						parent->distInputIdx = cnPtr->incomingInputIdx;
-						checkPrevious(parent, ot);
+						//parent->distInputIdx = cnPtr->incomingInputIdx;
+						//checkPrevious(parent, ot);
 					}
 					else if ((*cnIt)->state != NULL_STATE) {
 						node->refStates.erase((*cnIt)->state);
@@ -362,13 +211,6 @@ namespace FSMlearning {
 		checkNumberOfOutputs(teacher, ot.conjecture);
 		auto leaf = make_shared<ot_node_t>(node, input, idx, transitionOutput, stateOutput, teacher->getNextPossibleInputs());
 		if (ot.conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
-			// updata ot.ads
-			/*
-			for (input_t input = conjecture->getNumberOfInputs(); input < teacher->getNumberOfInputs(); input++) {
-			sequence_in_t seq({ input });
-			if (conjecture->isOutputState()) seq.emplace_back(STOUT_INPUT);
-			pset.insert(move(seq));
-			}*/
 			ot.conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - ot.conjecture->getNumberOfInputs());
 		}
 		node->next[idx] = leaf;
@@ -415,72 +257,67 @@ namespace FSMlearning {
 		return f1.first * f2.second < f2.first * f1.second;
 	}
 
-	static frac_t evaluateADS(const shared_ptr<ot_ads_t>& ads, vector<shared_ptr<ot_node_t>>& nodes, state_t undistinguishedStates,
-			seq_len_t& totalLen, seq_len_t currLength) {
-		auto numStates = nodes.size() + undistinguishedStates;
-		map<output_t, vector<shared_ptr<ot_node_t>>> next;
-		for (auto& node : nodes) {
-			auto idx = getNextIdx(node, ads->input);
-			if (node->next[idx]) {
-				auto it = next.find(node->next[idx]->incomingOutput);
-				if (it == next.end()) {
-					next.emplace(node->next[idx]->incomingOutput, vector<shared_ptr<ot_node_t>>({ node->next[idx] }));
-				} else {
-					it->second.emplace_back(node->next[idx]);
+	static bool areDistinguished(vector<shared_ptr<ot_node_t>>& nodes) {
+		for (auto it1 = nodes.begin(); it1 != nodes.end(); ++it1) {
+			auto it2 = it1;
+			for (++it2; it2 != nodes.end(); ++it2) {
+				if ((*it1)->consistentNodes.size() < (*it2)->consistentNodes.size()) {
+					if ((*it1)->consistentNodes.find((*it2).get()) == (*it1)->consistentNodes.end()) return true;
 				}
-			} else undistinguishedStates++;
-		}
-		frac_t adsVal(0, 1);
-		for (auto p : next) {
-			auto& adsDec = ads->decision.at(p.first);
-			if (adsDec->next.empty() || (p.second.size() == 1)) {
-				adsDec->currIdx = STOUT_INPUT;
-				adsVal = fracSum(adsVal, frac_t(numStates - p.second.size() - undistinguishedStates, next.size() * (numStates - 1)));
-				totalLen += (currLength * (p.second.size() + undistinguishedStates));// (currLength * p.second.size());//
-			} else {// choose the best next input for ADS
-				frac_t bestVal(0, 1);
-				seq_len_t subtreeLen, minLen = seq_len_t(-1);
-				for (input_t i = 0; i < adsDec->next.size(); i++) {
-					subtreeLen = 0;
-					auto val = evaluateADS(adsDec->next[i], p.second, undistinguishedStates, subtreeLen, currLength + 1);
-					if (fracLess(bestVal, val) || (!fracLess(val, bestVal) && (minLen > subtreeLen))) {
-						bestVal = val;
-						minLen = subtreeLen;
-						adsDec->currIdx = i;
-					}
-				}
-				bestVal.second *= next.size();
-				adsVal = fracSum(adsVal, bestVal);
-				totalLen += minLen;
+				else if ((*it2)->consistentNodes.find((*it1).get()) == (*it2)->consistentNodes.end()) return true;
 			}
 		}
-		return adsVal;
+		return false;
 	}
 
-	static shared_ptr<ot_ads_t> chooseADS(const shared_ptr<ot_node_t>& node, state_t expectedState, const ObservationTree& ot) {
-		auto& adsVec = ot.ads->decision.at(node->stateOutput)->next;
-		input_t prevInput = node->parent.lock()->nextInputs[node->incomingInputIdx];
-		if (node->refStates.size() == 1) {
-			return adsVec[prevInput];
-		}
-		shared_ptr<ot_ads_t> ads;
-		frac_t maxVal(0, 1);
-		seq_len_t totalLen, minLen = seq_len_t(-1);
-		vector<shared_ptr<ot_node_t>> nodes;
-		for (auto& state : node->refStates) {
-			nodes.emplace_back(ot.stateNodes[state]);
-		}
-		for (auto& currADS : adsVec) {
-			totalLen = 0;
-			auto val = evaluateADS(currADS, nodes, 0, totalLen, 1);
-			if (fracLess(maxVal, val) || (!fracLess(val, maxVal) && ((minLen > totalLen)
-				|| ((minLen == totalLen) && (currADS->input == prevInput))))) {
-				maxVal = val;
-				minLen = totalLen;
-				ads = currADS;
+	static void chooseADS(vector<shared_ptr<ot_node_t>>& nodes, const ObservationTree& ot, frac_t& bestVal, frac_t& currVal,
+			seq_len_t& totalLen, seq_len_t currLength = 1, state_t undistinguishedStates = 0, size_t prob = 1) {
+		auto numStates = nodes.size() + undistinguishedStates;
+		frac_t localBest(1, 1);
+		seq_len_t subtreeLen, minLen = seq_len_t(-1);
+		for (input_t i = 0; i < ot.conjecture->getNumberOfInputs(); i++) {
+			map<output_t, vector<shared_ptr<ot_node_t>>> next;
+			undistinguishedStates = numStates - nodes.size();
+			for (auto& node : nodes) {
+				auto idx = getNextIdx(node, i);
+				if ((idx == STOUT_INPUT) || (!node->next[idx])) {
+					undistinguishedStates++;
+				} else {
+					auto it = next.find(node->next[idx]->incomingOutput);
+					if (it == next.end()) {
+						next.emplace(node->next[idx]->incomingOutput, vector<shared_ptr<ot_node_t>>({ node->next[idx] }));
+					}
+					else {
+						it->second.emplace_back(node->next[idx]);
+					}
+				}
+			}
+			if (next.empty()) continue;
+			auto adsVal = currVal;
+			subtreeLen = 0;
+			for (auto p : next) {
+				if ((p.second.size() == 1) || (!areDistinguished(p.second))) {
+					p.second.front()->distInputIdx = STOUT_INPUT;
+					adsVal = fracSum(adsVal, frac_t(p.second.size() + undistinguishedStates - 1, prob * next.size() * (numStates - 1)));
+					subtreeLen += (currLength * (p.second.size() + undistinguishedStates));// (currLength * p.second.size());//
+				} else {
+					chooseADS(p.second, ot, bestVal, adsVal, subtreeLen, currLength + 1, undistinguishedStates, prob * next.size());
+				}
+				if (fracLess(bestVal, adsVal)) {// prune
+					break;
+				}
+			}
+			if (fracLess(adsVal, localBest) || (!fracLess(localBest, adsVal) && (minLen > subtreeLen))) {
+				localBest = adsVal;
+				minLen = subtreeLen;
+				nodes.front()->distInputIdx = i;
+				if ((prob == 1) && fracLess(adsVal, bestVal)) {// update bestVal
+					bestVal = adsVal;
+				}
 			}
 		}
-		return ads;
+		currVal = localBest;
+		totalLen += minLen;
 	}
 
 	static void identify(shared_ptr<ot_node_t>& node, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
@@ -489,30 +326,45 @@ namespace FSMlearning {
 			auto& parent = node->parent.lock();
 			expectedState = ot.conjecture->getNextState(*(parent->refStates.begin()), parent->nextInputs[node->incomingInputIdx]);
 		}
-		auto ads = chooseADS(node, expectedState, ot);
+		vector<shared_ptr<ot_node_t>> nodes;
+		for (auto& state : node->refStates) {
+			nodes.emplace_back(ot.stateNodes[state]);
+		}
+		if (node->refStates.size() == 1) {
+			nodes.front()->distInputIdx = node->parent.lock()->nextInputs[node->incomingInputIdx];
+		} else {
+			seq_len_t totalLen = 0;
+			chooseADS(nodes, ot, frac_t(1, 1), frac_t(0, 1), totalLen);
+		}
 		// simulate ADS
 		auto currNode = node;
-		auto idx = getNextIdx(currNode, ads->input);
+		auto idx = getNextIdx(currNode, nodes.front()->distInputIdx);
 		//if (idx == STOUT_INPUT) newState;
 		while (idx != STOUT_INPUT) {
 			if (!currNode->next[idx]) {
 				query(currNode, idx, ot, teacher);
 			}
 			currNode = currNode->next[idx];
-			auto it = ads->decision.find(currNode->incomingOutput);
-			if (it == ads->decision.end()) {
+			vector<shared_ptr<ot_node_t>> next;
+			for (auto& node : nodes) {
+				auto idx = getNextIdx(node, nodes.front()->distInputIdx);
+				if ((idx == STOUT_INPUT) || (!node->next[idx])) {
+					continue;
+				}
+				if (node->next[idx]->incomingOutput == currNode->incomingOutput) {
+					next.emplace_back(node->next[idx]);
+				}
+			}
+			if (next.empty() || (next.front()->distInputIdx == STOUT_INPUT)) {
 				break;
 			}
-			auto& adsDec = it->second;
-			if (adsDec->currIdx == STOUT_INPUT) {
-				break;
-			}
+			nodes.swap(next);
+			/*
 			if ((expectedState != NULL_STATE) &&
 				(find(adsDec->initialStates.begin(), adsDec->initialStates.end(), expectedState) == adsDec->initialStates.end())) {
 				break;
-			}
-			ads = adsDec->next[adsDec->currIdx];
-			idx = getNextIdx(currNode, ads->input);
+			}*/
+			idx = getNextIdx(currNode, nodes.front()->distInputIdx);
 			//if (idx == STOUT_INPUT) newState;
 		}
 		checkAndQueryNext(currNode, ot);
@@ -539,14 +391,6 @@ namespace FSMlearning {
 			checkNumberOfOutputs(teacher, ot.conjecture);
 			ot.conjecture->setOutput(0, node->stateOutput);
 		}
-		// prepare distinguishing structures
-		auto adsDec = make_shared<ads_node_t>();
-		adsDec->initialStates.push_back(0);
-		adsDec->currentNode.emplace_back(node);
-		adsDec->next = createADSforeachInput(ot.conjecture->getNumberOfInputs());
-		ot.ads = make_shared<ot_ads_t>(STOUT_INPUT);
-		ot.ads->decision.emplace(node->stateOutput, move(adsDec));
-
 		ot.uncheckedNodes.emplace_back(node);
 		ot.bbNode = node;
 		ot.numberOfExtraStates = 0;
@@ -564,8 +408,6 @@ namespace FSMlearning {
 					query(node, i, ot, teacher);
 					nextNode = node->next[i];
 					if (node->state != NULL_STATE) {
-						auto& ads = ot.ads->decision.at(node->stateOutput)->next[node->nextInputs[i]];
-						updateADSdecision(ads, node->state, nextNode);
 						if (ot.conjecture->isOutputState() && nextNode->refStates.empty()) {// new state
 							checkAndQueryNext(nextNode, ot);
 							nextNode = nullptr;
@@ -577,7 +419,7 @@ namespace FSMlearning {
 					break;
 				}
 				if ((nextNode == node) && (node->next[i]->refStates.size() > 1)) {
-					nextNode = node->next[i];// the last unconfirmed next node
+					nextNode = node->next[i];// the first unconfirmed next node
 					nextNode->extraStateLevel = node->extraStateLevel + 1;
 				}
 			}
@@ -615,123 +457,4 @@ return true;
 return false;
 }
 
-static bool areStateDomainsDifferent(const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2) {
-if (n1->refStates.empty())  {
-if (n2->refStates.empty()) // n1, n2 will be two new states, or the same one
-return (n1->consistentNodes.find(n2.get()) == n1->consistentNodes.end());
-return true; // n1 will be a new state
-} else if (n2->refStates.empty()) return true;
-return !any_of(n1->refStates.begin(), n1->refStates.end(), [&](state_t state){
-return (n2->refStates.find(state) != n2->refStates.end());
-});
-}
-
-static bool checkDomainsUnder(const shared_ptr<ot_node_t>& node, input_t idx, ObservationTree& ot,
-function<bool(const shared_ptr<ot_node_t>&, const shared_ptr<ot_node_t>&)> areDifferent) {
-bool checkPrevious = false, newStateFound = false;
-for (auto cnIt = node->consistentNodes.begin(); cnIt != node->consistentNodes.end();) {
-if ((*cnIt)->next[idx] && (areDifferent(node->next[idx], (*cnIt)->next[idx]))) {
-(*cnIt)->consistentNodes.erase(node.get());
-if (node->state != NULL_STATE) {// is this possible? there needs to be the same path from the consistent node and the path was not from this stateNode
-(*cnIt)->refStates.erase(node->state);
-auto cnPtr = shared_ptr<ot_node_t>(*cnIt);
-if (cnPtr->parent.lock())// && (node->state == NULL_STATE)) // if the parent is not root and the node is not state
-newStateFound |= checkDomainsUnder(cnPtr->parent.lock(), cnPtr->incomingInputIdx, ot, areDomainsDifferent);
-newStateFound |= checkNode(cnPtr, ot);
-} else if ((*cnIt)->state != NULL_STATE) {
-node->refStates.erase((*cnIt)->state);
-checkPrevious = true;
-}
-cnIt = node->consistentNodes.erase(cnIt);
-}
-else ++cnIt;
-}
-//if (checkPrevious) {
-if (node->parent.lock())// && (node->state == NULL_STATE)) // if the parent is not root and the node is not state
-newStateFound |= checkDomainsUnder(node->parent.lock(), node->incomingInputIdx, ot, areDomainsDifferent);
-//}
-newStateFound |= checkNode(node, ot);
-return newStateFound;
-}
-
-// not used
-static void query(shared_ptr<ot_node_t> node, sequence_in_t& seq, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
-
-	if (seq.front() == STOUT_INPUT) seq.pop_front();
-	auto idx = getNextIdx(node, seq.front());
-	while (!node->next[idx]) {
-		node = node->next[idx];
-		seq.pop_front();
-		if (seq.front() == STOUT_INPUT) seq.pop_front();
-		idx = getNextIdx(node, seq.front());
-	}
-	// prepare teacher
-
-	bool newStateFound = false;
-	while (!newStateFound && !seq.empty()) {
-		if (seq.front() == STOUT_INPUT) {
-			seq.pop_front();
-			continue;
-		}
-		idx = getNextIdx(node, seq.front());
-		if (idx == STOUT_INPUT) break;//cannot be applied
-		state_t transitionOutput, stateOutput = DEFAULT_OUTPUT;
-		if (!teacher->isProvidedOnlyMQ() && (ot.conjecture->getType() == TYPE_DFSM)) {
-			sequence_in_t suffix({ seq.front(), STOUT_INPUT });
-			auto output = teacher->outputQuery(suffix);
-			transitionOutput = output.front();
-			stateOutput = output.back();
-		}
-		else {
-			transitionOutput = teacher->outputQuery(seq.front());
-			if (ot.conjecture->getType() == TYPE_DFSM) {
-				stateOutput = teacher->outputQuery(STOUT_INPUT);
-			}
-			else if (!ot.conjecture->isOutputTransition()) {// Moore, DFA
-				stateOutput = transitionOutput;
-				transitionOutput = DEFAULT_OUTPUT;
-			}
-		}
-		//if (node->state != NULL_STATE) updateADS(node, seq.front(), ot);
-		checkNumberOfOutputs(teacher, ot.conjecture);
-		auto leaf = make_shared<ot_node_t>(node, seq.front(), idx, transitionOutput, stateOutput, teacher->getNextPossibleInputs());
-		seq.pop_front();
-		if (ot.conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
-			/*
-			for (input_t input = conjecture->getNumberOfInputs(); input < teacher->getNumberOfInputs(); input++) {
-			sequence_in_t seq({ input });
-			if (conjecture->isOutputState()) seq.emplace_back(STOUT_INPUT);
-			pset.insert(move(seq));
-			}* /
-			ot.conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - ot.conjecture->getNumberOfInputs());
-		}
-		node->next[idx] = leaf;
-		//if (conjecture->isOutputState()) {
-		findConsistentNodes(leaf, ot, [](const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2){
-			return ((n1->stateOutput == n2->stateOutput) && (n1->nextInputs == n2->nextInputs)); });
-		newStateFound |= checkDomainsUnder(node, idx, ot, [](const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2){
-			return ((n1->stateOutput != n2->stateOutput) || (n1->incomingOutput != n2->incomingOutput)
-				|| (n1->nextInputs != n2->nextInputs)); });
-		//newStateFound |= checkNode(leaf, ot);
-		/*
-		} else {// Mealy
-		if (node->consistentNodes.empty()) {
-		findConsistentNodes(node, ot, [&](const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2){
-		return ((n1->nextInputs == n2->nextInputs) && (!n2->next[idx] ||
-		((n2->next[idx]->incomingOutput == leaf->incomingOutput) && (n2->next[idx]->nextInputs == leaf->nextInputs)))); });
-		if (node->parent.lock() && node->state == NULL_STATE) // if the parent is not root and the node is not state
-		checkDomainsUnder(node->parent.lock(), node->incomingInputIdx, ot, areDomainsDifferent);
-		} else {
-		checkDomainsUnder(node, idx, ot, [](const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2){
-		return ((n1->stateOutput != n2->stateOutput) || (n1->incomingOutput != n2->incomingOutput)
-		|| (n1->nextInputs != n2->nextInputs)); });
-		}
-		checkNode(node, ot);
-		}* /
-
-
-		node = leaf;
-	}
-	ot.bbNode = node;
-}
 */

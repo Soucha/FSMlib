@@ -260,7 +260,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	descriptions.emplace_back(fnName + ";GoodSplit;maxDistLen:" + to_string(maxDistLen) + ";");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr));
 #endif
-#if 1 // ObservationTreeAlgorithm
+#if 0 // ObservationTreeAlgorithm
 	descriptions.emplace_back(fnName + ";OTree;ExtraStates:" + to_string(maxExtraStates) + ";");
 	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr));
 #endif
@@ -313,7 +313,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
-	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
