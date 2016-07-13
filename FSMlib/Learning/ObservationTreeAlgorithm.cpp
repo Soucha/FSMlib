@@ -61,6 +61,17 @@ namespace FSMlearning {
 		bool spaceEfficient = true;
 	};
 
+	typedef double frac_t;
+
+	struct ads_t {
+		list<shared_ptr<ot_node_t>> nodes;
+		input_t input;
+		map<output_t, shared_ptr<ads_t>> next;
+
+		ads_t() : input(STOUT_INPUT) {}
+		ads_t(const shared_ptr<ot_node_t>& node) : nodes({ node }), input(STOUT_INPUT) {}
+	};
+
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
 		if (conjecture->getNumberOfOutputs() != teacher->getNumberOfOutputs()) {
 			conjecture->incNumberOfOutputs(teacher->getNumberOfOutputs() - conjecture->getNumberOfOutputs());
@@ -206,8 +217,7 @@ namespace FSMlearning {
 					*(node->next[node->distInputIdx]->refStates.begin()), 
 					(ot.conjecture->isOutputTransition() ? node->next[node->distInputIdx]->incomingOutput : DEFAULT_OUTPUT));
 			}
-		}
-		/*
+		}/* 
 		else if ((node->refStates.size() == 1) && (node->state == NULL_STATE)) {
 			auto state = *(node->refStates.begin());
 			if (ot.stateNodes[state]->accessSequence.size() > node->accessSequence.size()) {
@@ -234,7 +244,15 @@ namespace FSMlearning {
 						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
 						if (areNodesDifferentUnder(node, cnPtr)) {
 							cnPtr->refStates.erase(node->state);
-							checkNode(cnPtr, ot);
+							if (cnPtr->refStates.size() == 1) {
+								if (parent->state != NULL_STATE) {
+									ot.conjecture->setTransition(parent->state, parent->nextInputs[cnPtr->incomingInputIdx], 
+										*(cnPtr->refStates.begin()),
+										(ot.conjecture->isOutputTransition() ? cnPtr->incomingOutput : DEFAULT_OUTPUT));
+								}
+							} else {
+								checkNode(cnPtr, ot);
+							}
 							cnIt = node->consistentNodes.erase(cnIt);
 						} else ++cnIt;
 					}
@@ -324,61 +342,6 @@ namespace FSMlearning {
 		}
 	}
 
-
-	static size_t gcd(size_t a, size_t  b) {
-		// Reduce by GCD-remainder property [GCD(a,b) == GCD(b,a MOD b)]
-		while (true) {
-			if (a == 0) return b;
-			b %= a;
-			if (b == 0)	return a;
-			a %= b;
-		}
-	}
-	/*
-	struct frac_t {
-		size_t num, den;
-
-		frac_t(size_t numerator, size_t denominator) : num(numerator), den(denominator) {
-			auto g = gcd(num, den);
-			if (g > 1) {
-				num /= g;
-				den /= g;
-			}
-		}
-
-		frac_t(size_t integer) : num(integer), den(1) {}
-
-		frac_t& operator+=(const frac_t& r) {
-			auto r_num = r.num;
-			auto r_den = r.den;
-
-			auto g = gcd(den, r_den);
-			den /= g;
-			num = num * (r_den / g) + r_num * den;
-			g = gcd(num, g);
-			num /= g;
-			den *= r_den / g;
-			return *this;
-		}
-
-		bool operator< (const frac_t& r) const {
-			if (num == 0) return (0 < r.num);
-			if (r.num == 0) return false;
-			if (den == r.den) return (num < r.num);
-			auto g = gcd(den, r.den);
-			auto left = num * (r.den / g);
-			auto right = r.num * (den / g);
-			//if ((num > 1000000) || (r.num > 1000000) || (den > 1000000) || (r.den > 1000000))
-			//printf("%u\t%u * %u = %u %u\t%u * %u = %u %u\n", g, num, r.den, left, num * r.den, r.num, den, right, r.num * den);
-			//if ((num <= left) && (r.den <= left) && (r.num <= right) && (den <= right))
-				return left < right;
-			throw "overflow";
-			return false;
-		}
-	};
-	*/
-	typedef double frac_t;
-
 	static bool areDistinguished(list<shared_ptr<ot_node_t>>& nodes, bool spaceEfficient) {
 		for (auto it1 = nodes.begin(); it1 != nodes.end(); ++it1) {
 			auto it2 = it1;
@@ -395,15 +358,6 @@ namespace FSMlearning {
 		}
 		return false;
 	}
-
-	struct ads_t {
-		list<shared_ptr<ot_node_t>> nodes;
-		input_t input;
-		map<output_t, shared_ptr<ads_t>> next;
-
-		ads_t() : input(STOUT_INPUT) {}
-		ads_t(const shared_ptr<ot_node_t>& node) : nodes({ node }), input(STOUT_INPUT) {}
-	};
 
 	static void chooseADS(const shared_ptr<ads_t>& ads, const ObservationTree& ot, frac_t& bestVal, frac_t& currVal,
 			seq_len_t& totalLen, seq_len_t currLength = 1, state_t undistinguishedStates = 0, double prob = 1) {
@@ -431,10 +385,27 @@ namespace FSMlearning {
 			subtreeLen = 0;
 			for (auto p : next) {
 				if ((p.second->nodes.size() == 1) || (!areDistinguished(p.second->nodes, ot.spaceEfficient))) {
-					//p.second.front()->distInputIdx = STOUT_INPUT;
 					adsVal += frac_t(p.second->nodes.size() + undistinguishedStates - 1) / (prob * next.size() * (numStates - 1));
-					//adsVal += frac_t(p.second.size() + undistinguishedStates - 1, prob * next.size() * (numStates - 1));
-					subtreeLen += (currLength * (p.second->nodes.size() + undistinguishedStates));// (currLength * p.second.size());//
+					subtreeLen += (currLength * (p.second->nodes.size() + undistinguishedStates));
+				} else if (ot.conjecture->getType() == TYPE_DFSM) {
+					for (auto& node : p.second->nodes) {
+						auto it = p.second->next.find(node->stateOutput);
+						if (it == p.second->next.end()) {
+							p.second->next.emplace(node->stateOutput, make_shared<ads_t>(node));
+						} else {
+							it->second->nodes.emplace_back(node);
+						}
+					}
+					for (auto& sp : p.second->next) {
+						if ((sp.second->nodes.size() == 1) || (!areDistinguished(sp.second->nodes, ot.spaceEfficient))) {
+							adsVal += frac_t(sp.second->nodes.size() + undistinguishedStates - 1) /
+								(prob * next.size() * p.second->next.size() * (numStates - 1));
+							subtreeLen += (currLength * (sp.second->nodes.size() + undistinguishedStates));
+						} else {
+							chooseADS(sp.second, ot, bestVal, adsVal, subtreeLen, currLength + 1,
+								undistinguishedStates, prob * next.size() * p.second->next.size());
+						}
+					}
 				} else {
 					chooseADS(p.second, ot, bestVal, adsVal, subtreeLen, currLength + 1, undistinguishedStates, prob * next.size());
 				}
@@ -445,7 +416,6 @@ namespace FSMlearning {
 			if ((adsVal < localBest) || (!(localBest < adsVal) && (minLen > subtreeLen))) {
 				localBest = adsVal;
 				minLen = subtreeLen;
-				//nodes.front()->distInputIdx = i;
 				ads->input = i;
 				ads->next.swap(next);
 				if ((prob == 1) && (adsVal < bestVal)) {// update bestVal
@@ -468,7 +438,6 @@ namespace FSMlearning {
 			ads->nodes.emplace_back(ot.stateNodes[state]);
 		}
 		if (node->refStates.size() == 1) {
-			//nodes.front()->distInputIdx = node->parent.lock()->nextInputs[node->incomingInputIdx];
 			ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
 		} else {
 			seq_len_t totalLen = 0;
@@ -485,25 +454,17 @@ namespace FSMlearning {
 			}
 			currNode = currNode->next[idx];
 			auto it = ads->next.find(currNode->incomingOutput);
-			if ((it == ads->next.end()) || (it->second->input == STOUT_INPUT)) {
+			if ((it == ads->next.end()) || (it->second->next.empty())) {
 				break;
 			}
 			ads = it->second;
-			/*
-			list<shared_ptr<ot_node_t>> next;
-			for (auto& node : nodes) {
-				auto idx = getNextIdx(node, nodes.front()->distInputIdx);
-				if ((idx == STOUT_INPUT) || (!node->next[idx])) {
-					continue;
+			if (ot.conjecture->getType() == TYPE_DFSM) {
+				it = ads->next.find(currNode->stateOutput);
+				if ((it == ads->next.end()) || (it->second->input == STOUT_INPUT)) {
+					break;
 				}
-				if (node->next[idx]->incomingOutput == currNode->incomingOutput) {
-					next.emplace_back(node->next[idx]);
-				}
+				ads = it->second;
 			}
-			if (next.empty() || (next.front()->distInputIdx == STOUT_INPUT)) {
-				break;
-			}
-			nodes.swap(next);*/
 			/*
 			if ((expectedState != NULL_STATE) &&
 				(find(adsDec->initialStates.begin(), adsDec->initialStates.end(), expectedState) == adsDec->initialStates.end())) {

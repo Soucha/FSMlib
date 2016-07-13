@@ -44,22 +44,22 @@ namespace FSMlibTest
 		TEST_METHOD(TestOTreeAlg_Mealy)
 		{
 			fsm = make_unique<Mealy>();
-			//*
+			/*
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
-			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");/*/
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm", 97);
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm");
-			/*testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_HS.fsm");
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_HS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_PDS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_SS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm");
-			/* /
+			/*/
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SS.fsm");
-			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");// could require len of 3
+			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
 			//*/
 		}
 
