@@ -315,7 +315,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R10_PDS.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
