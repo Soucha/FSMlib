@@ -68,13 +68,13 @@ namespace FSMlibTest
 			fsm = make_unique<Moore>();
 			//*
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
-			//testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard
-			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", 97);
+			//testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard Correct: 1,reset: 3621,OQ: 19883,EQ: 3,symbols: 72341, TeacherDFSM, ExtraStates:1
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", 1);//97
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS_E.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R4_HS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R4_PDS.fsm");
-			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R4_SS.fsm", 2);
+			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R4_SS.fsm", 1);//2
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm");
 			/*/
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
@@ -93,12 +93,12 @@ namespace FSMlibTest
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm");
-			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm", 2);
+			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R4_SS.fsm");//2
 			testOTreeAlg(DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm");
 		}
 
 		void testOTreeAlgorithm(const unique_ptr<Teacher>& teacher, string teacherName, string filename, state_t maxExtraStates) {
-			auto model = ObservationTreeAlgorithm(teacher, maxExtraStates, showConjecture);
+			auto model = ObservationTreeAlgorithm(teacher, maxExtraStates, true, showConjecture);
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\tExtraStates: %d,\t%s\t%s%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(), maxExtraStates,
 				teacherName.c_str(), filename.c_str(), (FSMmodel::areIsomorphic(fsm, model) ? "" : "\tNOT LEARNED"));

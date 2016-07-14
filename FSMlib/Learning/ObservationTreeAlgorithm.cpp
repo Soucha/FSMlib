@@ -541,7 +541,7 @@ namespace FSMlearning {
 		checkAndQueryNext(currNode, ot);
 	}
 
-	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates, bool isEQallowed,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
 		if (!teacher->isBlackBoxResettable()) {
 			ERROR_MESSAGE("FSMlearning::ObservationTreeAlgorithm - the Black Box needs to be resettable");
@@ -570,7 +570,26 @@ namespace FSMlearning {
 			node = ot.uncheckedNodes.front();
 			if (node->extraStateLevel > ot.numberOfExtraStates) {
 				ot.numberOfExtraStates++;
-				if (ot.numberOfExtraStates > maxExtraStates) break;
+				if (ot.numberOfExtraStates > maxExtraStates) {
+					if (isEQallowed) {
+						auto ce = teacher->equivalenceQuery(ot.conjecture);
+						if (!ce.empty()) {
+							ot.numberOfExtraStates--;
+							auto currNode = ot.stateNodes[0];// root
+							for (auto& input : ce) {
+								if (input == STOUT_INPUT) continue;
+								auto idx = getNextIdx(currNode, input);
+								if (!currNode->next[idx]) {
+									query(currNode, idx, ot, teacher);
+								}
+								currNode = currNode->next[idx];
+							}
+							checkAndQueryNext(currNode, ot);
+							continue;
+						}
+					}
+					break;
+				}
 			}
 			auto nextNode = node;
 			for (input_t i = 0; i < node->nextInputs.size(); i++) {

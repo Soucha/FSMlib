@@ -1,0 +1,14 @@
+Correct;#Resets;#OQs;#EQs;#symbols;fileName;Algorithm;CEprocessing;Teacher;BB;
+1;53634;53634;30;1266400;../data/tests/sequences/Moore_R100_PDS.fsm;L*;addAllPrefixesToS;TeacherRL;;
+1;70605;70605;30;1689257;../data/tests/sequences/Moore_R100_PDS.fsm;L*;addAllSuffixesAfterLastStateToE;TeacherRL;;
+1;18847;18847;33;420718;../data/tests/sequences/Moore_R100_PDS.fsm;L*;addSuffix1by1ToE;TeacherRL;;
+1;19144;19144;38;432564;../data/tests/sequences/Moore_R100_PDS.fsm;L*;addSuffixAfterLastStateToE;TeacherRL;;
+1;19035;19035;38;430199;../data/tests/sequences/Moore_R100_PDS.fsm;L*;addSuffixToE_binarySearch;TeacherRL;;
+1;16707;16707;96;234445;../data/tests/sequences/Moore_R100_PDS.fsm;DT;;TeacherRL;;
+1;99968;99968;29;2807675;../data/tests/sequences/Moore_R100_PDS.fsm;OP;AllGlobally;TeacherRL;;
+1;21439;21439;44;527122;../data/tests/sequences/Moore_R100_PDS.fsm;OP;OneGlobally;TeacherRL;;
+1;6309;6309;75;133916;../data/tests/sequences/Moore_R100_PDS.fsm;OP;OneLocally;TeacherRL;;
+1;4610;4610;71;70411;../data/tests/sequences/Moore_R100_PDS.fsm;TTT;;TeacherRL;;
+1;2660;39580;6;80123;../data/tests/sequences/Moore_R100_PDS.fsm;Quotient;;TeacherRL;;
+0;770;770;0;3426;../data/tests/sequences/Moore_R100_PDS.fsm;GoodSplit;maxDistLen:3;TeacherRL;;
+1;3621;19883;3;72341;../data/tests/sequences/Moore_R100_PDS.fsm;OTree;ExtraStates:1;TeacherRL;;

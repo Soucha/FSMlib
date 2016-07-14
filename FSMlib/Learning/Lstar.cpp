@@ -273,16 +273,24 @@ namespace FSMlearning {
 		state_t s2 = blocks.front().at(1);
 		const auto& row1 = ot.T.at(ot.S.at(s1));
 		const auto& row2 = ot.T.at(ot.S.at(s2));
-		for (size_t i = 0; i < ot.E.size(); i++) {
+		size_t i;
+		for (i = 0; i < ot.E.size(); i++) {
 			if (row1[i] != row2[i]) {
 				distSeq = ot.E[i];
 				break;
 			}
 		}
-		while (s1 != s2) {
+		while ((s1 != s2) && !distSeq.empty()) {
 			s1 = ot.conjecture->getNextState(s1, distSeq.front());
 			s2 = ot.conjecture->getNextState(s2, distSeq.front());
 			distSeq.pop_front();
+		}
+		if (s1 != s2) {// a cyclic undistingushable block
+			distSeq = ot.E[i];
+			while (find(ot.E.begin(), ot.E.end(), distSeq) != ot.E.end()) {
+				distSeq.pop_front();
+				if (distSeq.empty()) return true;
+			}
 		}
 		ot.E.emplace_back(move(distSeq));
 		return false;

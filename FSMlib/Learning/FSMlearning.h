@@ -260,6 +260,7 @@ namespace FSMlearning {
 	* @return A learned model
 	*/
 	FSMLIB_API unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+		bool isEQallowed = true,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr);
 
 }

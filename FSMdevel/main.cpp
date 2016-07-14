@@ -260,27 +260,33 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	descriptions.emplace_back(fnName + ";GoodSplit;maxDistLen:" + to_string(maxDistLen) + ";");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr));
 #endif
-#if 0 // ObservationTreeAlgorithm
+#if 1 // ObservationTreeAlgorithm
 	descriptions.emplace_back(fnName + ";OTree;ExtraStates:" + to_string(maxExtraStates) + ";");
-	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr));
+	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, true, nullptr));
 #endif
 
+#if 0 // TeacherDFSM
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
 		auto model = algorithms[i](teacher);
 		printCSV(teacher, model, descriptions[i] + "TeacherDFSM;;");
 	}
+#endif
+#if 1 // TeacherRL
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 		auto model = algorithms[i](teacher);
 		printCSV(teacher, model, descriptions[i] + "TeacherRL;;");
 	}
+#endif
+#if 0 // TeacherBB
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
 		auto model = algorithms[i](teacher);
 		printCSV(teacher, model, descriptions[i] + "TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;");
 	}
+#endif
 }
 
 static void translateLearnLibDFAtoFSMformat(string fileName) {
@@ -309,13 +315,13 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Mealy>();
+	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
-	string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
@@ -332,16 +338,16 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*
+	/*
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
-	auto model = ObservationTreeAlgorithm(teacher, 1, showConjecture);// showAndStop);
+	auto model = ObservationTreeAlgorithm(teacher, 1, true, showConjecture);// showAndStop);
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
 	//*/
-	//compareLearningAlgorithms(fileName);
+	compareLearningAlgorithms(fileName, 1, 3);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;
