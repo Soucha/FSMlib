@@ -54,10 +54,10 @@ namespace FSMlibTest
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Mealy_R4_SS.fsm");
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Mealy_R6_ADS.fsm", 4);
 			/*/
-			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm", 3);
+			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");//3
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_HS.fsm");
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
-			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm", 3);
+			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");//3
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SS.fsm");
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");// could require len of 3
 			//*/
@@ -66,16 +66,16 @@ namespace FSMlibTest
 		TEST_METHOD(TestGoodSplit_Moore)
 		{
 			fsm = make_unique<Moore>();
-			/*
+			//*
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			//testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard
-			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", 98);
+			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");//98
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS_E.fsm");
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R4_HS.fsm");
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R4_PDS.fsm");
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R4_SS.fsm");
-			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm", 3);
+			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm");//3
 			/*/
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Moore_R4_ADS.fsm");
 			testGoodSplit(DATA_PATH + EXAMPLES_DIR + "Moore_R4_HS.fsm");
@@ -98,7 +98,7 @@ namespace FSMlibTest
 		}
 
 		void testGoodSplitAlgorithm(const unique_ptr<Teacher>& teacher, string teacherName, string filename, size_t maxLen) {
-			auto model = GoodSplit(teacher, maxLen, showConjecture);
+			auto model = GoodSplit(teacher, maxLen, showConjecture, true);
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\tMaxLen: %d,\t%s\t%s%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(), maxLen,
 				teacherName.c_str(), filename.c_str(), (FSMmodel::areIsomorphic(fsm, model) ? "" : "\tNOT LEARNED"));

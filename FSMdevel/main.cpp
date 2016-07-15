@@ -266,11 +266,11 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 #endif
 #if 1 // GoodSplit
 	descriptions.emplace_back(fnName + ";GoodSplit;maxDistLen:" + to_string(maxDistLen) + ";");
-	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr));
+	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, true));
 #endif
 #if 1 // ObservationTreeAlgorithm
 	descriptions.emplace_back(fnName + ";OTree;ExtraStates:" + to_string(maxExtraStates) + ";");
-	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, true, nullptr));
+	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr, true));
 #endif
 
 #if 1 // TeacherDFSM
@@ -348,20 +348,17 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	/*
+	//*
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
-	//auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
-	chrono::time_point<chrono::system_clock> start, end;
-	start = chrono::system_clock::now();
-	auto model = ObservationTreeAlgorithm(teacher, 1, true, showConjecture);// showAndStop);
-	end = chrono::system_clock::now();
-	chrono::duration<double> elapsed_seconds = end - start;
+	auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
+	//auto model = ObservationTreeAlgorithm(teacher, 1, showConjecture, true);// showAndStop);
+	COMPUTATION_TIME()
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;
 	//*/
-	compareLearningAlgorithms(fileName, 1, 2);
+	//compareLearningAlgorithms(fileName, 1, 2);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;

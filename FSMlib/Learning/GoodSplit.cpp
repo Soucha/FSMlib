@@ -145,36 +145,35 @@ namespace FSMlearning {
 		return output;
 	}
 
-	static void query(const shared_ptr<gs_node_t >& node, const sequence_in_t& sequence, const unique_ptr<Teacher>& teacher, bool setStateOutput) {
+	static void query(shared_ptr<gs_node_t> node, const sequence_in_t& sequence, const unique_ptr<Teacher>& teacher, bool setStateOutput) {
 		auto output = teacher->resetAndOutputQueryOnSuffix(node->accessSequence, sequence);
 		node->counter++;
-		auto curr = node;
 		for (auto& input : sequence) {
 			if (input == STOUT_INPUT) {
 				if (!teacher->isProvidedOnlyMQ()) {
-					curr->stateOutput = output.front();
+					node->stateOutput = output.front();
 					output.pop_front();
 				}
 				continue;
 			}
-			if (!curr->succ[input]) {
-				curr->succ[input] = make_shared<gs_node_t>(curr->accessSequence, teacher->getNumberOfInputs());
-				curr->succ[input]->accessSequence.emplace_back(input);
+			if (!node->succ[input]) {
+				node->succ[input] = make_shared<gs_node_t>(node->accessSequence, teacher->getNumberOfInputs());
+				node->succ[input]->accessSequence.emplace_back(input);
 			}
-			curr = curr->succ[input];
+			node = node->succ[input];
 			if (!teacher->isProvidedOnlyMQ()) {
-				if (setStateOutput) curr->stateOutput = output.front();
-				else curr->incomingOutput = output.front();
+				if (setStateOutput) node->stateOutput = output.front();
+				else node->incomingOutput = output.front();
 				output.pop_front();
 			}
 			else {
-				curr->counter++;
+				node->counter++;
 			}
 		}
 		if (teacher->isProvidedOnlyMQ()) {
-			if ((sequence.back() == STOUT_INPUT) || setStateOutput) curr->stateOutput = output.back();
-			else curr->incomingOutput = output.back();
-			curr->counter--;
+			if ((sequence.back() == STOUT_INPUT) || setStateOutput) node->stateOutput = output.back();
+			else node->incomingOutput = output.back();
+			node->counter--;
 		}
 	}
 
@@ -355,7 +354,7 @@ namespace FSMlearning {
 	}
 
 	unique_ptr<DFSM> GoodSplit(const unique_ptr<Teacher>& teacher, seq_len_t maxDistinguishingLength,
-		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel) {
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool isEQallowed) {
 		if (!teacher->isBlackBoxResettable()) {
 			ERROR_MESSAGE("FSMlearning::GoodSplit - the Black Box needs to be resettable");
 			return nullptr;
@@ -400,7 +399,70 @@ namespace FSMlearning {
 			// 3. step - the increase of len
 			if (10 * totalApplied >= 9 * totalDistSeq) {// totalApplied needs to be at least 90 % of totalDistSeq
 				len++;
-				if (len > maxDistinguishingLength) break;
+				if (len > maxDistinguishingLength) {
+					if (isEQallowed) {
+						auto ce = teacher->equivalenceQuery(conjecture);
+						if (!ce.empty()) {
+							if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
+								auto numInputs = teacher->getNumberOfInputs();
+								extendInputs(stateNodes[0], numInputs);
+								conjecture->incNumberOfInputs(numInputs - conjecture->getNumberOfInputs());
+							}
+							//split
+							sequence_in_t prefix, suffix(ce);
+							auto bbOutput = teacher->resetAndOutputQuery(ce);
+							state_t prevState, state = 0;
+							for (const auto& input : ce) {
+								if (input != STOUT_INPUT) {
+									if (prefix != stateNodes[state]->accessSequence) {
+										auto output = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->accessSequence, suffix);
+										if (bbOutput != output) {
+											break;
+										}
+									}
+									prefix.push_back(input);
+									prevState = state;
+									state = conjecture->getNextState(state, input);
+								}
+								if (bbOutput.size() > 1) bbOutput.pop_front();
+								suffix.pop_front();
+							}
+							if (getLastOutput(stateNodes[state], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
+								query(stateNodes[state], suffix, teacher, !conjecture->isOutputTransition());
+							}
+							if (getLastOutput(stateNodes[prevState]->succ[prefix.back()], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
+								query(stateNodes[prevState]->succ[prefix.back()], suffix, teacher, !conjecture->isOutputTransition());
+							}
+							len = 0;
+							while (!suffix.empty()) {
+								if (suffix.front() != STOUT_INPUT) {
+									len++;
+									if (len == maxDistinguishingLength + 1) {
+										if (!teacher->isProvidedOnlyMQ()) {
+											// clear all counters
+											for (auto& sn : stateNodes) {
+												for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
+													if (sn->succ[i]->state == NULL_STATE) sn->succ[i]->counter = 0;
+												}
+											}
+											totalApplied = 0;
+										}
+									}
+									if (len > maxDistinguishingLength) {
+										if (!teacher->isProvidedOnlyMQ()) {
+											distSequences.clear();
+										}
+										extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
+									}
+								}
+								suffix.pop_front();
+							}
+							maxDistinguishingLength = len;
+							continue;
+						}
+					}
+					break;
+				}
 				// extend distSequences
 				if (!teacher->isProvidedOnlyMQ()) {
 					distSequences.clear();

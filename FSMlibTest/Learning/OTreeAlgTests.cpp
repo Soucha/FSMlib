@@ -98,7 +98,7 @@ namespace FSMlibTest
 		}
 
 		void testOTreeAlgorithm(const unique_ptr<Teacher>& teacher, string teacherName, string filename, state_t maxExtraStates) {
-			auto model = ObservationTreeAlgorithm(teacher, maxExtraStates, true, showConjecture);
+			auto model = ObservationTreeAlgorithm(teacher, maxExtraStates, showConjecture, true);
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\tExtraStates: %d,\t%s\t%s%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(), maxExtraStates,
 				teacherName.c_str(), filename.c_str(), (FSMmodel::areIsomorphic(fsm, model) ? "" : "\tNOT LEARNED"));
