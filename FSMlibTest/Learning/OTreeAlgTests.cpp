@@ -68,7 +68,7 @@ namespace FSMlibTest
 			fsm = make_unique<Moore>();
 			//*
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
-			//testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard Correct: 1,reset: 3621,OQ: 19883,EQ: 3,symbols: 72341, TeacherDFSM, ExtraStates:1
+			//testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm", 1);//97
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
 			testOTreeAlg(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS_E.fsm");

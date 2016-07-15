@@ -16,6 +16,8 @@
 */
 
 #include <iostream>
+#include <chrono>
+
 
 #ifndef PARALLEL_COMPUTING
 //#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
@@ -173,9 +175,9 @@ bool showAndStop(const unique_ptr<DFSM>& conjecture) {
 	return !ce.empty();
 }
 
-static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, const string& description) {
-	printf("%d;%d;%d;%d;%d;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
-		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), description.c_str());
+static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, double sec, const string& description) {
+	printf("%d;%d;%d;%d;%d;%f;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
+		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), sec, description.c_str());
 }
 
 static void testLstar(const unique_ptr<Teacher>& teacher,
@@ -183,7 +185,7 @@ static void testLstar(const unique_ptr<Teacher>& teacher,
 	string fnName, bool checkConsistency = false) {
 	auto model = Lstar(teacher, processCE, showConjecture, false, true);
 	string desc = ";L*;" + fnName + ";;;";
-	printCSV(teacher, model, desc);
+	printCSV(teacher, model, 0, desc);
 	/*
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
@@ -217,6 +219,12 @@ static void testLStarAllVariants() {
 		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
 	}
 }
+
+#define COMPUTATION_TIME(com) \
+	auto start = chrono::system_clock::now(); \
+	com; \
+	auto end = chrono::system_clock::now(); \
+	chrono::duration<double> elapsed_seconds = end - start; 
 
 static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates = 1, seq_len_t maxDistLen = 2) {
 	printf("Correct;#Resets;#OQs;#EQs;#symbols;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
@@ -265,26 +273,26 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, true, nullptr));
 #endif
 
-#if 0 // TeacherDFSM
+#if 1 // TeacherDFSM
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-		auto model = algorithms[i](teacher);
-		printCSV(teacher, model, descriptions[i] + "TeacherDFSM;;");
+		COMPUTATION_TIME(auto model = algorithms[i](teacher))
+		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM;;");
 	}
 #endif
 #if 1 // TeacherRL
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-		auto model = algorithms[i](teacher);
-		printCSV(teacher, model, descriptions[i] + "TeacherRL;;");
+		COMPUTATION_TIME(auto model = algorithms[i](teacher))
+		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL;;");
 	}
 #endif
-#if 0 // TeacherBB
+#if 1 // TeacherBB
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-		auto model = algorithms[i](teacher);
-		printCSV(teacher, model, descriptions[i] + "TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;");
+		COMPUTATION_TIME(auto model = algorithms[i](teacher))
+		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;");
 	}
 #endif
 }
@@ -315,13 +323,15 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 int main(int argc, char** argv) {
 	//getCSet();
-	fsm = make_unique<Moore>();
+	fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
-	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
+	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
+	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
+	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
@@ -342,12 +352,16 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = QuotientAlgorithm(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 3, nullptr);// showAndStop);
+	chrono::time_point<chrono::system_clock> start, end;
+	start = chrono::system_clock::now();
 	auto model = ObservationTreeAlgorithm(teacher, 1, true, showConjecture);// showAndStop);
+	end = chrono::system_clock::now();
+	chrono::duration<double> elapsed_seconds = end - start;
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
-	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << endl;
+	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;
 	//*/
-	compareLearningAlgorithms(fileName, 1, 3);
+	compareLearningAlgorithms(fileName, 1, 2);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 
 	char c;

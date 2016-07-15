@@ -190,14 +190,6 @@ namespace FSMlearning {
 			}
 			node->refStates.emplace(node->state);
 			
-			auto currNode = node;
-			state_t level = 0;
-			while ((currNode->distInputIdx != STOUT_INPUT) && (level < ot.numberOfExtraStates)) {
-				currNode = currNode->next[currNode->distInputIdx];
-				if (currNode->state != NULL_STATE) break;
-				currNode->extraStateLevel = ++level;
-			}
-			
 			auto parent = node->parent.lock();
 			if (parent && (parent->state != NULL_STATE)) {
 				ot.conjecture->setTransition(parent->state, parent->nextInputs[node->incomingInputIdx], node->state, 
@@ -336,10 +328,12 @@ namespace FSMlearning {
 		return true;
 	}
 
-	static void checkAndQueryNext(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
+	static void tryExtendQueriedPath(shared_ptr<ot_node_t> node, ObservationTree& ot, const unique_ptr<Teacher>& teacher);
+
+	static void checkAndQueryNext(const shared_ptr<ot_node_t>& node, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
 		checkPrevious(node, ot);
 		
-		//can we query anything from currNode ? ;
+		tryExtendQueriedPath(node, ot, teacher);
 
 		if (ot.uncheckedNodes.empty()) {
 			ot.uncheckedNodes.assign(ot.stateNodes.begin(), ot.stateNodes.end());
@@ -492,29 +486,33 @@ namespace FSMlearning {
 		}
 	}
 
-	static void identify(shared_ptr<ot_node_t>& node, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
-		state_t expectedState = NULL_STATE;
-		if (node->extraStateLevel > 1) {
-			auto& parent = node->parent.lock();
-			expectedState = ot.conjecture->getNextState(*(parent->refStates.begin()), parent->nextInputs[node->incomingInputIdx]);
-		}
-		auto ads = make_shared<ads_t>();
-		for (auto& state : node->refStates) {
-			if (state != expectedState)
-				ads->nodes.emplace_back(ot.stateNodes[state]);
-			else
-				ads->nodes.push_front(ot.stateNodes[state]);
-		}
-		if (node->refStates.size() == 1) {
-			ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
-		} else if (expectedState != NULL_STATE) {
-			size_t bestVal(node->refStates.size());
-			seq_len_t len(-1);
-			chooseSVS(ads, ot, bestVal, len);
-		} else {
-			seq_len_t totalLen = 0;
-			frac_t bestVal(1), currVal(0);
-			chooseADS(ads, ot, bestVal, currVal, totalLen);
+	static void identify(const shared_ptr<ot_node_t>& node, ObservationTree& ot, const unique_ptr<Teacher>& teacher, shared_ptr<ads_t> ads = nullptr) {
+		if (!ads) {
+			state_t expectedState = NULL_STATE;
+			if (node->extraStateLevel > 1) {
+				auto& parent = node->parent.lock();
+				expectedState = ot.conjecture->getNextState(*(parent->refStates.begin()), parent->nextInputs[node->incomingInputIdx]);
+			}
+			ads = make_shared<ads_t>();
+			for (auto& state : node->refStates) {
+				if (state != expectedState)
+					ads->nodes.emplace_back(ot.stateNodes[state]);
+				else
+					ads->nodes.push_front(ot.stateNodes[state]);
+			}
+			if (node->refStates.size() == 1) {
+				ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
+			}
+			else if (expectedState != NULL_STATE) {
+				size_t bestVal(node->refStates.size());
+				seq_len_t len(-1);
+				chooseSVS(ads, ot, bestVal, len);
+			}
+			else {
+				seq_len_t totalLen = 0;
+				frac_t bestVal(1), currVal(0);
+				chooseADS(ads, ot, bestVal, currVal, totalLen);
+			}
 		}
 		// simulate ADS
 		auto currNode = node;
@@ -538,7 +536,87 @@ namespace FSMlearning {
 			}
 			idx = getNextIdx(currNode, ads->input);
 		}
-		checkAndQueryNext(currNode, ot);
+		checkAndQueryNext(currNode, ot, teacher);
+	}
+
+	static shared_ptr<ads_t> getADSwithFixedPrefix(shared_ptr<ot_node_t> node, state_t expectedState, ObservationTree& ot) {
+		auto ads = make_shared<ads_t>();
+		for (auto& state : node->refStates) {
+			if (state != expectedState)
+				ads->nodes.emplace_back(ot.stateNodes[state]);
+			else
+				ads->nodes.push_front(ot.stateNodes[state]);
+		}
+		auto currAds = ads;
+		while (node->distInputIdx != STOUT_INPUT) {
+			currAds->input = node->nextInputs[node->distInputIdx];
+			node = node->next[node->distInputIdx];
+			if (expectedState != NULL_STATE) {
+				auto& refNode = currAds->nodes.front();
+				auto idx = getNextIdx(refNode, currAds->input);
+				if ((idx == STOUT_INPUT) || (!refNode->next[idx])) {
+					return nullptr;
+				}
+			}
+			auto nextADS = make_shared<ads_t>();
+			for (auto& nn : currAds->nodes) {
+				auto idx = getNextIdx(nn, currAds->input);
+				if ((idx != STOUT_INPUT) && nn->next[idx]) {
+					nextADS->nodes.emplace_back(nn->next[idx]);
+				}
+			}
+			currAds->next.emplace(node->incomingOutput, nextADS);
+			currAds = nextADS;
+		}
+		if ((currAds->nodes.size() == 1) || (!areDistinguished(currAds->nodes, ot.spaceEfficient, (expectedState != NULL_STATE)))) {
+			return nullptr;
+		}
+		if (expectedState != NULL_STATE) {
+			size_t bestVal(currAds->nodes.size());
+			seq_len_t len(-1);
+			chooseSVS(currAds, ot, bestVal, len);
+		} else {
+			seq_len_t totalLen = 0;
+			frac_t bestVal(1), currVal(0);
+			chooseADS(currAds, ot, bestVal, currVal, totalLen);
+		}
+		return ads;
+	}
+
+	static void tryExtendQueriedPath(shared_ptr<ot_node_t> node, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		while (node->state == NULL_STATE) {// find the lowest state node
+			node = node->parent.lock();
+		}
+		if (node->distInputIdx == STOUT_INPUT) {//the state node is leaf
+			if (!node->nextInputs.empty()) {
+				// apply
+				query(node, 0, ot, teacher);
+				if (ot.conjecture->isOutputState() && node->next[0]->refStates.empty()) {// new state
+					return checkAndQueryNext(node->next[0], ot, teacher);
+				}
+				return identify(node->next[0], ot, teacher);
+			}
+		}
+		else {
+			auto level = node->extraStateLevel;
+			auto state = node->state;
+			while ((node->distInputIdx != STOUT_INPUT) && (level <= ot.numberOfExtraStates)) {
+				if (state != NULL_STATE) {
+					auto idx = getNextIdx(ot.stateNodes[state], node->nextInputs[node->distInputIdx]);
+					if (ot.stateNodes[state]->next[idx]->refStates.size() == 1) {
+						state = *(ot.stateNodes[state]->next[idx]->refStates.begin());
+					} else state = NULL_STATE;
+				}
+				node = node->next[node->distInputIdx];
+				if (node->refStates.size() > 1) {
+					auto ads = getADSwithFixedPrefix(node, state, ot);
+					if (ads) {
+						return identify(node, ot, teacher, ads);
+					}
+				}
+				node->extraStateLevel = ++level;
+			}
+		}
 	}
 
 	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates, bool isEQallowed,
@@ -584,7 +662,7 @@ namespace FSMlearning {
 								}
 								currNode = currNode->next[idx];
 							}
-							checkAndQueryNext(currNode, ot);
+							checkAndQueryNext(currNode, ot, teacher);
 							continue;
 						}
 					}
@@ -599,11 +677,11 @@ namespace FSMlearning {
 					nextNode = node->next[i];
 					if (node->state != NULL_STATE) {
 						if (ot.conjecture->isOutputState() && nextNode->refStates.empty()) {// new state
-							checkAndQueryNext(nextNode, ot);
+							checkAndQueryNext(nextNode, ot, teacher);
 							nextNode = nullptr;
 						}
 					} else if (!checkResponse(node, i, ot)) {// new state
-						checkAndQueryNext(nextNode, ot);
+						checkAndQueryNext(nextNode, ot, teacher);
 						nextNode = nullptr;
 					}
 					break;
