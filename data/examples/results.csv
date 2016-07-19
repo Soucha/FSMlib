@@ -1,0 +1,937 @@
+Correct	#Resets	#OQs	#EQs	#symbols	#BBresets	#BBsymbols	seconds	Algorithm	CEprocessing	Teacher	BB	fileName
+1	27	27	2	105	0	0	0.017011	L*	addAllPrefixesToS	TeacherDFSM		DFA_R4_ADS.fsm
+1	29	29	3	94	0	0	0.009003	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R4_ADS.fsm
+1	27	27	3	87	0	0	0.008506	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R4_ADS.fsm
+1	31	31	3	97	0	0	0.011507	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R4_ADS.fsm
+1	33	33	3	104	0	0	0.006505	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R4_ADS.fsm
+1	29	29	3	103	0	0	0.007005	DT		TeacherDFSM		DFA_R4_ADS.fsm
+1	40	40	1	134	0	0	0.007102	OP	AllGlobally	TeacherDFSM		DFA_R4_ADS.fsm
+1	40	40	1	134	0	0	0.012008	OP	OneGlobally	TeacherDFSM		DFA_R4_ADS.fsm
+1	39	39	1	132	0	0	0.008006	OP	OneLocally	TeacherDFSM		DFA_R4_ADS.fsm
+1	23	23	3	74	0	0	0.011507	TTT		TeacherDFSM		DFA_R4_ADS.fsm
+1	19	19	1	77	0	0	0.010509	Quotient		TeacherDFSM		DFA_R4_ADS.fsm
+1	37	37	1	149	0	0	88.184861	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R4_ADS.fsm
+1	15	29	1	64	0	0	2.721172	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R4_ADS.fsm
+1	27	27	2	105	0	0	0.010508	L*	addAllPrefixesToS	TeacherRL		DFA_R4_ADS.fsm
+1	29	29	3	94	0	0	0.013509	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R4_ADS.fsm
+1	27	27	3	87	0	0	0.013512	L*	addSuffix1by1ToE	TeacherRL		DFA_R4_ADS.fsm
+1	31	31	3	97	0	0	0.014008	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R4_ADS.fsm
+1	33	33	3	104	0	0	0.012008	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R4_ADS.fsm
+1	29	29	3	103	0	0	0.005506	DT		TeacherRL		DFA_R4_ADS.fsm
+1	40	40	1	134	0	0	0.008005	OP	AllGlobally	TeacherRL		DFA_R4_ADS.fsm
+1	40	40	1	134	0	0	0.007005	OP	OneGlobally	TeacherRL		DFA_R4_ADS.fsm
+1	39	39	1	132	0	0	0.007005	OP	OneLocally	TeacherRL		DFA_R4_ADS.fsm
+1	23	23	3	74	0	0	0.006509	TTT		TeacherRL		DFA_R4_ADS.fsm
+1	19	55	1	77	0	0	0.004003	Quotient		TeacherRL		DFA_R4_ADS.fsm
+1	36	36	1	142	0	0	0.006504	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R4_ADS.fsm
+1	15	29	1	64	0	0	0.006504	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R4_ADS.fsm
+1	43	27	2	71	43	141	0.040956	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	53	29	3	70	53	139	0.020514	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	51	27	3	73	51	146	0.021014	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	55	31	3	70	55	139	0.020514	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	57	33	3	70	57	139	0.020014	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	53	29	3	69	53	121	0.016010	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	51	40	1	68	51	167	0.012507	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	51	40	1	68	51	167	0.013007	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	50	39	1	68	50	167	0.012509	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	47	23	3	69	47	124	0.018511	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	30	19	1	71	30	141	0.011007	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	48	37	1	78	48	231	0.014510	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	26	29	1	71	26	152	0.016012	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_ADS.fsm
+1	39	39	3	155	0	0	0.008004	L*	addAllPrefixesToS	TeacherDFSM		DFA_R4_HS.fsm
+1	29	29	3	80	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R4_HS.fsm
+1	27	27	3	75	0	0	0.005002	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R4_HS.fsm
+1	31	31	3	83	0	0	0.004503	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R4_HS.fsm
+1	32	32	3	86	0	0	0.004503	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R4_HS.fsm
+1	27	27	3	83	0	0	0.002000	DT		TeacherDFSM		DFA_R4_HS.fsm
+1	42	42	1	119	0	0	0.004003	OP	AllGlobally	TeacherDFSM		DFA_R4_HS.fsm
+1	42	42	1	119	0	0	0.003502	OP	OneGlobally	TeacherDFSM		DFA_R4_HS.fsm
+1	41	41	1	117	0	0	0.003503	OP	OneLocally	TeacherDFSM		DFA_R4_HS.fsm
+1	22	22	3	59	0	0	0.003002	TTT		TeacherDFSM		DFA_R4_HS.fsm
+1	19	19	1	69	0	0	0.002001	Quotient		TeacherDFSM		DFA_R4_HS.fsm
+1	37	37	1	136	0	0	0.004503	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R4_HS.fsm
+1	13	28	1	51	0	0	0.006504	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R4_HS.fsm
+1	39	39	3	155	0	0	0.012009	L*	addAllPrefixesToS	TeacherRL		DFA_R4_HS.fsm
+1	29	29	3	80	0	0	0.006003	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R4_HS.fsm
+1	27	27	3	75	0	0	0.007005	L*	addSuffix1by1ToE	TeacherRL		DFA_R4_HS.fsm
+1	31	31	3	83	0	0	0.007005	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R4_HS.fsm
+1	32	32	3	86	0	0	0.008009	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R4_HS.fsm
+1	27	27	3	83	0	0	0.003002	DT		TeacherRL		DFA_R4_HS.fsm
+1	42	42	1	119	0	0	0.005005	OP	AllGlobally	TeacherRL		DFA_R4_HS.fsm
+1	42	42	1	119	0	0	0.006503	OP	OneGlobally	TeacherRL		DFA_R4_HS.fsm
+1	41	41	1	117	0	0	0.005504	OP	OneLocally	TeacherRL		DFA_R4_HS.fsm
+1	22	22	3	59	0	0	0.006004	TTT		TeacherRL		DFA_R4_HS.fsm
+1	19	55	1	69	0	0	0.004003	Quotient		TeacherRL		DFA_R4_HS.fsm
+1	37	37	1	136	0	0	0.006003	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R4_HS.fsm
+1	13	28	1	51	0	0	0.006004	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R4_HS.fsm
+1	78	51	3	93	78	215	0.046031	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	65	38	3	78	65	173	0.021514	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	63	36	3	78	63	173	0.023016	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	58	31	3	76	58	160	0.021014	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	60	33	3	76	60	160	0.022014	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	57	30	3	67	57	126	0.017012	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	58	42	1	66	58	164	0.014009	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	58	42	1	66	58	164	0.015009	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	57	41	1	66	57	164	0.012508	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	52	25	3	71	52	140	0.020513	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	35	19	1	69	35	136	0.012508	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	53	37	1	76	53	231	0.018513	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	29	28	1	71	29	150	0.016011	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_HS.fsm
+1	39	39	3	168	0	0	0.008505	L*	addAllPrefixesToS	TeacherDFSM		DFA_R4_PDS.fsm
+1	29	29	3	80	0	0	0.004003	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R4_PDS.fsm
+1	27	27	3	75	0	0	0.005504	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R4_PDS.fsm
+1	31	31	3	82	0	0	0.005004	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R4_PDS.fsm
+1	32	32	3	85	0	0	0.005503	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R4_PDS.fsm
+1	31	31	3	100	0	0	0.002001	DT		TeacherDFSM		DFA_R4_PDS.fsm
+1	45	45	1	130	0	0	0.003503	OP	AllGlobally	TeacherDFSM		DFA_R4_PDS.fsm
+1	45	45	1	130	0	0	0.003502	OP	OneGlobally	TeacherDFSM		DFA_R4_PDS.fsm
+1	44	44	1	128	0	0	0.003502	OP	OneLocally	TeacherDFSM		DFA_R4_PDS.fsm
+1	24	24	3	66	0	0	0.003003	TTT		TeacherDFSM		DFA_R4_PDS.fsm
+1	19	19	1	69	0	0	0.002501	Quotient		TeacherDFSM		DFA_R4_PDS.fsm
+1	36	36	1	130	0	0	0.004503	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R4_PDS.fsm
+1	14	28	1	57	0	0	0.006504	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R4_PDS.fsm
+1	39	39	3	168	0	0	0.011508	L*	addAllPrefixesToS	TeacherRL		DFA_R4_PDS.fsm
+1	29	29	3	80	0	0	0.006004	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R4_PDS.fsm
+1	27	27	3	75	0	0	0.006004	L*	addSuffix1by1ToE	TeacherRL		DFA_R4_PDS.fsm
+1	31	31	3	82	0	0	0.007005	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R4_PDS.fsm
+1	32	32	3	85	0	0	0.007505	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R4_PDS.fsm
+1	31	31	3	100	0	0	0.003002	DT		TeacherRL		DFA_R4_PDS.fsm
+1	45	45	1	130	0	0	0.006006	OP	AllGlobally	TeacherRL		DFA_R4_PDS.fsm
+1	45	45	1	130	0	0	0.005503	OP	OneGlobally	TeacherRL		DFA_R4_PDS.fsm
+1	44	44	1	128	0	0	0.005504	OP	OneLocally	TeacherRL		DFA_R4_PDS.fsm
+1	24	24	3	66	0	0	0.006004	TTT		TeacherRL		DFA_R4_PDS.fsm
+1	19	55	1	69	0	0	0.003502	Quotient		TeacherRL		DFA_R4_PDS.fsm
+1	37	37	1	150	0	0	0.005504	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R4_PDS.fsm
+1	14	28	1	57	0	0	0.007005	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R4_PDS.fsm
+1	79	51	3	93	79	215	0.045529	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	75	47	3	69	75	155	0.028521	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	55	27	3	63	55	131	0.024015	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	59	31	3	69	59	155	0.030520	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	60	32	3	69	60	155	0.024517	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	59	31	3	63	59	104	0.019013	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	61	45	1	63	61	151	0.014009	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	61	45	1	63	61	151	0.014009	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	60	44	1	63	60	151	0.014511	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	52	24	3	67	52	132	0.018012	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	35	19	1	63	35	120	0.011006	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	53	37	1	77	53	230	0.016011	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	30	28	1	70	30	141	0.016512	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_PDS.fsm
+1	33	33	2	138	0	0	0.007005	L*	addAllPrefixesToS	TeacherDFSM		DFA_R4_SCSet.fsm
+1	28	28	2	87	0	0	0.003503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R4_SCSet.fsm
+1	27	27	3	84	0	0	0.005504	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R4_SCSet.fsm
+1	29	29	2	89	0	0	4.177110	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.004502	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R4_SCSet.fsm
+1	32	32	3	108	0	0	0.002502	DT		TeacherDFSM		DFA_R4_SCSet.fsm
+1	68	68	2	246	0	0	0.008006	OP	AllGlobally	TeacherDFSM		DFA_R4_SCSet.fsm
+1	52	52	2	167	0	0	0.005503	OP	OneGlobally	TeacherDFSM		DFA_R4_SCSet.fsm
+1	47	47	2	146	0	0	0.005004	OP	OneLocally	TeacherDFSM		DFA_R4_SCSet.fsm
+1	25	25	2	76	0	0	0.004003	TTT		TeacherDFSM		DFA_R4_SCSet.fsm
+1	22	22	2	90	0	0	0.007004	Quotient		TeacherDFSM		DFA_R4_SCSet.fsm
+1	37	37	1	136	0	0	0.004504	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R4_SCSet.fsm
+1	16	33	1	65	0	0	0.009005	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R4_SCSet.fsm
+1	33	33	2	138	0	0	0.008005	L*	addAllPrefixesToS	TeacherRL		DFA_R4_SCSet.fsm
+1	28	28	2	87	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R4_SCSet.fsm
+1	27	27	3	84	0	0	0.006004	L*	addSuffix1by1ToE	TeacherRL		DFA_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.006508	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.007004	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R4_SCSet.fsm
+1	32	32	3	108	0	0	0.003505	DT		TeacherRL		DFA_R4_SCSet.fsm
+1	68	68	2	246	0	0	0.009005	OP	AllGlobally	TeacherRL		DFA_R4_SCSet.fsm
+1	52	52	2	167	0	0	0.009506	OP	OneGlobally	TeacherRL		DFA_R4_SCSet.fsm
+1	47	47	2	146	0	0	0.009007	OP	OneLocally	TeacherRL		DFA_R4_SCSet.fsm
+1	25	25	2	76	0	0	0.008005	TTT		TeacherRL		DFA_R4_SCSet.fsm
+1	22	68	2	90	0	0	0.006505	Quotient		TeacherRL		DFA_R4_SCSet.fsm
+1	36	36	1	131	0	0	0.009005	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R4_SCSet.fsm
+1	16	33	1	65	0	0	0.008506	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R4_SCSet.fsm
+1	49	27	2	98	49	173	0.033022	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	75	47	3	109	75	209	0.024517	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	55	27	3	91	55	168	0.023013	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	59	31	3	105	59	193	0.025016	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	61	33	3	105	61	193	0.023516	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	59	31	3	93	59	152	0.022015	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	153	131	2	155	153	274	0.037024	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	74	52	2	123	74	227	0.027018	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	69	47	2	107	69	203	0.027018	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	54	26	3	97	54	167	0.022016	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	44	22	2	95	44	165	0.019513	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	53	37	1	99	53	249	0.018512	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	32	33	1	87	32	168	0.020513	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SCSet.fsm
+1	33	33	3	138	0	0	0.007005	L*	addAllPrefixesToS	TeacherDFSM		DFA_R4_SS.fsm
+1	28	28	2	87	0	0	0.003504	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R4_SS.fsm
+1	27	27	2	84	0	0	0.004502	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R4_SS.fsm
+1	29	29	2	89	0	0	0.004503	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R4_SS.fsm
+1	29	29	2	89	0	0	0.004003	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R4_SS.fsm
+1	28	28	3	94	0	0	0.002502	DT		TeacherDFSM		DFA_R4_SS.fsm
+1	68	68	2	252	0	0	0.006504	OP	AllGlobally	TeacherDFSM		DFA_R4_SS.fsm
+1	52	52	2	171	0	0	0.005002	OP	OneGlobally	TeacherDFSM		DFA_R4_SS.fsm
+1	48	48	2	154	0	0	0.004503	OP	OneLocally	TeacherDFSM		DFA_R4_SS.fsm
+1	20	20	2	60	0	0	0.002502	TTT		TeacherDFSM		DFA_R4_SS.fsm
+1	20	20	2	82	0	0	0.003502	Quotient		TeacherDFSM		DFA_R4_SS.fsm
+1	34	34	1	124	0	0	0.009506	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R4_SS.fsm
+1	16	37	2	70	0	0	0.010006	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R4_SS.fsm
+1	33	33	3	138	0	0	0.007507	L*	addAllPrefixesToS	TeacherRL		DFA_R4_SS.fsm
+1	28	28	2	87	0	0	0.003501	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R4_SS.fsm
+1	27	27	2	84	0	0	0.004001	L*	addSuffix1by1ToE	TeacherRL		DFA_R4_SS.fsm
+1	29	29	2	89	0	0	0.005504	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R4_SS.fsm
+1	29	29	2	89	0	0	0.006504	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R4_SS.fsm
+1	28	28	3	94	0	0	0.003001	DT		TeacherRL		DFA_R4_SS.fsm
+1	68	68	2	252	0	0	0.008506	OP	AllGlobally	TeacherRL		DFA_R4_SS.fsm
+1	52	52	2	171	0	0	0.007506	OP	OneGlobally	TeacherRL		DFA_R4_SS.fsm
+1	48	48	2	154	0	0	0.007004	OP	OneLocally	TeacherRL		DFA_R4_SS.fsm
+1	20	20	2	60	0	0	0.004003	TTT		TeacherRL		DFA_R4_SS.fsm
+1	20	66	2	82	0	0	0.005003	Quotient		TeacherRL		DFA_R4_SS.fsm
+1	36	36	1	145	0	0	0.006504	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R4_SS.fsm
+1	16	37	2	70	0	0	0.009004	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R4_SS.fsm
+1	71	51	2	107	71	245	0.044031	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	66	46	2	98	66	198	0.018512	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	47	27	2	78	47	151	0.015510	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	49	29	2	96	49	182	0.018511	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	50	30	2	96	50	182	0.019015	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	55	28	3	77	55	125	0.016509	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	169	149	2	173	169	284	0.044029	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	72	52	2	121	72	204	0.027518	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	68	48	2	105	68	182	0.037525	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	41	21	2	86	41	148	0.015512	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	40	20	2	79	40	133	0.037524	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	46	33	1	90	46	212	0.028018	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	36	37	2	81	36	174	0.026517	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R4_SS.fsm
+1	76	76	4	368	0	0	0.020514	L*	addAllPrefixesToS	TeacherDFSM		DFA_R5_SVS.fsm
+1	47	47	4	152	0	0	0.008506	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFA_R5_SVS.fsm
+1	44	44	4	143	0	0	0.010006	L*	addSuffix1by1ToE	TeacherDFSM		DFA_R5_SVS.fsm
+1	50	50	4	158	0	0	0.009005	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFA_R5_SVS.fsm
+1	52	52	4	165	0	0	0.009006	L*	addSuffixToE_binarySearch	TeacherDFSM		DFA_R5_SVS.fsm
+1	50	50	4	183	0	0	0.004504	DT		TeacherDFSM		DFA_R5_SVS.fsm
+1	104	104	2	433	0	0	0.011508	OP	AllGlobally	TeacherDFSM		DFA_R5_SVS.fsm
+1	73	73	2	255	0	0	0.007503	OP	OneGlobally	TeacherDFSM		DFA_R5_SVS.fsm
+1	65	65	2	219	0	0	0.006004	OP	OneLocally	TeacherDFSM		DFA_R5_SVS.fsm
+1	37	37	4	117	0	0	0.005004	TTT		TeacherDFSM		DFA_R5_SVS.fsm
+1	28	28	2	119	0	0	0.004503	Quotient		TeacherDFSM		DFA_R5_SVS.fsm
+1	43	43	1	173	0	0	0.007004	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFA_R5_SVS.fsm
+1	23	41	1	103	0	0	0.017018	OTree	ExtraStates:1+EQ	TeacherDFSM		DFA_R5_SVS.fsm
+1	76	76	4	368	0	0	0.027516	L*	addAllPrefixesToS	TeacherRL		DFA_R5_SVS.fsm
+1	47	47	4	152	0	0	0.010506	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFA_R5_SVS.fsm
+1	44	44	4	143	0	0	0.012509	L*	addSuffix1by1ToE	TeacherRL		DFA_R5_SVS.fsm
+1	50	50	4	158	0	0	0.012010	L*	addSuffixAfterLastStateToE	TeacherRL		DFA_R5_SVS.fsm
+1	52	52	4	165	0	0	0.012512	L*	addSuffixToE_binarySearch	TeacherRL		DFA_R5_SVS.fsm
+1	50	50	4	183	0	0	0.004003	DT		TeacherRL		DFA_R5_SVS.fsm
+1	104	104	2	433	0	0	0.014510	OP	AllGlobally	TeacherRL		DFA_R5_SVS.fsm
+1	73	73	2	255	0	0	0.015510	OP	OneGlobally	TeacherRL		DFA_R5_SVS.fsm
+1	65	65	2	219	0	0	0.012008	OP	OneLocally	TeacherRL		DFA_R5_SVS.fsm
+1	37	37	4	117	0	0	0.006505	TTT		TeacherRL		DFA_R5_SVS.fsm
+1	28	84	2	119	0	0	0.010007	Quotient		TeacherRL		DFA_R5_SVS.fsm
+1	44	44	1	175	0	0	0.014010	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFA_R5_SVS.fsm
+1	23	41	1	103	0	0	0.016514	OTree	ExtraStates:1+EQ	TeacherRL		DFA_R5_SVS.fsm
+1	137	100	4	151	137	415	0.094066	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	117	80	4	103	117	265	0.036524	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	81	44	4	93	81	221	0.034523	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	87	50	4	103	87	265	0.036525	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	90	53	4	93	90	222	0.033523	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	88	51	4	93	88	174	0.027017	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	175	148	2	129	175	280	0.033522	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	100	73	2	90	100	235	0.029019	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	92	65	2	88	92	222	0.029519	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	78	43	4	89	78	229	0.029519	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	55	28	2	91	55	184	0.025517	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	64	42	1	102	64	289	0.023515	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	45	41	1	95	45	229	0.031522	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFA_R5_SVS.fsm
+1	45	45	2	172	0	0	0.006004	L*	addAllPrefixesToS	TeacherDFSM		DFSM_R4_ADS.fsm
+1	47	47	3	182	0	0	0.006004	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFSM_R4_ADS.fsm
+1	45	45	3	172	0	0	0.006003	L*	addSuffix1by1ToE	TeacherDFSM		DFSM_R4_ADS.fsm
+1	49	49	3	188	0	0	0.007505	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFSM_R4_ADS.fsm
+1	52	52	3	204	0	0	0.008506	L*	addSuffixToE_binarySearch	TeacherDFSM		DFSM_R4_ADS.fsm
+1	45	45	3	148	0	0	0.004003	DT		TeacherDFSM		DFSM_R4_ADS.fsm
+1	68	68	2	287	0	0	0.007004	OP	AllGlobally	TeacherDFSM		DFSM_R4_ADS.fsm
+1	62	62	3	237	0	0	0.006505	OP	OneGlobally	TeacherDFSM		DFSM_R4_ADS.fsm
+1	52	52	3	191	0	0	0.005503	OP	OneLocally	TeacherDFSM		DFSM_R4_ADS.fsm
+1	32	32	3	115	0	0	0.003502	TTT		TeacherDFSM		DFSM_R4_ADS.fsm
+1	22	22	2	96	0	0	0.003502	Quotient		TeacherDFSM		DFSM_R4_ADS.fsm
+1	36	36	1	197	0	0	0.007505	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFSM_R4_ADS.fsm
+1	16	33	1	103	0	0	0.010007	OTree	ExtraStates:1+EQ	TeacherDFSM		DFSM_R4_ADS.fsm
+1	45	45	2	172	0	0	0.006505	L*	addAllPrefixesToS	TeacherRL		DFSM_R4_ADS.fsm
+1	47	47	3	182	0	0	0.007005	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFSM_R4_ADS.fsm
+1	45	45	3	172	0	0	0.008007	L*	addSuffix1by1ToE	TeacherRL		DFSM_R4_ADS.fsm
+1	49	49	3	188	0	0	0.008504	L*	addSuffixAfterLastStateToE	TeacherRL		DFSM_R4_ADS.fsm
+1	52	52	3	204	0	0	0.008005	L*	addSuffixToE_binarySearch	TeacherRL		DFSM_R4_ADS.fsm
+1	45	45	3	148	0	0	0.003002	DT		TeacherRL		DFSM_R4_ADS.fsm
+1	68	68	2	287	0	0	0.008005	OP	AllGlobally	TeacherRL		DFSM_R4_ADS.fsm
+1	62	62	3	237	0	0	0.008505	OP	OneGlobally	TeacherRL		DFSM_R4_ADS.fsm
+1	52	52	3	191	0	0	0.008006	OP	OneLocally	TeacherRL		DFSM_R4_ADS.fsm
+1	32	32	3	115	0	0	0.004503	TTT		TeacherRL		DFSM_R4_ADS.fsm
+1	22	68	2	96	0	0	0.005003	Quotient		TeacherRL		DFSM_R4_ADS.fsm
+1	71	71	1	348	0	0	0.007005	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFSM_R4_ADS.fsm
+1	16	65	1	103	0	0	0.010005	OTree	ExtraStates:1+EQ	TeacherRL		DFSM_R4_ADS.fsm
+1	83	65	2	98	83	274	0.043529	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	91	73	2	95	91	211	0.021514	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	80	54	3	83	80	194	0.026519	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	77	51	3	83	77	194	0.024516	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	79	53	3	83	79	194	0.024515	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	75	49	3	81	75	142	0.018512	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	131	113	2	125	131	237	0.036530	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	90	64	3	83	90	194	0.026017	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	80	54	3	72	80	160	0.025017	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	66	40	3	73	66	123	0.020513	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	42	22	2	83	42	152	0.019012	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	49	37	1	99	49	212	0.017512	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	28	33	1	85	28	132	0.020514	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_ADS.fsm
+1	44	44	2	151	0	0	0.007004	L*	addAllPrefixesToS	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	37	37	2	113	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	36	36	2	109	0	0	0.006004	L*	addSuffix1by1ToE	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	38	38	2	115	0	0	0.006004	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	39	39	2	119	0	0	0.005004	L*	addSuffixToE_binarySearch	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	41	41	3	108	0	0	0.003002	DT		TeacherDFSM		DFSM_R4_SCSet.fsm
+1	70	70	2	252	0	0	0.007005	OP	AllGlobally	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	54	54	2	163	0	0	0.006004	OP	OneGlobally	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	48	48	2	141	0	0	0.005004	OP	OneLocally	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	32	32	3	86	0	0	0.003001	TTT		TeacherDFSM		DFSM_R4_SCSet.fsm
+1	19	19	1	69	0	0	0.002502	Quotient		TeacherDFSM		DFSM_R4_SCSet.fsm
+1	37	37	1	185	0	0	0.006004	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	15	29	1	88	0	0	0.009005	OTree	ExtraStates:1+EQ	TeacherDFSM		DFSM_R4_SCSet.fsm
+1	44	44	2	151	0	0	0.010007	L*	addAllPrefixesToS	TeacherRL		DFSM_R4_SCSet.fsm
+1	37	37	2	113	0	0	0.007005	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFSM_R4_SCSet.fsm
+1	36	36	2	109	0	0	0.008005	L*	addSuffix1by1ToE	TeacherRL		DFSM_R4_SCSet.fsm
+1	38	38	2	115	0	0	0.009007	L*	addSuffixAfterLastStateToE	TeacherRL		DFSM_R4_SCSet.fsm
+1	39	39	2	119	0	0	0.009006	L*	addSuffixToE_binarySearch	TeacherRL		DFSM_R4_SCSet.fsm
+1	41	41	3	108	0	0	0.005504	DT		TeacherRL		DFSM_R4_SCSet.fsm
+1	70	70	2	252	0	0	0.009004	OP	AllGlobally	TeacherRL		DFSM_R4_SCSet.fsm
+1	54	54	2	163	0	0	0.010983	OP	OneGlobally	TeacherRL		DFSM_R4_SCSet.fsm
+1	48	48	2	141	0	0	0.010507	OP	OneLocally	TeacherRL		DFSM_R4_SCSet.fsm
+1	32	32	3	86	0	0	0.009006	TTT		TeacherRL		DFSM_R4_SCSet.fsm
+1	19	55	1	69	0	0	0.006505	Quotient		TeacherRL		DFSM_R4_SCSet.fsm
+1	71	71	1	322	0	0	0.011508	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFSM_R4_SCSet.fsm
+1	15	57	1	88	0	0	0.008506	OTree	ExtraStates:1+EQ	TeacherRL		DFSM_R4_SCSet.fsm
+1	82	60	2	99	82	291	0.040027	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	95	73	2	89	95	194	0.024016	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	58	36	2	79	58	170	0.020109	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	62	40	2	79	62	170	0.020013	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	63	41	2	79	63	170	0.020013	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	72	46	3	81	72	155	0.019516	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	155	133	2	149	155	276	0.033027	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	78	56	2	79	78	170	0.020513	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	72	50	2	78	72	165	0.025017	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	70	44	3	77	70	143	0.022515	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	34	19	1	71	34	128	0.018512	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	52	37	1	89	52	199	0.019513	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	30	29	1	79	30	137	0.019016	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R4_SCSet.fsm
+1	114	114	2	422	0	0	0.015510	L*	addAllPrefixesToS	TeacherDFSM		DFSM_R5_PDS.fsm
+1	98	98	3	333	0	0	0.015511	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFSM_R5_PDS.fsm
+1	96	96	3	326	0	0	0.013512	L*	addSuffix1by1ToE	TeacherDFSM		DFSM_R5_PDS.fsm
+1	100	100	3	337	0	0	0.014509	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFSM_R5_PDS.fsm
+1	101	101	3	341	0	0	0.015010	L*	addSuffixToE_binarySearch	TeacherDFSM		DFSM_R5_PDS.fsm
+1	74	74	4	214	0	0	0.005005	DT		TeacherDFSM		DFSM_R5_PDS.fsm
+1	171	171	3	779	0	0	0.017510	OP	AllGlobally	TeacherDFSM		DFSM_R5_PDS.fsm
+1	127	127	3	501	0	0	0.021013	OP	OneGlobally	TeacherDFSM		DFSM_R5_PDS.fsm
+1	109	109	3	417	0	0	0.018012	OP	OneLocally	TeacherDFSM		DFSM_R5_PDS.fsm
+1	59	59	4	179	0	0	0.006004	TTT		TeacherDFSM		DFSM_R5_PDS.fsm
+1	58	58	2	250	0	0	0.012509	Quotient		TeacherDFSM		DFSM_R5_PDS.fsm
+1	136	136	1	774	0	0	0.099566	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFSM_R5_PDS.fsm
+1	45	94	1	292	0	0	0.045039	OTree	ExtraStates:1+EQ	TeacherDFSM		DFSM_R5_PDS.fsm
+1	114	114	2	422	0	0	0.084054	L*	addAllPrefixesToS	TeacherRL		DFSM_R5_PDS.fsm
+1	98	98	3	333	0	0	0.077552	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFSM_R5_PDS.fsm
+1	96	96	3	326	0	0	0.080553	L*	addSuffix1by1ToE	TeacherRL		DFSM_R5_PDS.fsm
+1	100	100	3	337	0	0	0.084556	L*	addSuffixAfterLastStateToE	TeacherRL		DFSM_R5_PDS.fsm
+1	101	101	3	341	0	0	0.082554	L*	addSuffixToE_binarySearch	TeacherRL		DFSM_R5_PDS.fsm
+1	74	74	4	214	0	0	0.028520	DT		TeacherRL		DFSM_R5_PDS.fsm
+1	171	171	3	779	0	0	0.068548	OP	AllGlobally	TeacherRL		DFSM_R5_PDS.fsm
+1	127	127	3	501	0	0	0.055035	OP	OneGlobally	TeacherRL		DFSM_R5_PDS.fsm
+1	109	109	3	417	0	0	0.049533	OP	OneLocally	TeacherRL		DFSM_R5_PDS.fsm
+1	59	59	4	179	0	0	0.040527	TTT		TeacherRL		DFSM_R5_PDS.fsm
+1	58	176	2	250	0	0	0.038525	Quotient		TeacherRL		DFSM_R5_PDS.fsm
+1	269	269	1	1387	0	0	0.077051	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFSM_R5_PDS.fsm
+1	45	187	1	292	0	0	0.040026	OTree	ExtraStates:1+EQ	TeacherRL		DFSM_R5_PDS.fsm
+1	204	150	3	331	204	844	0.267678	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	168	114	3	303	168	614	0.065543	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	166	112	3	303	166	614	0.068545	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	154	100	3	303	154	614	0.064042	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	158	104	3	303	158	614	0.065043	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	138	77	4	294	138	468	0.057538	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	233	187	2	352	233	672	0.080554	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	182	128	3	321	182	681	0.067043	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	164	110	3	303	164	608	0.068045	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	141	80	4	287	141	470	0.061540	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	104	58	2	309	104	531	0.055036	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	174	136	1	427	174	920	0.071549	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	83	94	1	321	83	506	0.074047	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_PDS.fsm
+1	75	75	3	295	0	0	0.014013	L*	addAllPrefixesToS	TeacherDFSM		DFSM_R5_SVS.fsm
+1	57	57	3	195	0	0	0.008006	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		DFSM_R5_SVS.fsm
+1	55	55	3	187	0	0	0.009505	L*	addSuffix1by1ToE	TeacherDFSM		DFSM_R5_SVS.fsm
+1	59	59	3	200	0	0	0.010507	L*	addSuffixAfterLastStateToE	TeacherDFSM		DFSM_R5_SVS.fsm
+1	61	61	3	208	0	0	0.009008	L*	addSuffixToE_binarySearch	TeacherDFSM		DFSM_R5_SVS.fsm
+1	62	62	4	183	0	0	0.003502	DT		TeacherDFSM		DFSM_R5_SVS.fsm
+1	123	123	3	514	0	0	0.014508	OP	AllGlobally	TeacherDFSM		DFSM_R5_SVS.fsm
+1	83	83	3	282	0	0	0.010007	OP	OneGlobally	TeacherDFSM		DFSM_R5_SVS.fsm
+1	69	69	3	229	0	0	0.007505	OP	OneLocally	TeacherDFSM		DFSM_R5_SVS.fsm
+1	45	45	4	138	0	0	0.004003	TTT		TeacherDFSM		DFSM_R5_SVS.fsm
+1	23	23	1	89	0	0	0.003503	Quotient		TeacherDFSM		DFSM_R5_SVS.fsm
+1	47	47	1	249	0	0	0.007005	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		DFSM_R5_SVS.fsm
+1	17	34	1	112	0	0	0.012007	OTree	ExtraStates:1+EQ	TeacherDFSM		DFSM_R5_SVS.fsm
+1	75	75	3	295	0	0	0.013510	L*	addAllPrefixesToS	TeacherRL		DFSM_R5_SVS.fsm
+1	57	57	3	195	0	0	0.009006	L*	addAllSuffixesAfterLastStateToE	TeacherRL		DFSM_R5_SVS.fsm
+1	55	55	3	187	0	0	0.009006	L*	addSuffix1by1ToE	TeacherRL		DFSM_R5_SVS.fsm
+1	59	59	3	200	0	0	0.009006	L*	addSuffixAfterLastStateToE	TeacherRL		DFSM_R5_SVS.fsm
+1	61	61	3	208	0	0	0.008507	L*	addSuffixToE_binarySearch	TeacherRL		DFSM_R5_SVS.fsm
+1	62	62	4	183	0	0	0.003502	DT		TeacherRL		DFSM_R5_SVS.fsm
+1	123	123	3	514	0	0	0.011508	OP	AllGlobally	TeacherRL		DFSM_R5_SVS.fsm
+1	83	83	3	282	0	0	0.008006	OP	OneGlobally	TeacherRL		DFSM_R5_SVS.fsm
+1	69	69	3	229	0	0	0.008506	OP	OneLocally	TeacherRL		DFSM_R5_SVS.fsm
+1	45	45	4	138	0	0	0.004002	TTT		TeacherRL		DFSM_R5_SVS.fsm
+1	23	67	1	89	0	0	0.002503	Quotient		TeacherRL		DFSM_R5_SVS.fsm
+1	87	87	1	416	0	0	0.006505	GoodSplit	maxDistLen:2+EQ	TeacherRL		DFSM_R5_SVS.fsm
+1	17	67	1	112	0	0	0.012007	OTree	ExtraStates:1+EQ	TeacherRL		DFSM_R5_SVS.fsm
+1	101	75	3	89	101	308	0.040526	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	83	57	3	77	83	232	0.029520	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	81	55	3	77	81	232	0.032022	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	85	59	3	77	85	232	0.030519	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	89	63	3	77	89	232	0.029020	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	92	62	4	77	92	177	0.025517	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	145	124	2	95	145	202	0.032022	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	108	82	3	77	108	228	0.030029	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	94	68	3	77	94	214	0.030020	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	86	58	3	77	86	160	0.027518	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	42	23	1	77	42	165	0.015510	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	66	47	1	103	66	257	0.024516	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	36	34	1	95	36	177	0.028519	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	DFSM_R5_SVS.fsm
+1	44	44	2	197	0	0	0.006004	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_ADS.fsm
+1	38	38	3	153	0	0	0.006004	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_ADS.fsm
+1	36	36	3	143	0	0	0.005504	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_ADS.fsm
+1	40	40	3	159	0	0	0.005503	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_ADS.fsm
+1	43	43	3	175	0	0	0.007506	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_ADS.fsm
+1	42	42	4	139	0	0	0.003000	DT		TeacherDFSM		Mealy_R4_ADS.fsm
+1	55	55	2	247	0	0	0.006004	OP	AllGlobally	TeacherDFSM		Mealy_R4_ADS.fsm
+1	49	49	3	197	0	0	0.006005	OP	OneGlobally	TeacherDFSM		Mealy_R4_ADS.fsm
+1	40	40	3	153	0	0	0.004503	OP	OneLocally	TeacherDFSM		Mealy_R4_ADS.fsm
+1	29	29	4	106	0	0	0.004003	TTT		TeacherDFSM		Mealy_R4_ADS.fsm
+1	23	23	3	88	0	0	0.006004	Quotient		TeacherDFSM		Mealy_R4_ADS.fsm
+1	74	74	2	361	0	0	0.010506	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_ADS.fsm
+1	18	50	1	95	0	0	0.019012	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_ADS.fsm
+1	44	44	2	197	0	0	0.024515	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_ADS.fsm
+1	38	38	3	153	0	0	0.022015	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_ADS.fsm
+1	36	36	3	143	0	0	0.025016	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_ADS.fsm
+1	40	40	3	159	0	0	0.025015	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_ADS.fsm
+1	43	43	3	175	0	0	0.026519	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_ADS.fsm
+1	42	42	4	139	0	0	0.015010	DT		TeacherRL		Mealy_R4_ADS.fsm
+1	55	55	2	247	0	0	0.021015	OP	AllGlobally	TeacherRL		Mealy_R4_ADS.fsm
+1	49	49	3	197	0	0	0.018012	OP	OneGlobally	TeacherRL		Mealy_R4_ADS.fsm
+1	40	40	3	153	0	0	0.015010	OP	OneLocally	TeacherRL		Mealy_R4_ADS.fsm
+1	29	29	4	106	0	0	0.015010	TTT		TeacherRL		Mealy_R4_ADS.fsm
+1	23	56	3	88	0	0	0.015009	Quotient		TeacherRL		Mealy_R4_ADS.fsm
+1	73	73	2	352	0	0	0.021014	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_ADS.fsm
+1	18	50	1	95	0	0	0.020015	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_ADS.fsm
+1	109	84	2	108	109	453	0.087056	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	71	46	2	72	71	184	0.022015	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	66	36	3	69	66	180	0.023518	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	72	42	3	69	72	180	0.025518	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	73	43	3	69	73	180	0.025022	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+0	4	2	1	2	4	2	0.000501	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	116	91	2	150	116	314	0.035022	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	81	51	3	87	81	205	0.031022	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	72	42	3	74	72	174	0.026517	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+0	4	2	1	2	4	2	0.000501	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	54	24	3	69	54	162	0.023514	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	95	70	2	91	95	385	0.030020	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	38	50	1	71	38	150	0.033523	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_ADS.fsm
+1	39	39	2	142	0	0	0.006504	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_HS.fsm
+1	28	28	2	87	0	0	0.003502	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_HS.fsm
+1	27	27	2	84	0	0	0.003503	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_HS.fsm
+1	29	29	2	89	0	0	0.004503	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_HS.fsm
+1	29	29	2	89	0	0	0.004003	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_HS.fsm
+1	37	37	4	103	0	0	0.003002	DT		TeacherDFSM		Mealy_R4_HS.fsm
+1	46	46	2	168	0	0	0.005003	OP	AllGlobally	TeacherDFSM		Mealy_R4_HS.fsm
+1	39	39	2	127	0	0	0.004503	OP	OneGlobally	TeacherDFSM		Mealy_R4_HS.fsm
+1	41	41	3	134	0	0	0.005004	OP	OneLocally	TeacherDFSM		Mealy_R4_HS.fsm
+1	27	27	4	79	0	0	0.004002	TTT		TeacherDFSM		Mealy_R4_HS.fsm
+1	19	19	2	58	0	0	0.003502	Quotient		TeacherDFSM		Mealy_R4_HS.fsm
+1	34	34	1	123	0	0	0.006004	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_HS.fsm
+1	23	48	1	106	0	0	0.019012	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_HS.fsm
+1	39	39	2	142	0	0	0.006504	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_HS.fsm
+1	28	28	2	87	0	0	0.003503	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_HS.fsm
+1	27	27	2	84	0	0	0.003503	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_HS.fsm
+1	29	29	2	89	0	0	0.004003	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_HS.fsm
+1	29	29	2	89	0	0	0.003502	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_HS.fsm
+1	37	37	4	103	0	0	0.002001	DT		TeacherRL		Mealy_R4_HS.fsm
+1	46	46	2	168	0	0	0.006503	OP	AllGlobally	TeacherRL		Mealy_R4_HS.fsm
+1	39	39	2	127	0	0	0.004503	OP	OneGlobally	TeacherRL		Mealy_R4_HS.fsm
+1	41	41	3	134	0	0	0.005004	OP	OneLocally	TeacherRL		Mealy_R4_HS.fsm
+1	27	27	4	79	0	0	0.003002	TTT		TeacherRL		Mealy_R4_HS.fsm
+1	19	42	2	58	0	0	0.003002	Quotient		TeacherRL		Mealy_R4_HS.fsm
+1	36	36	1	129	0	0	0.004503	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_HS.fsm
+1	23	48	1	106	0	0	0.020013	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_HS.fsm
+1	76	51	2	74	76	259	0.079054	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	53	28	2	59	53	159	0.020014	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	52	27	2	59	52	159	0.019511	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	54	29	2	59	54	159	0.021015	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	54	29	2	59	54	159	0.020013	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+0	4	2	1	2	4	2	0.000000	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	89	64	2	81	89	210	0.025025	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	64	39	2	71	64	166	0.020514	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	81	44	3	71	81	176	0.025517	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+0	4	2	1	2	4	2	0.000501	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	44	19	2	59	44	145	0.019012	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	52	32	1	61	52	186	0.019012	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	43	48	1	71	43	167	0.030520	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_HS.fsm
+1	39	39	2	154	0	0	0.006504	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_PDS.fsm
+1	28	28	2	88	0	0	0.005004	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_PDS.fsm
+1	27	27	2	84	0	0	0.005505	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_PDS.fsm
+1	29	29	2	90	0	0	0.004002	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_PDS.fsm
+1	30	30	2	94	0	0	0.004003	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_PDS.fsm
+1	34	34	4	88	0	0	0.002001	DT		TeacherDFSM		Mealy_R4_PDS.fsm
+1	56	56	2	218	0	0	0.005504	OP	AllGlobally	TeacherDFSM		Mealy_R4_PDS.fsm
+1	40	40	2	127	0	0	0.004003	OP	OneGlobally	TeacherDFSM		Mealy_R4_PDS.fsm
+1	35	35	2	108	0	0	0.003502	OP	OneLocally	TeacherDFSM		Mealy_R4_PDS.fsm
+1	27	27	4	74	0	0	0.003002	TTT		TeacherDFSM		Mealy_R4_PDS.fsm
+1	22	22	2	68	0	0	0.003002	Quotient		TeacherDFSM		Mealy_R4_PDS.fsm
+1	34	34	1	132	0	0	0.006503	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_PDS.fsm
+1	17	38	1	75	0	0	0.014010	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_PDS.fsm
+1	39	39	2	154	0	0	0.006504	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_PDS.fsm
+1	28	28	2	88	0	0	0.003502	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_PDS.fsm
+1	27	27	2	84	0	0	0.004003	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_PDS.fsm
+1	29	29	2	90	0	0	0.004003	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_PDS.fsm
+1	30	30	2	94	0	0	0.005004	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_PDS.fsm
+1	34	34	4	88	0	0	0.002501	DT		TeacherRL		Mealy_R4_PDS.fsm
+1	56	56	2	218	0	0	0.007005	OP	AllGlobally	TeacherRL		Mealy_R4_PDS.fsm
+1	40	40	2	127	0	0	0.004503	OP	OneGlobally	TeacherRL		Mealy_R4_PDS.fsm
+1	35	35	2	108	0	0	0.004003	OP	OneLocally	TeacherRL		Mealy_R4_PDS.fsm
+1	27	27	4	74	0	0	0.003502	TTT		TeacherRL		Mealy_R4_PDS.fsm
+1	22	45	2	68	0	0	0.003502	Quotient		TeacherRL		Mealy_R4_PDS.fsm
+1	36	36	1	128	0	0	0.004002	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_PDS.fsm
+1	17	38	1	75	0	0	0.015510	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_PDS.fsm
+1	63	39	2	58	63	190	0.053035	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	52	28	2	48	52	131	0.020013	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	51	27	2	48	51	131	0.019512	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	53	29	2	48	53	131	0.020513	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	54	30	2	48	54	131	0.024516	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+0	4	2	1	2	4	2	0.000000	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	80	56	2	63	80	162	0.023516	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	64	40	2	48	64	131	0.020513	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	59	35	2	47	59	126	0.020012	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+0	4	2	1	2	4	2	0.000500	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	46	22	2	48	46	127	0.018012	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	52	35	1	60	52	192	0.016512	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	34	38	1	56	34	121	0.024516	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_PDS.fsm
+1	76	76	3	373	0	0	0.016512	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	38	38	3	135	0	0	0.005503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	36	36	3	127	0	0	0.006005	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	40	40	3	141	0	0	0.006505	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	41	41	3	146	0	0	0.006004	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	38	38	4	110	0	0	0.002502	DT		TeacherDFSM		Mealy_R4_SCSet.fsm
+1	47	47	2	183	0	0	0.005504	OP	AllGlobally	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	49	49	3	183	0	0	0.006004	OP	OneGlobally	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	40	40	3	142	0	0	0.005003	OP	OneLocally	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	27	27	4	84	0	0	0.003502	TTT		TeacherDFSM		Mealy_R4_SCSet.fsm
+1	24	24	3	85	0	0	0.005004	Quotient		TeacherDFSM		Mealy_R4_SCSet.fsm
+1	70	70	2	314	0	0	0.012011	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	21	50	1	101	0	0	0.021034	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_SCSet.fsm
+1	76	76	3	373	0	0	0.046531	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_SCSet.fsm
+1	38	38	3	135	0	0	0.022015	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_SCSet.fsm
+1	36	36	3	127	0	0	0.023015	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_SCSet.fsm
+1	40	40	3	141	0	0	0.025517	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_SCSet.fsm
+1	41	41	3	146	0	0	0.025517	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_SCSet.fsm
+1	38	38	4	110	0	0	0.015510	DT		TeacherRL		Mealy_R4_SCSet.fsm
+1	47	47	2	183	0	0	0.018012	OP	AllGlobally	TeacherRL		Mealy_R4_SCSet.fsm
+1	49	49	3	183	0	0	0.018512	OP	OneGlobally	TeacherRL		Mealy_R4_SCSet.fsm
+1	40	40	3	142	0	0	0.016510	OP	OneLocally	TeacherRL		Mealy_R4_SCSet.fsm
+1	27	27	4	84	0	0	0.016511	TTT		TeacherRL		Mealy_R4_SCSet.fsm
+1	24	57	3	85	0	0	0.019013	Quotient		TeacherRL		Mealy_R4_SCSet.fsm
+1	74	74	2	328	0	0	0.020515	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_SCSet.fsm
+1	21	50	1	101	0	0	0.020012	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_SCSet.fsm
+1	106	68	3	84	106	323	0.090561	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	76	38	3	56	76	154	0.027017	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	74	36	3	56	74	154	0.031521	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	78	40	3	56	78	154	0.029020	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	79	41	3	56	79	154	0.029523	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+0	4	2	1	2	4	2	0.000501	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	74	47	2	57	74	150	0.021514	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	88	50	3	57	88	158	0.030020	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	79	41	3	55	79	144	0.027518	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+0	4	2	1	2	4	2	0.000500	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	62	24	3	56	62	148	0.027021	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	107	72	2	85	107	372	0.036027	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	45	50	1	65	45	143	0.033522	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SCSet.fsm
+1	18	18	1	50	0	0	0.002001	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002501	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_SS.fsm
+1	31	31	4	76	0	0	0.002001	DT		TeacherDFSM		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003503	OP	AllGlobally	TeacherDFSM		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003002	OP	OneGlobally	TeacherDFSM		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003002	OP	OneLocally	TeacherDFSM		Mealy_R4_SS.fsm
+1	27	27	4	69	0	0	0.003502	TTT		TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	Quotient		TeacherDFSM		Mealy_R4_SS.fsm
+1	36	36	1	128	0	0	0.005003	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_SS.fsm
+1	16	38	1	71	0	0	0.014510	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002501	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.002502	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.004005	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_SS.fsm
+1	18	18	1	50	0	0	0.003001	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_SS.fsm
+1	31	31	4	76	0	0	0.002500	DT		TeacherRL		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003503	OP	AllGlobally	TeacherRL		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003503	OP	OneGlobally	TeacherRL		Mealy_R4_SS.fsm
+1	29	29	1	86	0	0	0.003503	OP	OneLocally	TeacherRL		Mealy_R4_SS.fsm
+1	27	27	4	69	0	0	0.003001	TTT		TeacherRL		Mealy_R4_SS.fsm
+1	18	36	1	50	0	0	0.002001	Quotient		TeacherRL		Mealy_R4_SS.fsm
+1	36	36	1	130	0	0	0.003503	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_SS.fsm
+1	16	38	1	71	0	0	0.015510	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.037024	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.016510	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.016011	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.019014	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.019013	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+0	4	2	1	2	4	2	0.000501	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	49	29	1	50	49	131	0.019512	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	49	29	1	50	49	131	0.016511	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	49	29	1	50	49	131	0.019012	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+0	4	2	1	2	4	2	0.000501	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	38	18	1	50	38	131	0.014510	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	56	36	1	58	56	184	0.023017	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	36	38	1	62	36	139	0.027520	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SS.fsm
+1	39	39	2	142	0	0	0.007004	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_SVS.fsm
+1	28	28	2	87	0	0	0.004003	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_SVS.fsm
+1	27	27	2	84	0	0	0.003502	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_SVS.fsm
+1	29	29	2	89	0	0	0.004003	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_SVS.fsm
+1	29	29	2	89	0	0	0.004005	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_SVS.fsm
+1	37	37	4	103	0	0	0.002504	DT		TeacherDFSM		Mealy_R4_SVS.fsm
+1	46	46	2	168	0	0	0.006003	OP	AllGlobally	TeacherDFSM		Mealy_R4_SVS.fsm
+1	39	39	2	127	0	0	0.005004	OP	OneGlobally	TeacherDFSM		Mealy_R4_SVS.fsm
+1	41	41	3	134	0	0	0.005003	OP	OneLocally	TeacherDFSM		Mealy_R4_SVS.fsm
+1	27	27	4	79	0	0	0.004503	TTT		TeacherDFSM		Mealy_R4_SVS.fsm
+1	19	19	2	58	0	0	0.003001	Quotient		TeacherDFSM		Mealy_R4_SVS.fsm
+1	35	35	1	127	0	0	0.006004	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_SVS.fsm
+1	23	48	1	106	0	0	0.018516	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_SVS.fsm
+1	39	39	2	142	0	0	0.008004	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_SVS.fsm
+1	28	28	2	87	0	0	0.004003	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_SVS.fsm
+1	27	27	2	84	0	0	0.004002	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_SVS.fsm
+1	29	29	2	89	0	0	0.005004	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_SVS.fsm
+1	29	29	2	89	0	0	0.004503	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_SVS.fsm
+1	37	37	4	103	0	0	0.003002	DT		TeacherRL		Mealy_R4_SVS.fsm
+1	46	46	2	168	0	0	0.010007	OP	AllGlobally	TeacherRL		Mealy_R4_SVS.fsm
+1	39	39	2	127	0	0	0.009013	OP	OneGlobally	TeacherRL		Mealy_R4_SVS.fsm
+1	41	41	3	134	0	0	0.009007	OP	OneLocally	TeacherRL		Mealy_R4_SVS.fsm
+1	27	27	4	79	0	0	0.004003	TTT		TeacherRL		Mealy_R4_SVS.fsm
+1	19	42	2	58	0	0	0.005503	Quotient		TeacherRL		Mealy_R4_SVS.fsm
+1	36	36	1	130	0	0	0.009506	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_SVS.fsm
+1	23	48	1	106	0	0	0.020514	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_SVS.fsm
+1	76	51	2	74	76	259	0.073549	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	53	28	2	59	53	159	0.018512	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	52	27	2	59	52	159	0.019513	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	54	29	2	59	54	159	0.019513	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	54	29	2	59	54	159	0.020514	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+0	4	2	1	2	4	2	0.000501	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	89	64	2	81	89	210	0.025017	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	64	39	2	71	64	166	0.020514	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	81	44	3	71	81	176	0.026017	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+0	4	2	1	2	4	2	0.000000	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	44	19	2	59	44	145	0.019513	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	54	34	1	60	54	189	0.018511	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	43	48	1	71	43	167	0.033023	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_SVS.fsm
+1	39	39	1	111	0	0	0.004003	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.005003	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.004503	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.004504	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	43	43	4	108	0	0	0.002502	DT		TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.005003	OP	AllGlobally	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.005503	OP	OneGlobally	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.005503	OP	OneLocally	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	4	101	0	0	0.003503	TTT		TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.004503	Quotient		TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	112	112	1	420	0	0	0.016511	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	44	93	1	189	0	0	0.045030	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.009506	L*	addAllPrefixesToS	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.010006	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.010007	L*	addSuffix1by1ToE	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.010007	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	39	1	111	0	0	0.009006	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	43	43	4	108	0	0	0.006004	DT		TeacherRL		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.012508	OP	AllGlobally	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.012008	OP	OneGlobally	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	56	56	1	167	0	0	0.013008	OP	OneLocally	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	39	4	101	0	0	0.006503	TTT		TeacherRL		Mealy_R4_Zhu1993.fsm
+1	39	78	1	111	0	0	0.014009	Quotient		TeacherRL		Mealy_R4_Zhu1993.fsm
+1	111	111	1	472	0	0	0.049033	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	44	93	1	189	0	0	0.048532	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.085558	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.038024	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.030521	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.032522	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.032021	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+0	6	3	1	3	6	3	0.000500	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	101	56	1	121	101	307	0.032020	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	101	56	1	121	101	307	0.031521	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	101	56	1	121	101	307	0.032022	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+0	6	3	1	3	6	3	0.000500	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	84	39	1	121	84	307	0.031521	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	157	112	1	160	157	550	0.048032	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	89	93	1	151	89	335	0.073539	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R4_Zhu1993.fsm
+1	95	95	2	358	0	0	0.013009	L*	addAllPrefixesToS	TeacherDFSM		Mealy_R5.fsm
+1	82	82	3	284	0	0	0.011507	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Mealy_R5.fsm
+1	80	80	3	277	0	0	0.012508	L*	addSuffix1by1ToE	TeacherDFSM		Mealy_R5.fsm
+1	84	84	3	288	0	0	0.012508	L*	addSuffixAfterLastStateToE	TeacherDFSM		Mealy_R5.fsm
+1	85	85	3	292	0	0	0.012509	L*	addSuffixToE_binarySearch	TeacherDFSM		Mealy_R5.fsm
+1	70	70	5	204	0	0	0.004503	DT		TeacherDFSM		Mealy_R5.fsm
+1	150	150	3	706	0	0	0.015010	OP	AllGlobally	TeacherDFSM		Mealy_R5.fsm
+1	106	106	3	428	0	0	0.011508	OP	OneGlobally	TeacherDFSM		Mealy_R5.fsm
+1	89	89	3	346	0	0	0.011007	OP	OneLocally	TeacherDFSM		Mealy_R5.fsm
+1	55	55	5	169	0	0	0.005504	TTT		TeacherDFSM		Mealy_R5.fsm
+1	63	63	3	219	0	0	0.009506	Quotient		TeacherDFSM		Mealy_R5.fsm
+1	128	128	1	518	0	0	0.026517	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Mealy_R5.fsm
+1	58	133	1	274	0	0	0.085056	OTree	ExtraStates:1+EQ	TeacherDFSM		Mealy_R5.fsm
+1	95	95	2	358	0	0	0.017011	L*	addAllPrefixesToS	TeacherRL		Mealy_R5.fsm
+1	82	82	3	284	0	0	0.014509	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Mealy_R5.fsm
+1	80	80	3	277	0	0	0.015512	L*	addSuffix1by1ToE	TeacherRL		Mealy_R5.fsm
+1	84	84	3	288	0	0	0.016009	L*	addSuffixAfterLastStateToE	TeacherRL		Mealy_R5.fsm
+1	85	85	3	292	0	0	0.015510	L*	addSuffixToE_binarySearch	TeacherRL		Mealy_R5.fsm
+1	70	70	5	204	0	0	0.005503	DT		TeacherRL		Mealy_R5.fsm
+1	150	150	3	706	0	0	0.073548	OP	AllGlobally	TeacherRL		Mealy_R5.fsm
+1	106	106	3	428	0	0	0.041027	OP	OneGlobally	TeacherRL		Mealy_R5.fsm
+1	89	89	3	346	0	0	0.035524	OP	OneLocally	TeacherRL		Mealy_R5.fsm
+1	55	55	5	169	0	0	0.010007	TTT		TeacherRL		Mealy_R5.fsm
+1	63	133	3	219	0	0	0.041027	Quotient		TeacherRL		Mealy_R5.fsm
+1	135	135	1	555	0	0	0.113575	GoodSplit	maxDistLen:2+EQ	TeacherRL		Mealy_R5.fsm
+1	58	133	1	274	0	0	0.109572	OTree	ExtraStates:1+EQ	TeacherRL		Mealy_R5.fsm
+1	237	155	3	279	237	907	0.359239	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	164	82	3	234	164	576	0.090063	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	162	80	3	234	162	576	0.092561	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	166	84	3	234	166	576	0.092061	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	168	86	3	234	168	576	0.091561	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+0	6	3	1	3	6	3	0.000500	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	184	120	2	268	184	647	0.075050	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	189	107	3	246	189	627	0.091566	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	172	90	3	228	172	557	0.089558	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+0	6	3	1	3	6	3	0.000501	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	146	64	3	234	146	564	0.090560	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	175	124	1	274	175	837	0.081053	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	109	133	1	246	109	520	0.125083	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Mealy_R5.fsm
+1	27	27	2	105	0	0	0.004003	L*	addAllPrefixesToS	TeacherDFSM		Moore_R4_ADS.fsm
+1	29	29	3	94	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R4_ADS.fsm
+1	27	27	3	87	0	0	0.005004	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R4_ADS.fsm
+1	31	31	3	97	0	0	0.005003	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R4_ADS.fsm
+1	33	33	3	104	0	0	0.005004	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R4_ADS.fsm
+1	29	29	3	103	0	0	0.002001	DT		TeacherDFSM		Moore_R4_ADS.fsm
+1	40	40	1	134	0	0	0.003002	OP	AllGlobally	TeacherDFSM		Moore_R4_ADS.fsm
+1	40	40	1	134	0	0	0.003502	OP	OneGlobally	TeacherDFSM		Moore_R4_ADS.fsm
+1	39	39	1	132	0	0	0.003508	OP	OneLocally	TeacherDFSM		Moore_R4_ADS.fsm
+1	23	23	3	74	0	0	0.003502	TTT		TeacherDFSM		Moore_R4_ADS.fsm
+1	19	19	1	77	0	0	0.002001	Quotient		TeacherDFSM		Moore_R4_ADS.fsm
+1	37	37	1	150	0	0	0.004003	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R4_ADS.fsm
+1	15	29	1	64	0	0	0.006004	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R4_ADS.fsm
+1	27	27	2	105	0	0	0.004003	L*	addAllPrefixesToS	TeacherRL		Moore_R4_ADS.fsm
+1	29	29	3	94	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R4_ADS.fsm
+1	27	27	3	87	0	0	0.004503	L*	addSuffix1by1ToE	TeacherRL		Moore_R4_ADS.fsm
+1	31	31	3	97	0	0	0.004503	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R4_ADS.fsm
+1	33	33	3	104	0	0	0.005503	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R4_ADS.fsm
+1	29	29	3	103	0	0	0.002001	DT		TeacherRL		Moore_R4_ADS.fsm
+1	40	40	1	134	0	0	0.004003	OP	AllGlobally	TeacherRL		Moore_R4_ADS.fsm
+1	40	40	1	134	0	0	0.003502	OP	OneGlobally	TeacherRL		Moore_R4_ADS.fsm
+1	39	39	1	132	0	0	0.003502	OP	OneLocally	TeacherRL		Moore_R4_ADS.fsm
+1	23	23	3	74	0	0	0.002001	TTT		TeacherRL		Moore_R4_ADS.fsm
+1	19	55	1	77	0	0	0.002001	Quotient		TeacherRL		Moore_R4_ADS.fsm
+1	37	37	1	150	0	0	0.003002	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R4_ADS.fsm
+1	15	29	1	64	0	0	0.006004	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R4_ADS.fsm
+1	43	27	2	71	43	141	0.016511	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	53	29	3	70	53	139	0.018512	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	51	27	3	73	51	146	0.021014	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	55	31	3	70	55	139	0.019012	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	57	33	3	70	57	139	0.021013	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	53	29	3	69	53	121	0.016511	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	51	40	1	68	51	167	0.016011	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	51	40	1	68	51	167	0.013009	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	50	39	1	68	50	167	0.013009	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	47	23	3	69	47	124	0.018512	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	30	19	1	71	30	141	0.011007	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	48	37	1	79	48	236	0.014009	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	26	29	1	71	26	152	0.016011	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_ADS.fsm
+1	39	39	3	155	0	0	0.008506	L*	addAllPrefixesToS	TeacherDFSM		Moore_R4_HS.fsm
+1	29	29	3	80	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R4_HS.fsm
+1	27	27	3	75	0	0	0.004503	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R4_HS.fsm
+1	31	31	3	83	0	0	0.005004	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R4_HS.fsm
+1	32	32	3	86	0	0	0.004503	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R4_HS.fsm
+1	27	27	3	83	0	0	0.002001	DT		TeacherDFSM		Moore_R4_HS.fsm
+1	42	42	1	119	0	0	0.004003	OP	AllGlobally	TeacherDFSM		Moore_R4_HS.fsm
+1	42	42	1	119	0	0	0.004503	OP	OneGlobally	TeacherDFSM		Moore_R4_HS.fsm
+1	41	41	1	117	0	0	0.003502	OP	OneLocally	TeacherDFSM		Moore_R4_HS.fsm
+1	22	22	3	59	0	0	0.002501	TTT		TeacherDFSM		Moore_R4_HS.fsm
+1	19	19	1	69	0	0	0.002501	Quotient		TeacherDFSM		Moore_R4_HS.fsm
+1	37	37	1	135	0	0	0.004503	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R4_HS.fsm
+1	13	28	1	51	0	0	0.006504	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R4_HS.fsm
+1	39	39	3	155	0	0	0.011008	L*	addAllPrefixesToS	TeacherRL		Moore_R4_HS.fsm
+1	29	29	3	80	0	0	0.007004	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R4_HS.fsm
+1	27	27	3	75	0	0	0.009505	L*	addSuffix1by1ToE	TeacherRL		Moore_R4_HS.fsm
+1	31	31	3	83	0	0	0.009506	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R4_HS.fsm
+1	32	32	3	86	0	0	0.007005	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R4_HS.fsm
+1	27	27	3	83	0	0	0.002502	DT		TeacherRL		Moore_R4_HS.fsm
+1	42	42	1	119	0	0	0.006005	OP	AllGlobally	TeacherRL		Moore_R4_HS.fsm
+1	42	42	1	119	0	0	0.005503	OP	OneGlobally	TeacherRL		Moore_R4_HS.fsm
+1	41	41	1	117	0	0	0.005505	OP	OneLocally	TeacherRL		Moore_R4_HS.fsm
+1	22	22	3	59	0	0	0.005004	TTT		TeacherRL		Moore_R4_HS.fsm
+1	19	55	1	69	0	0	0.003458	Quotient		TeacherRL		Moore_R4_HS.fsm
+1	37	37	1	136	0	0	0.005507	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R4_HS.fsm
+1	13	28	1	51	0	0	0.006004	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R4_HS.fsm
+1	78	51	3	93	78	215	0.038024	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	65	38	3	78	65	173	0.023016	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	63	36	3	78	63	173	0.023015	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	58	31	3	76	58	160	0.023020	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	60	33	3	76	60	160	0.022516	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	57	30	3	67	57	126	0.018012	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	58	42	1	66	58	164	0.013509	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	58	42	1	66	58	164	0.015010	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	57	41	1	66	57	164	0.015510	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	52	25	3	71	52	140	0.019012	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	35	19	1	69	35	136	0.011508	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	52	36	1	76	52	227	0.017512	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	29	28	1	71	29	150	0.018512	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_HS.fsm
+1	39	39	3	168	0	0	0.008005	L*	addAllPrefixesToS	TeacherDFSM		Moore_R4_PDS.fsm
+1	29	29	3	80	0	0	0.004503	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R4_PDS.fsm
+1	27	27	3	75	0	0	0.005502	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R4_PDS.fsm
+1	31	31	3	82	0	0	0.005004	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R4_PDS.fsm
+1	32	32	3	85	0	0	0.005504	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R4_PDS.fsm
+1	31	31	3	100	0	0	0.002502	DT		TeacherDFSM		Moore_R4_PDS.fsm
+1	45	45	1	130	0	0	0.003502	OP	AllGlobally	TeacherDFSM		Moore_R4_PDS.fsm
+1	45	45	1	130	0	0	0.003503	OP	OneGlobally	TeacherDFSM		Moore_R4_PDS.fsm
+1	44	44	1	128	0	0	0.003502	OP	OneLocally	TeacherDFSM		Moore_R4_PDS.fsm
+1	24	24	3	66	0	0	0.003002	TTT		TeacherDFSM		Moore_R4_PDS.fsm
+1	19	19	1	69	0	0	0.002502	Quotient		TeacherDFSM		Moore_R4_PDS.fsm
+1	36	36	1	144	0	0	0.005004	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R4_PDS.fsm
+1	14	28	1	57	0	0	0.006504	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R4_PDS.fsm
+1	39	39	3	168	0	0	0.012008	L*	addAllPrefixesToS	TeacherRL		Moore_R4_PDS.fsm
+1	29	29	3	80	0	0	0.006004	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R4_PDS.fsm
+1	27	27	3	75	0	0	0.007505	L*	addSuffix1by1ToE	TeacherRL		Moore_R4_PDS.fsm
+1	31	31	3	82	0	0	0.008506	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R4_PDS.fsm
+1	32	32	3	85	0	0	0.009006	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R4_PDS.fsm
+1	31	31	3	100	0	0	0.004509	DT		TeacherRL		Moore_R4_PDS.fsm
+1	45	45	1	130	0	0	0.005503	OP	AllGlobally	TeacherRL		Moore_R4_PDS.fsm
+1	45	45	1	130	0	0	0.005998	OP	OneGlobally	TeacherRL		Moore_R4_PDS.fsm
+1	44	44	1	128	0	0	0.005504	OP	OneLocally	TeacherRL		Moore_R4_PDS.fsm
+1	24	24	3	66	0	0	0.007005	TTT		TeacherRL		Moore_R4_PDS.fsm
+1	19	55	1	69	0	0	0.003503	Quotient		TeacherRL		Moore_R4_PDS.fsm
+1	36	36	1	148	0	0	0.005504	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R4_PDS.fsm
+1	14	28	1	57	0	0	0.007505	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R4_PDS.fsm
+1	79	51	3	93	79	215	0.043530	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	75	47	3	69	75	155	0.022515	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	55	27	3	63	55	131	0.022514	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	59	31	3	69	59	155	0.022516	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	60	32	3	69	60	155	0.024017	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	59	31	3	63	59	104	0.018511	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	61	45	1	63	61	151	0.014009	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	61	45	1	63	61	151	0.013509	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	60	44	1	63	60	151	0.012508	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	52	24	3	67	52	132	0.019513	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	35	19	1	63	35	120	0.011008	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	53	37	1	77	53	229	0.016011	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	30	28	1	70	30	141	0.016011	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_PDS.fsm
+1	33	33	2	138	0	0	0.005503	L*	addAllPrefixesToS	TeacherDFSM		Moore_R4_SCSet.fsm
+1	28	28	2	87	0	0	0.004002	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R4_SCSet.fsm
+1	27	27	3	84	0	0	0.005504	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.005504	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.005004	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R4_SCSet.fsm
+1	32	32	3	108	0	0	0.002501	DT		TeacherDFSM		Moore_R4_SCSet.fsm
+1	68	68	2	246	0	0	0.007005	OP	AllGlobally	TeacherDFSM		Moore_R4_SCSet.fsm
+1	52	52	2	167	0	0	0.005504	OP	OneGlobally	TeacherDFSM		Moore_R4_SCSet.fsm
+1	47	47	2	146	0	0	0.005003	OP	OneLocally	TeacherDFSM		Moore_R4_SCSet.fsm
+1	25	25	2	76	0	0	0.004502	TTT		TeacherDFSM		Moore_R4_SCSet.fsm
+1	22	22	2	90	0	0	0.004003	Quotient		TeacherDFSM		Moore_R4_SCSet.fsm
+1	37	37	1	150	0	0	0.005504	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R4_SCSet.fsm
+1	16	33	1	65	0	0	0.009006	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R4_SCSet.fsm
+1	33	33	2	138	0	0	0.008506	L*	addAllPrefixesToS	TeacherRL		Moore_R4_SCSet.fsm
+1	28	28	2	87	0	0	0.005504	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R4_SCSet.fsm
+1	27	27	3	84	0	0	0.007505	L*	addSuffix1by1ToE	TeacherRL		Moore_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.008505	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R4_SCSet.fsm
+1	29	29	2	89	0	0	0.009006	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R4_SCSet.fsm
+1	32	32	3	108	0	0	0.004003	DT		TeacherRL		Moore_R4_SCSet.fsm
+1	68	68	2	246	0	0	0.010007	OP	AllGlobally	TeacherRL		Moore_R4_SCSet.fsm
+1	52	52	2	167	0	0	0.010007	OP	OneGlobally	TeacherRL		Moore_R4_SCSet.fsm
+1	47	47	2	146	0	0	0.010007	OP	OneLocally	TeacherRL		Moore_R4_SCSet.fsm
+1	25	25	2	76	0	0	0.009508	TTT		TeacherRL		Moore_R4_SCSet.fsm
+1	22	68	2	90	0	0	0.008506	Quotient		TeacherRL		Moore_R4_SCSet.fsm
+1	36	36	1	145	0	0	0.008504	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R4_SCSet.fsm
+1	16	33	1	65	0	0	0.010007	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R4_SCSet.fsm
+1	49	27	2	98	49	173	0.031521	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	75	47	3	109	75	209	0.027018	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	55	27	3	91	55	168	0.026517	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	59	31	3	105	59	193	0.023015	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	61	33	3	105	61	193	0.024017	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	59	31	3	93	59	152	0.019012	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	153	131	2	155	153	274	0.033522	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	74	52	2	123	74	227	0.028518	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	69	47	2	107	69	203	0.025517	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	54	26	3	97	54	167	0.022015	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	44	22	2	95	44	165	0.020014	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	52	36	1	95	52	232	0.016511	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	32	33	1	87	32	168	0.020514	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SCSet.fsm
+1	33	33	3	138	0	0	0.007505	L*	addAllPrefixesToS	TeacherDFSM		Moore_R4_SS.fsm
+1	28	28	2	87	0	0	0.004003	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R4_SS.fsm
+1	27	27	2	84	0	0	0.004003	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R4_SS.fsm
+1	29	29	2	89	0	0	0.005003	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R4_SS.fsm
+1	29	29	2	89	0	0	0.004003	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R4_SS.fsm
+1	28	28	3	94	0	0	0.002001	DT		TeacherDFSM		Moore_R4_SS.fsm
+1	68	68	2	252	0	0	0.006004	OP	AllGlobally	TeacherDFSM		Moore_R4_SS.fsm
+1	52	52	2	171	0	0	0.006504	OP	OneGlobally	TeacherDFSM		Moore_R4_SS.fsm
+1	48	48	2	154	0	0	0.005003	OP	OneLocally	TeacherDFSM		Moore_R4_SS.fsm
+1	20	20	2	60	0	0	0.002501	TTT		TeacherDFSM		Moore_R4_SS.fsm
+1	20	20	2	82	0	0	0.003002	Quotient		TeacherDFSM		Moore_R4_SS.fsm
+1	32	32	1	124	0	0	0.004503	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R4_SS.fsm
+1	16	37	2	70	0	0	0.009508	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R4_SS.fsm
+1	33	33	3	138	0	0	0.007503	L*	addAllPrefixesToS	TeacherRL		Moore_R4_SS.fsm
+1	28	28	2	87	0	0	0.004003	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R4_SS.fsm
+1	27	27	2	84	0	0	0.004003	L*	addSuffix1by1ToE	TeacherRL		Moore_R4_SS.fsm
+1	29	29	2	89	0	0	0.005004	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R4_SS.fsm
+1	29	29	2	89	0	0	0.005003	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R4_SS.fsm
+1	28	28	3	94	0	0	0.002001	DT		TeacherRL		Moore_R4_SS.fsm
+1	68	68	2	252	0	0	0.008505	OP	AllGlobally	TeacherRL		Moore_R4_SS.fsm
+1	52	52	2	171	0	0	0.007505	OP	OneGlobally	TeacherRL		Moore_R4_SS.fsm
+1	48	48	2	154	0	0	0.007505	OP	OneLocally	TeacherRL		Moore_R4_SS.fsm
+1	20	20	2	60	0	0	0.003001	TTT		TeacherRL		Moore_R4_SS.fsm
+1	20	66	2	82	0	0	0.004503	Quotient		TeacherRL		Moore_R4_SS.fsm
+1	36	36	1	142	0	0	0.006004	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R4_SS.fsm
+1	16	37	2	70	0	0	0.009006	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R4_SS.fsm
+1	71	51	2	107	71	245	0.043029	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	66	46	2	98	66	198	0.019513	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	47	27	2	78	47	151	0.015510	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	49	29	2	96	49	182	0.019514	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	50	30	2	96	50	182	0.019512	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	55	28	3	77	55	125	0.016511	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	169	149	2	173	169	284	0.043028	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	72	52	2	121	72	204	0.028019	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	68	48	2	105	68	182	0.037024	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	41	21	2	86	41	148	0.016013	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	40	20	2	79	40	133	0.037024	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	45	32	1	82	45	198	0.026517	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	36	37	2	81	36	174	0.026017	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R4_SS.fsm
+1	76	76	4	368	0	0	0.021014	L*	addAllPrefixesToS	TeacherDFSM		Moore_R5_SVS.fsm
+1	47	47	4	152	0	0	0.008006	L*	addAllSuffixesAfterLastStateToE	TeacherDFSM		Moore_R5_SVS.fsm
+1	44	44	4	143	0	0	0.009506	L*	addSuffix1by1ToE	TeacherDFSM		Moore_R5_SVS.fsm
+1	50	50	4	158	0	0	0.008506	L*	addSuffixAfterLastStateToE	TeacherDFSM		Moore_R5_SVS.fsm
+1	52	52	4	165	0	0	0.009506	L*	addSuffixToE_binarySearch	TeacherDFSM		Moore_R5_SVS.fsm
+1	50	50	4	183	0	0	0.003502	DT		TeacherDFSM		Moore_R5_SVS.fsm
+1	104	104	2	433	0	0	0.011007	OP	AllGlobally	TeacherDFSM		Moore_R5_SVS.fsm
+1	73	73	2	255	0	0	0.007005	OP	OneGlobally	TeacherDFSM		Moore_R5_SVS.fsm
+1	65	65	2	219	0	0	0.006504	OP	OneLocally	TeacherDFSM		Moore_R5_SVS.fsm
+1	37	37	4	117	0	0	0.004503	TTT		TeacherDFSM		Moore_R5_SVS.fsm
+1	28	28	2	119	0	0	0.004003	Quotient		TeacherDFSM		Moore_R5_SVS.fsm
+1	43	43	1	167	0	0	0.006505	GoodSplit	maxDistLen:2+EQ	TeacherDFSM		Moore_R5_SVS.fsm
+1	23	41	1	103	0	0	0.016010	OTree	ExtraStates:1+EQ	TeacherDFSM		Moore_R5_SVS.fsm
+1	76	76	4	368	0	0	0.031522	L*	addAllPrefixesToS	TeacherRL		Moore_R5_SVS.fsm
+1	47	47	4	152	0	0	0.011507	L*	addAllSuffixesAfterLastStateToE	TeacherRL		Moore_R5_SVS.fsm
+1	44	44	4	143	0	0	0.014009	L*	addSuffix1by1ToE	TeacherRL		Moore_R5_SVS.fsm
+1	50	50	4	158	0	0	0.017011	L*	addSuffixAfterLastStateToE	TeacherRL		Moore_R5_SVS.fsm
+1	52	52	4	165	0	0	0.017511	L*	addSuffixToE_binarySearch	TeacherRL		Moore_R5_SVS.fsm
+1	50	50	4	183	0	0	0.004004	DT		TeacherRL		Moore_R5_SVS.fsm
+1	104	104	2	433	0	0	0.017511	OP	AllGlobally	TeacherRL		Moore_R5_SVS.fsm
+1	73	73	2	255	0	0	0.016009	OP	OneGlobally	TeacherRL		Moore_R5_SVS.fsm
+1	65	65	2	219	0	0	0.017512	OP	OneLocally	TeacherRL		Moore_R5_SVS.fsm
+1	37	37	4	117	0	0	0.016010	TTT		TeacherRL		Moore_R5_SVS.fsm
+1	28	84	2	119	0	0	0.011509	Quotient		TeacherRL		Moore_R5_SVS.fsm
+1	44	44	1	177	0	0	0.016010	GoodSplit	maxDistLen:2+EQ	TeacherRL		Moore_R5_SVS.fsm
+1	23	41	1	103	0	0	0.017511	OTree	ExtraStates:1+EQ	TeacherRL		Moore_R5_SVS.fsm
+1	137	100	4	151	137	415	0.091061	L*	addAllPrefixesToS	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	117	80	4	103	117	265	0.035026	L*	addAllSuffixesAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	81	44	4	93	81	221	0.032527	L*	addSuffix1by1ToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	87	50	4	103	87	265	0.038029	L*	addSuffixAfterLastStateToE	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	90	53	4	93	90	222	0.033529	L*	addSuffixToE_binarySearch	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	88	51	4	93	88	174	0.027022	DT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	175	148	2	129	175	280	0.033522	OP	AllGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	100	73	2	90	100	235	0.029018	OP	OneGlobally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	92	65	2	88	92	222	0.031020	OP	OneLocally	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	78	43	4	89	78	229	0.029020	TTT		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	55	28	2	91	55	184	0.026016	Quotient		TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	66	44	1	101	66	294	0.027019	GoodSplit	maxDistLen:2+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm
+1	45	41	1	95	45	229	0.030519	OTree	ExtraStates:1+EQ	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R5_SVS.fsm

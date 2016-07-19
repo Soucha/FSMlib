@@ -603,7 +603,8 @@ namespace FSMlearning {
 			while ((node->distInputIdx != STOUT_INPUT) && (level <= ot.numberOfExtraStates)) {
 				if (state != NULL_STATE) {
 					auto idx = getNextIdx(ot.stateNodes[state], node->nextInputs[node->distInputIdx]);
-					if (ot.stateNodes[state]->next[idx]->refStates.size() == 1) {
+					if ((idx != STOUT_INPUT) && ot.stateNodes[state]->next[idx] && 
+							(ot.stateNodes[state]->next[idx]->refStates.size() == 1)) {
 						state = *(ot.stateNodes[state]->next[idx]->refStates.begin());
 					} else state = NULL_STATE;
 				}
@@ -617,6 +618,50 @@ namespace FSMlearning {
 				node->extraStateLevel = ++level;
 			}
 		}
+	}
+
+	static bool applyIfMissing(shared_ptr<ot_node_t> currNode, const sequence_in_t& ce, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		bool queried = false;
+		for (auto& input : ce) {
+			if (input == STOUT_INPUT) {
+				continue;
+			}
+			auto idx = getNextIdx(currNode, input);
+			if (!currNode->next[idx]) {
+				queried = true;
+				query(currNode, idx, ot, teacher);
+			}
+			currNode = currNode->next[idx];
+		}
+		if (queried) {
+			checkAndQueryNext(currNode, ot, teacher);
+		}
+		return queried;
+	}
+
+	static void updateWithCE(sequence_in_t ce, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		auto node = ot.stateNodes[0];
+		list<state_t> statesAlong({ node->state });
+		while (node->refStates.find(statesAlong.back()) != node->refStates.end()) {
+			if (ce.front() == STOUT_INPUT) ce.pop_front(); 
+			auto idx = getNextIdx(node, ce.front());
+			node = node->next[idx];
+			statesAlong.emplace_back(ot.conjecture->getNextState(statesAlong.back(), ce.front()));
+			ce.pop_front();
+		}
+		if (ce.front() == STOUT_INPUT) ce.pop_front();
+		do {
+			if (applyIfMissing(ot.stateNodes[statesAlong.back()], ce, ot, teacher)) {
+				if (ot.uncheckedNodes.front() == ot.stateNodes[0]) break;
+			}
+			statesAlong.pop_back();
+			if (applyIfMissing(ot.stateNodes[statesAlong.back()]->next[node->incomingInputIdx], ce, ot, teacher)) {
+				if (ot.uncheckedNodes.front() == ot.stateNodes[0]) break;
+			}
+			auto parent = node->parent.lock();
+			ce.push_front(parent->nextInputs[node->incomingInputIdx]);
+			node = parent;
+		} while (ot.uncheckedNodes.front() != ot.stateNodes[0]);
 	}
 
 	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
@@ -643,6 +688,8 @@ namespace FSMlearning {
 		ot.uncheckedNodes.emplace_back(node);
 		ot.bbNode = node;
 		ot.numberOfExtraStates = 0;
+		sequence_in_t ce;
+		sequence_out_t bbOutput;
 
 		while (!ot.uncheckedNodes.empty()) {
 			node = ot.uncheckedNodes.front();
@@ -650,19 +697,34 @@ namespace FSMlearning {
 				ot.numberOfExtraStates++;
 				if (ot.numberOfExtraStates > maxExtraStates) {
 					if (isEQallowed) {
-						auto ce = teacher->equivalenceQuery(ot.conjecture);
+						if (!ce.empty()) {
+							auto out = ot.conjecture->getOutputAlongPath(0, ce);
+							if (bbOutput != out) {
+								while (ot.uncheckedNodes.front() != ot.stateNodes[0])
+								continue;
+							}
+							bbOutput.clear();
+						}
+						ce = teacher->equivalenceQuery(ot.conjecture);
 						if (!ce.empty()) {
 							ot.numberOfExtraStates--;
 							auto currNode = ot.stateNodes[0];// root
 							for (auto& input : ce) {
-								if (input == STOUT_INPUT) continue;
+								if (input == STOUT_INPUT) {
+									bbOutput.emplace_back(currNode->stateOutput);
+									continue;
+								}
 								auto idx = getNextIdx(currNode, input);
 								if (!currNode->next[idx]) {
 									query(currNode, idx, ot, teacher);
 								}
 								currNode = currNode->next[idx];
+								bbOutput.emplace_back(currNode->incomingOutput);
 							}
 							checkAndQueryNext(currNode, ot, teacher);
+							if (ot.uncheckedNodes.front() != ot.stateNodes[0]) {// a new state was not found
+								updateWithCE(ce, ot, teacher);
+							}
 							continue;
 						}
 					}

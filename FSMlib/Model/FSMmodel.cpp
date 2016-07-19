@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <process.h>
+#include <filesystem>
 #include "FSMmodel.h"
 
 #define SEQUENCE_SEPARATOR       ","
@@ -44,6 +45,41 @@ namespace FSMmodel {
 			return nullptr;
 		}
 		fsm->create(numberOfStates, numberOfInputs, numberOfOutputs);
+		return fsm;
+	}
+
+	unique_ptr<DFSM> loadFSM(string filename) {
+		/*
+		tr2::sys::path fn(filename);
+		if (fn.extension().compare(".fsm") != 0) {
+			ERROR_MESSAGE("FSMmodel::loadFSM - the extension of file %s is not '.fsm'", filename.c_str());
+			return nullptr;
+		}*/
+		ifstream file(filename.c_str());
+		if (!file.is_open()) {
+			ERROR_MESSAGE("FSMmodel::loadFSM - unable to open file %s", filename.c_str());
+			return nullptr;
+		}
+		machine_type_t type;
+		file >> type;
+		unique_ptr<DFSM> fsm;
+		switch (type) {
+		case TYPE_DFSM:
+			fsm = move(make_unique<DFSM>());
+			break;
+		case TYPE_MEALY:
+			fsm = move(make_unique<Mealy>());
+			break;
+		case TYPE_MOORE:
+			fsm = move(make_unique<Moore>());
+			break;
+		case TYPE_DFA:
+			fsm = move(make_unique<DFA>());
+			break;
+		default:
+			return nullptr;
+		}
+		if (!fsm->load(filename)) return nullptr;
 		return fsm;
 	}
 

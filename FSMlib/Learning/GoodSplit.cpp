@@ -427,15 +427,9 @@ namespace FSMlearning {
 								if (bbOutput.size() > 1) bbOutput.pop_front();
 								suffix.pop_front();
 							}
-							if (getLastOutput(stateNodes[state], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
-								query(stateNodes[state], suffix, teacher, !conjecture->isOutputTransition());
-							}
-							if (getLastOutput(stateNodes[prevState]->succ[prefix.back()], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
-								query(stateNodes[prevState]->succ[prefix.back()], suffix, teacher, !conjecture->isOutputTransition());
-							}
 							len = 0;
-							while (!suffix.empty()) {
-								if (suffix.front() != STOUT_INPUT) {
+							for (const auto& input : suffix) {
+								if (input != STOUT_INPUT) {
 									len++;
 									if (len == maxDistinguishingLength + 1) {
 										if (!teacher->isProvidedOnlyMQ()) {
@@ -455,7 +449,12 @@ namespace FSMlearning {
 										extendDistinguishingSequences(distSequences, longestDistSequences, conjecture, teacher);
 									}
 								}
-								suffix.pop_front();
+							}
+							if (getLastOutput(stateNodes[state], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
+								query(stateNodes[state], suffix, teacher, !conjecture->isOutputTransition());
+							}
+							if (getLastOutput(stateNodes[prevState]->succ[prefix.back()], suffix, !conjecture->isOutputTransition()) == DEFAULT_OUTPUT) {
+								query(stateNodes[prevState]->succ[prefix.back()], suffix, teacher, !conjecture->isOutputTransition());
 							}
 							maxDistinguishingLength = len;
 							continue;

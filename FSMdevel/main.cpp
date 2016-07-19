@@ -227,7 +227,7 @@ static void testLStarAllVariants() {
 	chrono::duration<double> elapsed_seconds = end - start; 
 
 static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates = 1, seq_len_t maxDistLen = 2) {
-	printf("Correct;#Resets;#OQs;#EQs;#symbols;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
+	printf("Correct;#Resets;#OQs;#EQs;#symbols;seconds;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
 	vector<string> descriptions;
 	vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 #if 1 // L*
@@ -273,7 +273,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr, true));
 #endif
 
-#if 1 // TeacherDFSM
+#if 0 // TeacherDFSM
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
 		COMPUTATION_TIME(auto model = algorithms[i](teacher))
@@ -321,16 +321,22 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 	
 }
 
+extern void testDir(string dir, string outFilename = "");
+
 int main(int argc, char** argv) {
-	//getCSet();
-	fsm = make_unique<Mealy>();
+	testDir(DATA_PATH + EXPERIMENTS_DIR + "100multi/", "res.csv");
+	//testDir(string(argv[1]));
+	/*/getCSet();
+	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R20_tER9A.fsm";
+
 	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
 	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
-	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
@@ -342,17 +348,17 @@ int main(int argc, char** argv) {
 		if (len < seq.size()) len = seq.size();
 	}
 	cout << len << endl;
-	//*/
+	//* /
 	//testLStarAllVariants();
-	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
+	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*
-	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	//auto model = QuotientAlgorithm(teacher, showConjecture);
-	auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
-	//auto model = ObservationTreeAlgorithm(teacher, 1, showConjecture, true);// showAndStop);
+	//* /
+	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
+	//auto model = TTT(teacher, showConjecture);
+	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
+	auto model = ObservationTreeAlgorithm(teacher, 1, showConjecture, true);// showAndStop);
 	COMPUTATION_TIME()
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();

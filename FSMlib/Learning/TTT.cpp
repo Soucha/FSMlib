@@ -561,9 +561,11 @@ namespace FSMlearning {
 					node->state = WRONG_STATE;
 					node->incomingOutput = move(blockRoot->incomingOutput);
 					node->sequence = move(discriminator);
-					node->parent = blockRoot->parent;
-					blockRoot->parent.reset();// blockRoot begins to be a root of the old subtree
-					node->parent.lock()->succ[node->incomingOutput] = node;
+					if (blockRoot != dt) {
+						node->parent = blockRoot->parent;
+						blockRoot->parent.reset();// blockRoot begins to be a root of the old subtree
+						node->parent.lock()->succ[node->incomingOutput] = node;
+					}
 					// update transitions and stateNodes
 					state_t numStates = conjecture->getNumberOfStates();
 					for (auto& sd : statesDirection) {
@@ -571,6 +573,9 @@ namespace FSMlearning {
 							updateTransitionsTo(stateNode->state, node, sd.first, numStates, stateNodes, conjecture, teacher);
 							stateNodes[stateNode->state] = stateNode;
 						}
+					}
+					if (blockRoot == dt) {
+						dt = node;
 					}
 					blockRoot = node;
 					if (numStates != conjecture->getNumberOfStates()) // new states found
@@ -636,11 +641,10 @@ namespace FSMlearning {
 					ce.swap(newCE);
 				}
 
-				auto bbOutput = teacher->resetAndOutputQuery(ce);
-				shortenCE(ce, bbOutput, conjecture, teacher);
-				
+				auto bbOutput = teacher->resetAndOutputQuery(ce);		
 				bool isCE = true;
 				do {
+					shortenCE(ce, bbOutput, conjecture, teacher);
 					ce_t divCE(0, ce);
 					divCE.outputs[0] = bbOutput;
 					refineHypothesis(divCE, dt, stateNodes, conjecture, teacher);

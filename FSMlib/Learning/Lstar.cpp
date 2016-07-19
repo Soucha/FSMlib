@@ -285,11 +285,15 @@ namespace FSMlearning {
 			s2 = ot.conjecture->getNextState(s2, distSeq.front());
 			distSeq.pop_front();
 		}
-		if (s1 != s2) {// a cyclic undistingushable block
-			distSeq = ot.E[i];
-			while (find(ot.E.begin(), ot.E.end(), distSeq) != ot.E.end()) {
-				distSeq.pop_front();
-				if (distSeq.empty()) return true;
+		if (distSeq.empty()) {// a cyclic undistingushable block
+			for (auto rIt = ot.E[i].rbegin(); rIt != ot.E[i].rend(); ++rIt) {
+				distSeq.push_front(*rIt);
+				if (find(ot.E.begin(), ot.E.end(), distSeq) == ot.E.end()) {
+					break;
+				}
+			}
+			if (distSeq == ot.E[i]) {
+				return true;
 			}
 		}
 		ot.E.emplace_back(move(distSeq));

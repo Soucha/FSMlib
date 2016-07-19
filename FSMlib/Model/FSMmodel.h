@@ -35,6 +35,14 @@ namespace FSMmodel {
 	FSMLIB_API unique_ptr<DFSM> createFSM(machine_type_t machineType, state_t numberOfStates = 1, input_t numberOfInputs = 0, output_t numberOfOutputs = 0);
 
 	/**
+	* Loads a FSM from the given file.
+	*
+	* @param filename of '.fsm' file with a FSM to load
+	* @return a pointer to the loaded FSM, or nullptr if loading was not succesful
+	*/
+	FSMLIB_API unique_ptr<DFSM> loadFSM(string filename);
+
+	/**
 	* Creates a copy of provided finite state machine.
 	*
 	* @param fsm
