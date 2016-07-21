@@ -1,6 +1,7 @@
 # Ignore the build folder
 **/x64/*
 **/ipch/*
+**/diagnostics/*
 
 *.opensdf
 *.suo
