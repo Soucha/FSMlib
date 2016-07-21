@@ -285,7 +285,8 @@ namespace FSMlearning {
 			s2 = ot.conjecture->getNextState(s2, distSeq.front());
 			distSeq.pop_front();
 		}
-		if (distSeq.empty()) {// a cyclic undistingushable block
+		if (distSeq.empty() || (find(ot.E.begin(), ot.E.end(), distSeq) != ot.E.end())) {// a cyclic undistingushable block
+			distSeq.clear();
 			for (auto rIt = ot.E[i].rbegin(); rIt != ot.E[i].rend(); ++rIt) {
 				distSeq.push_front(*rIt);
 				if (find(ot.E.begin(), ot.E.end(), distSeq) == ot.E.end()) {

@@ -67,12 +67,15 @@ static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>&
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),
 		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), 
 		(bb ? bb->getAppliedResetCount() : 0), (bb ? bb->getQueriedSymbolsCount() : 0), sec, description.c_str());
+	fflush(outFile);
+	printf(".");
 }
 
 static vector<string> descriptions;
 static vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 
 static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed) {
+#if 0
 #if 1 // L*
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
@@ -111,6 +114,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 #endif
+#endif
 #if 1 // ObservationTreeAlgorithm
 	descriptions.emplace_back("OTree\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr, isEQallowed));
@@ -125,6 +129,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM\t\t" + fnName);
 	}
 #endif
+	printf(" ");
 #if 1 // TeacherRL
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
@@ -132,7 +137,8 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL\t\t" + fnName);
 	}
 #endif
-#if 1 // TeacherBB
+	printf(" ");
+#if 0 // TeacherBB
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, maxExtraStates + 1);
@@ -164,7 +170,7 @@ void testDir(string dir, string outFilename = "") {
 			path fn(it->path());
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm) {// && (fsm->getType() == TYPE_MEALY)) {
+				if (fsm && (fsm->getNumberOfStates() < 1000)) {// && (fsm->getType() == TYPE_MEALY)) {
 					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed);
 					printf("%s tested\n", fn.filename().c_str());
 				}
