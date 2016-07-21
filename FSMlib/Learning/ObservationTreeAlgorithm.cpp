@@ -230,6 +230,8 @@ namespace FSMlearning {
 						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
 						if (areNodesDifferentUnder(node, cnPtr)) {
 							cnPtr->refStates.erase(node->state);
+							if ((cnPtr->extraStateLevel == 1) || (cnPtr->refStates.empty())) printf("\n");
+							printf("%d->%d ", cnPtr->extraStateLevel, cnPtr->refStates.size());
 							if (cnPtr->refStates.size() == 1) {
 								if (parent->state != NULL_STATE) {
 									ot.conjecture->setTransition(parent->state, parent->nextInputs[cnPtr->incomingInputIdx], 
@@ -603,13 +605,15 @@ namespace FSMlearning {
 					} else state = NULL_STATE;
 				}
 				node = node->next[node->distInputIdx];
+				node->extraStateLevel = ++level;
 				if (node->refStates.size() > 1) {
 					auto ads = getADSwithFixedPrefix(node, state, ot);
 					if (ads) {
 						return identify(node, ot, teacher, ads);
 					}
+				} else if (node->distInputIdx == STOUT_INPUT) {
+					return identify(node, ot, teacher);
 				}
-				node->extraStateLevel = ++level;
 			}
 		}
 	}
@@ -694,13 +698,15 @@ namespace FSMlearning {
 						if (!ce.empty()) {
 							auto out = ot.conjecture->getOutputAlongPath(0, ce);
 							if (bbOutput != out) {
-								while (ot.uncheckedNodes.front() != ot.stateNodes[0])
+								updateWithCE(ce, ot, teacher);
 								continue;
 							}
 							bbOutput.clear();
 						}
 						ce = teacher->equivalenceQuery(ot.conjecture);
 						if (!ce.empty()) {
+							printf("\nCE %d\n", ce.size());
+
 							ot.numberOfExtraStates--;
 							auto currNode = ot.stateNodes[0];// root
 							for (auto& input : ce) {

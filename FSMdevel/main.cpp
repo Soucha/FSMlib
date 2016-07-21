@@ -325,19 +325,19 @@ extern void testDir(string dir, string outFilename = "");
 
 int main(int argc, char** argv) {
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "100multi/", "res.csv");
-	testDir(string(argv[1]));
-	/*/getCSet();
+	//testDir(string(argv[1]));
+	//getCSet();
 	fsm = make_unique<Moore>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R6_ADS.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R600_hefpO.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R600_hefpO.fsm";
 
 	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
 	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_HS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm->load(fileName);
@@ -354,7 +354,7 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//* /
+	//*/
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = TTT(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
