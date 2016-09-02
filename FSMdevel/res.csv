@@ -1,0 +1,39 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	3	100	2	2	3262	3262	11	35327	0	0	11.031784	L*	addAllPrefixesToS	0	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3026	3026	12	28463	0	0	13.228369	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3216	3216	16	30879	0	0	22.688267	L*	addSuffix1by1ToE	2	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3250	3250	16	30223	0	0	19.462231	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3271	3271	16	30374	0	0	16.942293	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3465	3465	3	35818	0	0	3.104571	OP	AllGlobally	5	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	4444	4444	14	45405	0	0	3.089063	OP	OneGlobally	6	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	2826	2826	92	27996	0	0	3.375253	OP	OneLocally	7	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	4706	4706	92	35661	0	0	1.831752	DT		8	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	1640	1640	88	13741	0	0	8.233893	TTT		9	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	1597	1597	14	17753	0	0	3.689411	Quotient		10	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	4459	4459	4	60229	0	0	15.671326	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	461	1725	1	5296	0	0	9.654777	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	3920	3920	13	43264	0	0	16.636137	L*	addAllPrefixesToS	0	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	3631	3631	14	34645	0	0	10.554803	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	3216	3216	16	30879	0	0	19.590954	L*	addSuffix1by1ToE	2	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	3250	3250	16	30223	0	0	11.935402	L*	addSuffixAfterLastStateToE	3	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	3271	3271	16	30374	0	0	34.252168	L*	addSuffixToE_binarySearch	4	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	4877	4877	4	52407	0	0	4.459677	OP	AllGlobally	5	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	4492	4492	14	45838	0	0	2.268479	OP	OneGlobally	6	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	2903	2903	91	28743	0	0	2.580839	OP	OneLocally	7	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	5333	5333	99	40316	0	0	1.976820	DT		8	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	1688	1688	89	14089	0	0	7.421981	TTT		9	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	1597	5033	14	17753	0	0	2.030356	Quotient		10	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	2973	2973	3	33924	0	0	2.004337	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	461	1725	1	5296	0	0	9.606581	OTree	ExtraStates:1+EQ	12	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	4940	3570	9	6857	4940	30030	47.076351	L*	addAllPrefixesToS	0	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	2767	1812	4	5697	2767	19569	7.309378	L*	addAllSuffixesAfterLastStateToE	1	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	3752	2613	13	5509	3752	26337	18.444686	L*	addSuffix1by1ToE	2	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	2722	1622	8	5788	2722	22081	15.117986	L*	addSuffixAfterLastStateToE	3	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	2734	1634	8	5788	2734	22081	23.911649	L*	addSuffixToE_binarySearch	4	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	7546	6663	3	9697	7546	26026	7.952905	OP	AllGlobally	5	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	5189	3635	10	6461	5189	22676	10.760181	OP	OneGlobally	6	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	8443	2289	66	6175	8443	18463	20.857796	OP	OneLocally	7	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	10965	4173	81	5916	10965	20049	34.009999	DT		8	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	7747	1738	64	5648	7747	21111	21.090256	TTT		9	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	2850	1341	12	6249	2850	23553	20.335683	Quotient		10	TeacherBB:SPY_method(ExtraStates:2)	BlackBoxDFSM	Moore_R100.fsm
+1	3	100	2	2	56508	55294	4	101106	56508	953595	78.448852	GoodSplit	maxDistLen:2+

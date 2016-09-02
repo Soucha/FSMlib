@@ -32,9 +32,9 @@ namespace FSMlibTest
 		{
 			fsm = make_unique<DFSM>();
 			testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
-			testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
-			testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
-			testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
+			//testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_ADS.fsm");
+			//testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_SVS.fsm");
+			//testHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 		}
 
 		TEST_METHOD(TestHmethod_Mealy)
@@ -73,7 +73,7 @@ namespace FSMlibTest
 
 		void testHmethod(string filename) {
 			fsm->load(filename);
-			for (int extraStates = 0; extraStates < 3; extraStates++) {
+			for (int extraStates = 3; extraStates < 5; extraStates++) {
 				auto TS = H_method(fsm, extraStates);
 				printTS(TS, filename);
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");

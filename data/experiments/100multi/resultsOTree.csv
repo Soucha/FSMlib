@@ -1,0 +1,23 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	3	100	2	2	461	1725	1	5296	0	0	0.382254	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R100.fsm
+1	3	100	2	2	461	1725	1	5296	0	0	0.391758	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R100.fsm
+1	3	100	2	2	464	1786	1	5562	0	0	0.447796	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R100_ueyvd.fsm
+1	3	100	2	2	464	1786	1	5562	0	0	0.396771	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R100_ueyvd.fsm
+1	3	200	2	2	984	4902	2	14309	0	0	17.271200	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R200.fsm
+1	3	200	2	2	984	4902	2	14309	0	0	16.490992	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R200.fsm
+1	3	200	2	2	961	4220	1	13683	0	0	7.306414	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R200_LVKf4.fsm
+1	3	200	2	2	961	4220	1	13683	0	0	7.333891	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R200_LVKf4.fsm
+1	3	300	2	2	1401	6484	1	20324	0	0	35.830571	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R300.fsm
+1	3	300	2	2	1401	6484	1	20324	0	0	35.867851	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R300.fsm
+1	3	300	2	2	2414	14497	2	43210	0	0	955.905866	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R300_L5E63.fsm
+1	3	300	2	2	2414	14497	2	43210	0	0	965.423436	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R300_L5E63.fsm
+1	3	400	2	2	1794	8809	1	28061	0	0	96.750934	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R400.fsm
+1	3	400	2	2	1794	8809	1	28061	0	0	96.056617	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R400.fsm
+1	3	400	2	2	2918	17154	2	50469	0	0	1651.856668	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R400_kGw0x.fsm
+1	3	400	2	2	2918	17154	2	50469	0	0	1652.921203	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R400_kGw0x.fsm
+1	3	500	2	2	3351	21656	1	60465	0	0	2786.813475	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R500.fsm
+1	3	500	2	2	3351	21656	1	60465	0	0	2942.979121	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R500.fsm
+1	3	500	2	2	2587	17042	1	46655	0	0	1125.973890	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R500_EaX8Q.fsm
+1	3	500	2	2	2587	17042	1	46655	0	0	1053.078037	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R500_EaX8Q.fsm
+1	3	600	2	2	5343	34877	2	103163	0	0	15415.001319	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R600.fsm
+1	3	600	2	2	5343	34877	2	103163	0	0	14904.809534	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R600.fsm

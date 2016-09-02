@@ -75,7 +75,7 @@ static vector<string> descriptions;
 static vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 
 static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed) {
-#if 0
+#if 1
 #if 1 // L*
 	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
@@ -110,7 +110,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
 #endif
-#if 1 // GoodSplit
+#if 0 // GoodSplit
 	descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 #endif
@@ -170,7 +170,7 @@ void testDir(string dir, string outFilename = "") {
 			path fn(it->path());
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm && (fsm->getNumberOfStates() < 1000)) {// && (fsm->getType() == TYPE_MEALY)) {
+				if (fsm && (fsm->getNumberOfStates() == 664)) {// && (fsm->getType() == TYPE_MEALY)) {
 					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed);
 					printf("%s tested\n", fn.filename().c_str());
 				}

@@ -1,0 +1,5 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	3	1000	2	2	11280	83418	2	238354	0	0	77.911586	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R1000.fsm
+1	3	1000	2	2	11280	83418	2	238354	0	0	78.787165	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R1000.fsm
+1	3	1000	2	2	5902	53257	2	127810	0	0	31.977171	OTree	ExtraStates:1+EQ	0	TeacherDFSM		Moore_R1000_iEGpW.fsm
+1	3	1000	2	2	5902	53257	2	127810	0	0	31.919133	OTree	ExtraStates:1+EQ	0	TeacherRL		Moore_R1000_iEGpW.fsm

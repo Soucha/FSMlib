@@ -1,0 +1,25 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	4	97	12	2	23235	23235	12	306248	0	0	0.123582	L*	addAllPrefixesToS	0	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	18654	18654	15	232284	0	0	0.089559	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	18640	18640	16	232183	0	0	0.088557	L*	addSuffix1by1ToE	2	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	18670	18670	16	232389	0	0	0.076050	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	18699	18699	16	232651	0	0	0.076548	L*	addSuffixToE_binarySearch	4	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	63670	63670	4	1104127	0	0	0.222648	OP	AllGlobally	5	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	21736	21736	4	275119	0	0	0.068546	OP	OneGlobally	6	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	18322	18322	18	226554	0	0	0.064542	OP	OneLocally	7	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	11805	11805	96	121988	0	0	0.058038	DT		8	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	3606	3606	94	45018	0	0	0.060038	TTT		9	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	16741	16741	4	223978	0	0	0.161607	Quotient		10	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	14254	28128	1	190635	0	0	7.064181	OTree	ExtraStates:1+EQ	11	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	23235	23235	12	306248	0	0	0.103570	L*	addAllPrefixesToS	0	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	18654	18654	15	232284	0	0	0.074550	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	18640	18640	16	232183	0	0	0.086057	L*	addSuffix1by1ToE	2	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	18670	18670	16	232389	0	0	0.072549	L*	addSuffixAfterLastStateToE	3	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	18699	18699	16	232651	0	0	0.081054	L*	addSuffixToE_binarySearch	4	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	63670	63670	4	1104127	0	0	0.139091	OP	AllGlobally	5	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	21736	21736	4	275119	0	0	0.044529	OP	OneGlobally	6	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	18322	18322	18	226554	0	0	0.052035	OP	OneLocally	7	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	11805	11805	96	121988	0	0	0.036525	DT		8	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	3606	3606	94	45018	0	0	0.036525	TTT		9	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	16741	51109	4	223978	0	0	0.117576	Quotient		10	TeacherRL		DFA_R97_sched4.fsm
+1	4	97	12	2	14254	28128	1	190635	0	0	7.026666	OTree	ExtraStates:1+EQ	11	TeacherRL		DFA_R97_sched4.fsm

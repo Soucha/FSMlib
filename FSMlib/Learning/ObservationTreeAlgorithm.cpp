@@ -147,7 +147,7 @@ namespace FSMlearning {
 		for (const auto& sn : ot.stateNodes) {
 			if ((node->stateOutput == sn->stateOutput) && (node->nextInputs == sn->nextInputs)) {
 				node->refStates.emplace(sn->state);
-				sn->consistentNodes.emplace(node.get());
+				if (node->extraStateLevel - 1 <= ot.numberOfExtraStates) sn->consistentNodes.emplace(node.get());
 			}
 		}
 	}
@@ -161,10 +161,49 @@ namespace FSMlearning {
 				nodes.pop();
 				if ((node != otNode) && (otNode->state == NULL_STATE) && !areNodesDifferent(node, otNode)) {
 					otNode->refStates.emplace(node->state);
-					node->consistentNodes.emplace(otNode.get());
+					if (otNode->extraStateLevel - 1 <= ot.numberOfExtraStates) node->consistentNodes.emplace(otNode.get());
 				}
 				for (const auto& nn : otNode->next) {
 					if (nn && (nn->state == NULL_STATE)) nodes.emplace(nn);
+				}
+			}
+		}
+	}
+
+	static void updateConsistentOfSucc(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
+		for (auto& nn : node->next) {
+			if (nn && (nn->state == NULL_STATE)) {
+				if (nn->extraStateLevel - 1 > ot.numberOfExtraStates) {
+					for (auto snIt = nn->refStates.begin(); snIt != nn->refStates.end();) {
+						if (areNodesDifferent(nn, ot.stateNodes[*snIt])) {
+							snIt = nn->refStates.erase(snIt);
+						}
+						else {
+							ot.stateNodes[*snIt]->consistentNodes.emplace(nn.get());
+							++snIt;
+						}
+					}
+				}
+				nn->extraStateLevel = node->extraStateLevel + 1;
+				if (nn->extraStateLevel <= ot.numberOfExtraStates) {
+					updateConsistentOfSucc(nn, ot);
+				}
+			}
+		}
+	}
+
+	static void assumeSuccConsistent(ObservationTree& ot) {
+		for (auto& node : ot.uncheckedNodes) {
+			for (auto& nn : node->next) {
+				if (nn && (nn->state == NULL_STATE)) {
+					for (auto snIt = nn->refStates.begin(); snIt != nn->refStates.end();) {
+						if (areNodesDifferent(nn, ot.stateNodes[*snIt])) {
+							snIt = nn->refStates.erase(snIt);
+						} else {
+							ot.stateNodes[*snIt]->consistentNodes.emplace(nn.get());
+							++snIt;
+						}
+					}
 				}
 			}
 		}
@@ -177,6 +216,7 @@ namespace FSMlearning {
 			ot.stateNodes.emplace_back(node);
 			if (ot.spaceEfficient) {
 				addNewStateToConsistentNodes(node, ot);
+				updateConsistentOfSucc(node, ot);
 			} else {
 				for (auto& cn : node->consistentNodes) {
 					cn->refStates.emplace(node->state);
@@ -219,7 +259,9 @@ namespace FSMlearning {
 				if (node->state == NULL_STATE) {
 					for (auto snIt = node->refStates.begin(); snIt != node->refStates.end();) {
 						if (areNodesDifferentUnder(node, ot.stateNodes[*snIt])) {
-							ot.stateNodes[*snIt]->consistentNodes.erase(node.get());
+							if (node->extraStateLevel - 1 <= ot.numberOfExtraStates) {
+								ot.stateNodes[*snIt]->consistentNodes.erase(node.get());
+							}
 							snIt = node->refStates.erase(snIt);
 						}
 						else ++snIt;
@@ -230,8 +272,6 @@ namespace FSMlearning {
 						auto cnPtr = parent->next[(*cnIt)->incomingInputIdx];
 						if (areNodesDifferentUnder(node, cnPtr)) {
 							cnPtr->refStates.erase(node->state);
-							if ((cnPtr->extraStateLevel == 1) || (cnPtr->refStates.empty())) printf("\n");
-							printf("%d->%d ", cnPtr->extraStateLevel, cnPtr->refStates.size());
 							if (cnPtr->refStates.size() == 1) {
 								if (parent->state != NULL_STATE) {
 									ot.conjecture->setTransition(parent->state, parent->nextInputs[cnPtr->incomingInputIdx], 
@@ -535,6 +575,52 @@ namespace FSMlearning {
 		checkAndQueryNext(currNode, ot, teacher);
 	}
 
+	// returns false if a new state was found
+	static bool distinguishFromPrefixes(const shared_ptr<ot_node_t>& node, const shared_ptr<ot_node_t>& prevNode, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		auto& parent = prevNode->parent.lock();
+		if (parent && (parent->state != NULL_STATE)) {
+			if (!distinguishFromPrefixes(node, parent, ot, teacher)) return false;
+		}
+		if (*(node->refStates.begin()) == *(prevNode->refStates.begin())) return true;
+
+		if (areNodesDifferent(node, prevNode)) return true;
+		// find the separating sequence of the states starting in the node
+		list<pair<shared_ptr<ot_node_t>, shared_ptr<ot_node_t>>> fifo;
+		fifo.emplace_back(node, ot.stateNodes[*(prevNode->refStates.begin())]);
+		sequence_in_t::iterator sIt, eIt;
+		while (!fifo.empty()) {
+			auto p = move(fifo.front());
+			fifo.pop_front();
+			for (input_t i = 0; i < p.first->nextInputs.size(); i++) {
+				if (p.first->next[i] && p.second->next[i]) {
+					auto& n1 = p.first->next[i];
+					auto& n2 = p.second->next[i];
+					if ((n1->stateOutput != n2->stateOutput) || (n1->incomingOutput != n2->incomingOutput)
+							|| (n1->nextInputs != n2->nextInputs)) {
+						sIt = n1->accessSequence.begin();
+						advance(sIt, node->accessSequence.size());
+						eIt = n1->accessSequence.end();
+						fifo.clear();
+						break;
+					} else {
+						fifo.emplace_back(n1, n2);
+					}
+				}
+			}
+		}
+		// apply the separating sequence from the prevNode
+		auto currNode = prevNode;
+		for (; sIt != eIt; ++sIt) {
+			auto idx = getNextIdx(currNode, *sIt);
+			if (!currNode->next[idx]) {
+				query(currNode, idx, ot, teacher);
+			}
+			currNode = currNode->next[idx];
+		}
+		checkAndQueryNext(currNode, ot, teacher);
+		return (ot.uncheckedNodes.front() != ot.stateNodes[0]); // a new state was not found
+	}
+
 	static shared_ptr<ads_t> getADSwithFixedPrefix(shared_ptr<ot_node_t> node, state_t expectedState, ObservationTree& ot) {
 		auto ads = make_shared<ads_t>();
 		for (auto& state : node->refStates) {
@@ -699,14 +785,13 @@ namespace FSMlearning {
 							auto out = ot.conjecture->getOutputAlongPath(0, ce);
 							if (bbOutput != out) {
 								updateWithCE(ce, ot, teacher);
+								ot.numberOfExtraStates--;
 								continue;
 							}
 							bbOutput.clear();
 						}
 						ce = teacher->equivalenceQuery(ot.conjecture);
 						if (!ce.empty()) {
-							printf("\nCE %d\n", ce.size());
-
 							ot.numberOfExtraStates--;
 							auto currNode = ot.stateNodes[0];// root
 							for (auto& input : ce) {
@@ -730,6 +815,7 @@ namespace FSMlearning {
 					}
 					break;
 				}
+				assumeSuccConsistent(ot);
 			}
 			auto nextNode = node;
 			for (input_t i = 0; i < node->nextInputs.size(); i++) {
@@ -754,14 +840,24 @@ namespace FSMlearning {
 				}
 			}
 			if (nextNode == node) {// node checked
-				for (auto& nn : node->next) {
-					if (nn->state == NULL_STATE) {
-						nn->extraStateLevel = node->extraStateLevel + 1;
-						ot.uncheckedNodes.emplace_back(nn);
+				if (node->extraStateLevel > 0) {
+					for (input_t i = 0; i < node->nextInputs.size(); i++) {
+						if (!distinguishFromPrefixes(node->next[i], node, ot, teacher)) {
+							nextNode = nullptr;
+							break;
+						}
 					}
 				}
-				ot.uncheckedNodes.pop_front();
-				continue;
+				if (nextNode) {
+					for (auto& nn : node->next) {
+						if (nn->state == NULL_STATE) {
+							nn->extraStateLevel = node->extraStateLevel + 1;
+							ot.uncheckedNodes.emplace_back(nn);
+						}
+					}
+					ot.uncheckedNodes.pop_front();
+					continue;
+				}
 			}
 			if (nextNode) {// new state not found
 				// identify or confirm
