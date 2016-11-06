@@ -326,8 +326,8 @@ extern void testDir(string dir, string outFilename = "");
 
 
 int main(int argc, char** argv) {
-	//testDir(DATA_PATH + EXPERIMENTS_DIR + "100multi/", "res.csv");
-	testDir(string(argv[1]));
+	testDir(DATA_PATH + EXPERIMENTS_DIR + "100multi/", "res.csv");
+	//testDir(string(argv[1]));
 	/*/getCSet();
 	fsm = make_unique<DFA>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
@@ -361,8 +361,13 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = TTT(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
-	COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 1, nullptr, true));// showAndStop);
-	//COMPUTATION_TIME(auto model = Lstar(teacher, addSuffixAfterLastStateToE, nullptr, false, true);)
+	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 1, nullptr, true));// showAndStop);
+	//COMPUTATION_TIME(auto model = Lstar(teacher, addSuffixToE_binarySearch, nullptr, false, true);)
+	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
+	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, AllGlobally, nullptr);)
+	//COMPUTATION_TIME(auto model = TTT(teacher, nullptr);)
+	//COMPUTATION_TIME(auto model = QuotientAlgorithm(teacher, nullptr);)
+	COMPUTATION_TIME(auto model = GoodSplit(teacher, 2, nullptr,true);)
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;

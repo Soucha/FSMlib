@@ -33,6 +33,10 @@ namespace FSMlearning {
 		for (auto& p : ot.T) {
 			for (auto i = p.second.size(); i < ot.E.size(); i++) {
 				p.second.emplace_back(teacher->resetAndOutputQueryOnSuffix(p.first, ot.E[i]));
+#if DUMP_OQ 
+				printf("%d T(%s, %s) = %s fillOTonE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(p.first).c_str(),
+				FSMmodel::getInSequenceAsString(ot.E[i]).c_str(), FSMmodel::getOutSequenceAsString(p.second.back()).c_str());
+#endif // DUMP_OQ
 			}
 		}
 	}
@@ -43,10 +47,14 @@ namespace FSMlearning {
 			vector<sequence_out_t> row;
 			for (const auto& seq : ot.E) {
 				row.emplace_back(teacher->resetAndOutputQueryOnSuffix(newRowSeq, seq));
+#if DUMP_OQ 
+				printf("%d T(%s, %s) = %s fillOTonS\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(newRowSeq).c_str(),
+				FSMmodel::getInSequenceAsString(seq).c_str(), FSMmodel::getOutSequenceAsString(row.back()).c_str());
+#endif // DUMP_OQ
 			}
 			ot.T.emplace(newRowSeq, move(row));
 			newRowSeq.pop_back();
-		}		
+		}
 	}
 
 	static void extendOTbyNewInputs(const unique_ptr<Teacher>& teacher, ObservationTable& ot) {
@@ -125,16 +133,27 @@ namespace FSMlearning {
 		conjecture->setTransition(from, input, to, output);
 	}
 
-	static void shortenCE(sequence_in_t& ce, sequence_out_t& bbOutput, 
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
-		if (bbOutput.empty()) bbOutput = teacher->resetAndOutputQuery(ce);
+	static void shortenCE(sequence_in_t& ce, sequence_out_t& bbOutput,
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		if (bbOutput.empty()) {
+			bbOutput = teacher->resetAndOutputQuery(ce);
+#if DUMP_OQ 
+			printf("%d T(eps, %s) = %s shortenCE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str(),
+			FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
+		}
 		auto output = conjecture->getOutputAlongPath(0, ce);
 		while (output.back() == bbOutput.back()) {
 			ce.pop_back();
 			output.pop_back();
 			if (teacher->isProvidedOnlyMQ()) {
 				bbOutput = teacher->resetAndOutputQuery(ce);
-			} else {
+#if DUMP_OQ 
+				printf("%d T(eps, %s) = %s shortenCE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str(),
+				FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
+			}
+			else {
 				bbOutput.pop_back();
 			}
 		}
@@ -161,6 +180,10 @@ namespace FSMlearning {
 	void addSuffixToE_binarySearch(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		auto bbOutput = teacher->resetAndOutputQuery(ce);
+#if DUMP_OQ 
+		printf("%d T(eps, %s) = %s addSuffixToE_binarySearch\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str(),
+		FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
 		shortenCE(suffix, bbOutput, ot.conjecture, teacher);
 		auto refOutput = ot.conjecture->getOutputAlongPath(0, suffix).back();
 		size_t len = suffix.size();
@@ -186,6 +209,11 @@ namespace FSMlearning {
 				}
 			}
 			auto output = teacher->resetAndOutputQueryOnSuffix(ot.S[ot.conjecture->getEndPathState(0, prefix)], suffix);
+#if DUMP_OQ 
+			printf("%d T(%s, %s) = %s addSuffixToE_binarySearch\n", teacher->getOutputQueryCount(), 
+			FSMmodel::getInSequenceAsString(ot.S[ot.conjecture->getEndPathState(0, prefix)]).c_str(),
+				FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 			sameOutput = (output.back() == refOutput);
 		}
 		if (!sameOutput || (suffix.front() == STOUT_INPUT)) suffix.pop_front();
@@ -195,6 +223,10 @@ namespace FSMlearning {
 	void addSuffixAfterLastStateToE(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix, suffix(ce);
 		auto bbOutput = teacher->resetAndOutputQuery(ce);
+#if DUMP_OQ 
+		printf("%d T(eps, %s) = %s addSuffixAfterLastStateToE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str(),
+		FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
 		shortenCE(suffix, bbOutput, ot.conjecture, teacher);
 		state_t state = 0;
 		while (!suffix.empty()) {
@@ -203,6 +235,10 @@ namespace FSMlearning {
 				prefix.push_back(input);
 				if (!ot.T.count(prefix)) {
 					auto output = teacher->resetAndOutputQueryOnSuffix(ot.S[state], suffix);
+#if DUMP_OQ 
+					printf("%d T(%s, %s) = %s addSuffixAfterLastStateToE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ot.S[state]).c_str(),
+					FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 					if (bbOutput != output) {
 						break;
 					}
@@ -301,13 +337,25 @@ namespace FSMlearning {
 		return false;
 	}
 
+	static bool isCE(const sequence_in_t& ce, const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		auto output = conjecture->getOutputAlongPath(0, ce);
+#if DUMP_OQ 
+		printf("%d T(eps, %s) = ? isCE\n", teacher->getOutputQueryCount() + 1, FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
+		if (teacher->isProvidedOnlyMQ()) {
+			return output.back() != teacher->resetAndOutputQuery(ce).back();
+		}
+		return output != teacher->resetAndOutputQuery(ce);
+	}
+
 	unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher,
 		function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCounterexample,
-		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool checkConsistency, bool checkSemanticSuffixClosedness) {
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool checkPreviousCE, bool checkSemanticSuffixClosedness) {
 		if (!teacher->isBlackBoxResettable()) {
 			ERROR_MESSAGE("FSMlearning::Lstar - the Black Box needs to be resettable");
 			return nullptr;
 		}
+		bool checkConsistency = false;
 		/// counterexample
 		sequence_in_t ce;
 		/// observation table (S,E,T)
@@ -380,7 +428,11 @@ namespace FSMlearning {
 				}
 			}
 			if (conjecture->getNumberOfInputs() == teacher->getNumberOfInputs()) {// EQ -> CE or stop
-				ce = teacher->equivalenceQuery(conjecture);
+				if (!checkPreviousCE || ce.empty() || !isCE(ce, conjecture, teacher))
+					ce = teacher->equivalenceQuery(conjecture);
+#if DUMP_OQ 
+				printf("%d EQ => %s\n", teacher->getEquivalenceQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
 				if (ce.empty()) unlearned = false;
 				else {
 					if (conjecture->isOutputState() && !conjecture->isOutputTransition()) {// Moore and DFA
@@ -395,6 +447,7 @@ namespace FSMlearning {
 					auto ssize = ot.S.size();
 					processCounterexample(ce, ot, teacher);
 					if (ssize != ot.S.size()) {
+						checkConsistency = true;
 						for (auto i = ssize; i < ot.S.size(); i++) {// increasing order of prefixes is supposed
 							fillOTonS(teacher, ot, ot.S[i]);
 							//conjecture is updated in making OT closed

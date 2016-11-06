@@ -145,15 +145,14 @@ namespace FSMlearning {
 	*							If the function extends S, then all prefixes of a new string needs to be included in S before the string.
 	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
 	*							If the function returns false, then the learning stops immediately.
-	* @param checkConsistency - the OT is checked for inconsistency (S contains indistinguished states) if sets to true 
-	*							(needed for addAllPrefixesToS as processCounterexample function)
+	* @param checkPreviousCE - the obtained CE is checked again after it reveals a new state if sets to true 
 	* @param checkSemanticSuffixClosedness - the suffix set E is extended by suffixes that make the conjecture minimal if sets to true
 	* @return A learned model
 	*/
 	FSMLIB_API unique_ptr<DFSM> Lstar(const unique_ptr<Teacher>& teacher,
 		function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCounterexample,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr,
-		bool checkConsistency = false, bool checkSemanticSuffixClosedness = false);
+		bool checkPreviousCE = false, bool checkSemanticSuffixClosedness = false);
 
 	/**
 	* The learning algorithm based on a Discrimination Tree

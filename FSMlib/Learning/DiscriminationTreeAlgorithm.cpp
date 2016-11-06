@@ -41,6 +41,9 @@ namespace FSMlearning {
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
 			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(%s, S) = %d addState\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(node->sequence).c_str(), output);
+#endif // DUMP_OQ
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(node->state, output);
 		}
@@ -50,6 +53,10 @@ namespace FSMlearning {
 		auto currentNode = dt;
 		while (currentNode->state == NULL_STATE) {
 			auto output = teacher->resetAndOutputQueryOnSuffix(s, currentNode->sequence);
+#if DUMP_OQ 
+			printf("%d T(%s, %s) = %s sift\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(s).c_str(),
+			FSMmodel::getInSequenceAsString(currentNode->sequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 			auto it = currentNode->succ.find(output);
 			if (it == currentNode->succ.end()) {
 				return createNode(currentNode, s, move(output));
@@ -72,6 +79,10 @@ namespace FSMlearning {
 				conjecture->setTransition(state, i, dtNode->state);
 				if (conjecture->isOutputTransition()) {
 					auto output = teacher->resetAndOutputQuery(prefix);
+#if DUMP_OQ 
+					printf("%d T(eps, %s) = %s addNewTransitions\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+					FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 					checkNumberOfOutputs(teacher, conjecture);
 					conjecture->setOutput(state, output.back(), i);
 				}
@@ -104,7 +115,7 @@ namespace FSMlearning {
 		}
 	}
 
-	static void updateConjecture(state_t splittedState, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes, 
+	static void updateConjecture(state_t splittedState, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		auto newState = stateNodes.back()->state;
 		auto distNode = stateNodes[splittedState]->parent.lock();
@@ -122,11 +133,15 @@ namespace FSMlearning {
 					}
 					//auto dtNode = sift(dt, prefix, teacher);// similar to what follows but with more effort
 					auto output = teacher->resetAndOutputQueryOnSuffix(prefix, distNode->sequence);
+#if DUMP_OQ 
+					printf("%d T(%s, %s) = %s updateConjecture\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+					FSMmodel::getInSequenceAsString(distNode->sequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 					auto it = distNode->succ.find(output);
 					if (it == distNode->succ.end()) {// new state
 						auto leaf = createNode(distNode, move(prefix), move(output));
 						addState(leaf, stateNodes, conjecture, teacher);
-						conjecture->setTransition(state, i, leaf->state, 
+						conjecture->setTransition(state, i, leaf->state,
 							conjecture->isOutputTransition() ? conjecture->getOutput(state, i) : DEFAULT_OUTPUT);
 					}
 					else if (it->second->state != splittedState) {// == newState
@@ -138,9 +153,9 @@ namespace FSMlearning {
 		}
 		addNewTransitions(newState, dt, stateNodes, conjecture, teacher);
 	}
-	
+
 	static void updateTree(const sequence_in_t& ce, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		state_t currState = 0;
 		sequence_in_t prefix;
 		for (const auto& input : ce) {
@@ -150,6 +165,10 @@ namespace FSMlearning {
 			if (conjecture->isOutputTransition()) {
 				// nextState== NULL_STATE ?
 				auto output = teacher->resetAndOutputQuery(prefix);
+#if DUMP_OQ 
+				printf("%d T(eps, %s) = %s updateTree\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+				FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 				if (output.back() != conjecture->getOutput(currState, input)) {
 					auto refNode = stateNodes[currState];
 					auto leaf = createNode(refNode, move(refNode->sequence), sequence_out_t({ conjecture->getOutput(currState, input) }));
@@ -173,7 +192,8 @@ namespace FSMlearning {
 				addState(dtNode, stateNodes, conjecture, teacher);
 				addNewTransitions(dtNode->state, dt, stateNodes, conjecture, teacher);
 				break;
-			} else if (nextState != dtNode->state) {
+			}
+			else if (nextState != dtNode->state) {
 				// find distinguishing sequence
 				auto n1 = stateNodes[nextState];
 				auto n2 = stateNodes[dtNode->state];
@@ -188,15 +208,23 @@ namespace FSMlearning {
 
 				auto refNode = stateNodes[currState];
 				auto output = teacher->resetAndOutputQueryOnSuffix(refNode->sequence, distSequence);
+#if DUMP_OQ 
+				printf("%d T(%s, %s) = %s updateTree\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(refNode->sequence).c_str(),
+				FSMmodel::getInSequenceAsString(distSequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 				auto leaf = createNode(refNode, move(refNode->sequence), move(output));
 				leaf->state = currState;
 				stateNodes[currState] = leaf;
-	
+
 				prefix.pop_back();
 				output = teacher->resetAndOutputQueryOnSuffix(prefix, distSequence);
+#if DUMP_OQ 
+				printf("%d T(%s, %s) = %s updateTree\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+				FSMmodel::getInSequenceAsString(distSequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 				leaf = createNode(refNode, move(prefix), move(output));
 				addState(leaf, stateNodes, conjecture, teacher);
-				
+
 				refNode->sequence = move(distSequence);
 				refNode->state = NULL_STATE;
 
@@ -224,6 +252,9 @@ namespace FSMlearning {
 		if (conjecture->isOutputState()) {
 			dt->sequence.emplace_back(STOUT_INPUT);
 			auto output = teacher->resetAndOutputQuery(STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(eps, S) = %d dt\n", teacher->getOutputQueryCount(), output);
+#endif // DUMP_OQ
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(0, output);
 			auto leaf = createNode(dt, sequence_in_t(), sequence_out_t({ output }));// the initial state -> empty access sequence
@@ -242,6 +273,9 @@ namespace FSMlearning {
 		}
 		while (unlearned) {
 			ce = teacher->equivalenceQuery(conjecture);
+#if DUMP_OQ 
+			printf("%d EQ => %s\n", teacher->getEquivalenceQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
 			if (ce.empty()) unlearned = false;
 			else {
 				if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {

@@ -52,6 +52,10 @@ namespace FSMlearning {
 		stateNodes.emplace_back(node);
 		if (conjecture->isOutputState()) {
 			auto output = teacher->resetAndOutputQueryOnSuffix(node->sequence, STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(%s, S) = %d addState\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(node->sequence).c_str(),
+			output);
+#endif // DUMP_OQ
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(node->state, output);
 		}
@@ -61,6 +65,10 @@ namespace FSMlearning {
 		auto currentNode = dt;
 		while (currentNode->state == NULL_STATE) {
 			auto output = teacher->resetAndOutputQueryOnSuffix(s, currentNode->sequence);
+#if DUMP_OQ 
+			printf("%d T(%s, %s) = %s sift\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(s).c_str(),
+			FSMmodel::getInSequenceAsString(currentNode->sequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 			auto it = currentNode->succ.find(output);
 			if (it == currentNode->succ.end()) {
 				return createNode(currentNode, s, move(output));
@@ -71,11 +79,15 @@ namespace FSMlearning {
 	}
 
 	static bool isRowClosed(vector<sequence_out_t>& row, const sequence_in_t& prefix, const componentOT& ot,
-			size_t startColumn, size_t& sepSeqIdx, const unique_ptr<Teacher>& teacher) {
+		size_t startColumn, size_t& sepSeqIdx, const unique_ptr<Teacher>& teacher) {
 		bool undististinguished = true;
 		auto& refRow = ot.T.at(ot.S);
 		for (auto e = startColumn; e < ot.E.size(); e++) {
 			row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, ot.E[e]));
+#if DUMP_OQ 
+			printf("%d T(%s, %s) = %s isRowClosed\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+			FSMmodel::getInSequenceAsString(ot.E[e]).c_str(), FSMmodel::getOutSequenceAsString(row.back()).c_str());
+#endif // DUMP_OQ
 			if (undististinguished && (row.back() != refRow[e])) {
 				sepSeqIdx = e;
 				undististinguished = false;
@@ -85,9 +97,9 @@ namespace FSMlearning {
 	}
 
 	static void split(shared_ptr<dt_node_t>& dtNode, vector<shared_ptr<dt_node_t>>& stateNodes, vector<componentOT>& components,
-			vector<sequence_in_t> E, size_t sepSeqIdx, sequence_out_t& outputToMoved, 
-			sequence_in_t prefix, vector<sequence_out_t>& row, size_t sepSeqOfNewComponent,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		vector<sequence_in_t> E, size_t sepSeqIdx, sequence_out_t& outputToMoved,
+		sequence_in_t prefix, vector<sequence_out_t>& row, size_t sepSeqOfNewComponent,
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		auto leaf = createNode(dtNode, move(dtNode->sequence), outputToMoved, dtNode->level);
 		leaf->state = dtNode->state;
 		stateNodes[dtNode->state] = leaf;
@@ -102,7 +114,7 @@ namespace FSMlearning {
 		dtNode = leaf;
 	}
 
-	static void separateRow(vector<sequence_out_t>& row, sequence_in_t accessSeq, shared_ptr<dt_node_t> currentNode, 
+	static void separateRow(vector<sequence_out_t>& row, sequence_in_t accessSeq, shared_ptr<dt_node_t> currentNode,
 		const state_t& state, const size_t& sepSeqIdx, vector<shared_ptr<dt_node_t>>& stateNodes,
 		vector<componentOT>& components, vector<componentOT>& newComponents,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
@@ -157,8 +169,8 @@ namespace FSMlearning {
 	}
 
 	static void extendStateByInput(state_t state, input_t input, shared_ptr<dt_node_t>& dt, vector<shared_ptr<dt_node_t>>& stateNodes,
-			vector<componentOT>& components, vector<componentOT>& newComponents, const OP_CEprocessing& processCE,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		vector<componentOT>& components, vector<componentOT>& newComponents, const OP_CEprocessing& processCE,
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t prefix(stateNodes[state]->sequence);
 		prefix.emplace_back(input);
 		auto dtNode = sift(dt, prefix, teacher);// what state is the next state?
@@ -170,6 +182,10 @@ namespace FSMlearning {
 				for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
 					sequence_in_t seq({ i });
 					row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, seq));
+#if DUMP_OQ 
+					printf("%d T(%s, %s) = %s extendStateByInput\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+						FSMmodel::getInSequenceAsString(seq).c_str(), FSMmodel::getOutSequenceAsString(row.back()).c_str());
+#endif // DUMP_OQ
 					E.emplace_back(move(seq));
 				}
 				if (conjecture->isOutputState()) {
@@ -181,6 +197,10 @@ namespace FSMlearning {
 				E = components.front().E;
 				for (auto& seq : E) {
 					row.emplace_back(teacher->resetAndOutputQueryOnSuffix(prefix, seq));
+#if DUMP_OQ 
+					printf("%d T(%s, %s) = %s extendStateByInput\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+					FSMmodel::getInSequenceAsString(seq).c_str(), FSMmodel::getOutSequenceAsString(row.back()).c_str());
+#endif // DUMP_OQ
 				}
 			}
 			newComponents.emplace_back(move(prefix), move(E), move(row));
@@ -234,23 +254,30 @@ namespace FSMlearning {
 		vector<componentOT> components, newComponents;
 		// numberOfOutputs can produce error message
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
-		
+
 		vector<sequence_in_t> E;
 		vector<sequence_out_t> row;
 		// add all transitions
 		for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
 			sequence_in_t seq({ i });
 			row.emplace_back(teacher->resetAndOutputQuery(seq));
+#if DUMP_OQ 
+			printf("%d T(eps, %s) = %s OPalg\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(seq).c_str(),
+			FSMmodel::getOutSequenceAsString(row.back()).c_str());
+#endif // DUMP_OQ
 			E.emplace_back(move(seq));
 			conjecture->setTransition(0, i, 0, DEFAULT_OUTPUT);
 			if (conjecture->isOutputTransition()) {
 				checkNumberOfOutputs(teacher, conjecture);
 				conjecture->setOutput(0, row.back().back(), i);
 			}
-		}	
+		}
 		if (conjecture->isOutputState()) {
 			dt->sequence.emplace_back(STOUT_INPUT);
 			auto output = teacher->resetAndOutputQuery(STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(eps, S) = %d OPalg\n", teacher->getOutputQueryCount(), output);
+#endif // DUMP_OQ
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(0, output);
 			row.emplace_back(sequence_out_t({ output }));
@@ -279,6 +306,10 @@ namespace FSMlearning {
 					auto& refRow = ot.T[ot.S];
 					for (auto e = refRow.size(); e < ot.E.size(); e++) {
 						refRow.emplace_back(teacher->resetAndOutputQueryOnSuffix(ot.S, ot.E[e]));
+#if DUMP_OQ 
+						printf("%d T(%s, %s) = %s completeRefRow\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(ot.S).c_str(),
+							FSMmodel::getInSequenceAsString(ot.E[e]).c_str(), FSMmodel::getOutSequenceAsString(refRow.back()).c_str());
+#endif // DUMP_OQ
 					}
 					auto refNode = stateNodes[state];
 					bool rowErased = false;// the first row can be erased so the iterator can't be incremented
@@ -287,7 +318,7 @@ namespace FSMlearning {
 						if (itRow->first == ot.S) continue;
 						size_t sepSeqIdx;
 						if (!isRowClosed(itRow->second, itRow->first, ot, itRow->second.size(), sepSeqIdx, teacher)) {
-							separateRow(itRow->second, itRow->first, refNode, state, sepSeqIdx, 
+							separateRow(itRow->second, itRow->first, refNode, state, sepSeqIdx,
 								stateNodes, components, newComponents, conjecture, teacher);
 							// erase row from ot
 							itRow = ot.T.erase(itRow);
@@ -314,7 +345,7 @@ namespace FSMlearning {
 					if (!unlearned) break;
 				}
 				deltaInputs = 0;
-				if (!unlearned) break;	
+				if (!unlearned) break;
 			}
 			// process new components
 			state_t numberOfOldComponents = state_t(components.size());
@@ -335,13 +366,16 @@ namespace FSMlearning {
 			if (!unlearned) break;
 			// EQ
 			ce = teacher->equivalenceQuery(conjecture);
+#if DUMP_OQ 
+			printf("%d EQ => %s\n", teacher->getEquivalenceQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
 			if (ce.empty()) unlearned = false;
 			else {// process CE
 				if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
 					deltaInputs = teacher->getNumberOfInputs() - conjecture->getNumberOfInputs();
 					for (auto& ot : components) {
 						for (input_t input = conjecture->getNumberOfInputs(); input < teacher->getNumberOfInputs(); input++) {
-							ot.E.emplace_back(sequence_in_t({input}));
+							ot.E.emplace_back(sequence_in_t({ input }));
 						}
 					}
 					conjecture->incNumberOfInputs(deltaInputs);
@@ -362,11 +396,19 @@ namespace FSMlearning {
 					//split
 					sequence_in_t prefix, suffix(ce);
 					auto bbOutput = teacher->resetAndOutputQuery(ce);
+#if DUMP_OQ 
+					printf("%d T(eps, %s) = %s splitCE\n", teacher->getOutputQueryCount(), 
+					FSMmodel::getInSequenceAsString(ce).c_str(), FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
 					state_t state = 0;
 					for (const auto& input : ce) {
 						if (input != STOUT_INPUT) {
 							if (prefix != stateNodes[state]->sequence) {
 								auto output = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->sequence, suffix);
+#if DUMP_OQ 
+								printf("%d T(%s, %s) = %s splitCE\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(stateNodes[state]->sequence).c_str(),
+								FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 								if (bbOutput != output) {
 									break;
 								}

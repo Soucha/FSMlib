@@ -39,7 +39,7 @@ void TeacherDFSM::resetBlackBox() {
 
 output_t TeacherDFSM::outputQuery(input_t input) {
 	_outputQueryCounter++;
-	_querySymbolCounter++;
+	if (input != STOUT_INPUT) _querySymbolCounter++;
 	auto ns = _fsm->getNextState(_currState, input);
 	auto output = WRONG_OUTPUT; 
 	if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {

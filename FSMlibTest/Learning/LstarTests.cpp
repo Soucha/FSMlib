@@ -116,8 +116,8 @@ namespace FSMlibTest
 
 		void testLstar(const unique_ptr<Teacher>& teacher,
 				function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCE,
-				string fnName, string teacherName, string filename, bool checkConsistency = false, bool checkSemSuffix = false) {
-			auto model = Lstar(teacher, processCE, showConjecture, checkConsistency, checkSemSuffix);
+				string fnName, string teacherName, string filename, bool checkPreviousCE = false, bool checkSemSuffix = false) {
+			auto model = Lstar(teacher, processCE, showConjecture, checkPreviousCE, checkSemSuffix);
 			DEBUG_MSG("Reset: %d,\tOQ: %d,\tsymbols: %d,\tEQ: %d,\t%s\t%s\t%s%s\n", teacher->getAppliedResetCount(),
 				teacher->getOutputQueryCount(), teacher->getQueriedSymbolsCount(), teacher->getEquivalenceQueryCount(),
 				fnName.c_str(), teacherName.c_str(), filename.c_str(), (FSMmodel::areIsomorphic(fsm, model) ? "" : "\tNOT LEARNED"));
@@ -129,18 +129,18 @@ namespace FSMlibTest
 			
 			for (size_t i = 0; i < ceFunc.size(); i++) {
 				unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "TeacherDFSM", filename, (i == 0));
+				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "TeacherDFSM", filename, (i == 2), (i > 2));
 			}
 
 			for (size_t i = 0; i < ceFunc.size(); i++) {
 				unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "TeacherRL", filename, (i == 0));
+				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "TeacherRL", filename, (i == 2), (i > 2));
 			}
 
 			for (size_t i = 0; i < ceFunc.size(); i++) {
 				shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename, (i == 0), (i > 2));
+				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename, (i == 2), (i > 2));
 			}
 		}
 	};

@@ -85,7 +85,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
 	for (size_t i = 0; i < ceFunc.size(); i++) {
 		descriptions.emplace_back("L*\t" + ceFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
-		algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 0), (i > 2)));
+		algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 2), (i > 2)));
 	}
 #endif
 #if 1 // OP
@@ -110,7 +110,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
 #endif
-#if 0 // GoodSplit
+#if 1 // GoodSplit
 	descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 #endif
@@ -170,7 +170,7 @@ void testDir(string dir, string outFilename = "") {
 			path fn(it->path());
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm && (fsm->getNumberOfStates() == 664)) {// && (fsm->getType() == TYPE_MEALY)) {
+				if (fsm && (fsm->getNumberOfStates() == 300)) {// && (fsm->getType() == TYPE_MEALY)) {
 					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed);
 					printf("%s tested\n", fn.filename().c_str());
 				}

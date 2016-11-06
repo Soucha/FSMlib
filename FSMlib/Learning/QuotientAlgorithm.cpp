@@ -34,9 +34,9 @@ namespace FSMlearning {
 			stateOutput(DEFAULT_OUTPUT), accessSeq(accessSeq) {
 		}
 	};
-	
+
 	static void printTree(const shared_ptr<qa_ot_node_t>& node, string prefix) {
-		printf("%d/%s %s\n", 
+		printf("%d/%s %s\n",
 			node->state, FSMmodel::getOutSequenceAsString(sequence_out_t({ node->stateOutput })).c_str(),
 			FSMmodel::getInSequenceAsString(sequence_in_t({ node->accessSeq })).c_str());
 		for (auto& p : node->succ) {
@@ -73,27 +73,38 @@ namespace FSMlearning {
 	}
 
 	static void addNodes(shared_ptr<qa_ot_node_t> node, sequence_in_t& seq,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		sequence_in_t accessSeq(node->accessSeq);
 		sequence_out_t outputSeq;
 		bool isRL = teacher->isProvidedOnlyMQ();// TeacherRL gives only the last output
 		if (!isRL) outputSeq = teacher->resetAndOutputQueryOnSuffix(accessSeq, seq);
 		else teacher->resetAndOutputQuery(accessSeq);
+#if DUMP_OQ 
+		if (!isRL) printf("%d T(%s, %s) = %s addNodes\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(accessSeq).c_str(),
+			FSMmodel::getInSequenceAsString(seq).c_str(), FSMmodel::getOutSequenceAsString(outputSeq).c_str());
+		else printf("%d T(%s, eps) => addNodes\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(accessSeq).c_str());
+#endif // DUMP_OQ
 		auto outIt = outputSeq.begin();
 		for (auto& input : seq) {
 			if (input == STOUT_INPUT) {
 				node->stateOutput = isRL ? teacher->outputQuery(input) : *outIt;
+#if DUMP_OQ 
+				if (isRL) printf("%d T(S) = %d addNodes\n", teacher->getOutputQueryCount(), node->stateOutput);
+#endif // DUMP_OQ
 			}
 			else {
 				accessSeq.push_back(input);
 				node->succ.emplace(input, make_shared<qa_ot_node_t>(isRL ? teacher->outputQuery(input) : *outIt, accessSeq));
 				node = node->succ.at(input);
+#if DUMP_OQ 
+				if (isRL) printf("%d T(%d) = %d addNodes\n", teacher->getOutputQueryCount(), input, node->incomingOutput);
+#endif // DUMP_OQ
 			}
 			if (!isRL) ++outIt;
 		}
 	}
 
-	static void extendNode(const shared_ptr<qa_ot_node_t>& node, sequence_in_t& seq, 
+	static void extendNode(const shared_ptr<qa_ot_node_t>& node, sequence_in_t& seq,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 
 		auto it = node->succ.find(seq.front());
@@ -107,7 +118,7 @@ namespace FSMlearning {
 		}
 	}
 
-	static void extendNode(const shared_ptr<qa_ot_node_t>& node, const sequence_set_t& D, 
+	static void extendNode(const shared_ptr<qa_ot_node_t>& node, const sequence_set_t& D,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		for (auto seq : D) {
 			extendNode(node, seq, conjecture, teacher);
@@ -115,8 +126,8 @@ namespace FSMlearning {
 	}
 
 	static bool buildQuotient(const shared_ptr<qa_ot_node_t>& root, FSMlib::PrefixSet& pset, vector<shared_ptr<qa_ot_node_t>>& stateNodes,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
-		
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+
 		auto D = pset.getMaximalSequences();
 		queue<shared_ptr<qa_ot_node_t>> openNodes;
 		openNodes.emplace(root);
@@ -151,7 +162,7 @@ namespace FSMlearning {
 		for (auto& sn : stateNodes) {
 			if (conjecture->isOutputState()) conjecture->setOutput(sn->state, sn->stateOutput);
 			for (auto& p : sn->succ) {
-				conjecture->setTransition(sn->state, p.first, p.second->state, 
+				conjecture->setTransition(sn->state, p.first, p.second->state,
 					conjecture->isOutputTransition() ? p.second->incomingOutput : DEFAULT_OUTPUT);
 			}
 		}
@@ -200,12 +211,15 @@ namespace FSMlearning {
 
 		/// distinguishing sequences
 		FSMlib::PrefixSet pset;
-		
+
 		// numberOfOutputs can produce error message
 		auto conjecture = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, teacher->getNumberOfInputs(), teacher->getNumberOfOutputs());
 
 		if (conjecture->isOutputState()) {
 			ot->stateOutput = teacher->resetAndOutputQuery(STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(eps, S) = %d QuotientAlgorithm\n", teacher->getOutputQueryCount(), ot->stateOutput);
+#endif // DUMP_OQ
 		}
 		for (input_t input = 0; input < conjecture->getNumberOfInputs(); input++) {
 			sequence_in_t seq({ input });
@@ -226,6 +240,9 @@ namespace FSMlearning {
 				if (!unlearned) break;
 			}
 			ce = teacher->equivalenceQuery(conjecture);
+#if DUMP_OQ 
+			printf("%d EQ => %s\n", teacher->getEquivalenceQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
 			if (ce.empty()) unlearned = false;
 			else {// process CE
 				if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {

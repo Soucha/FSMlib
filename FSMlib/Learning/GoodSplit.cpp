@@ -29,7 +29,7 @@ namespace FSMlearning {
 		state_t lastComparedState;
 		vector<shared_ptr<gs_node_t>> consistentStates;
 
-		gs_node_t(sequence_in_t seq, const input_t& numInputs) : 
+		gs_node_t(sequence_in_t seq, const input_t& numInputs) :
 			accessSequence(move(seq)), state(NULL_STATE), succ(numInputs),
 			incomingOutput(DEFAULT_OUTPUT), stateOutput(DEFAULT_OUTPUT),
 			counter(0), lastComparedState(0) {
@@ -48,7 +48,7 @@ namespace FSMlearning {
 	}
 
 	static bool areNodesDifferent(const shared_ptr<gs_node_t>& first, const shared_ptr<gs_node_t>& second) {
-		if ((first->stateOutput != second->stateOutput) && 
+		if ((first->stateOutput != second->stateOutput) &&
 			(first->stateOutput != DEFAULT_OUTPUT) && (second->stateOutput != DEFAULT_OUTPUT)) return true;
 		for (input_t i = 0; i < first->succ.size(); i++) {
 			if ((first->succ[i]) && (second->succ[i]) &&
@@ -75,9 +75,18 @@ namespace FSMlearning {
 				if (conjecture->isOutputTransition() && (node->incomingOutput == DEFAULT_OUTPUT)) {
 					if (teacher->isProvidedOnlyMQ() || (!conjecture->isOutputState()) || (node->stateOutput != DEFAULT_OUTPUT)) {
 						node->incomingOutput = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->accessSequence, i);
-					} else {// DFSM
+#if DUMP_OQ 
+						printf("%d T(%s, %d) = %d makeClosed\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(stateNodes[state]->accessSequence).c_str(),
+						i, node->incomingOutput);
+#endif // DUMP_OQ
+					}
+					else {// DFSM
 						sequence_in_t suffix({ i, STOUT_INPUT });
 						auto outputSeq = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->accessSequence, suffix);
+#if DUMP_OQ 
+						printf("%d T(%s, %s) = %s makeClosed\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(stateNodes[state]->accessSequence).c_str(),
+						FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(outputSeq).c_str());
+#endif // DUMP_OQ
 						node->incomingOutput = outputSeq.front();
 						node->stateOutput = outputSeq.back();
 					}
@@ -86,6 +95,10 @@ namespace FSMlearning {
 					sequence_in_t prefix(stateNodes[state]->accessSequence);
 					prefix.emplace_back(i);
 					node->stateOutput = teacher->resetAndOutputQueryOnSuffix(prefix, STOUT_INPUT);
+#if DUMP_OQ 
+					printf("%d T(%s, S) = %d makeClosed\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(prefix).c_str(),
+					node->stateOutput);
+#endif // DUMP_OQ
 				}
 				// compare with previous states
 				for (int sn = 0; sn < node->consistentStates.size(); sn++) {
@@ -108,7 +121,8 @@ namespace FSMlearning {
 					conjecture->setTransition(state, i, node->state, node->incomingOutput);
 					end = state_t(stateNodes.size());
 					endState = state + 1;
-				} else {//if (node->consistentStates.size() == 1) {
+				}
+				else {//if (node->consistentStates.size() == 1) {
 					checkNumberOfOutputs(teacher, conjecture);
 					conjecture->setTransition(state, i, node->consistentStates[rand() % node->consistentStates.size()]->state, node->incomingOutput);
 				}
@@ -133,7 +147,8 @@ namespace FSMlearning {
 		for (auto& input : sequence) {
 			if (input == STOUT_INPUT) {
 				output.emplace_back(curr->stateOutput);
-			} else {
+			}
+			else {
 				if (!curr->succ[input]) {
 					output.emplace_back(DEFAULT_OUTPUT);
 					return output;
@@ -147,6 +162,10 @@ namespace FSMlearning {
 
 	static void query(shared_ptr<gs_node_t> node, const sequence_in_t& sequence, const unique_ptr<Teacher>& teacher, bool setStateOutput) {
 		auto output = teacher->resetAndOutputQueryOnSuffix(node->accessSequence, sequence);
+#if DUMP_OQ 
+		printf("%d T(%s, %s) = %s query\n", teacher->getOutputQueryCount(), FSMmodel::getInSequenceAsString(node->accessSequence).c_str(),
+		FSMmodel::getInSequenceAsString(sequence).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 		node->counter++;
 		for (auto& input : sequence) {
 			if (input == STOUT_INPUT) {
@@ -187,7 +206,8 @@ namespace FSMlearning {
 				node->succ.emplace(out, next);
 				next->counter = 0;
 				node = next;
-			} else {
+			}
+			else {
 				node = it->second;
 			}
 		}
@@ -204,7 +224,7 @@ namespace FSMlearning {
 	}
 
 	static size_t closeNextStates(const vector<shared_ptr<gs_node_t>>& stateNodes, const sequence_vec_t& distSequences,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		size_t totalSeqApplied = 0;
 		for (state_t state = 0; state < stateNodes.size(); state++) {
 			for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
@@ -227,7 +247,8 @@ namespace FSMlearning {
 								auto statIt = outCounter.find(output);
 								if (statIt == outCounter.end()) {
 									outCounter.emplace(move(output), 1);
-								} else {
+								}
+								else {
 									statIt->second++;
 								}
 							}
@@ -258,15 +279,16 @@ namespace FSMlearning {
 						}
 					}
 					query(node, *bestSeqIt, teacher, !conjecture->isOutputTransition());
-					
+
 					// update node->consistentStates;
 					auto refOutput = getOutput(node, *bestSeqIt, !conjecture->isOutputTransition());
 					for (int sn = 0; sn < node->consistentStates.size(); sn++) {
 						bool distinguished;
-						if(teacher->isProvidedOnlyMQ()) {
+						if (teacher->isProvidedOnlyMQ()) {
 							auto output = getLastOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition());
 							distinguished = (output != DEFAULT_OUTPUT) && (output != refOutput.back());
-						} else {
+						}
+						else {
 							auto output = getOutput(node->consistentStates[sn], *bestSeqIt, !conjecture->isOutputTransition());
 							distinguished = false;
 							for (auto itRef = refOutput.begin(), it = output.begin(); it != output.end(); ++itRef, ++it) {
@@ -291,9 +313,9 @@ namespace FSMlearning {
 		}
 		return totalSeqApplied;
 	}
-	
+
 	static void extendDistinguishingSequences(sequence_vec_t& distSequences, list<sequence_in_t>& longestDistSequences,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		list<sequence_in_t> tmpLongest;
 		for (input_t input = 0; input < conjecture->getNumberOfInputs(); input++) {
 			for (auto seq : longestDistSequences) {
@@ -311,7 +333,7 @@ namespace FSMlearning {
 	}
 
 	static void makeRandomQueries(const vector<shared_ptr<gs_node_t>>& stateNodes, const sequence_vec_t& distSequences,
-			const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher, size_t remainingSeq) {
+		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher, size_t remainingSeq) {
 		auto numStates = conjecture->getNumberOfStates();
 		auto numInputs = conjecture->getNumberOfInputs();
 		auto numQueries = numStates / 2 + numStates % 2;
@@ -332,9 +354,9 @@ namespace FSMlearning {
 			}
 			bool distinguished = (teacher->isProvidedOnlyMQ() ?
 				(getLastOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
-					getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())) :
+				getLastOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())) :
 				(getOutput(node, distSequences[seqIdx], !conjecture->isOutputTransition()) !=
-					getOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())));
+				getOutput(node->consistentStates.front(), distSequences[seqIdx], !conjecture->isOutputTransition())));
 			if (distinguished) {
 				node->consistentStates.pop_back();// -> new state (or consistent with a new state)
 				if (node->consistentStates.empty()) {
@@ -367,6 +389,9 @@ namespace FSMlearning {
 		stateNodes[0]->state = 0;
 		if (conjecture->isOutputState()) {
 			auto output = teacher->resetAndOutputQuery(STOUT_INPUT);
+#if DUMP_OQ 
+			printf("%d T(eps, S) = %d GoodSplit\n", teacher->getOutputQueryCount(), output);
+#endif // DUMP_OQ
 			checkNumberOfOutputs(teacher, conjecture);
 			conjecture->setOutput(0, output);
 			stateNodes[0]->stateOutput = output;
@@ -402,6 +427,9 @@ namespace FSMlearning {
 				if (len > maxDistinguishingLength) {
 					if (isEQallowed) {
 						auto ce = teacher->equivalenceQuery(conjecture);
+#if DUMP_OQ 
+						printf("%d EQ => %s\n", teacher->getEquivalenceQueryCount(), FSMmodel::getInSequenceAsString(ce).c_str());
+#endif // DUMP_OQ
 						if (!ce.empty()) {
 							if (conjecture->getNumberOfInputs() != teacher->getNumberOfInputs()) {
 								auto numInputs = teacher->getNumberOfInputs();
@@ -411,11 +439,20 @@ namespace FSMlearning {
 							//split
 							sequence_in_t prefix, suffix(ce);
 							auto bbOutput = teacher->resetAndOutputQuery(ce);
+#if DUMP_OQ 
+							printf("%d T(eps, %s) = %s addSuffixAfterLastStateToE\n", teacher->getOutputQueryCount(), 
+							FSMmodel::getInSequenceAsString(ce).c_str(), FSMmodel::getOutSequenceAsString(bbOutput).c_str());
+#endif // DUMP_OQ
 							state_t prevState, state = 0;
 							for (const auto& input : ce) {
 								if (input != STOUT_INPUT) {
 									if (prefix != stateNodes[state]->accessSequence) {
 										auto output = teacher->resetAndOutputQueryOnSuffix(stateNodes[state]->accessSequence, suffix);
+#if DUMP_OQ 
+										printf("%d T(%s, %s) = %s addSuffixAfterLastStateToE\n", teacher->getOutputQueryCount(), 
+										FSMmodel::getInSequenceAsString(stateNodes[state]->accessSequence).c_str(),
+											FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+#endif // DUMP_OQ
 										if (bbOutput != output) {
 											break;
 										}
