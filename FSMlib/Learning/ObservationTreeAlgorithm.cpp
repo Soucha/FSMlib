@@ -19,6 +19,8 @@
 #include <numeric>
 #include "FSMlearning.h"
 
+//#define DUMP_OQ 1
+
 namespace FSMlearning {
 	struct ot_node_t;
 	bool consistentComp(const ot_node_t* a, const ot_node_t* b);
@@ -327,12 +329,34 @@ namespace FSMlearning {
 				teacher->resetAndOutputQueryOnSuffix(node->accessSequence, suffix);
 			transitionOutput = output.front();
 			stateOutput = output.back();
+#if DUMP_OQ 
+			if (ot.bbNode == node) {
+				printf("%d T(%s) = %s query\n", teacher->getOutputQueryCount(),
+					FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+			} else {
+				printf("%d T(%s, %s) = %s query\n", teacher->getOutputQueryCount(),
+					FSMmodel::getInSequenceAsString(node->accessSequence).c_str(),
+					FSMmodel::getInSequenceAsString(suffix).c_str(), FSMmodel::getOutSequenceAsString(output).c_str());
+			}
+#endif // DUMP_OQ
 		} else {
 			transitionOutput = (ot.bbNode == node) ? teacher->outputQuery(input) :
 				teacher->resetAndOutputQueryOnSuffix(node->accessSequence, input);
+#if DUMP_OQ 
+			if (ot.bbNode == node) {
+				printf("%d T(%d) = %d query\n", teacher->getOutputQueryCount(), input, transitionOutput);
+			} else {
+				printf("%d T(%s, %s) = %s query\n", teacher->getOutputQueryCount(),
+					FSMmodel::getInSequenceAsString(node->accessSequence).c_str(), input, transitionOutput);
+			}
+#endif // DUMP_OQ
 			if (ot.conjecture->getType() == TYPE_DFSM) {
 				stateOutput = teacher->outputQuery(STOUT_INPUT);
-			} else if (!ot.conjecture->isOutputTransition()) {// Moore, DFA
+#if DUMP_OQ 
+				printf("%d T(S) = %d query\n", teacher->getOutputQueryCount(), stateOutput);
+#endif // DUMP_OQ
+			}
+			else if (!ot.conjecture->isOutputTransition()) {// Moore, DFA
 				stateOutput = transitionOutput;
 				//transitionOutput = DEFAULT_OUTPUT;
 			}
@@ -563,9 +587,9 @@ namespace FSMlearning {
 				break;
 			}
 			ads = it->second;
-			if (ot.conjecture->getType() == TYPE_DFSM) {
+			if ((ot.conjecture->getType() == TYPE_DFSM) && (ads->input == STOUT_INPUT)) {
 				it = ads->next.find(currNode->stateOutput);
-				if ((it == ads->next.end()) || (it->second->input == STOUT_INPUT)) {
+				if ((it == ads->next.end()) || (it->second->next.empty())) {//(it->second->input == STOUT_INPUT)) {
 					break;
 				}
 				ads = it->second;
