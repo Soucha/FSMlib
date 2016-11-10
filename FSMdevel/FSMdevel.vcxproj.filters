@@ -21,8 +21,5 @@
     <ClCompile Include="experimenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BBportTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

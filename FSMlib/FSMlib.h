@@ -55,7 +55,7 @@ namespace FSMlib {
 	/**
 	* Calls errorMsgHandler with given message.
 	*/
-	void noticeListeners(const char*);
+	FSMLIB_API void noticeListeners(const char*);
 
 	/**
 	* Sets errorMsgHandler to point on arbitrary function that takes

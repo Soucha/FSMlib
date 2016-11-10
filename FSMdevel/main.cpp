@@ -323,7 +323,7 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 extern void testDir(string dir, string outFilename = "");
 
-extern void testBBport();
+//extern void testBBport();
 
 int main(int argc, char** argv) {
 	//testBBport();
@@ -363,13 +363,19 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = TTT(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
-	COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 1, showConjecture, true));// showAndStop);
-	//COMPUTATION_TIME(auto model = Lstar(teacher, addSuffixToE_binarySearch, nullptr, false, true);)
+	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 1, nullptr, true));// showAndStop);
+	COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
-	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, AllGlobally, nullptr);)
+	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, OneLocally, nullptr);)
 	//COMPUTATION_TIME(auto model = TTT(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = QuotientAlgorithm(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = GoodSplit(teacher, 2, nullptr,true);)
+	printf("Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tseconds\n");
+	printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\n", FSMmodel::areIsomorphic(fsm, model), fsm->getType(),
+		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),
+		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(),
+		elapsed_seconds.count());
+	/*/
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;

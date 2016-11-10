@@ -151,7 +151,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BBportTest.cpp" />
     <ClCompile Include="experimenter.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

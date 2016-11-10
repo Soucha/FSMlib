@@ -29,9 +29,11 @@
 #define RESPONSE_REQUESTED	input_t(-5)
 
 extern "C" {
-	BBPORT_API int initLearning(bool isResettable, input_t numberOfInputs, state_t maxExtraStates);
+	BBPORT_API int initLearning(bool isResettable, input_t numberOfInputs, state_t maxExtraStates, int algId, bool writeDot);
 
 	//BBPORT_API input_t getNextInput(int id);
 	//BBPORT_API void setResponse(int id, output_t output);
 	BBPORT_API input_t updateAndGetNextInput(int id, output_t output);
+
+	BBPORT_API void stopLearning(int id);
 }
