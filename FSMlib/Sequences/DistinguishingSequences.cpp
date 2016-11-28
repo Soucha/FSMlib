@@ -85,12 +85,12 @@ namespace FSMsequence {
 		return lp.first < rp;
 	}
 
-	static inline void initH(const shared_ptr<block_node_t>& node, const vector<sequence_in_t>& seq, const state_t& N) {
+	static inline void initH(const shared_ptr<block_node_t>& node, const vector<sequence_in_t>& seq) {
 		node->h = 0;
 		for (block_t::iterator i = node->states.begin(); i != node->states.end(); i++) {
 			block_t::iterator j = i;
 			for (j++; j != node->states.end(); j++) {
-				auto idx = getStatePairIdx(*i, *j, N);
+				auto idx = getStatePairIdx(*i, *j);
 				if (node->h < seq[idx].size()) {
 					node->h = seq_len_t(seq[idx].size());
 				}
@@ -98,11 +98,11 @@ namespace FSMsequence {
 		}
 	}
 
-	static inline void initSVS_H(const unique_ptr<node_svs_t>& node, const vector<sequence_in_t>& seq, const state_t& N) {
+	static inline void initSVS_H(const unique_ptr<node_svs_t>& node, const vector<sequence_in_t>& seq) {
 		node->h = 0;
 		for (const auto& i : node->states) {
 			if (i != node->actState) {
-				auto idx = getStatePairIdx(i, node->actState, N);
+				auto idx = getStatePairIdx(i, node->actState);
 				if (node->h < seq[idx].size()) {
 					node->h = seq_len_t(seq[idx].size());
 				}
@@ -164,7 +164,7 @@ namespace FSMsequence {
 	extern sequence_set_t getSCSet(const vector<sequence_in_t>& distSeqs, state_t state, state_t N, bool filterPrefixes = false, bool useStout = false);
 
 	static void distinguishBN(const unique_ptr<DFSM>& fsm, const shared_ptr<block_node_t> bn, const sequence_vec_t& seq, bn_partition_t& allBN) {
-		state_t N = fsm->getNumberOfStates();
+		
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 			auto stop = false;
 			vector<block_t> sameOutput(fsm->getNumberOfOutputs() + 1);// + 1 for DEFAULT_OUTPUT
@@ -203,7 +203,7 @@ namespace FSMsequence {
 							succBN = *allBNit;
 						}
 						else {
-							initH(succBN, seq, N);
+							initH(succBN, seq);
 							allBN.emplace(succBN);
 						}
 						outOnIn.emplace_back(out, succBN);
@@ -235,7 +235,7 @@ namespace FSMsequence {
 										succStoutBN = *allBNit;
 									}
 									else {
-										initH(succStoutBN, seq, N);
+										initH(succStoutBN, seq);
 										allBN.insert(succStoutBN);
 									}
 									outOnSTOUT.emplace_back(p.first, move(succStoutBN));
@@ -296,7 +296,7 @@ namespace FSMsequence {
 						succBN = *allBNit;
 					}
 					else {
-						initH(succBN, seq, N);
+						initH(succBN, seq);
 						allBN.emplace(succBN);
 					}
 					if (succBN->states.size() > 1) {
@@ -477,7 +477,7 @@ namespace FSMsequence {
 				outSVS.push_back(STOUT_INPUT);
 				return outSVS;
 			}
-			initSVS_H(actSVS, seq, N);
+			initSVS_H(actSVS, seq);
 			//printf("%d states\n", succSVS->states.size());
 			actSVS->svs.push_back(STOUT_INPUT);
 		}
@@ -562,7 +562,7 @@ namespace FSMsequence {
 				auto succSVS = make_unique<node_svs_t>();
 				succSVS->actState = nextState;
 				succSVS->states.swap(sameOutput);
-				initSVS_H(succSVS, seq, N);
+				initSVS_H(succSVS, seq);
 				succSVS->svs.insert(succSVS->svs.begin(), actSVS->svs.begin(), actSVS->svs.end());
 				succSVS->svs.push_back(input);
 				if (stoutNeeded || useStout) succSVS->svs.push_back(STOUT_INPUT);

@@ -446,7 +446,7 @@ namespace FSMtesting {
 						//((outputTransition != DEFAULT_OUTPUT) && (outTranNS != outputTransition))) {
 						return false;
 					}
-					printf("what output on: %d - %d / ? -> ? (%d)\n", node->instance, input, outTranNS);
+					//printf("what output on: %d - %d / ? -> ? (%d)\n", node->instance, input, outTranNS);
 					// set transition and possibly even output
 					partial->setTransition(node->instance, input, insNS, outTranNS);
 					log.emplace(make_unique<LogItemFC>(node->instance, input, NULL_STATE, DEFAULT_OUTPUT));
@@ -456,7 +456,7 @@ namespace FSMtesting {
 					}
 				}
 				else if (partial->isOutputTransition()) {
-					printf("setOutput: %d - %d / %d -> ?\n", node->instance, input, outTranNS);
+					//printf("setOutput: %d - %d / %d -> ?\n", node->instance, input, outTranNS);
 					/*
 					outputTransition = partial->getOutput(node->instance, input);
 					if (outTranNS != outputTransition) {// always: var[i].output != DEFAULT_OUTPUT

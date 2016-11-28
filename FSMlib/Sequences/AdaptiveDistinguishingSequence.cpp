@@ -137,7 +137,7 @@ namespace FSMsequence {
 		const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
 
 		vector<vector<pair<input_t, state_t>>> link(dependent.size());
-		state_t N = state_t(curNode.size());
+		
 		// add link to dependent vector
 		for (state_t dI = 0; dI < dependent.size(); dI++) {
 			dependent[dI]->nextStates.emplace_back(dI);
@@ -176,7 +176,7 @@ namespace FSMsequence {
 					auto next = curNode[pivot];
 					// find lowest node of ST with block of all diffStates and pivot
 					for (const auto& diffState : diffStates) {
-						auto idx = getStatePairIdx(pivot, diffState, N);
+						auto idx = getStatePairIdx(pivot, diffState);
 						if (next->block.size() < distinguished[idx]->block.size()) {
 							next = distinguished[idx];
 						}
@@ -200,7 +200,7 @@ namespace FSMsequence {
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp>& partition,
 		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
 		vector<shared_ptr<st_node_t>>& curNode, vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
-		state_t N = state_t(curNode.size());
+		
 		auto distCounter = dependent.size();
 		while (!bfsqueue.empty()) {
 			auto dI = bfsqueue.top().second;
@@ -259,7 +259,7 @@ namespace FSMsequence {
 						curNode[stateI] = next;
 						for (output_t j = i + 1; j < node->succ.size(); j++) {
 							for (state_t stateJ : node->succ[j].second->block) {
-								auto idx = getStatePairIdx(stateI, stateJ, N);
+								auto idx = getStatePairIdx(stateI, stateJ);
 								distinguished[idx] = node;// where two states were distinguished
 							}
 						}
@@ -288,7 +288,7 @@ namespace FSMsequence {
 		return (distCounter == 0);
 	}
 
-	static unique_ptr<AdaptiveDS> buildAds(const vector<state_t>& block, const state_t& N, 
+	static unique_ptr<AdaptiveDS> buildAds(const vector<state_t>& block, 
 			const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
 		auto outADS = make_unique<AdaptiveDS>();
 		outADS->initialStates = outADS->currentStates = block;
@@ -303,7 +303,7 @@ namespace FSMsequence {
 			auto next = curNode[pivot];
 			// find lowest node of ST with block of all currentStates
 			for (state_t j = 1; j < adsNode->currentStates.size(); j++) {
-				auto idx = getStatePairIdx(pivot, adsNode->currentStates[j], N);
+				auto idx = getStatePairIdx(pivot, adsNode->currentStates[j]);
 				if (next->block.size() < distinguished[idx]->block.size()) {
 					next = distinguished[idx];
 				}
@@ -375,7 +375,7 @@ namespace FSMsequence {
 					curNode[stateI] = next;
 					for (output_t j = i + 1; j < node->succ.size(); j++) {
 						for (state_t stateJ : node->succ[j].second->block) {
-							auto idx = getStatePairIdx(stateI, stateJ, N);
+							auto idx = getStatePairIdx(stateI, stateJ);
 							distinguished[idx] = node;// where two states were distinguished
 						}
 					}
@@ -406,7 +406,7 @@ namespace FSMsequence {
 						curNode[stateI] = next;
 						for (output_t j = i + 1; j < node->succ.size(); j++) {
 							for (state_t stateJ : node->succ[j].second->block) {
-								auto idx = getStatePairIdx(stateI, stateJ, N);
+								auto idx = getStatePairIdx(stateI, stateJ);
 								distinguished[idx] = node;// where two states were distinguished
 							}
 						}
@@ -428,6 +428,6 @@ namespace FSMsequence {
 			}
 		}
 		// build ADS from ST
-		return buildAds(rootST->block, N, curNode, distinguished, useStout);
+		return buildAds(rootST->block, curNode, distinguished, useStout);
 	}
 }

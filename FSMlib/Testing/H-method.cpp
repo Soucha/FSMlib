@@ -99,8 +99,8 @@ namespace FSMtesting {
 	}
 
 	static seq_len_t getEstimate(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2, const input_t& input,
-			const vector<LinkCell>& sepSeq, const state_t& N) {
-		auto idx = getStatePairIdx(n1->state, n2->state, N);
+			const vector<LinkCell>& sepSeq) {
+		auto idx = getStatePairIdx(n1->state, n2->state);
 		auto nextIdx = sepSeq[idx].next[input];
 		if (nextIdx == NULL_STATE) return seq_len_t(-1);
 		if (nextIdx == idx) return 1;
@@ -127,7 +127,7 @@ namespace FSMtesting {
 					}
 				}
 				else {
-					auto est = getEstimate(n1, n2, i, sepSeq, N);
+					auto est = getEstimate(n1, n2, i, sepSeq);
 					if (minVal > est) {
 						minVal = est;
 						input = i;
@@ -136,14 +136,14 @@ namespace FSMtesting {
 			}
 			else {
 				if (sIt2 != n2->next.end()) {
-					auto est = getEstimate(n2, n1, i, sepSeq, N);
+					auto est = getEstimate(n2, n1, i, sepSeq);
 					if (minVal > est) {
 						minVal = est;
 						input = i;
 					}
 				}
 				else {
-					auto est = getEstimate(n2, n1, i, sepSeq, N);
+					auto est = getEstimate(n2, n1, i, sepSeq);
 					if (minVal - 1 > est) {
 						minVal = est + 1;
 						input = i;
@@ -157,7 +157,7 @@ namespace FSMtesting {
 
 	static void appendSeparatingSequence(const shared_ptr<TestNodeH>& n1, const shared_ptr<TestNodeH>& n2,
 			const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq) {
-		auto idx = getStatePairIdx(n1->state, n2->state, fsm->getNumberOfStates());
+		auto idx = getStatePairIdx(n1->state, n2->state);
 		input_t input = STOUT_INPUT;
 		for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
 			auto nextIdx = sepSeq[idx].next[i];

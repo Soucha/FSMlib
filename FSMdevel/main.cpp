@@ -327,17 +327,17 @@ extern void testDir(string dir, string outFilename = "");
 
 int main(int argc, char** argv) {
 	//testBBport();
-	//testDir(DATA_PATH + EXPERIMENTS_DIR + "100multi/", "res.csv");
+	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
 	//testDir(string(argv[1]));
 	//getCSet();
-	fsm = make_unique<DFSM>();
+	fsm = make_unique<DFA>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R600_hefpO.fsm";
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R20_0nDie.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	
 	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
 	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
@@ -359,12 +359,12 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*/
+	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
 	//auto model = TTT(teacher, showConjecture);
 	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
-	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 1, nullptr, true));// showAndStop);
-	COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
+	COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
+	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, OneLocally, nullptr);)
 	//COMPUTATION_TIME(auto model = TTT(teacher, nullptr);)
@@ -375,13 +375,56 @@ int main(int argc, char** argv) {
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),
 		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(),
 		elapsed_seconds.count());
-	/*/
+	/* /
 	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
 	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
 	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;
 	//*/
 	//compareLearningAlgorithms(fileName, 1, 2);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
+
+	sequence_set_t TS;
+	int extraStates = 0;
+	TS.insert({ 0, 0 });
+	TS.insert({ 1, 1, 1, 1, 0, 1, 1, 0, 1 });
+	TS.insert({ 0, 1 });
+	TS.insert({ 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1 });
+
+	auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
+	cout << (indistinguishable.size()) << endl;
+	if (indistinguishable.size() > 1) {
+		for (auto& f : indistinguishable) {
+			auto s = f->writeDOTfile(DATA_PATH + "tmp/");
+			cout << s << endl;
+		}
+	}
+
+	TS.insert({ 0, 0, 0, 0, 1 });
+	//TS.insert({ 1, 1, 0, 0, 1 });
+	TS.insert({ 1, 1, 1, 0, 1, 1, 1, 1 });
+	TS.insert({ 1, 0, 0, 1 });
+	TS.insert({ 1, 0, 1 });
+	TS.insert({ 1, 0, 0, 0, 1, 0, 0, 1 });
+
+	TS.clear();
+	TS.insert({ 0, 0, 1, 0, 1, 0, 0, 0, 1 });
+	TS.insert({ 0, 0, 1, 1, 0, 1 });
+	TS.insert({ 0, 1, 0, 0, 1, 1, 0, 1 });
+	TS.insert({ 1, 0, 0, 0, 1, 0, 0, 1 });
+	TS.insert({ 1, 0, 0, 1, 1, 1 });
+	TS.insert({ 1, 0, 1, 1, 0, 0, 1 });
+	TS.insert({ 1, 1, 1, 0, 1 });
+
+
+	extraStates = 1;
+	indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
+	cout << (indistinguishable.size()) << endl;
+	if (indistinguishable.size() > 1) {
+		for (auto& f : indistinguishable) {
+			auto s = f->writeDOTfile(DATA_PATH + "tmp/");
+			cout << s << endl;
+		}
+	}
 
 	char c;
 	cin >> c;

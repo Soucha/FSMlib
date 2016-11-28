@@ -404,6 +404,22 @@ namespace FSMsequence {// all design functions require a compact FSM
 	/**
 	* Calculates index of given pair of states as follows:
 	* Index of state pair (i,j) is derived from:
+	*   (0,1) => 0, 
+	*   (0,2) => 1, (1,2) => 2,
+	*   (0,3) => 3, (1,3) => 4, (2,3) => 5,
+	*   ...
+	*   i, j are indexes to the vector of states dfsm->getStates()
+	*	for each (i,j): i<j  
+	*		(i,j) => (j * (j - 1)) / 2 + i
+	* @param s1 - the first state
+	* @param s2 - the second state
+	* @return index of state pair
+	*/
+	FSMLIB_API state_t getStatePairIdx(const state_t& s1, const state_t& s2);
+
+	/**
+	* Calculates index of given pair of states as follows:
+	* Index of state pair (i,j) is derived from:
 	*   (0,1) => 0, (0,2) => 1,..., (0,N-1) => N-2
 	*   (1,2) => N-1,...
 	*   i, j are indexes to the vector of states dfsm->getStates()

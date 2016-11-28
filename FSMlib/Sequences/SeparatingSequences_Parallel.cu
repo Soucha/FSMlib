@@ -104,9 +104,9 @@ namespace FSMsequence {
 		CHECK_ERROR(cudaMalloc((void**)&(dev.Mapping), M*sizeof(state_t)));
 		state_t * mapping = new state_t[M];
 		state_t idx = 0;
-		for (state_t i = 0; i < N - 1; i++) {
-			for (state_t j = i + 1; j < N; j++) {
-				mapping[idx++] = i;
+		for (state_t j = 1; j < N; j++) {
+			for (state_t i = 0; i < j; i++) {
+				mapping[idx++] = j;
 			}
 		}
 		CHECK_ERROR(cudaMemcpy(dev.Mapping, mapping, M*sizeof(state_t), cudaMemcpyHostToDevice));
@@ -148,12 +148,12 @@ namespace FSMsequence {
 	// <--- SF's kernels --->
 
 	__global__ void distinguishByStateOutputs(state_t M, state_t N, input_t P, state_t * distinguishedCount,
-		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, state_t * distSeqLen, output_t * output) {
+		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, seq_len_t * distSeqLen, output_t * output) {
 		state_t idx = threadIdx.x + blockIdx.x * blockDim.x;
 		int distinguished = 0;
 		if (idx < M) {
 			state_t i = mapping[idx];
-			state_t j = idx + 1 + i*(i + 3) / 2 - i*N;
+			state_t j = idx - (i * (i - 1)) / 2;
 			if (output[i] != output[j]) {
 				distinguishing[idx] = STOUT_INPUT;
 				nextDistIdx[idx] = idx;
@@ -168,12 +168,12 @@ namespace FSMsequence {
 	}
 
 	__global__ void distinguishByTransitionOutputs(state_t M, state_t N, input_t P, state_t * distinguishedCount,
-		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, state_t * distSeqLen, output_t * output) {
+		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, seq_len_t * distSeqLen, output_t * output) {
 		state_t idx = threadIdx.x + blockIdx.x * blockDim.x;
 		int distinguished = 0;
 		if ((idx < M) && (nextDistIdx[idx] == NULL_STATE)) {
 			state_t i = mapping[idx];
-			state_t j = idx + 1 + i*(i + 3) / 2 - i*N;
+			state_t j = idx - (i * (i - 1)) / 2;
 			for (input_t input = 0; input < P; input++) {
 				//printf("%d on %d: %d->%d %d->%d\n", idx, input, i, output[i*P + input], j, output[j*P + input]);
 				if (output[i*P + input] != output[j*P + input]) {
@@ -192,12 +192,12 @@ namespace FSMsequence {
 	}
 
 	__global__ void distinguishByNextStates(state_t M, state_t N, input_t P, seq_len_t len, state_t * distinguishedCount,
-		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, state_t * distSeqLen, state_t * nextState) {
+		state_t * mapping, state_t * nextDistIdx, input_t * distinguishing, seq_len_t * distSeqLen, state_t * nextState) {
 		state_t idx = threadIdx.x + blockIdx.x * blockDim.x;
 		int distinguished = 0;
 		if ((idx < M) && (nextDistIdx[idx] == NULL_STATE)) {
 			state_t i = mapping[idx];
-			state_t j = idx + 1 + i*(i + 3) / 2 - i*N;
+			state_t j = idx - (i * (i - 1)) / 2;
 			state_t nextStateI, nextStateJ, nextIdx;
 			for (input_t input = 0; input < P; input++) {
 				nextStateI = nextState[i*P + input];
@@ -205,8 +205,8 @@ namespace FSMsequence {
 				//printf("%d on %d: %d->%d %d->%d\n", idx, input, i, nextStateI, j, nextStateJ);
 				if (nextStateI != nextStateJ) {
 					nextIdx = (nextStateI < nextStateJ) ?
-						(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
-						(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
+						((nextStateJ * (nextStateJ - 1)) / 2 + nextStateI) :
+						((nextStateI * (nextStateI - 1)) / 2 + nextStateJ);
 					if ((nextDistIdx[nextIdx] != NULL_STATE) && (distSeqLen[nextIdx] == len)) {
 						distinguishing[idx] = input;
 						nextDistIdx[idx] = nextIdx;
@@ -232,7 +232,7 @@ namespace FSMsequence {
 		state_t idx = threadIdx.x + blockIdx.x * blockDim.x;
 		if (idx < M) {
 			state_t i = mapping[idx];
-			state_t j = idx + 1 + i*(i + 3) / 2 - i*N;
+			state_t j = idx - (i * (i - 1)) / 2;
 			if ((stateOutput) && (stateOutput[i] != stateOutput[j])) {
 				distinguishing[idx] = STOUT_INPUT;
 				nextDistIdx[idx] = idx;
@@ -262,8 +262,8 @@ namespace FSMsequence {
 						//printf("%d on %d: %d->%d %d->%d\n", idx, input, i, nextStateI, j, nextStateJ);
 						if (nextStateI != nextStateJ) {
 							nextIdx = (nextStateI < nextStateJ) ?
-								(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
-								(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
+								((nextStateJ * (nextStateJ - 1)) / 2 + nextStateI) :
+								((nextStateI * (nextStateI - 1)) / 2 + nextStateJ);
 							if (idx != nextIdx) {
 								atomicAdd(prevIdx + nextIdx, 1);
 							}
@@ -281,7 +281,7 @@ namespace FSMsequence {
 		state_t idx = threadIdx.x + blockIdx.x * blockDim.x;
 		if ((idx < M) && (nextDistIdx[idx] == NULL_STATE)) {
 			state_t i = mapping[idx];
-			state_t j = idx + 1 + i*(i + 3) / 2 - i*N;
+			state_t j = idx - (i * (i - 1)) / 2;
 			state_t nextStateI, nextStateJ, nextIdx;
 			for (input_t input = 0; input < P; input++) {
 				nextStateI = nextState[i*P + input];
@@ -289,8 +289,8 @@ namespace FSMsequence {
 				//printf("%d on %d: %d->%d %d->%d\n", idx, input, i, nextStateI, j, nextStateJ);
 				if (nextStateI != nextStateJ) {
 					nextIdx = (nextStateI < nextStateJ) ?
-						(nextStateI * N + nextStateJ - 1 - (nextStateI * (nextStateI + 3)) / 2) :
-						(nextStateJ * N + nextStateI - 1 - (nextStateJ * (nextStateJ + 3)) / 2);
+						((nextStateJ * (nextStateJ - 1)) / 2 + nextStateI) :
+						((nextStateI * (nextStateI - 1)) / 2 + nextStateJ);
 					if (idx != nextIdx) {
 						state_t basePrevIdx = atomicAdd(prevIdx + nextIdx, 1);
 						basePrevIdx += prevIdxLen[nextIdx];

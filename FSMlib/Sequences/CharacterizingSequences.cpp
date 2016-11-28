@@ -39,6 +39,12 @@ namespace FSMsequence {
 			(s2 * N + s1 - 1 - (s2 * (s2 + 3)) / 2);
 	}
 	
+	state_t getStatePairIdx(const state_t& s1, const state_t& s2) {
+		return (s1 < s2) ?
+			((s2 * (s2 - 1)) / 2 + s1) :
+			((s1 * (s1 - 1)) / 2 + s2);
+	}
+
 	state_t getIdx(const vector<state_t>& states, state_t stateId) {
 		if ((stateId < states.size()) && (states[stateId] == stateId)) return stateId;
 		auto lower = std::lower_bound(states.begin(), states.end(), stateId);
@@ -55,9 +61,9 @@ namespace FSMsequence {
 		sequence_vec_t seq(M);
 		vector< vector< pair<state_t, input_t> > > link(M);
 		queue<state_t> unchecked;
-		for (state_t i = 0; i < N - 1; i++) {
-			for (state_t j = i + 1; j < N; j++) {
-				auto idx = getStatePairIdx(i, j, N);
+		for (state_t j = 1; j < N; j++) {
+			for (state_t i = 0; i < j; i++) {
+				auto idx = getStatePairIdx(i, j);
 				if ((fsm->isOutputState()) && (fsm->getOutput(i, STOUT_INPUT) != fsm->getOutput(j, STOUT_INPUT))) {
 					seq[idx].push_back(STOUT_INPUT);
 					unchecked.emplace(idx);
@@ -79,7 +85,7 @@ namespace FSMsequence {
 						// there are no transition -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
-							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
+							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ);
 							if (seq[nextIdx].empty()) {
 								if (nextIdx != idx)
 									link[nextIdx].emplace_back(idx, input);
@@ -125,9 +131,9 @@ namespace FSMsequence {
 		for (state_t i = 0; i < M; i++) {
 			seq[i].next.resize(fsm->getNumberOfInputs(), NULL_STATE);
 		}
-		for (state_t i = 0; i < N - 1; i++) {
-			for (state_t j = i + 1; j < N; j++) {
-				auto idx = getStatePairIdx(i, j, N);
+		for (state_t j = 1; j < N; j++) {
+			for (state_t i = 0; i < j; i++) {
+				auto idx = getStatePairIdx(i, j);
 				if ((fsm->isOutputState()) && (fsm->getOutput(i, STOUT_INPUT) != fsm->getOutput(j, STOUT_INPUT))) {
 					seq[idx].minLen = 1;// to correspond that STOUT_INPUT needs to be applied
 					unchecked.emplace(idx);
@@ -148,7 +154,7 @@ namespace FSMsequence {
 						// there are no transitions -> same next state = NULL_STATE
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
-							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ, N);
+							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ);
 							if (nextIdx != idx) {
 								seq[idx].next[input] = nextIdx;
 								link[nextIdx].emplace_back(idx, input);
@@ -204,7 +210,7 @@ namespace FSMsequence {
 			for (state_t j = i + 1; j < N; j++) {
 				outJ = fsm->getOutputAlongPath(j, seq);
 				if (outI != outJ) {
-					auto idx = getStatePairIdx(i, j, N);
+					auto idx = getStatePairIdx(i, j);
 					if (!distinguished[idx]) {
 						dist.push_back(idx);
 						outJ.pop_back();
@@ -341,7 +347,7 @@ namespace FSMsequence {
 				output_t output = fsm->getOutput(i, STOUT_INPUT);
 				for (state_t j = i + 1; j < N; j++) {
 					if (output != fsm->getOutput(j, STOUT_INPUT)) {
-						auto idx = getStatePairIdx(i, j, N);
+						auto idx = getStatePairIdx(i, j);
 						distinguished[idx] = true;
 					}
 				}
@@ -361,7 +367,7 @@ namespace FSMsequence {
 				for (state_t j = i + 1; j < N; j++) {
 					outJ = fsm->getOutputAlongPath(j, *sIt);
 					if (outI != outJ) {
-						auto idx = getStatePairIdx(i, j, N);
+						auto idx = getStatePairIdx(i, j);
 						if (!distinguished[idx]) {
 							seqInfo.dist.emplace_back(idx);
 							outJ.pop_back();
@@ -603,7 +609,7 @@ namespace FSMsequence {
 		// grab sequence from table seq incident with state
 		for (state_t j = 0; j < N; j++) {
 			if (j != state) {
-				auto idx = getStatePairIdx(j, state, N);
+				auto idx = getStatePairIdx(j, state);
 				if (filterPrefixes) {
 					if (useStout && distSeqs[idx].front() != STOUT_INPUT) {
 						sequence_in_t s(distSeqs[idx]);

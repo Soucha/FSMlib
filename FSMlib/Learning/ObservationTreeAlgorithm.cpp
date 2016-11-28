@@ -172,10 +172,12 @@ namespace FSMlearning {
 		}
 	}
 
+	static void checkNode(const shared_ptr<ot_node_t>& node, ObservationTree& ot);
+
 	static void updateConsistentOfSucc(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
 		for (auto& nn : node->next) {
 			if (nn && (nn->state == NULL_STATE)) {
-				if (nn->extraStateLevel - 1 > ot.numberOfExtraStates) {
+				//if (nn->extraStateLevel - 1 > ot.numberOfExtraStates) {
 					for (auto snIt = nn->refStates.begin(); snIt != nn->refStates.end();) {
 						if (areNodesDifferent(nn, ot.stateNodes[*snIt])) {
 							snIt = nn->refStates.erase(snIt);
@@ -185,6 +187,10 @@ namespace FSMlearning {
 							++snIt;
 						}
 					}
+				//}
+				checkNode(nn, ot);
+				if (ot.uncheckedNodes.empty()) {
+					return;
 				}
 				nn->extraStateLevel = node->extraStateLevel + 1;
 				if (nn->extraStateLevel <= ot.numberOfExtraStates) {
@@ -205,6 +211,10 @@ namespace FSMlearning {
 							ot.stateNodes[*snIt]->consistentNodes.emplace(nn.get());
 							++snIt;
 						}
+					}
+					checkNode(nn, ot);
+					if (ot.uncheckedNodes.empty()) {
+						return;
 					}
 				}
 			}
@@ -561,6 +571,7 @@ namespace FSMlearning {
 					ads->nodes.push_front(ot.stateNodes[state]);
 			}
 			if (node->refStates.size() == 1) {
+				//ads->input = STOUT_INPUT;
 				ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
 			}
 			else if (expectedState != NULL_STATE) {
@@ -840,6 +851,12 @@ namespace FSMlearning {
 					break;
 				}
 				assumeSuccConsistent(ot);
+				if (ot.uncheckedNodes.empty()) {
+					ot.uncheckedNodes.assign(ot.stateNodes.begin(), ot.stateNodes.end());
+					ot.uncheckedNodes.sort([](const shared_ptr<ot_node_t>& n1, const shared_ptr<ot_node_t>& n2){
+						return n1->accessSequence.size() < n2->accessSequence.size(); });
+					continue;
+				}
 			}
 			auto nextNode = node;
 			for (input_t i = 0; i < node->nextInputs.size(); i++) {

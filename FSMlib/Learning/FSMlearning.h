@@ -267,4 +267,18 @@ namespace FSMlearning {
 	FSMLIB_API unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 
+	/**
+	*
+	* @param Teacher
+	* @param maxExtraStates - the learning stops when the conjecture is correct with the assumption of given number of extra states
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @param isEQallowed - an Equivalence Query is asked after the stop condition is met if this parameter is true,
+	*						then the learning continues if a counterexample is returned,
+	*						maxExtraStates is used as the number of assumed extra states
+	* @return A learned model
+	*/
+	FSMLIB_API unique_ptr<DFSM> SPYlearner(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
+
 }

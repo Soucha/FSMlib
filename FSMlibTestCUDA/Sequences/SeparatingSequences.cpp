@@ -109,8 +109,8 @@ namespace FSMlibTestCUDA
 			DEBUG_MSG("Separating sequences (%s) of %s:\n", name.c_str(), filename.c_str());
 			state_t k = 0, N = fsm->getNumberOfStates();
 			ARE_EQUAL(((N - 1) * N) / 2, state_t(seq.size()), "The number of state pairs is not equal to the number of separating sequences");
-			for (state_t i = 0; i < N - 1; i++) {
-				for (state_t j = i + 1; j < N; j++, k++) {
+			for (state_t j = 1; j < N; j++) {
+				for (state_t i = 0; i < j; i++, k++) {
 					ARE_EQUAL(true,
 						fsm->getOutputAlongPath(i, seq[k]) != fsm->getOutputAlongPath(j, seq[k]),
 						"States %d and %d are not separated by %s", i, j, FSMmodel::getInSequenceAsString(seq[k]).c_str());

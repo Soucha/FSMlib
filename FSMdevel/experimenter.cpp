@@ -116,8 +116,10 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 #endif
 #endif
 #if 1 // ObservationTreeAlgorithm
-	descriptions.emplace_back("OTree\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr, isEQallowed));
+	for (state_t i = 0; i <= maxExtraStates; i++) {
+		descriptions.emplace_back("OTree\tExtraStates:" + to_string(i) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+		algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, i, nullptr, isEQallowed));
+	}
 #endif
 }
 
@@ -130,7 +132,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	}
 #endif
 	printf(" ");
-#if 1 // TeacherRL
+#if 0 // TeacherRL
 	for (size_t i = 0; i < algorithms.size(); i++) {
 		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 		COMPUTATION_TIME(auto model = algorithms[i](teacher));
@@ -170,7 +172,7 @@ void testDir(string dir, string outFilename = "") {
 			path fn(it->path());
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm && (fsm->getNumberOfStates() == 300)) {// && (fsm->getType() == TYPE_MEALY)) {
+				if (fsm) {// && (fsm->getNumberOfStates() == 300)) {// && (fsm->getType() == TYPE_MEALY)) {
 					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed);
 					printf("%s tested\n", fn.filename().c_str());
 				}

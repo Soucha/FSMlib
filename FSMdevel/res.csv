@@ -1,17 +1,537 @@
 Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
-1	3	300	2	2	12006	12006	14	137354	0	0	2.504668	L*	addAllPrefixesToS	0	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	15643	15643	18	199710	0	0	26.309146	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	11437	11437	19	134639	0	0	28.028352	L*	addSuffix1by1ToE	2	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	11463	11463	19	134917	0	0	37.087458	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	11487	11487	19	135103	0	0	33.683645	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	17032	17032	5	230059	0	0	10.031831	OP	AllGlobally	5	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	15364	15364	16	175968	0	0	6.932663	OP	OneGlobally	6	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	10426	10426	291	109743	0	0	14.798889	OP	OneLocally	7	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	20121	20121	276	146281	0	0	20.321591	DT		8	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	6084	6084	287	58539	0	0	277.923255	TTT		9	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	5198	5198	16	60211	0	0	7.957840	Quotient		10	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	13186	13186	4	189186	0	0	50.136776	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	1406	6492	1	20402	0	0	46.620412	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Moore_R300.fsm
-1	3	300	2	2	12635	12635	14	145711	0	0	8.013869	L*	addAllPrefixesToS	0	TeacherRL		Moore_R300.fsm
-1	3	300	2	2	15643	15643	18	199710	0	0	12.252818	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Moore_R300.fsm
-1	3	300	2	2	11437	11437	19	134639	0	0	12.261178	L*	addSuffix1by1ToE	2	TeacherRL		Moore_R300.fsm
+1	2	10	2	2	135	135	4	753	0	0	0.004003	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	108	108	4	522	0	0	0.012008	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	108	108	4	522	0	0	0.013009	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	111	111	4	530	0	0	0.012008	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	114	114	4	544	0	0	0.012508	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	213	213	3	1267	0	0	0.015009	OP	AllGlobally	5	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	160	160	4	886	0	0	0.037524	OP	OneGlobally	6	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	132	132	7	711	0	0	0.032022	OP	OneLocally	7	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	189	189	10	740	0	0	0.022515	DT		8	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	98	98	9	431	0	0	0.069046	TTT		9	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	65	65	4	326	0	0	0.029520	Quotient		10	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	73	73	1	375	0	0	4.516442	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	50	127	1	324	0	0	0.024517	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10.fsm
+1	2	10	2	2	135	135	4	753	0	0	0.059539	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	108	108	4	522	0	0	0.051038	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	108	108	4	522	0	0	0.042029	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	111	111	4	530	0	0	0.052033	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	114	114	4	544	0	0	0.041032	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	215	215	3	1268	0	0	0.051535	OP	AllGlobally	5	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	160	160	4	886	0	0	0.038533	OP	OneGlobally	6	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	132	132	7	711	0	0	0.036023	OP	OneLocally	7	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	189	189	10	740	0	0	0.022515	DT		8	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	98	98	9	431	0	0	0.035524	TTT		9	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	65	140	4	326	0	0	0.030020	Quotient		10	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	84	84	1	448	0	0	0.043039	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	50	127	1	324	0	0	0.028519	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10.fsm
+1	2	10	2	2	135	135	4	783	0	0	0.082554	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	108	108	4	552	0	0	0.062539	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	108	108	4	552	0	0	0.076551	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	111	111	4	560	0	0	0.086557	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	114	114	4	578	0	0	0.083555	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	189	189	3	1228	0	0	0.063543	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	157	157	4	911	0	0	0.052534	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	129	129	6	659	0	0	0.042528	OP	OneLocally	7	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	203	203	10	848	0	0	0.021513	DT		8	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	96	96	7	454	0	0	0.068046	TTT		9	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	63	63	4	337	0	0	0.030519	Quotient		10	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	70	70	3	372	0	0	0.150599	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	47	137	1	331	0	0	0.040027	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	135	135	4	783	0	0	0.068545	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	108	108	4	552	0	0	0.046031	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	108	108	4	552	0	0	0.066544	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	111	111	4	560	0	0	0.056537	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	114	114	4	578	0	0	0.048531	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	319	319	4	2318	0	0	0.073549	OP	AllGlobally	5	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	157	157	4	911	0	0	0.046030	OP	OneGlobally	6	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	129	129	6	659	0	0	0.039026	OP	OneLocally	7	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	203	203	10	848	0	0	0.020514	DT		8	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	96	96	7	454	0	0	0.040527	TTT		9	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	63	138	4	337	0	0	0.034023	Quotient		10	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	80	80	1	469	0	0	0.052033	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	47	137	1	331	0	0	0.040027	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_0VFLT.fsm
+1	2	10	2	2	108	108	3	634	0	0	0.076051	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	86	86	3	433	0	0	0.054536	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	86	86	3	433	0	0	0.060041	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	88	88	3	437	0	0	0.065544	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	90	90	3	448	0	0	0.062541	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	171	171	2	1057	0	0	0.072048	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	132	132	3	679	0	0	0.046031	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	124	124	7	636	0	0	0.042027	OP	OneLocally	7	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	199	199	10	821	0	0	0.024017	DT		8	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	99	99	10	462	0	0	0.077050	TTT		9	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	52	52	3	260	0	0	0.035524	Quotient		10	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	74	74	1	422	0	0	0.174617	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	44	120	1	303	0	0	0.039026	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_cfetx.fsm
+1	2	10	2	2	108	108	3	634	0	0	0.057537	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	86	86	3	433	0	0	0.037525	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	86	86	3	433	0	0	0.038025	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	88	88	3	437	0	0	0.045530	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	90	90	3	448	0	0	0.041028	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	172	172	2	1050	0	0	0.042528	OP	AllGlobally	5	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	132	132	3	679	0	0	0.031021	OP	OneGlobally	6	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	124	124	7	636	0	0	0.031020	OP	OneLocally	7	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	199	199	10	821	0	0	0.018012	DT		8	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	99	99	10	462	0	0	0.028519	TTT		9	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	52	116	3	260	0	0	0.023516	Quotient		10	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	82	82	1	434	0	0	0.037525	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	44	120	1	303	0	0	0.024519	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_cfetx.fsm
+1	2	10	2	2	210	210	5	1381	0	0	0.118578	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	130	130	5	721	0	0	0.068045	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	130	130	5	721	0	0	0.074550	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	134	134	5	735	0	0	0.085055	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	139	139	5	764	0	0	0.091061	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	253	253	3	1915	0	0	0.072047	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	183	183	5	1142	0	0	0.072547	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	135	135	6	851	0	0	0.069546	OP	OneLocally	7	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	179	179	9	824	0	0	0.044529	DT		8	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	93	93	8	482	0	0	0.083054	TTT		9	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	71	71	5	401	0	0	0.069052	Quotient		10	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	150	150	3	977	0	0	0.309703	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	39	116	1	266	0	0	0.025017	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	210	210	5	1381	0	0	0.069047	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	130	130	5	721	0	0	0.039026	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	130	130	5	721	0	0	0.041027	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	134	134	5	735	0	0	0.044030	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	139	139	5	764	0	0	0.043529	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	257	257	3	1950	0	0	0.049533	OP	AllGlobally	5	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	187	187	5	1176	0	0	0.038024	OP	OneGlobally	6	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	142	142	6	907	0	0	0.032522	OP	OneLocally	7	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	222	222	10	1047	0	0	0.020513	DT		8	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	106	106	10	544	0	0	0.036525	TTT		9	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	71	157	5	401	0	0	0.031522	Quotient		10	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	164	164	2	1125	0	0	0.052034	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	39	116	1	266	0	0	0.007505	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_NKB8J.fsm
+1	2	10	2	2	155	155	4	818	0	0	0.018013	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	129	129	4	616	0	0	0.013009	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	108	108	4	491	0	0	0.012508	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	112	112	4	506	0	0	0.012009	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	113	113	4	510	0	0	0.012008	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	124	124	2	605	0	0	0.016011	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	159	159	4	735	0	0	0.027518	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	132	132	6	603	0	0	0.015510	OP	OneLocally	7	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	183	183	10	687	0	0	0.006004	DT		8	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	99	99	9	413	0	0	0.011007	TTT		9	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	68	68	4	325	0	0	0.012008	Quotient		10	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	70	70	1	345	0	0	0.046029	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	35	125	1	252	0	0	0.019020	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_qK62k.fsm
+1	2	10	2	2	155	155	4	818	0	0	0.056544	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	129	129	4	616	0	0	0.047030	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	108	108	4	491	0	0	0.041527	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	112	112	4	506	0	0	0.044030	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	113	113	4	510	0	0	0.043537	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	194	194	3	1007	0	0	0.051035	OP	AllGlobally	5	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	159	159	4	735	0	0	0.048531	OP	OneGlobally	6	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	132	132	6	603	0	0	0.040027	OP	OneLocally	7	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	183	183	10	687	0	0	0.022015	DT		8	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	99	99	9	413	0	0	0.040027	TTT		9	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	68	144	4	325	0	0	0.029019	Quotient		10	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	84	84	2	403	0	0	0.052034	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	35	125	1	252	0	0	0.033524	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_qK62k.fsm
+1	2	10	2	2	175	175	4	955	0	0	0.124581	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	108	108	4	531	0	0	0.064543	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	108	108	4	531	0	0	0.067045	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	111	111	4	541	0	0	0.065043	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	113	113	4	550	0	0	0.067043	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	206	206	3	1171	0	0	0.069546	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	161	161	4	863	0	0	0.048032	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	139	139	7	815	0	0	0.046033	OP	OneLocally	7	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	184	184	10	737	0	0	0.023515	DT		8	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	96	96	9	427	0	0	0.048532	TTT		9	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	63	63	4	311	0	0	0.030521	Quotient		10	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	150	150	2	904	0	0	0.156104	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	47	126	1	310	0	0	0.008505	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	175	175	4	955	0	0	0.062541	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	108	108	4	531	0	0	0.035023	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	108	108	4	531	0	0	0.037528	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	111	111	4	541	0	0	0.039526	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	113	113	4	550	0	0	0.039026	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	219	219	3	1243	0	0	0.051034	OP	AllGlobally	5	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	161	161	4	863	0	0	0.043028	OP	OneGlobally	6	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	139	139	7	815	0	0	0.044028	OP	OneLocally	7	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	184	184	10	737	0	0	0.022015	DT		8	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	96	96	9	427	0	0	0.034023	TTT		9	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	63	138	4	311	0	0	0.029019	Quotient		10	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	164	164	2	963	0	0	0.077052	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	47	126	1	310	0	0	0.013007	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_WTYjL.fsm
+1	2	10	2	2	344	344	6	2128	0	0	0.189627	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	173	173	6	887	0	0	0.087557	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	173	173	6	887	0	0	0.098567	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	157	157	6	802	0	0	0.100574	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	162	162	6	828	0	0	0.091560	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	321	321	4	2273	0	0	0.098566	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	209	209	6	1258	0	0	0.120080	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	139	139	7	823	0	0	0.065045	OP	OneLocally	7	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	192	192	10	748	0	0	0.031528	DT		8	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	102	102	9	443	0	0	0.096066	TTT		9	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	94	94	6	513	0	0	0.070546	Quotient		10	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	143	143	2	831	0	0	0.355235	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	57	132	1	362	0	0	0.046531	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	344	344	6	2128	0	0	0.154603	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	173	173	6	887	0	0	0.085557	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	173	173	6	887	0	0	0.087058	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	157	157	6	802	0	0	0.082055	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	162	162	6	828	0	0	0.075550	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	363	363	5	2585	0	0	0.096064	OP	AllGlobally	5	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	209	209	6	1258	0	0	0.095063	OP	OneGlobally	6	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	139	139	7	823	0	0	0.070547	OP	OneLocally	7	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	192	192	10	748	0	0	0.034023	DT		8	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	102	102	9	443	0	0	0.054036	TTT		9	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	94	204	6	513	0	0	0.072048	Quotient		10	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	163	163	2	934	0	0	0.093561	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	57	132	1	362	0	0	0.022516	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_XyvOQ.fsm
+1	2	10	2	2	162	162	4	1011	0	0	0.114075	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	130	130	5	705	0	0	0.097595	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	130	130	5	705	0	0	0.078052	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	134	134	5	721	0	0	0.075551	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	139	139	5	751	0	0	0.073548	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	215	215	3	1388	0	0	0.069547	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	172	172	5	951	0	0	0.075051	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	130	130	6	712	0	0	0.051033	OP	OneLocally	7	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	208	208	10	924	0	0	0.028518	DT		8	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	103	103	8	540	0	0	0.063043	TTT		9	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	70	70	5	394	0	0	0.045531	Quotient		10	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	147	147	2	930	0	0	0.305201	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	47	127	1	324	0	0	0.012509	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	162	162	4	1011	0	0	0.026017	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	130	130	5	705	0	0	0.018513	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	130	130	5	705	0	0	0.020514	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	134	134	5	721	0	0	0.030520	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	139	139	5	751	0	0	0.021013	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	247	247	3	1556	0	0	0.033023	OP	AllGlobally	5	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	190	190	5	1043	0	0	0.019013	OP	OneGlobally	6	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	154	154	6	838	0	0	0.015009	OP	OneLocally	7	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	208	208	10	924	0	0	0.012008	DT		8	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	115	115	9	585	0	0	0.010506	TTT		9	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	70	167	5	394	0	0	0.015011	Quotient		10	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	164	164	2	1007	0	0	0.037024	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	47	127	1	324	0	0	0.009506	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_YfxFl.fsm
+1	2	10	2	2	210	210	5	1296	0	0	0.062041	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	130	130	5	655	0	0	0.013510	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	130	130	5	655	0	0	0.017014	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	134	134	5	668	0	0	0.021513	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	138	138	5	689	0	0	0.023515	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	235	235	3	1490	0	0	0.054538	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	177	177	5	914	0	0	0.039026	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	129	129	7	622	0	0	0.026017	OP	OneLocally	7	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	175	175	10	683	0	0	0.004002	DT		8	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	88	88	7	386	0	0	0.006004	TTT		9	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	73	73	5	382	0	0	0.027518	Quotient		10	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	142	142	2	853	0	0	0.189634	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	49	124	2	308	0	0	0.017010	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_YlOac.fsm
+1	2	10	2	2	210	210	5	1296	0	0	0.066547	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	130	130	5	655	0	0	0.039025	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	130	130	5	655	0	0	0.041527	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	134	134	5	668	0	0	0.045030	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	138	138	5	689	0	0	0.044030	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	255	255	4	1462	0	0	0.057038	OP	AllGlobally	5	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	178	178	5	920	0	0	0.039032	OP	OneGlobally	6	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	132	132	7	640	0	0	0.032526	OP	OneLocally	7	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	181	181	10	717	0	0	0.018518	DT		8	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	91	91	7	400	0	0	0.033519	TTT		9	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	73	159	5	382	0	0	0.030020	Quotient		10	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	162	162	2	933	0	0	0.056537	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	49	124	2	308	0	0	0.008507	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_YlOac.fsm
+1	2	10	2	2	145	145	3	821	0	0	0.089559	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	108	108	4	534	0	0	0.070046	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	108	108	4	534	0	0	0.075050	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	111	111	4	544	0	0	0.086057	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	115	115	4	565	0	0	0.072548	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	157	157	2	852	0	0	0.048532	OP	AllGlobally	5	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	159	159	4	784	0	0	0.046531	OP	OneGlobally	6	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	130	130	7	613	0	0	0.043029	OP	OneLocally	7	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	161	161	9	637	0	0	0.044529	DT		8	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	97	97	9	432	0	0	0.059039	TTT		9	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	67	67	4	339	0	0	0.031021	Quotient		10	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	153	153	2	919	0	0	0.221646	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	48	129	2	313	0	0	0.010007	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	145	145	3	821	0	0	0.078552	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	108	108	4	534	0	0	0.045032	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	108	108	4	534	0	0	0.041528	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	111	111	4	544	0	0	0.045530	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	115	115	4	565	0	0	0.046029	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	260	260	3	1584	0	0	0.064545	OP	AllGlobally	5	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	160	160	4	789	0	0	0.040026	OP	OneGlobally	6	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	133	133	7	629	0	0	0.034523	OP	OneLocally	7	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	198	198	10	775	0	0	0.020012	DT		8	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	99	99	9	440	0	0	0.028018	TTT		9	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	67	142	4	339	0	0	0.028519	Quotient		10	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	163	163	3	955	0	0	0.062041	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	10	2	2	48	129	2	313	0	0	0.011507	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R10_yZjoV.fsm
+1	2	20	2	2	315	315	4	2148	0	0	0.166612	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	250	250	5	1425	0	0	0.125583	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	250	250	5	1425	0	0	0.156104	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	254	254	5	1439	0	0	0.128586	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	258	258	5	1458	0	0	0.133089	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	522	522	3	3622	0	0	0.083054	OP	AllGlobally	5	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	379	379	5	2181	0	0	0.262674	OP	OneGlobally	6	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	343	343	17	2033	0	0	0.222157	OP	OneLocally	7	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	547	547	20	2481	0	0	0.097066	DT		8	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	241	241	20	1279	0	0	0.118078	TTT		9	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	152	152	5	911	0	0	0.231153	Quotient		10	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	141	141	2	863	0	0	0.991657	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	94	293	1	770	0	0	0.219147	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20.fsm
+1	2	20	2	2	315	315	4	2148	0	0	0.459306	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	250	250	5	1425	0	0	0.299702	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	250	250	5	1425	0	0	0.275683	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	254	254	5	1439	0	0	0.271180	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	258	258	5	1458	0	0	0.268176	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	503	503	3	3568	0	0	0.372747	OP	AllGlobally	5	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	379	379	5	2181	0	0	0.300700	OP	OneGlobally	6	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	343	343	17	2033	0	0	0.316710	OP	OneLocally	7	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	547	547	20	2481	0	0	0.122079	DT		8	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	241	241	20	1279	0	0	0.137092	TTT		9	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	152	318	5	911	0	0	0.208638	Quotient		10	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	166	166	6	965	0	0	0.395761	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	94	293	1	770	0	0	0.505836	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20.fsm
+1	2	20	2	2	282	282	4	1764	0	0	0.670945	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	292	292	6	1776	0	0	0.481819	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	292	292	6	1776	0	0	0.570378	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	297	297	6	1798	0	0	0.552365	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	302	302	6	1826	0	0	0.613407	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	498	498	3	3443	0	0	0.583887	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	380	380	5	2635	0	0	0.338731	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	344	344	17	2177	0	0	0.278686	OP	OneLocally	7	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	567	567	20	2677	0	0	0.117581	DT		8	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	245	245	19	1347	0	0	0.148101	TTT		9	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	159	159	6	1011	0	0	0.276182	Quotient		10	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	255	255	2	1951	0	0	1.793193	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	99	333	1	843	0	0	0.142094	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_08i2n.fsm
+1	2	20	2	2	282	282	4	1764	0	0	0.428285	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	292	292	6	1776	0	0	0.339226	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	292	292	6	1776	0	0	0.404767	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	297	297	6	1798	0	0	0.429785	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	302	302	6	1826	0	0	0.380253	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	664	664	4	4703	0	0	0.665960	OP	AllGlobally	5	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	380	380	5	2635	0	0	0.359735	OP	OneGlobally	6	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	344	344	17	2177	0	0	0.298699	OP	OneLocally	7	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	567	567	20	2677	0	0	0.112574	DT		8	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	245	245	19	1347	0	0	0.143595	TTT		9	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	159	346	6	1011	0	0	0.268681	Quotient		10	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	308	308	2	2159	0	0	0.598396	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	99	333	1	843	0	0	0.279685	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_08i2n.fsm
+1	2	20	2	2	459	459	6	3057	0	0	0.376749	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	376	376	8	2343	0	0	0.285689	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	376	376	8	2343	0	0	0.321715	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	383	383	8	2373	0	0	0.368744	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	391	391	8	2419	0	0	0.365742	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	534	534	4	3779	0	0	0.283689	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	471	471	8	3019	0	0	0.210138	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	298	298	16	1845	0	0	0.120581	OP	OneLocally	7	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	566	566	20	2664	0	0	0.079553	DT		8	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	232	232	17	1325	0	0	0.094562	TTT		9	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	185	185	8	1224	0	0	0.134589	Quotient		10	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	270	270	2	1900	0	0	0.686957	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	107	308	2	859	0	0	0.252179	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	459	459	6	3057	0	0	0.221147	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	376	376	8	2343	0	0	0.203636	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	376	376	8	2343	0	0	0.218643	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	383	383	8	2373	0	0	0.201132	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	391	391	8	2419	0	0	0.191627	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	576	576	4	3969	0	0	0.178118	OP	AllGlobally	5	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	507	507	8	3234	0	0	0.142594	OP	OneGlobally	6	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	353	353	15	2187	0	0	0.096071	OP	OneLocally	7	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	566	566	20	2664	0	0	0.064556	DT		8	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	238	238	17	1341	0	0	0.060039	TTT		9	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	185	414	8	1224	0	0	0.099567	Quotient		10	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	311	311	2	2549	0	0	0.178117	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	107	308	2	859	0	0	0.177633	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_0cQtT.fsm
+1	2	20	2	2	376	376	5	2795	0	0	0.287693	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	374	374	6	2502	0	0	0.274180	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	376	376	7	2475	0	0	0.257671	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	342	342	7	2240	0	0	0.223648	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	348	348	7	2270	0	0	0.203135	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	478	478	3	3497	0	0	0.224649	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	455	455	7	3077	0	0	0.202135	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	320	320	16	2167	0	0	0.096064	OP	OneLocally	7	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	459	459	17	2293	0	0	0.069547	DT		8	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	217	217	16	1225	0	0	0.087058	TTT		9	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	180	180	7	1212	0	0	0.110073	Quotient		10	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	270	270	2	2187	0	0	0.594393	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	83	269	1	673	0	0	0.161112	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_0nDie.fsm
+1	2	20	2	2	376	376	5	2795	0	0	0.410772	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	374	374	6	2502	0	0	0.367744	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	376	376	7	2475	0	0	0.362260	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	342	342	7	2240	0	0	0.290195	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	348	348	7	2270	0	0	0.307207	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	424	424	3	3056	0	0	0.352233	OP	AllGlobally	5	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	470	470	7	3178	0	0	0.314709	OP	OneGlobally	6	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	343	343	16	2334	0	0	0.232654	OP	OneLocally	7	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	573	573	20	2784	0	0	0.102577	DT		8	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	237	237	16	1338	0	0	0.111073	TTT		9	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	180	395	7	1212	0	0	0.233155	Quotient		10	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	307	307	2	2304	0	0	0.404269	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	83	269	1	673	0	0	0.110575	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_0nDie.fsm
+1	2	20	2	2	488	488	7	3866	0	0	0.902598	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	375	375	7	2597	0	0	0.612922	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	375	375	7	2597	0	0	0.711971	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	340	340	7	2340	0	0	0.564886	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	348	348	7	2394	0	0	0.656938	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	439	439	3	3523	0	0	0.517362	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	424	424	7	3041	0	0	0.356236	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	272	272	14	1936	0	0	0.249666	OP	OneLocally	7	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	454	454	15	2506	0	0	0.155603	DT		8	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	234	234	16	1508	0	0	0.145097	TTT		9	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	183	183	7	1357	0	0	0.309204	Quotient		10	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	259	259	2	1995	0	0	1.428995	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	82	285	1	732	0	0	0.113074	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	488	488	7	3866	0	0	0.581390	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	375	375	7	2597	0	0	0.371771	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	375	375	7	2597	0	0	0.455300	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	340	340	7	2340	0	0	0.407773	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	348	348	7	2394	0	0	0.362239	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	500	500	3	3913	0	0	0.361740	OP	AllGlobally	5	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	474	474	7	3390	0	0	0.375752	OP	OneGlobally	6	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	350	350	13	2524	0	0	0.304201	OP	OneLocally	7	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	676	676	20	3689	0	0	0.123580	DT		8	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	238	238	14	1499	0	0	0.113575	TTT		9	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	183	398	7	1357	0	0	0.282688	Quotient		10	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	309	309	2	2308	0	0	0.581885	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	82	285	1	732	0	0	0.117578	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_1ghJc.fsm
+1	2	20	2	2	205	205	2	1279	0	0	0.540859	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	5	1523	0	0	0.417778	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	5	1523	0	0	0.421293	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	254	254	5	1543	0	0	0.498330	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	258	258	5	1564	0	0	0.553379	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	559	559	3	4289	0	0	0.726982	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	385	385	5	2539	0	0	0.351733	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	349	349	17	2167	0	0	0.324215	OP	OneLocally	7	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	602	602	20	2936	0	0	0.114076	DT		8	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	20	1456	0	0	0.161607	TTT		9	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	153	153	5	986	0	0	0.287194	Quotient		10	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	291	291	3	2137	0	0	1.733653	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	85	309	1	784	0	0	0.165611	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	258	258	3	1649	0	0	0.399265	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	5	1523	0	0	0.303702	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	5	1523	0	0	0.311207	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	254	254	5	1543	0	0	0.326728	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	258	258	5	1564	0	0	0.386767	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	663	663	4	5426	0	0	0.630425	OP	AllGlobally	5	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	385	385	5	2539	0	0	0.328229	OP	OneGlobally	6	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	349	349	17	2167	0	0	0.303702	OP	OneLocally	7	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	602	602	20	2936	0	0	0.146597	DT		8	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	250	250	20	1456	0	0	0.199633	TTT		9	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	153	319	5	986	0	0	0.301700	Quotient		10	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	159	159	2	1019	0	0	0.339229	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	85	309	1	784	0	0	0.454803	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_cpNZd.fsm
+1	2	20	2	2	385	385	5	2603	0	0	0.940627	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	292	292	6	1803	0	0	0.623430	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	292	292	6	1803	0	0	0.729988	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	297	297	6	1821	0	0	0.609426	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	302	302	6	1850	0	0	0.641424	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	447	447	3	2961	0	0	0.603902	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	426	426	6	2514	0	0	0.408796	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	339	339	17	1952	0	0	0.315209	OP	OneLocally	7	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	395	395	16	1885	0	0	0.131587	DT		8	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	241	241	19	1332	0	0	0.166110	TTT		9	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	161	161	6	1006	0	0	0.293695	Quotient		10	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	290	290	2	2056	0	0	1.811718	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	95	299	1	764	0	0	0.186135	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	385	385	5	2603	0	0	0.535366	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	292	292	6	1803	0	0	0.398264	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	292	292	6	1803	0	0	0.355760	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	297	297	6	1821	0	0	0.359277	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	302	302	6	1850	0	0	0.358747	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	462	462	3	3087	0	0	0.433789	OP	AllGlobally	5	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	426	426	6	2514	0	0	0.340224	OP	OneGlobally	6	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	339	339	17	1952	0	0	0.270185	OP	OneLocally	7	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	551	551	20	2599	0	0	0.094564	DT		8	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	246	246	20	1343	0	0	0.100569	TTT		9	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	161	348	6	1006	0	0	0.239162	Quotient		10	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	310	310	2	2219	0	0	0.478818	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	95	299	1	764	0	0	0.166611	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_h1oFZ.fsm
+1	2	20	2	2	294	294	4	2656	0	0	0.671445	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	207	207	3	1582	0	0	0.569877	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	207	207	3	1582	0	0	0.526850	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	209	209	3	1589	0	0	0.487327	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	212	212	3	1609	0	0	0.572379	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	326	326	2	2744	0	0	0.366263	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	337	337	4	2715	0	0	0.353234	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	327	327	16	2590	0	0	0.280190	OP	OneLocally	7	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	717	717	20	4522	0	0	0.118081	DT		8	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	237	237	17	1741	0	0	0.352745	TTT		9	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	143	143	5	1137	0	0	0.283689	Quotient		10	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	292	292	2	2539	0	0	1.650621	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	120	294	1	1096	0	0	0.160609	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	440	440	6	3980	0	0	0.575927	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	249	249	4	1910	0	0	0.395766	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	249	249	4	1910	0	0	0.387257	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	252	252	4	1919	0	0	0.387264	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	256	256	4	1945	0	0	0.348730	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	539	539	3	5008	0	0	0.570382	OP	AllGlobally	5	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	384	384	5	3099	0	0	0.351734	OP	OneGlobally	6	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	337	337	17	2715	0	0	0.291708	OP	OneLocally	7	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	732	732	20	4715	0	0	0.128086	DT		8	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	245	245	18	1842	0	0	0.145595	TTT		9	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	143	309	5	1137	0	0	0.251694	Quotient		10	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	310	310	2	2929	0	0	0.617919	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	120	294	1	1096	0	0	0.203131	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_Op4vV.fsm
+1	2	20	2	2	472	472	6	3302	0	0	0.219145	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	334	334	7	2030	0	0	0.158606	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	334	334	7	2030	0	0	0.141098	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	340	340	7	2056	0	0	0.142094	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	346	346	7	2088	0	0	0.137090	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	445	445	3	3093	0	0	0.264675	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	470	470	7	2846	0	0	0.267177	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	342	342	17	1964	0	0	0.115576	OP	OneLocally	7	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	562	562	20	2591	0	0	0.047031	DT		8	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	249	249	20	1352	0	0	0.054035	TTT		9	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	183	183	7	1169	0	0	0.105569	Quotient		10	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	266	266	2	1863	0	0	0.659438	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	68	290	1	595	0	0	0.230653	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	472	472	6	3302	0	0	0.203636	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	334	334	7	2030	0	0	0.169612	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	334	334	7	2030	0	0	0.130586	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	340	340	7	2056	0	0	0.153102	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	346	346	7	2088	0	0	0.125583	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	745	745	4	5892	0	0	0.269186	OP	AllGlobally	5	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	470	470	7	2846	0	0	0.116578	OP	OneGlobally	6	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	342	342	17	1964	0	0	0.080554	OP	OneLocally	7	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	562	562	20	2591	0	0	0.046530	DT		8	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	249	249	20	1352	0	0	0.051037	TTT		9	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	183	391	7	1169	0	0	0.072548	Quotient		10	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	314	314	2	2380	0	0	0.205637	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	68	290	1	595	0	0	0.113076	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_sF0Pv.fsm
+1	2	20	2	2	270	270	3	1704	0	0	0.192627	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	250	250	5	1423	0	0	0.143595	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	250	250	5	1423	0	0	0.130085	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	254	254	5	1438	0	0	0.127091	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	257	257	5	1452	0	0	0.122082	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	408	408	3	2618	0	0	0.142095	OP	AllGlobally	5	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	386	386	5	2304	0	0	0.105570	OP	OneGlobally	6	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	338	338	17	1919	0	0	0.076551	OP	OneLocally	7	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	470	470	18	2184	0	0	0.039028	DT		8	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	235	235	18	1262	0	0	0.051034	TTT		9	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	144	144	5	873	0	0	0.047031	Quotient		10	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	134	134	1	867	0	0	0.281685	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	87	294	1	736	0	0	0.302701	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	343	343	4	2226	0	0	0.336723	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	250	250	5	1423	0	0	0.211139	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	250	250	5	1423	0	0	0.209638	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	254	254	5	1438	0	0	0.227652	L*	addSuffixAfterLastStateToE	3	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	257	257	5	1452	0	0	0.265176	L*	addSuffixToE_binarySearch	4	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	423	423	3	2683	0	0	0.295696	OP	AllGlobally	5	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	386	386	5	2304	0	0	0.317710	OP	OneGlobally	6	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	338	338	17	1919	0	0	0.260173	OP	OneLocally	7	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	542	542	20	2480	0	0	0.110073	DT		8	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	241	241	20	1287	0	0	0.124090	TTT		9	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	144	310	5	873	0	0	0.242664	Quotient		10	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	156	156	1	928	0	0	0.433787	GoodSplit	maxDistLen:2+EQ	11	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	20	2	2	87	294	1	736	0	0	0.431297	OTree	ExtraStates:1+EQ	12	TeacherRL		Mealy_R20_VH1mI.fsm
+1	2	30	2	2	483	483	5	3722	0	0	1.106235	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	369	369	4	2785	0	0	0.809043	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	494	494	7	3813	0	0	1.172782	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	506	506	7	3892	0	0	1.063714	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	507	507	7	3896	0	0	1.015177	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	671	671	3	5625	0	0	0.492828	OP	AllGlobally	5	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	670	670	6	5420	0	0	0.597396	OP	OneGlobally	6	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	602	602	27	4536	0	0	0.410772	OP	OneLocally	7	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	1122	1122	30	6062	0	0	0.182622	DT		8	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	398	398	28	2678	0	0	0.211641	TTT		9	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	279	279	7	2114	0	0	0.397263	Quotient		10	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	420	420	2	3636	0	0	2.111910	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	108	437	1	1076	0	0	0.078551	OTree	ExtraStates:1+EQ	12	TeacherDFSM		Mealy_R30.fsm
+1	2	30	2	2	483	483	5	3722	0	0	1.140763	L*	addAllPrefixesToS	0	TeacherRL		Mealy_R30.fsm
+1	2	30	2	2	553	553	5	4390	0	0	1.076226	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		Mealy_R30.fsm
+1	2	30	2	2	494	494	7	3813	0	0	1.222321	L*	addSuffix1by1ToE	2	TeacherRL		Mealy_R30.fsm

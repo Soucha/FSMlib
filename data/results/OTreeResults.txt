@@ -1,0 +1,23 @@
+Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds
+DFA_R97_sched4
+1       4       97      12      2       2307    3173    78      28913   4.840734     OTree   ExtraStates:0   12
+1       4       97      12      2       2371    3176    77      29673   5.293547	without tryExtendQueriedPath
+1       4       97      12      2       2372    2699    78      29185   5.297063	without tryExtendQueriedPath + sameInputNext
+1       4       97      12      2       14254   28128   0       190634  21.582038     OTree   ExtraStates:1   12
+1       4       97      12      2       14685   27156   0       194526  17.908115	without tryExtendQueriedPath
+1       4       97      12      2       15212   15991   0       188938  13.821796	without tryExtendQueriedPath + sameInputNext
+
+SEQUENCES_DIR + "Mealy_R100.fsm"
+1       2       100     4       5       914     1758    4       6052    2.425700     OTree   ExtraStates:0   12
+1       2       100     4       5       989     1688    8       6416    2.607237	without tryExtendQueriedPath
+1       2       100     4       5       993     1688    9       6420    2.604263	without tryExtendQueriedPath + sameInputNext
+
+1       2       100     4       5       1625    5835    0       14218   3.327247     OTree   ExtraStates:1   12
+1       2       100     4       5       2536    5589    0       19434   4.397978	without tryExtendQueriedPath
+1       2       100     4       5       2540    5589    0       19438   4.356960	without tryExtendQueriedPath + sameInputNext
+
+
+EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm"
+
+1       3       300     2       2       4832    12499   2       68703   56.018868	without tryExtendQueriedPath
+1       3       300     2       2       4835    12499   2       68708   57.954387	without tryExtendQueriedPath + sameInputNext

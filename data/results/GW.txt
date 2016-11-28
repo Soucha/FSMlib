@@ -12,8 +12,17 @@ Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds 
 
 Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds
 1       1       25      5       5       267     461     8       1286    0.217145      OTree   ExtraStates:0   12
+1       1       25      5       5       294     460     10      1380    0.153101	without tryExtendQueriedPath
+1       1       25      5       5       294     450     10      1365    0.143100	without tryExtendQueriedPath + sameInputNext
+
 1       1       25      5       5       738     1637    1       4543    0.563373      OTree   ExtraStates:1   12
+1       1       25      5       5       718     1368    1       3979    0.466308	without tryExtendQueriedPath
+1       1       25      5       5       727     1337    1       3960    0.445295	without tryExtendQueriedPath + sameInputNext
+
 1       1       25      5       5       3100    6692    1       21699   3.127074      OTree   ExtraStates:2   12
+1       1       25      5       5       3008    6515    1       20002   2.930939	without tryExtendQueriedPath
+1       1       25      5       5       3029    6363    1       19895   2.774840	without tryExtendQueriedPath + sameInputNext
+
 1       1       25      5       5       2886    2886    1       16094   2.699355	GoodSplit	MaxDistLen:2
 1       1       25      5       5       631     631     1       2755    0.042027	Quotient 
 1       1       25      5       5       756     756     16      3169    0.015010	TTT
