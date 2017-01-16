@@ -74,97 +74,137 @@ static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>&
 static vector<string> descriptions;
 static vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 
-static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed) {
-#if 1
-#if 1 // L*
-	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
-	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
-	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
-	for (size_t i = 0; i < ceFunc.size(); i++) {
-		descriptions.emplace_back("L*\t" + ceFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
-		algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 2), (i > 2)));
+static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {
+	if (mask & 1) { // L*
+		vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
+		ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
+		ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
+		ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
+		ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
+		ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
+		for (size_t i = 0; i < ceFunc.size(); i++) {
+			descriptions.emplace_back("L*\t" + ceFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
+			algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 2), (i > 2)));
+		}
 	}
-#endif
-#if 1 // OP
-	vector<pair<OP_CEprocessing, string>> opCeFunc;
-	opCeFunc.emplace_back(PTRandSTR(AllGlobally));
-	opCeFunc.emplace_back(PTRandSTR(OneGlobally));
-	opCeFunc.emplace_back(PTRandSTR(OneLocally));
-	for (size_t i = 0; i < opCeFunc.size(); i++) {
-		descriptions.emplace_back("OP\t" + opCeFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
-		algorithms.emplace_back(bind(ObservationPackAlgorithm, placeholders::_1, opCeFunc[i].first, nullptr));
+	if (mask & 2) { // OP
+		vector<pair<OP_CEprocessing, string>> opCeFunc;
+		opCeFunc.emplace_back(PTRandSTR(AllGlobally));
+		opCeFunc.emplace_back(PTRandSTR(OneGlobally));
+		opCeFunc.emplace_back(PTRandSTR(OneLocally));
+		for (size_t i = 0; i < opCeFunc.size(); i++) {
+			descriptions.emplace_back("OP\t" + opCeFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
+			algorithms.emplace_back(bind(ObservationPackAlgorithm, placeholders::_1, opCeFunc[i].first, nullptr));
+		}
 	}
-#endif
-#if 1 // DT
-	descriptions.emplace_back("DT\t\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(DiscriminationTreeAlgorithm, placeholders::_1, nullptr));
-#endif
-#if 1 // TTT
-	descriptions.emplace_back("TTT\t\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(TTT, placeholders::_1, nullptr));
-#endif
-#if 1 // Quotient
-	descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
-#endif
-#if 1 // GoodSplit
-	descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
-#endif
-#endif
-#if 1 // ObservationTreeAlgorithm
-	for (state_t i = 0; i <= maxExtraStates; i++) {
-		descriptions.emplace_back("OTree\tExtraStates:" + to_string(i) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
-		algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, i, nullptr, isEQallowed));
+	if (mask & 4) { // DT
+		descriptions.emplace_back("DT\t\t" + to_string(descriptions.size()) + "\t");
+		algorithms.emplace_back(bind(DiscriminationTreeAlgorithm, placeholders::_1, nullptr));
 	}
-#endif
+	if (mask & 8) { // TTT
+		descriptions.emplace_back("TTT\t\t" + to_string(descriptions.size()) + "\t");
+		algorithms.emplace_back(bind(TTT, placeholders::_1, nullptr));
+	}
+	if (mask & 16) { // Quotient
+		descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size()) + "\t");
+		algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
+	}
+	if (mask & 32) { // GoodSplit
+		descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + 
+			(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+		algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
+	}
+	if (mask & 64) { // ObservationTreeAlgorithm
+		for (state_t i = 0; i <= maxExtraStates; i++) {
+			descriptions.emplace_back("OTree\tExtraStates:" + to_string(i) + 
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+			algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, i, nullptr, isEQallowed));
+		}
+	}
 }
 
-static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed) {
-#if 1 // TeacherDFSM
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher));
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM\t\t" + fnName);
+static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {
+	if (mask & 1) { // TeacherDFSM
+		for (size_t i = 0; i < algorithms.size(); i++) {
+			unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+			COMPUTATION_TIME(auto model = algorithms[i](teacher));
+			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM\t\t" + fnName);
+		}
 	}
-#endif
 	printf(" ");
-#if 0 // TeacherRL
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher));
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL\t\t" + fnName);
+	if (mask & 2) { // TeacherRL
+		for (size_t i = 0; i < algorithms.size(); i++) {
+			unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+			COMPUTATION_TIME(auto model = algorithms[i](teacher));
+			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL\t\t" + fnName);
+		}
 	}
-#endif
 	printf(" ");
-#if 0 // TeacherBB
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, maxExtraStates + 1);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher));
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + 
-			"TeacherBB:SPY_method(ExtraStates:" + to_string(maxExtraStates + 1) + ")\tBlackBoxDFSM\t" + fnName, bb);
+	if (mask & 4) { // TeacherBB
+		for (size_t i = 0; i < algorithms.size(); i++) {
+			shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+			unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, maxExtraStates + 1);
+			COMPUTATION_TIME(auto model = algorithms[i](teacher));
+			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] +
+				"TeacherBB:SPY_method(ExtraStates:" + to_string(maxExtraStates + 1) + ")\tBlackBoxDFSM\t" + fnName, bb);
+		}
 	}
-#endif
 }
 
 using namespace std::tr2::sys;
 
-void testDir(string dir, string outFilename = "") {
+void testDir(int argc, char** argv) {
+	string outFilename = "";
+	auto dir = string(argv[1]);
+	state_t maxExtraStates = 2;
+	seq_len_t maxDistLen = 2;
+	bool isEQallowed = true;
+	unsigned int machineTypeMask = unsigned int(-1);// all
+	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
+	unsigned int algorithmMask = unsigned int(-1);//all
+	unsigned int teacherMask = 1;//TEACHER_DFSM
+	for (int i = 2; i < argc; i++) {
+		if (strcmp(argv[i], "-o") == 0) {
+			outFilename = string(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-es") == 0) {
+			maxExtraStates = state_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-dl") == 0) {
+			maxDistLen = seq_len_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-eq") == 0) {
+			isEQallowed = bool(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-m") == 0) {//machine type
+			machineTypeMask = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-s") == 0) {//states
+			statesRestrictionLess = state_t(atoi(argv[++i]));
+			statesRestrictionGreater = statesRestrictionLess - 1;
+			statesRestrictionLess++;
+		}
+		else if (strcmp(argv[i],"-sl") == 0) {//states
+			statesRestrictionLess = state_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-sg") == 0) {//states
+			statesRestrictionGreater = state_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-a") == 0) {//algorithm
+			algorithmMask = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-t") == 0) {//teacher
+			teacherMask = atoi(argv[++i]);
+		}
+	}
 	if (outFilename.empty()) outFilename = dir + "results.csv";
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;
 	}
-	state_t maxExtraStates = 1;
-	seq_len_t maxDistLen = 2;
-	bool isEQallowed = true;
 	fprintf(outFile, "Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tBBresets\tBBsymbols\tseconds\t"
 		"Algorithm\tCEprocessing\tAlgId\tTeacher\tBB\tfileName\n");
-	loadAlgorithms(maxExtraStates, maxDistLen, isEQallowed);
+	loadAlgorithms(maxExtraStates, maxDistLen, isEQallowed, algorithmMask);
 	path dirPath(dir); 
 	directory_iterator endDir;
 	for (directory_iterator it(dirPath); it != endDir; ++it) {
@@ -172,8 +212,10 @@ void testDir(string dir, string outFilename = "") {
 			path fn(it->path());
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm) {// && (fsm->getNumberOfStates() == 300)) {// && (fsm->getType() == TYPE_MEALY)) {
-					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed);
+				if ((fsm) && (machineTypeMask & (1 << fsm->getType())) && 
+					((statesRestrictionLess != NULL_STATE) && (fsm->getNumberOfStates() < statesRestrictionLess)) &&
+					((statesRestrictionGreater != NULL_STATE) && (statesRestrictionGreater < fsm->getNumberOfStates()))) {
+					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed, teacherMask);
 					printf("%s tested\n", fn.filename().c_str());
 				}
 			}

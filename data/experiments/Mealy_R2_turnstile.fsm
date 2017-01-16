@@ -1,0 +1,17 @@
+2 0
+2 2 3
+2
+0	0	1
+1	0	2
+0	1	0
+1	1	0
+2 state labels
+0 Locked
+1 Unlocked
+2 input labels
+0 coin
+1 push
+3 output labels
+0 nothing
+1 locked
+2 free

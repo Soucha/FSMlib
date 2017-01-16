@@ -1,4 +1,7 @@
 GridWorldLearning
+
+==== MapK ====
+
 Algorithm	steps
 GW-OTree	12380	8 min
 OTree:1ES	25830	3 min 55486 
@@ -8,6 +11,7 @@ Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds 
 1       1       25      5       5       738     1637    0       6180    192.901591      OTree   ExtraStates:1   12	25830 
 1       1       25      5       5       1333    631     1       15504   652.554361      Quotient 1ES       10	48015 
 1       1       25      5       5       4191    849     8       71454   2102.726960     TTT    2ES     9	194136 
+1       1       25      5       5       727     1337    0       5297    242.444400      OTree   ExtraStates:1   12	23819
 
 
 Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds
@@ -35,3 +39,9 @@ Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds
 1       1       25      5       5       1264    1264    5       6248    0.040026	L*	suffix1by1
 1       1       25      5       5       1264    1264    5       6248    0.030021	L*	allSuffixes
 1       1       25      5       5       1460    1460    5       7402    0.038025	L*	allPrefixes
+
+
+==== MapL ====
+Correct FSMtype States  Inputs  Outputs Resets  OQs     EQs     symbols seconds Algorithm       CEprocessing    AlgId
+0       1       10      5       4       241     518     0       1932    68.379132       OTree   ExtraStates:1   12	8990
+

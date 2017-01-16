@@ -1,0 +1,16 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	1	10	5	4	427	427	2	2107	0	0	0.001001	L*	addAllPrefixesToS	0	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	358	358	2	1657	0	0	0.000503	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	358	358	2	1657	0	0	0.001002	L*	addSuffix1by1ToE	2	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	359	359	2	1661	0	0	0.001001	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	360	360	2	1666	0	0	0.000485	L*	addSuffixToE_binarySearch	4	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	638	638	2	3748	0	0	0.001504	OP	AllGlobally	5	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	487	487	2	2503	0	0	0.000502	OP	OneGlobally	6	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	442	442	2	2249	0	0	0.000501	OP	OneLocally	7	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	258	258	6	1059	0	0	0.000000	DT		8	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	214	214	6	938	0	0	0.000000	TTT		9	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	256	256	1	1180	0	0	0.000503	Quotient		10	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	1175	1175	1	6536	0	0	0.008005	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	76	131	4	368	0	0	0.002501	OTree	ExtraStates:0+EQ	12	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	241	518	1	1414	0	0	0.007004	OTree	ExtraStates:1+EQ	13	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	1147	2517	1	7911	0	0	0.058039	OTree	ExtraStates:2+EQ	14	TeacherDFSM		DFSM_R10_GW_L.fsm

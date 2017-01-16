@@ -175,6 +175,7 @@ namespace FSMlearning {
 	static void checkNode(const shared_ptr<ot_node_t>& node, ObservationTree& ot);
 
 	static void updateConsistentOfSucc(const shared_ptr<ot_node_t>& node, ObservationTree& ot) {
+		auto numStates = ot.stateNodes.size();
 		for (auto& nn : node->next) {
 			if (nn && (nn->state == NULL_STATE)) {
 				//if (nn->extraStateLevel - 1 > ot.numberOfExtraStates) {
@@ -189,8 +190,8 @@ namespace FSMlearning {
 					}
 				//}
 				checkNode(nn, ot);
-				if (ot.uncheckedNodes.empty()) {
-					return;
+				if (numStates != ot.stateNodes.size()) {
+					continue;
 				}
 				nn->extraStateLevel = node->extraStateLevel + 1;
 				if (nn->extraStateLevel <= ot.numberOfExtraStates) {
@@ -356,7 +357,7 @@ namespace FSMlearning {
 			if (ot.bbNode == node) {
 				printf("%d T(%d) = %d query\n", teacher->getOutputQueryCount(), input, transitionOutput);
 			} else {
-				printf("%d T(%s, %s) = %s query\n", teacher->getOutputQueryCount(),
+				printf("%d T(%s, %d) = %d query\n", teacher->getOutputQueryCount(),
 					FSMmodel::getInSequenceAsString(node->accessSequence).c_str(), input, transitionOutput);
 			}
 #endif // DUMP_OQ

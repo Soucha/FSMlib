@@ -1,0 +1,22 @@
+Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	2	14	14	2	2758	2758	1	13930	0	0	0.004002	L*	addAllPrefixesToS	0	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	2758	2758	1	13930	0	0	0.004000	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	2758	2758	1	13930	0	0	0.004003	L*	addSuffix1by1ToE	2	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	2758	2758	1	13930	0	0	0.004002	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	2758	2758	1	13930	0	0	0.003504	L*	addSuffixToE_binarySearch	4	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	3841	3841	1	19941	0	0	0.005503	OP	AllGlobally	5	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	3841	3841	1	19941	0	0	0.005504	OP	OneGlobally	6	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	3841	3841	1	19941	0	0	0.005505	OP	OneLocally	7	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	1536	1536	14	7774	0	0	0.002001	DT		8	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	1370	1370	14	7223	0	0	0.002001	TTT		9	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	2758	2758	1	13930	0	0	0.008004	Quotient		10	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	34926	34926	1	211045	0	0	17.156235	GoodSplit	maxDistLen:2+EQ	11	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	851	1437	11	4743	0	0	0.089061	OTree	ExtraStates:0+EQ	0	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	876	1327	13	4696	0	0	0.072500	OTree	ExtraStates:0+EQ-tryExtend	0	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	890	1327	14	4710	0	0	0.071546	OTree	ExtraStates:0+EQ-tryExtend-sameInput	0	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	4249	8545	1	27735	0	0	1.110741	OTree	ExtraStates:1+EQ	1	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	4590	7697	1	28473	0	0	1.146265	OTree	ExtraStates:1+EQ-tryExtend	1	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	4604	7697	1	28487	0	0	1.076218	OTree	ExtraStates:1+EQ-tryExtend-sameInput	1	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	44757	101188	1	338647	0	0	176.519890	OTree	ExtraStates:2+EQ	2	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	44142	100053	1	331087	0	0	192.014017	OTree	ExtraStates:2+EQ-tryExtend	2	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	44156	100053	1	331101	0	0	174.995874	OTree	ExtraStates:2+EQ-tryExtend-sameInput	2	TeacherDFSM		Mealy_R14_cvs.fsm

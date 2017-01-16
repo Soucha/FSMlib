@@ -185,6 +185,7 @@
     <ClCompile Include="Learning\ObservationPackAlgorithm.cpp" />
     <ClCompile Include="Learning\ObservationTreeAlgorithm.cpp" />
     <ClCompile Include="Learning\QuotientAlgorithm.cpp" />
+    <ClCompile Include="Learning\SPYlearner.cpp" />
     <ClCompile Include="Learning\TeacherBB.cpp" />
     <ClCompile Include="Learning\TeacherDFSM.cpp" />
     <ClCompile Include="Learning\TeacherRL.cpp" />

@@ -321,31 +321,33 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 	
 }
 
-extern void testDir(string dir, string outFilename = "");
+extern void testDir(int argc, char** argv);
 
 //extern void testBBport();
 
 int main(int argc, char** argv) {
 	//testBBport();
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
-	//testDir(string(argv[1]));
-	//getCSet();
-	fsm = make_unique<DFA>();
+	testDir(argc, argv);
+	/*/getCSet();
+	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
-	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R20_wCAS2.fsm";
 	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
 	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
-	fsm->load(fileName);
+	//fsm->load(fileName);
+	fsm = FSMmodel::loadFSM(fileName);
 	/* // to determine maxLen for GoodSplit
 	auto vec = getStatePairsShortestSeparatingSequences(fsm, true);
 	seq_len_t len = 0;
@@ -361,8 +363,7 @@ int main(int argc, char** argv) {
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	//auto model = TTT(teacher, showConjecture);
-	//auto model = GoodSplit(teacher, 1, nullptr, true);// showAndStop);
+	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, nullptr, false));// showAndStop);
 	COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
@@ -382,7 +383,7 @@ int main(int argc, char** argv) {
 	//*/
 	//compareLearningAlgorithms(fileName, 1, 2);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
-
+	/*
 	sequence_set_t TS;
 	int extraStates = 0;
 	TS.insert({ 0, 0 });
@@ -425,7 +426,7 @@ int main(int argc, char** argv) {
 			cout << s << endl;
 		}
 	}
-
+	*/
 	char c;
 	cin >> c;
 	return 0;

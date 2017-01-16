@@ -1,0 +1,64 @@
+2 0
+14 14 2
+14
+0	1	0	0	0	0	0	0	0	0	0	0	0	0	0
+1	0	1	0	0	0	0	0	0	0	0	0	0	0	0
+2	0	0	1	1	0	0	0	1	0	1	1	0	0	0
+3	0	0	0	0	1	0	0	0	0	0	0	0	0	0
+4	0	0	0	1	0	1	1	0	0	0	0	0	0	0
+5	0	0	0	0	0	0	0	0	0	0	0	0	1	0
+6	0	0	0	1	0	0	0	0	1	0	0	0	1	0
+7	0	0	0	0	0	0	0	1	0	0	0	0	0	0
+8	0	0	0	0	0	0	0	0	0	1	0	0	1	0
+9	0	0	1	0	0	0	0	0	0	0	0	1	0	0
+10	0	0	0	0	0	0	1	0	0	0	0	0	0	0
+11	0	0	1	0	0	0	0	0	0	0	0	0	1	0
+12	0	0	0	0	0	0	0	0	0	0	1	0	1	0
+13	0	0	0	0	0	0	0	0	0	0	0	0	0	1
+0	1	0	0	0	0	0	0	0	0	0	0	0	0	0
+1	1	2	1	1	1	1	1	1	1	1	1	1	1	1
+2	2	2	5	3	2	2	2	6	2	8	9	2	2	2
+3	3	3	3	3	4	3	3	3	3	3	3	3	3	3
+4	4	4	4	3	4	4	5	4	4	4	4	4	4	4
+5	5	5	5	5	5	5	5	5	5	5	5	5	13	5
+6	6	6	6	7	6	6	6	6	6	6	6	6	13	6
+7	7	7	7	7	7	7	7	6	7	7	7	7	7	7
+8	8	8	8	8	8	8	8	8	8	8	8	8	13	8
+9	9	9	10	9	9	9	9	9	9	9	9	11	9	9
+10	10	10	10	10	10	10	12	10	10	10	10	10	10	10
+11	11	11	12	11	11	11	11	11	11	11	11	11	13	11
+12	12	12	12	12	12	12	12	12	12	12	9	12	13	12
+13	13	13	13	13	13	13	13	13	13	13	13	13	13	0
+14 state labels
+0 Init
+1 Connected
+2 LoggedIn
+3 DirChanged
+4 Editing
+5 FileStored
+6 FilesListed
+7 DirChanged
+8 DirCreated
+9 FileTypeSet
+10 FileStored
+11 FileRenamed
+12 FileStored
+13 LoggedOut
+14 input labels
+0 connect
+1 login
+2 storefile
+3 changedir
+4 listnames
+5 delete
+6 appendfile
+7 listfiles
+8 retrievefile
+9 makedir
+10 setfiletype
+11 rename
+12 logout
+13 disconnect
+2 output labels
+0 0
+1 1
