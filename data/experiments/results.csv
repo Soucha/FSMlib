@@ -1,21 +1,2 @@
 Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
-1	1	25	5	5	1460	1460	5	7402	0	0	3.329044	L*	addAllPrefixesToS	0	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1264	1264	5	6248	0	0	3.093158	L*	addAllSuffixesAfterLastStateToE	1	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1264	1264	5	6248	0	0	3.104632	L*	addSuffix1by1ToE	2	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1268	1268	5	6256	0	0	3.100692	L*	addSuffixAfterLastStateToE	3	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1269	1269	5	6260	0	0	3.113144	L*	addSuffixToE_binarySearch	4	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	2189	2189	4	11584	0	0	1.613140	OP	AllGlobally	5	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1724	1724	5	9435	0	0	1.267373	OP	OneGlobally	6	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1375	1375	8	6701	0	0	0.934618	OP	OneLocally	7	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	267	461	8	1286	0	0	3.687441	OTree	ExtraStates:0+EQ	8	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	738	1637	1	4543	0	0	14.649275	OTree	ExtraStates:1+EQ	9	TeacherDFSM		DFSM_R25_GW.fsm
-1	1	25	5	5	1460	1460	5	7402	0	0	2.515337	L*	addAllPrefixesToS	0	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1264	1264	5	6248	0	0	2.333045	L*	addAllSuffixesAfterLastStateToE	1	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1264	1264	5	6248	0	0	2.354071	L*	addSuffix1by1ToE	2	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1268	1268	5	6256	0	0	2.292025	L*	addSuffixAfterLastStateToE	3	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1269	1269	5	6260	0	0	2.273006	L*	addSuffixToE_binarySearch	4	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	2287	2287	4	12092	0	0	1.331881	OP	AllGlobally	5	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1792	1792	5	9831	0	0	1.269841	OP	OneGlobally	6	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	1486	1486	8	7287	0	0	1.050696	OP	OneLocally	7	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	267	921	8	1286	0	0	4.001181	OTree	ExtraStates:0+EQ	8	TeacherRL		DFSM_R25_GW.fsm
-1	1	25	5	5	738	3273	1	4543	0	0	19.696586	OTree	ExtraStates:1+EQ	9	TeacherRL		DFSM_R25_GW.fsm
+0	4	241	15	2	30	31	0	45	0	0	0.000000	SPYlearner	ExtraStates:0+EQ	0	TeacherDFSM		DFA_R241_sched5.fsm

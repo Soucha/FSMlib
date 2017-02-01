@@ -466,14 +466,14 @@ void DFSM::generateTransitions() {
 	state_t coherentStates = 0;
 	do {
 		while (!lifo.empty()) {
-			auto &actState = lifo.top();
+			auto actState = lifo.top();
+			lifo.pop();
 			coherentStates++;
-			for (input_t input = 0; input < _numberOfInputs; input++) {
-				auto &nextState = _transition[actState][input];
+			for (input_t i = 0; i < _numberOfInputs; i++) {
+				auto &nextState = _transition[actState][i];
 				if (endCounter[nextState] == 0) lifo.emplace(nextState);
 				if (actState != nextState) endCounter[nextState]++;
 			}
-			lifo.pop();
 		}
 		if (coherentStates == _numberOfStates) break;
 		input_t input = 0;

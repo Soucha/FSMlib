@@ -121,6 +121,13 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 			algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
+	if (mask & 128) { // SPYlearner
+		for (state_t i = 0; i <= maxExtraStates; i++) {
+			descriptions.emplace_back("SPYlearner\tExtraStates:" + to_string(i) +
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+			algorithms.emplace_back(bind(SPYlearner, placeholders::_1, i, nullptr, isEQallowed));
+		}
+	}
 }
 
 static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {
@@ -213,8 +220,8 @@ void testDir(int argc, char** argv) {
 			if (fn.extension().compare(".fsm") == 0) {
 				fsm = FSMmodel::loadFSM(fn.string());
 				if ((fsm) && (machineTypeMask & (1 << fsm->getType())) && 
-					((statesRestrictionLess != NULL_STATE) && (fsm->getNumberOfStates() < statesRestrictionLess)) &&
-					((statesRestrictionGreater != NULL_STATE) && (statesRestrictionGreater < fsm->getNumberOfStates()))) {
+					((statesRestrictionLess == NULL_STATE) || (fsm->getNumberOfStates() < statesRestrictionLess)) &&
+					((statesRestrictionGreater == NULL_STATE) || (statesRestrictionGreater < fsm->getNumberOfStates()))) {
 					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed, teacherMask);
 					printf("%s tested\n", fn.filename().c_str());
 				}

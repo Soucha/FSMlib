@@ -137,6 +137,71 @@ static void testAll() {
 
 }
 
+static void generate() {
+	srand(time(NULL));
+	int cU, cS, cNS, cNADS, c = 0;
+	fsm = make_unique<DFSM>();
+	for (state_t states = 10; states <= 60; states += 10) {
+		//while (c < 10) {
+		cS = cU = cNS = cNADS = 0;
+		input_t inputs = 2;//states / 10;
+		output_t outputs = 2;//states / 10;
+		while (cS < 10) {
+			try {
+				fsm->generate(states, inputs, outputs);
+				bool properDFSM = false;
+				for (state_t state = 0; !properDFSM && (state < states); state++) {
+					for (input_t i = 0; i < inputs; i++) {
+						if (fsm->getOutput(state, i) != fsm->getOutput(fsm->getNextState(state, i), STOUT_INPUT)) {
+							properDFSM = true;
+							break;
+						}
+					}
+				}
+				if (!properDFSM) continue;
+				fsm->minimize();
+				if (states == fsm->getNumberOfStates()) {
+					if (FSMmodel::isStronglyConnected(fsm)) {
+						auto ads = FSMsequence::getAdaptiveDistinguishingSequence(fsm);
+						if (ads) {
+							fsm->save(DATA_PATH + EXPERIMENTS_DIR + "10multi/dfsm/");
+							cS++;
+						}
+						else {
+							//fsm->save("data/experiments/NoADS/");
+							cNADS++;
+						}
+					}
+					else {
+						//fsm->save("data/experiments/NotStronglyConnected/");
+						cNS++;
+					}
+				}
+				else {
+					cU++;
+				}
+			}
+			catch (const char * ex) {
+				printf(ex);
+				//return EXIT_FAILURE;
+			}
+			catch (string ex) {
+				printf(ex.c_str());
+			}
+			catch (exception& e) {
+				printf("%s\n", e.what());
+				//return EXIT_FAILURE;
+			}
+			catch (...) {
+				printf("wtf\n");
+				//return EXIT_FAILURE;
+			}
+		}
+		printf("%d;%d;%d;%d;%d;%d;%d;%d\n", states, cS, cNADS, cNS, cU, fsm->getType(), inputs, outputs);
+		c++;
+	}
+}
+
 static DFSM getFSM() {
 	DFSM dfsm;
 	dfsm.create(3, 4, 5);
@@ -326,12 +391,16 @@ extern void testDir(int argc, char** argv);
 //extern void testBBport();
 
 int main(int argc, char** argv) {
+	//generate();
 	//testBBport();
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
-	testDir(argc, argv);
-	/*/getCSet();
+	//testDir(argc, argv);
+	//char* vals[6] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12"};
+	//testDir(6, vals);
+	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R241_sched5.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
@@ -339,7 +408,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R20_wCAS2.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R60_bdaT1.fsm";
 	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
 	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
@@ -361,10 +430,10 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//* /
+	//*/
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, nullptr, false));// showAndStop);
-	COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
+	COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, false));// showAndStop);
+	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, OneLocally, nullptr);)
