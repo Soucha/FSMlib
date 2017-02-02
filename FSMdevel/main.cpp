@@ -395,15 +395,15 @@ int main(int argc, char** argv) {
 	//testBBport();
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
 	//testDir(argc, argv);
-	//char* vals[6] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12"};
-	//testDir(6, vals);
+	char* vals[6] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12"};
+	testDir(6, vals);
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R241_sched5.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R241_sched5.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
@@ -430,9 +430,9 @@ int main(int argc, char** argv) {
 	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//*/
+	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, false));// showAndStop);
+	COMPUTATION_TIME(auto model = SPYlearner(teacher, 0, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)

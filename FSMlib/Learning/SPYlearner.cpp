@@ -1193,8 +1193,8 @@ namespace FSMlearning {
 		generateRequestedQueries(ot);
 		node->assumedState = node->state = 0;
 		
-		sequence_in_t ce;
-		sequence_out_t bbOutput;
+		//sequence_in_t ce;
+		//sequence_out_t bbOutput;
 		ot.testedState = 0;
 		ot.testedInput = 0;
 
@@ -1251,32 +1251,48 @@ namespace FSMlearning {
 						}
 						bbOutput.clear();
 					}
-					ce = teacher->equivalenceQuery(ot.conjecture);
+					*/
+					auto ce = teacher->equivalenceQuery(ot.conjecture);
 					if (!ce.empty()) {
 						ot.numberOfExtraStates--;
-						auto currNode = ot.stateNodes[0];// root
+						auto currNode = ot.stateNodes[0]->convergent.front();// root
+						seq_len_t suffixLen = ce.size();
+						if (ot.conjecture->isOutputState()) {
+							for (auto& input : ce) {
+								if (input == STOUT_INPUT) {
+									suffixLen--;
+								}
+							}
+						}
 						for (auto& input : ce) {
 							if (input == STOUT_INPUT) {
-								bbOutput.emplace_back(currNode->stateOutput);
+								//bbOutput.emplace_back(currNode->stateOutput);
 								continue;
 							}
-							auto idx = getNextIdx(currNode, input);
-							if (!currNode->next[idx]) {
-								query(currNode, idx, ot, teacher);
+							if (currNode->maxSuffixLen < suffixLen) {
+								currNode->maxSuffixLen = suffixLen;
 							}
-							currNode = currNode->next[idx];
-							bbOutput.emplace_back(currNode->incomingOutput);
+							suffixLen--;
+							if (!currNode->next[input]) {
+								query(currNode, input, ot, teacher);
+							}
+							currNode = currNode->next[input];
+							
+							//bbOutput.emplace_back(currNode->incomingOutput);
 						}
+						checkPrevious(currNode, ot);
+						if (ot.repairingInconsistency > 0) {
+							ot.unconfirmedTransitions = ot.repairingInconsistency - 1;
+						}
+						/*
 						checkAndQueryNext(currNode, ot, teacher);
 						if (ot.uncheckedNodes.front() != ot.stateNodes[0]) {// a new state was not found
 							updateWithCE(ce, ot, teacher);
-						}
+						}*/
 						continue;
 					}
-					*/
 				}
 				unlearned = false;
-				//break;
 			} else {
 				//update
 				generateRequestedQueries(ot);

@@ -404,7 +404,7 @@ namespace FSMlearning {
 	static void checkAndQueryNext(const shared_ptr<ot_node_t>& node, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
 		checkPrevious(node, ot);
 		
-		//tryExtendQueriedPath(node, ot, teacher);
+		tryExtendQueriedPath(node, ot, teacher);
 
 		if (ot.uncheckedNodes.empty()) {
 			ot.uncheckedNodes.assign(ot.stateNodes.begin(), ot.stateNodes.end());
@@ -573,7 +573,7 @@ namespace FSMlearning {
 			}
 			if (node->refStates.size() == 1) {
 				//ads->input = STOUT_INPUT;
-				//ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
+				ads->input = node->parent.lock()->nextInputs[node->incomingInputIdx];
 			}
 			else if (expectedState != NULL_STATE) {
 				size_t bestVal(node->refStates.size());
