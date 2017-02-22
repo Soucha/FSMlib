@@ -394,23 +394,21 @@ int main(int argc, char** argv) {
 	//generate();
 	//testBBport();
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
-	//testDir(argc, argv);
-	char* vals[6] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12"};
-	testDir(6, vals);
+	//testDir(argc, argv);/*
+	char* vals[8] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9"}; testDir(8, vals);
 	//getCSet();
 	//fsm = make_unique<Mealy>();
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R97_sched4.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R241_sched5.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
-	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R60_bdaT1.fsm";
-	//Correct: 1, reset: 2494,        OQ: 5527,       EQ: 1,  symbols: 19096, time:283.844
-	//Correct: 1, reset : 1561, OQ : 5758, EQ : 1, symbols : 13731, time : 230.602
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
@@ -432,7 +430,7 @@ int main(int argc, char** argv) {
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	COMPUTATION_TIME(auto model = SPYlearner(teacher, 0, showConjecture, true));// showAndStop);
+	COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)

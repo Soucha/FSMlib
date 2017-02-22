@@ -1,2 +1,1 @@
 Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
-0	4	241	15	2	30	31	0	45	0	0	0.000000	SPYlearner	ExtraStates:0+EQ	0	TeacherDFSM		DFA_R241_sched5.fsm
