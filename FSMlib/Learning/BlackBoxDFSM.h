@@ -30,6 +30,8 @@ public:
 		_fsm->minimize();
 	}
 
+	virtual ~BlackBoxDFSM() {}
+
 	vector<input_t> getNextPossibleInputs();
 
 	input_t getNumberOfInputs() {

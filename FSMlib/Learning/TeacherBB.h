@@ -27,6 +27,8 @@ public:
 	TeacherBB(const shared_ptr<BlackBox>& blackBox, 
 		function<sequence_set_t(const unique_ptr<DFSM>& fsm, int extraStates)> testingMethod, state_t maxExtraStates = 3);
 
+	virtual ~TeacherBB() {}
+
 	bool isProvidedOnlyMQ() {
 		return false;
 	}

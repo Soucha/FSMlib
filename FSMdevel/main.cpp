@@ -15,8 +15,16 @@
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define DBG_MEMORY_LEAK 0
+#if DBG_MEMORY_LEAK
+#define _CRTDBG_MAP_ALLOC  
+#include <stdlib.h>  
+#include <crtdbg.h>  
+#endif
+
 #include <iostream>
 #include <chrono>
+#include <filesystem>
 
 
 #ifndef PARALLEL_COMPUTING
@@ -36,6 +44,8 @@ wchar_t message[200];
 using namespace FSMsequence;
 using namespace FSMtesting;
 using namespace FSMlearning;
+
+using namespace std::tr2::sys;
 
 static void printSeqSet(sequence_set_t& seqSet) {
 	for (auto seq : seqSet) {
@@ -137,34 +147,69 @@ static void testAll() {
 
 }
 
+static void compareTestingMethods() {
+	path dirPath("../" + DATA_PATH + EXPERIMENTS_DIR + "100multi/");
+	directory_iterator endDir;
+	printf("FSMtype\tStates\tInputs\tOutputs\tES\tH\tH-indist\tSPY\tSPY-indist\tfileName\n");
+	for (directory_iterator it(dirPath); it != endDir; ++it) {
+		if (is_regular_file(it->status())) {
+			path fn(it->path());
+			if (fn.extension().compare(".fsm") == 0) {
+				fsm = FSMmodel::loadFSM(fn.string());
+				if (fsm) {// && (fsm->getNumberOfStates() == 664)) {
+					for (state_t ES = 0; ES < 4; ES++) {
+						printf("%d\t%d\t%d\t%d\t%d\t",
+							fsm->getType(), fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), ES);
+						auto TS = H_method(fsm, ES);
+						seq_len_t len = 0;
+						for (auto& seq : TS) len += seq.size() + 1;
+						auto indist = sequence_vec_t();// FaultCoverageChecker::getFSMs(fsm, TS, ES);
+						printf("%d\t%d\t", len, indist.size());
+
+						TS = SPY_method(fsm, ES);
+						len = 0;
+						for (auto& seq : TS) len += seq.size() + 1;
+						//indist = FaultCoverageChecker::getFSMs(fsm, TS, ES);
+						printf("%d\t%d\t", len, indist.size());
+
+						printf("%s\n", fn.filename().c_str());
+					}
+				}
+			}
+		}
+	}
+}
+
 static void generate() {
 	srand(time(NULL));
 	int cU, cS, cNS, cNADS, c = 0;
-	fsm = make_unique<DFSM>();
-	for (state_t states = 10; states <= 60; states += 10) {
+	fsm = make_unique<Mealy>();
+	for (state_t states = 10; states <= 100; states += 10) {
 		//while (c < 10) {
 		cS = cU = cNS = cNADS = 0;
-		input_t inputs = 2;//states / 10;
+		input_t inputs = states * 2;
 		output_t outputs = 2;//states / 10;
 		while (cS < 10) {
 			try {
 				fsm->generate(states, inputs, outputs);
-				bool properDFSM = false;
-				for (state_t state = 0; !properDFSM && (state < states); state++) {
-					for (input_t i = 0; i < inputs; i++) {
-						if (fsm->getOutput(state, i) != fsm->getOutput(fsm->getNextState(state, i), STOUT_INPUT)) {
-							properDFSM = true;
-							break;
+				if (fsm->getType() == TYPE_DFSM) {
+					bool properDFSM = false;
+					for (state_t state = 0; !properDFSM && (state < states); state++) {
+						for (input_t i = 0; i < inputs; i++) {
+							if (fsm->getOutput(state, i) != fsm->getOutput(fsm->getNextState(state, i), STOUT_INPUT)) {
+								properDFSM = true;
+								break;
+							}
 						}
 					}
+					if (!properDFSM) continue;
 				}
-				if (!properDFSM) continue;
 				fsm->minimize();
 				if (states == fsm->getNumberOfStates()) {
 					if (FSMmodel::isStronglyConnected(fsm)) {
 						auto ads = FSMsequence::getAdaptiveDistinguishingSequence(fsm);
 						if (ads) {
-							fsm->save(DATA_PATH + EXPERIMENTS_DIR + "10multi/dfsm/");
+							fsm->save(DATA_PATH + EXPERIMENTS_DIR + "10multiIn2nOutBin/");
 							cS++;
 						}
 						else {
@@ -391,11 +436,17 @@ extern void testDir(int argc, char** argv);
 //extern void testBBport();
 
 int main(int argc, char** argv) {
-	//generate();
+	//generate();return 0;
+	//compareTestingMethods();	return 0;
 	//testBBport();
 	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
-	//testDir(argc, argv);/*
-	char* vals[8] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9"}; testDir(8, vals);
+	testDir(argc, argv);/*
+#if DBG_MEMORY_LEAK
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+	//_CrtSetBreakAlloc(1045);
+#endif
+	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "4", "-sg", "9", "-sl", "49"}; testDir(10, vals);
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
@@ -408,13 +459,17 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R50_ylWfw.fsm"; 
+	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
+	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn
+	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
-	fsm = FSMmodel::loadFSM(fileName);
+	auto fsm = FSMmodel::loadFSM(fileName);
 	/* // to determine maxLen for GoodSplit
 	auto vec = getStatePairsShortestSeparatingSequences(fsm, true);
 	seq_len_t len = 0;
@@ -430,7 +485,7 @@ int main(int argc, char** argv) {
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
+	COMPUTATION_TIME(auto model = SPYlearner(teacher, 0, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
@@ -494,6 +549,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	*/
+	
 	char c;
 	cin >> c;
 	return 0;

@@ -1,1 +1,19 @@
 Correct	FSMtype	States	Inputs	Outputs	Resets	OQs	EQs	symbols	BBresets	BBsymbols	seconds	Algorithm	CEprocessing	AlgId	Teacher	BB	fileName
+1	4	50	18	2	1337	2016	44	10057	0	0	0.411772	OTree	ExtraStates:0+EQ	0	TeacherDFSM		DFA_R50_peterson2.fsm
+1	4	50	18	2	15595	31447	1	131769	0	0	4.142289	OTree	ExtraStates:1+EQ	1	TeacherDFSM		DFA_R50_peterson2.fsm
+1	4	50	18	2	276372	552965	1	2601641	0	0	67.581450	OTree	ExtraStates:2+EQ	2	TeacherDFSM		DFA_R50_peterson2.fsm
+1	4	97	12	2	2307	3173	78	28913	0	0	0.743493	OTree	ExtraStates:0+EQ	0	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	14254	28128	1	190634	0	0	5.653240	OTree	ExtraStates:1+EQ	1	TeacherDFSM		DFA_R97_sched4.fsm
+1	4	97	12	2	156243	312619	1	2235719	0	0	42.982294	OTree	ExtraStates:2+EQ	2	TeacherDFSM		DFA_R97_sched4.fsm
+1	1	10	5	4	76	131	4	368	0	0	0.002503	OTree	ExtraStates:0+EQ	0	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	241	518	1	1414	0	0	0.010005	OTree	ExtraStates:1+EQ	1	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	10	5	4	1147	2517	1	7911	0	0	0.071047	OTree	ExtraStates:2+EQ	2	TeacherDFSM		DFSM_R10_GW_L.fsm
+1	1	25	5	5	267	461	8	1286	0	0	0.017515	OTree	ExtraStates:0+EQ	0	TeacherDFSM		DFSM_R25_GW.fsm
+1	1	25	5	5	738	1637	1	4543	0	0	0.074051	OTree	ExtraStates:1+EQ	1	TeacherDFSM		DFSM_R25_GW.fsm
+1	1	25	5	5	3100	6692	1	21699	0	0	0.424781	OTree	ExtraStates:2+EQ	2	TeacherDFSM		DFSM_R25_GW.fsm
+1	2	14	14	2	851	1437	11	4743	0	0	0.091560	OTree	ExtraStates:0+EQ	0	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	4249	8545	1	27735	0	0	1.595056	OTree	ExtraStates:1+EQ	1	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	14	14	2	44757	101188	1	338647	0	0	188.731183	OTree	ExtraStates:2+EQ	2	TeacherDFSM		Mealy_R14_cvs.fsm
+1	2	2	2	3	4	7	2	10	0	0	0.000000	OTree	ExtraStates:0+EQ	0	TeacherDFSM		Mealy_R2_turnstile.fsm
+1	2	2	2	3	8	16	1	26	0	0	0.000000	OTree	ExtraStates:1+EQ	1	TeacherDFSM		Mealy_R2_turnstile.fsm
+1	2	2	2	3	20	34	1	82	0	0	0.000501	OTree	ExtraStates:2+EQ	2	TeacherDFSM		Mealy_R2_turnstile.fsm

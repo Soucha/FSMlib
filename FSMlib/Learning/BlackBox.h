@@ -30,6 +30,8 @@ public:
 		_type(type) {
 	}
 
+	virtual ~BlackBox() {}
+
 	/**
 	* @return True if the BlackBox can be reset, False otherwise.
 	*/

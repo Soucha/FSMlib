@@ -37,6 +37,8 @@ public:
 		_outputTransition.clear();
 	}
 
+	virtual ~DFSM() {}
+
 	// implicit copy and move constructors and assignment operators
 
 	/**

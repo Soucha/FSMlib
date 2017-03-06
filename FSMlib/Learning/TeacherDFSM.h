@@ -30,6 +30,8 @@ public:
 		_currState(0) {
 	}
 
+	virtual ~TeacherDFSM() {}
+
 	bool isProvidedOnlyMQ() {
 		return false;
 	}

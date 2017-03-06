@@ -19,6 +19,9 @@
 #include "FSMlearning.h"
 
 namespace FSMlearning {
+
+#define CHECK_PREDECESSORS 1
+
 	struct convergent_node_t;
 
 	struct spy_node_t {
@@ -57,10 +60,28 @@ namespace FSMlearning {
 		map<input_t, shared_ptr<requested_query_node_t>> next;
 	};
 
+	inline bool CNcompare(const convergent_node_t* ls, const convergent_node_t* rs);
+
+	struct CNcomp {
+		bool operator() (const convergent_node_t* ls, const convergent_node_t* rs) const {
+			return CNcompare(ls, rs);
+		}
+	};
+	/*struct CNcomp {
+	bool operator() (const convergent_node_t* ls, const convergent_node_t* rs) const {
+	const auto& las = ls->convergent.front()->accessSequence;
+	const auto& ras = rs->convergent.front()->accessSequence;
+	if (las.size() != ras.size()) return las.size() > ras.size();
+	return las < ras;
+	}
+	//};*/
+
+	typedef set<convergent_node_t*, CNcomp> cn_set_t;
+
 	struct convergent_node_t {
 		list<shared_ptr<spy_node_t>> convergent;
 		vector<shared_ptr<convergent_node_t>> next;
-		set<convergent_node_t*> domain;// or consistent cn in case of state nodes
+		cn_set_t domain;// or consistent cn in case of state nodes
 		shared_ptr<requested_query_node_t> requestedQueries;
 
 		convergent_node_t(const shared_ptr<spy_node_t>& node) {
@@ -68,6 +89,13 @@ namespace FSMlearning {
 			next.resize(node->next.size());
 		}
 	};
+
+	inline bool CNcompare(const convergent_node_t* ls, const convergent_node_t* rs) {
+		const auto& las = ls->convergent.front()->accessSequence;
+		const auto& ras = rs->convergent.front()->accessSequence;
+		if (las.size() != ras.size()) return las.size() < ras.size();
+		return las < ras;
+	}
 
 	typedef double frac_t;
 
@@ -98,6 +126,9 @@ namespace FSMlearning {
 		state_t testedState;
 		input_t testedInput;
 		sequence_in_t inconsistentSequence;
+#if CHECK_PREDECESSORS
+		cn_set_t changedNodes;
+#endif
 	};
 
 	static void checkNumberOfOutputs(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& conjecture) {
@@ -172,7 +203,7 @@ namespace FSMlearning {
 			|| areNodesDifferentUnder(n1->next[idx], n2->next[idx], len - 1)));
  	}
 
-	static bool isIntersectionEmpty(const set<convergent_node_t*>& domain1, const set<convergent_node_t*>& domain2) {
+	static bool isIntersectionEmpty(const cn_set_t& domain1, const cn_set_t& domain2) {
 		if (domain1.size() < domain2.size()) {
 			for (auto& cn : domain1) {
 				if (domain2.count(cn)) return false;
@@ -185,9 +216,33 @@ namespace FSMlearning {
 		}
 		return true;
 	}
+
+	static bool isIntersectionEmpty(const set<state_t>& domain1, const set<state_t>& domain2) {
+		if (domain1.size() < domain2.size()) {
+			for (auto& cn : domain1) {
+				if (domain2.count(cn)) return false;
+			}
+		}
+		else {
+			for (auto& cn : domain2) {
+				if (domain1.count(cn)) return false;
+			}
+		}
+		return true;
+	}
+
 	
 	static bool areNodeAndConvergentDifferentUnder(const shared_ptr<spy_node_t>& node, convergent_node_t* cn) {
-		if ((node->stateOutput != cn->convergent.front()->stateOutput)) return true;
+		if (node->stateOutput != cn->convergent.front()->stateOutput) return true;
+#if CHECK_PREDECESSORS
+		auto& cn1 = node->convergentNode.lock();
+		if (cn->requestedQueries || cn1->requestedQueries)  {
+			if (cn->requestedQueries && cn1->requestedQueries) {
+				if (cn1.get() != cn) return true;
+			}
+			else if (!cn1->domain.count(cn)) return true;
+		} else if (isIntersectionEmpty(cn1->domain, cn->domain)) return true;
+#endif
 		if ((node->lastQueriedInput == STOUT_INPUT) || (!cn->next[node->lastQueriedInput])) return false;
 		auto& idx = node->lastQueriedInput;
 		auto it = cn->convergent.begin();
@@ -201,9 +256,12 @@ namespace FSMlearning {
 	static bool areConvergentNodesDistinguished(const shared_ptr<convergent_node_t>& cn1, const shared_ptr<convergent_node_t>& cn2) {
 		if (cn1 == cn2) return false;
 		if (cn1->convergent.front()->stateOutput != cn2->convergent.front()->stateOutput) return true;
-		if ((cn1->requestedQueries && (!cn1->domain.count(cn2.get()))) 
-				|| (cn2->requestedQueries && (!cn2->domain.count(cn1.get())))) 
-			return true;
+		if (cn1->requestedQueries || cn2->requestedQueries)  {
+			if (!cn1->domain.count(cn2.get())) return true;
+		}
+#if CHECK_PREDECESSORS
+		else if (isIntersectionEmpty(cn1->domain, cn2->domain)) return true;
+#endif
 		for (input_t i = 0; i < cn1->next.size(); i++) {
 			if ((cn1->next[i]) && (cn2->next[i])) {
 				auto it1 = cn1->convergent.begin();
@@ -301,6 +359,42 @@ namespace FSMlearning {
 				generateConvergentSubtree(cn->next[input], ot);
 			}
 		}
+	}
+
+	static bool reduceDomainUsingSuccessor(const shared_ptr<convergent_node_t>& cn, SPYObservationTree& ot) {
+		for (input_t i = 0; i < cn->next.size(); i++) {
+			if (cn->next[i]) {
+				if (!reduceDomainUsingSuccessor(cn->next[i], ot)) {
+					return false;
+				}
+			}
+		}
+		if (!cn->requestedQueries) {
+			bool reduced = false;
+			for (auto it = cn->domain.begin(); it != cn->domain.end();) {
+				if (areConvergentNodesDistinguished(cn, (*it)->convergent.front()->convergentNode.lock())) {
+					(*it)->domain.erase(cn.get());
+					it = cn->domain.erase(it); 
+					reduced = true;		
+				}
+				else {
+					++it;
+				}
+			}
+			if (reduced) {
+				if (cn->domain.empty()) {
+					auto& n = cn->convergent.front();
+					//n->assumedState = WRONG_STATE;
+					storeInconsistentNode(n, ot);//node, 
+					ot.identifiedNodes.clear();
+					return false;
+				}
+				if (cn->domain.size() == 1) {
+					storeIdentifiedNode(cn->convergent.front(), ot);
+				}
+			}
+		}
+		return true;
 	}
 
 	static void generateRequestedQueries(SPYObservationTree& ot) {
@@ -632,6 +726,7 @@ namespace FSMlearning {
 		if (n1->stateOutput != n2->stateOutput) {
 			return sequence_in_t();
 		}
+		sequence_in_t retVal;
 		queue<pair<shared_ptr<spy_node_t>, shared_ptr<spy_node_t>>> fifo;
 		fifo.emplace(n1, n2);
 		while (!fifo.empty()) {
@@ -645,9 +740,15 @@ namespace FSMlearning {
 					fifo.emplace(p.first->next[i], p.second->next[i]);
 				}
 			}
+#if CHECK_PREDECESSORS
+			if (retVal.empty() && isIntersectionEmpty(p.first->refStates, p.second->refStates)) {
+				retVal = getAccessSequence(n1, p.first);
+				retVal.emplace_front(STOUT_INPUT);
+			}
+#endif
 			fifo.pop();
 		}
-		return sequence_in_t();
+		return retVal;
 	}
 
 	static sequence_in_t getQueriedSeparatingSequenceFromSN(const shared_ptr<spy_node_t>& n1, const shared_ptr<convergent_node_t>& cn2) {
@@ -655,6 +756,7 @@ namespace FSMlearning {
 			return sequence_in_t();
 		}
 		queue<pair<shared_ptr<spy_node_t>, shared_ptr<convergent_node_t>>> fifo;
+		sequence_in_t retVal;
 		fifo.emplace(n1, cn2);
 		while (!fifo.empty()) {
 			auto& p = fifo.front();
@@ -670,9 +772,16 @@ namespace FSMlearning {
 					fifo.emplace(p.first->next[i], p.second->next[i]);
 				}
 			}
+#if CHECK_PREDECESSORS
+			if (retVal.empty() && !p.second->requestedQueries && !p.first->convergentNode.lock()->requestedQueries
+				&& isIntersectionEmpty(p.first->convergentNode.lock()->domain, p.second->domain)) {
+				retVal = getAccessSequence(n1, p.first);
+				retVal.emplace_front(STOUT_INPUT);
+			}
+#endif
 			fifo.pop();
 		}
-		return sequence_in_t();
+		return retVal;
 	}
 
 	static sequence_in_t getQueriedSeparatingSequenceOfCN(const shared_ptr<convergent_node_t>& cn1, const shared_ptr<convergent_node_t>& cn2) {
@@ -681,6 +790,7 @@ namespace FSMlearning {
 		}
 		queue<pair<shared_ptr<convergent_node_t>, shared_ptr<convergent_node_t>>> fifo;
 		queue<sequence_in_t> seqFifo;
+		sequence_in_t retVal;
 		fifo.emplace(cn1, cn2);
 		seqFifo.emplace(sequence_in_t());
 		while (!fifo.empty()) {
@@ -697,56 +807,26 @@ namespace FSMlearning {
 						seqFifo.front().emplace_back(i);
 						return move(seqFifo.front());
 					}
-					fifo.emplace(p.first->next[i], p.second->next[i]);
-					auto seq(seqFifo.front());
-					seq.emplace_back(i);
-					seqFifo.emplace(move(seq));
+					if (p.first->next[i] != p.second->next[i]) {
+						fifo.emplace(p.first->next[i], p.second->next[i]);
+						auto seq(seqFifo.front());
+						seq.emplace_back(i);
+						seqFifo.emplace(move(seq));
+					}
 				}
 			}
+#if CHECK_PREDECESSORS
+			if (retVal.empty() && !p.first->requestedQueries && !p.second->requestedQueries 
+				&& ((cn1 != p.first) || !p.second->domain.count(cn2.get())) && ((cn1 != p.second) || !p.first->domain.count(cn2.get()))
+					&& isIntersectionEmpty(p.first->domain, p.second->domain)) {
+				retVal = move(seqFifo.front());
+				retVal.emplace_front(STOUT_INPUT);
+			}
+#endif
 			fifo.pop();
 			seqFifo.pop();
 		}
-		return sequence_in_t();
-	}
-
-	static sequence_in_t getQueriedSeparatingSequenceForSuccessor(state_t diffState, state_t parentState, 
-			const sequence_in_t& transferSeq, SPYObservationTree& ot) {
-		sequence_in_t sepSeq;
-		list<shared_ptr<spy_node_t>> diffCN, cn;
-		queue<shared_ptr<spy_node_t>> nodes;
-		nodes.emplace(ot.stateNodes[0]->convergent.front());//root
-		while (!nodes.empty()) {
-			auto node = move(nodes.front());
-			nodes.pop();
-			if (node->assumedState == diffState) {
-				for (const auto& n : cn) {
-					sepSeq = getQueriedSeparatingSequence(node, n);
-					if (!sepSeq.empty()) {
-						return sepSeq;
-					}
-				}
-				diffCN.emplace_back(node);
-			} else if (node->assumedState == parentState) {
-				auto n = node;
-				for (auto& input : transferSeq) {
-					n = n->next[input];
-					if (!n) break;
-				}
-				if (n) {
-					for (const auto& diffN : diffCN) {
-						sepSeq = getQueriedSeparatingSequence(n, diffN);
-						if (!sepSeq.empty()) {
-							return sepSeq;
-						}
-					}
-					cn.emplace_back(n);
-				}
-			}
-			for (const auto& nn : node->next) {
-				if (nn) nodes.emplace(nn);
-			}
-		}
-		return sepSeq;
+		return retVal;
 	}
 
 	static bool isPrefix(const sequence_in_t& seq, const sequence_in_t& base) {
@@ -971,47 +1051,109 @@ namespace FSMlearning {
 		return false;
 	}
 
+#if CHECK_PREDECESSORS
+	static bool checkPredecessors(shared_ptr<spy_node_t> node, shared_ptr<convergent_node_t> parentCN, SPYObservationTree& ot) {
+		bool reduced;
+		do {
+			reduced = false;
+			auto input = node->accessSequence.back();
+			for (auto it = parentCN->domain.begin(); it != parentCN->domain.end();) {
+				if ((*it)->next[input] && (((*it)->next[input]->requestedQueries &&
+					(!(*it)->next[input]->domain.count(parentCN->next[input].get())))
+					|| (!(*it)->next[input]->requestedQueries &&
+					isIntersectionEmpty(parentCN->next[input]->domain, (*it)->next[input]->domain)))) {
 
-	static bool querySequenceAndCheck(shared_ptr<spy_node_t> currNode, const sequence_in_t& seq,
-		SPYObservationTree& ot, const unique_ptr<Teacher>& teacher, bool allowIdentification = true) {
-		//seq_len_t suffixLen = seq.size();
-		long long suffixAdded = 0;
-		/*
-		if (currNode != ot.stateNodes[0]->convergent.front()) {
-			suffixLen += currNode->accessSequence.size();
-			auto n = ot.stateNodes[0]->convergent.front();
-			for (auto& input : currNode->accessSequence) {
-				if (n->maxSuffixLen < suffixLen) {
-					n->maxSuffixLen = suffixLen;
+					(*it)->domain.erase(parentCN.get());
+					if (parentCN->requestedQueries) {// a state node
+						if ((*it)->domain.empty()) {
+							auto& n = (*it)->convergent.front();
+							//n->assumedState = WRONG_STATE;
+							it = parentCN->domain.erase(it);
+							storeInconsistentNode(n, ot);//node, 
+							ot.identifiedNodes.clear();
+							return false;
+						}
+						if ((*it)->domain.size() == 1) {
+							storeIdentifiedNode((*it)->convergent.front(), ot);
+						}
+						ot.changedNodes.insert(*it);
+					}
+					else {
+						reduced = true;
+					}
+					it = parentCN->domain.erase(it);
 				}
-				suffixLen--;
-				n = n->next[input];
+				else ++it;
 			}
-		}*/
-		for (auto& input : seq) {
+			if (reduced) {
+				if (parentCN->domain.empty()) {
+					auto& n = parentCN->convergent.front();
+					//n->assumedState = WRONG_STATE;
+					storeInconsistentNode(n, ot);//node, 
+					ot.identifiedNodes.clear();
+					return false;
+				}
+				if (parentCN->domain.size() == 1) {
+					storeIdentifiedNode(parentCN->convergent.front(), ot);
+					//break;
+				}
+				node = parentCN->convergent.front();
+				parentCN = node->parent.lock()->convergentNode.lock();
+			}
 			/*
-			if (currNode->maxSuffixLen < suffixLen) {
-				currNode->maxSuffixLen = suffixLen;
-			}
-			suffixLen--;*/
-			if (!currNode->next[input]) {
-				query(currNode, input, ot, teacher);
-				suffixAdded--;
-			}
-			currNode = currNode->next[input];
-		}
-		bool isConsistent = checkPrevious(move(currNode), ot, suffixAdded);
-		if (allowIdentification) {
-			if (!ot.identifiedNodes.empty()) {// new state
-				isConsistent &= makeStateNode(move(ot.identifiedNodes.front()), ot, teacher);
-			}
 			else {
-				isConsistent &= processConfirmedTransitions(ot);
+				while (!changedNodes.empty()) {
+					auto parent = changedNodes.front()->parent.lock()->convergentNode.lock();
+					if (!checkPredecessors(move(changedNodes.front()), move(parent), ot)) {
+						return false;
+					}
+					changedNodes.pop_front();
+				}
+			}*/
+		} while (reduced);
+		return true;
+	}
+#endif
+
+	static bool processChangedNodes(SPYObservationTree& ot) {
+		while (!ot.changedNodes.empty()) {
+			auto it = ot.changedNodes.end();
+			--it;
+			auto node = (*it)->convergent.front();
+			ot.changedNodes.erase(it);
+			if (!checkPredecessors(node, node->parent.lock()->convergentNode.lock(), ot)) {
+				ot.changedNodes.clear();
+				return false;
 			}
 		}
-		return isConsistent;
+		return true;
 	}
-
+	
+	static bool reduceDomainsBySuccessors(SPYObservationTree& ot) {
+		for (const auto& cn : ot.stateNodes) {
+			for (auto it = cn->domain.begin(); it != cn->domain.end();) {
+				if (areConvergentNodesDistinguished(cn, (*it)->convergent.front()->convergentNode.lock())) {
+					(*it)->domain.erase(cn.get());
+					if ((*it)->domain.empty()) {
+						auto& n = (*it)->convergent.front();
+						it = cn->domain.erase(it);
+						//n->assumedState = WRONG_STATE;
+						storeInconsistentNode(n, ot);//node, 
+						ot.changedNodes.clear();
+						return false;
+					}
+					if ((*it)->domain.size() == 1) {
+						storeIdentifiedNode((*it)->convergent.front(), ot);
+					}
+					ot.changedNodes.insert(*it);
+					it = cn->domain.erase(it);
+				} else {
+					++it;
+				}
+			}
+		}
+		return processChangedNodes(ot);
+	}
 
 	static bool mergeConvergentNoES(shared_ptr<convergent_node_t>& fromCN, const shared_ptr<convergent_node_t>& toCN, SPYObservationTree& ot) {
 		if (toCN->requestedQueries) {// a state node
@@ -1027,16 +1169,21 @@ namespace FSMlearning {
 				if (areConvergentNodesDistinguished(fromCN, (*toIt)->convergent.front()->convergentNode.lock())) {
 					(*toIt)->domain.erase(toCN.get());
 					if ((*toIt)->domain.empty()) {
-						auto& n = fromCN->convergent.front();
-						n->convergentNode = fromCN;
+						//auto& n = fromCN->convergent.front();
+						//n->convergentNode = fromCN;
 						//n->assumedState = WRONG_STATE;
-						toCN->convergent.remove(n);
-						storeInconsistentNode((*toIt)->convergent.front(), n, ot);
-						return false;
+						//toCN->convergent.remove(n);
+						storeInconsistentNode((*toIt)->convergent.front(), ot);
+						//return false;
 					}
-					else if ((*toIt)->domain.size() == 1) {
+					if ((*toIt)->domain.size() == 1) {
 						storeIdentifiedNode((*toIt)->convergent.front(), ot);
 					}
+#if CHECK_PREDECESSORS
+					if (ot.inconsistentNodes.empty()) {
+						ot.changedNodes.insert(*toIt);
+					}
+#endif	
 					toIt = toCN->domain.erase(toIt);
 				}
 				else {
@@ -1058,13 +1205,13 @@ namespace FSMlearning {
 			auto toIt = toCN->domain.begin();
 			auto fromIt = fromCN->domain.begin();
 			while ((toIt != toCN->domain.end()) && (fromIt != fromCN->domain.end())) {
-				if (*toIt < *fromIt) {
+				if (CNcompare(*toIt, *fromIt)) {
 					(*toIt)->domain.erase(toCN.get());
 					toIt = toCN->domain.erase(toIt);
 					reduced = true;
 				}
 				else {
-					if (!(*fromIt < *toIt)) {
+					if (!(CNcompare(*fromIt, *toIt))) {
 						++toIt;
 					}
 					(*fromIt)->domain.erase(fromCN.get());
@@ -1084,7 +1231,8 @@ namespace FSMlearning {
 			for (auto& node : fromCN->convergent) {
 				node->convergentNode = toCN;
 				if (node->accessSequence.size() < toCN->convergent.front()->accessSequence.size()) {
-					toCN->convergent.emplace_front(node);
+					//toCN->convergent.emplace_front(node);
+					toCN->convergent.emplace_back(node);
 				}
 				else {
 					toCN->convergent.emplace_back(node);
@@ -1092,11 +1240,11 @@ namespace FSMlearning {
 			}
 			if (toCN->domain.empty()) {
 				auto& n = fromCN->convergent.front();
-				n->convergentNode = fromCN;
-				toCN->convergent.remove(n);
-				storeInconsistentNode(n, n, ot);
-				return false;
-			}
+				//n->convergentNode = fromCN;
+				//toCN->convergent.remove(n);
+				storeInconsistentNode(n, ot);
+				//return false;
+			} else
 			if (reduced && (toCN->domain.size() == 1)) {
 				storeIdentifiedNode(toCN->convergent.front(), ot);
 			}
@@ -1160,60 +1308,9 @@ namespace FSMlearning {
 				}
 			}
 		}
-		return true;
-	}
-
-	static bool checkPredecessors(shared_ptr<spy_node_t> node, shared_ptr<convergent_node_t> parentCN, 
-			const shared_ptr<convergent_node_t>& refCN, SPYObservationTree& ot) {
-		auto input = node->accessSequence.back();
-		bool reduced = false;
-		for (auto it = parentCN->domain.begin(); it != parentCN->domain.end();) {
-			if ((*it)->next[input] && 
-				(((*it)->next[input]->requestedQueries && 
-					((refCN && ((*it)->next[input] != refCN)) || 
-					(!refCN && (!(*it)->next[input]->domain.count(parentCN->next[input].get())))))
-				|| 
-				(!(*it)->next[input]->requestedQueries && 
-					((refCN && !(*it)->next[input]->domain.count(refCN.get())) || 
-					(!refCN && isIntersectionEmpty(parentCN->next[input]->domain, (*it)->next[input]->domain)))))) {
-				(*it)->domain.erase(parentCN.get());
-				it = parentCN->domain.erase(it);
-				reduced = true;
-			}
-			else ++it;
-		}
-		while (reduced) {
-			if (parentCN->domain.empty()) {
-				auto& n = parentCN->convergent.front();
-				//n->assumedState = WRONG_STATE;
-				storeInconsistentNode(n, ot);//node, 
-				ot.identifiedNodes.clear();
-				return false;
-			}
-			if (parentCN->domain.size() == 1) {
-				storeIdentifiedNode(parentCN->convergent.front(), ot);
-				break;
-			}
-			else {
-				node = parentCN->convergent.front();
-				parentCN = node->parent.lock()->convergentNode.lock();
-				reduced = false;
-				if (!parentCN->requestedQueries) {// not a state node
-					input = node->accessSequence.back();
-					for (auto it = parentCN->domain.begin(); it != parentCN->domain.end();) {
-						if ((*it)->next[input] && (((*it)->next[input]->requestedQueries &&
-							(!(*it)->next[input]->domain.count(parentCN->next[input].get())))
-							|| (!(*it)->next[input]->requestedQueries &&
-							isIntersectionEmpty(parentCN->next[input]->domain, (*it)->next[input]->domain)))) {
-							(*it)->domain.erase(parentCN.get());
-							it = parentCN->domain.erase(it);
-							reduced = true;
-						}
-						else ++it;
-					}
-				}
-			}
-		}
+#if CHECK_PREDECESSORS
+		ot.changedNodes.erase(tmpCN.get());
+#endif	
 		return true;
 	}
 
@@ -1227,9 +1324,19 @@ namespace FSMlearning {
 				auto& refCN = (*(node->convergentNode.lock()->domain.begin()))->convergent.front()->convergentNode.lock();
 				if (!mergeConvergentNoES(parentCN->next[input], refCN, ot)) {
 					refCN->convergent.remove(node);
-					node->state = NULL_STATE;
+					node->assumedState = node->state = NULL_STATE;
 					node->convergentNode = parentCN->next[input];
 					storeInconsistentNode(node, refCN->convergent.front(), ot);
+					ot.identifiedNodes.clear();
+					ot.changedNodes.clear();
+					return false;
+				}
+				if (!ot.inconsistentNodes.empty()
+#if CHECK_PREDECESSORS
+						|| !processChangedNodes(ot)
+#endif	
+					) {
+					ot.changedNodes.clear();
 					ot.identifiedNodes.clear();
 					return false;
 				}
@@ -1246,12 +1353,47 @@ namespace FSMlearning {
 						ot.identifiedNodes.clear();
 						return false;
 					}
-				} else {
+				}
+#if CHECK_PREDECESSORS
+				else {
+					bool reduced = false;
+					for (auto it = parentCN->domain.begin(); it != parentCN->domain.end();) {
+						if ((*it)->next[input] &&
+							(((*it)->next[input]->requestedQueries && ((*it)->next[input] != refCN)) ||
+							(!(*it)->next[input]->requestedQueries && !(*it)->next[input]->domain.count(refCN.get())))) {
 
-					if (!checkPredecessors(node, parentCN, refCN, ot)) {
-						return false;
+							(*it)->domain.erase(parentCN.get());
+							it = parentCN->domain.erase(it);
+							reduced = true;
+						}
+						else ++it;
+					}
+					if (reduced) {
+						if (parentCN->domain.empty()) {
+							auto& n = parentCN->convergent.front();
+							//n->assumedState = WRONG_STATE;
+							storeInconsistentNode(n, ot);//node, 
+							ot.identifiedNodes.clear();
+							return false;
+						}
+						if (parentCN->domain.size() == 1) {
+							storeIdentifiedNode(parentCN->convergent.front(), ot);
+						}
+						ot.changedNodes.insert(parentCN.get());
+						if (!processChangedNodes(ot)) {
+							return false;
+						}
+
+						/*else {
+							node = parentCN->convergent.front();
+							parentCN = node->parent.lock()->convergentNode.lock();
+							if (!checkPredecessors(move(node), move(parentCN), ot)) {
+								return false;
+							}
+						//}*/
 					}
 				}
+#endif
 			}
 			else {
 				node->state = node->assumedState;
@@ -1260,91 +1402,7 @@ namespace FSMlearning {
 		return true;
 	}
 
-	static bool makeStateNode(shared_ptr<spy_node_t> node, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
-		auto parent = node->parent.lock();
-		if ((parent->state == NULL_STATE) || (ot.stateNodes[parent->state]->convergent.front() != parent)) {
-			ot.identifiedNodes.clear();
-			auto state = parent->assumedState;
-			if (state == NULL_STATE) {
-				if (parent->refStates.size() > 1) {
-					return false;
-				}
-				state = *(parent->refStates.begin());
-			}
-			else if (!parent->refStates.count(state)) {
-				return false;
-			}
-			auto newSN = ot.stateNodes[state]->convergent.front();
-			auto& input = node->accessSequence.back();
-			if (!newSN->next[input]) {
-				query(newSN, input, ot, teacher);
-				newSN = newSN->next[input];
-				checkPrevious(newSN, ot);
-			}
-			else {
-				newSN = newSN->next[input];
-			}
-			while (!newSN->refStates.empty() && !parent->refStates.empty()) {
-				auto state = *(newSN->refStates.begin());
-				sequence_in_t sepSeq;
-				if ((node->assumedState == NULL_STATE) || (node->assumedState == state) ||
-					!isSeparatingSequenceQueried(node, state, sepSeq, ot)) {
-					sepSeq = getQueriedSeparatingSequence(node, ot.stateNodes[state]->convergent.front());
-				}
-				querySequenceAndCheck(newSN, sepSeq, ot, teacher, false);
-			}
-			if (newSN->refStates.empty()) {
-				node = newSN;
-			} else {
-				return makeStateNode(parent, ot, teacher);
-			}
-		}
-
-		sequence_set_t hsi;
-		// update hsi
-		for (state_t state = 0; state < ot.stateNodes.size(); state++) {
-			sequence_in_t sepSeq;
-			if ((node->assumedState == NULL_STATE) || (node->assumedState == state) ||
-				!isSeparatingSequenceQueried(node, state, sepSeq, ot)) {
-				sepSeq = getQueriedSeparatingSequence(node, ot.stateNodes[state]->convergent.front());
-				if (!isPrefix(sepSeq, ot.stateIdentifier[state])) {
-					removePrefixes(sepSeq, ot.stateIdentifier[state]);
-					ot.stateIdentifier[state].emplace(sepSeq);
-				}
-			}// else sepSeq is set to a separating prefix of the sep. seq. of (state,node->assumedState), see isSeparatingSequenceQueried
-			if (!isPrefix(sepSeq, hsi)) {
-				removePrefixes(sepSeq, hsi);
-				hsi.emplace(sepSeq);
-			}
-			ot.separatingSequences.emplace_back(move(sepSeq));
-		}
-		ot.stateIdentifier.emplace_back(move(hsi));
-
-		node->state = ot.conjecture->addState(node->stateOutput);
-		ot.stateNodes.emplace_back(make_shared<convergent_node_t>(node));
-		ot.stateNodes.back()->requestedQueries = make_shared<requested_query_node_t>();
-		auto& cn = node->convergentNode.lock();
-		if (cn) {
-			cn->convergent.remove(node);
-		}
-		node->convergentNode = ot.stateNodes.back();
-
-		// update OTree with new state and fill ot.identifiedNodes with nodes with |domain|<= 1
-		ot.identifiedNodes.clear();
-		updateOTreeWithNewState(node, ot);
-
-		ot.numberOfExtraStates = 0;
-		if (!ot.identifiedNodes.empty() && (ot.identifiedNodes.front()->refStates.empty())) {// new state
-			return makeStateNode(move(ot.identifiedNodes.front()), ot, teacher);
-		}
-		ot.testedState = 0;
-		generateRequestedQueries(ot);
-
-		ot.inconsistentSequence.clear();
-		ot.inconsistentNodes.clear();
-		return processIdentified(ot);
-	}
-
+	
 	static bool checkNodeNoES(const shared_ptr<spy_node_t>& node, SPYObservationTree& ot) {
 		if (node->refStates.empty()) {// new state
 			storeIdentifiedNode(node, ot);
@@ -1352,6 +1410,8 @@ namespace FSMlearning {
 		}
 		else if ((node->assumedState != NULL_STATE) && !node->refStates.count(node->assumedState)) {// inconsistent node
 			storeInconsistentNode(node, ot);
+			node->convergentNode.lock()->convergent.remove(node);
+			node->state = NULL_STATE;
 			return false;
 		}
 		else if (node->state == NULL_STATE) {
@@ -1365,8 +1425,8 @@ namespace FSMlearning {
 		return true;
 	}
 
-	static bool checkAgainstAllNodesNoES(const shared_ptr<spy_node_t>& node, const seq_len_t& suffixLen, SPYObservationTree& ot) {
-		bool isConsistent = true;
+	static void checkAgainstAllNodesNoES(const shared_ptr<spy_node_t>& node, const seq_len_t& suffixLen, 
+			bool& isConsistent, SPYObservationTree& ot) {
 		stack<shared_ptr<spy_node_t>> nodes;
 		nodes.emplace(ot.stateNodes[0]->convergent.front());//root
 		while (!nodes.empty()) {
@@ -1377,11 +1437,13 @@ namespace FSMlearning {
 					otNode->refStates.erase(node->state);
 					if (otNode->convergentNode.lock()->domain.erase(ot.stateNodes[node->state].get())) {
 						ot.stateNodes[node->state]->domain.erase(otNode->convergentNode.lock().get());
-						
-						auto parentCN = otNode->parent.lock()->convergentNode.lock();
-						if (!parentCN->requestedQueries) {
-							isConsistent &= checkPredecessors(otNode, parentCN, nullptr, ot);
+#if CHECK_PREDECESSORS
+						if (isConsistent) {
+							ot.changedNodes.insert(otNode->convergentNode.lock().get());
+							isConsistent &= processChangedNodes(ot);
+							//isConsistent &= checkPredecessors(otNode, otNode->parent.lock()->convergentNode.lock(), ot);
 						}
+#endif
 					}
 					isConsistent &= checkNodeNoES(otNode, ot);
 				}
@@ -1390,10 +1452,9 @@ namespace FSMlearning {
 				if (nn && (nn->maxSuffixLen >= suffixLen)) nodes.emplace(nn);
 			}
 		}
-		return isConsistent;
 	}
 
-	static void reduceDomainNoES(const shared_ptr<spy_node_t>& node, const seq_len_t& suffixLen, bool checkCN, SPYObservationTree& ot) {
+	static void reduceDomainNoES(const shared_ptr<spy_node_t>& node, const seq_len_t& suffixLen, bool& checkCN, SPYObservationTree& ot) {
 		const auto& cn = node->convergentNode.lock();
 		for (auto snIt = node->refStates.begin(); snIt != node->refStates.end();) {
 			if (areNodesDifferentUnder(node, ot.stateNodes[*snIt]->convergent.front(), suffixLen)) {
@@ -1403,7 +1464,7 @@ namespace FSMlearning {
 				snIt = node->refStates.erase(snIt);
 			}
 			else {
-				if (checkCN && (node->state == NULL_STATE)) {
+				if (checkCN) {
 					auto cnIt = cn->domain.find(ot.stateNodes[*snIt].get());
 					if (cnIt != cn->domain.end()) {
 						if (areNodeAndConvergentDifferentUnder(node, ot.stateNodes[*snIt].get())) {
@@ -1415,29 +1476,61 @@ namespace FSMlearning {
 				++snIt;
 			}
 		}
-		if (checkCN && (node->state != NULL_STATE)) {// convergent state node
+	}
+
+	static void reduceDomainStateNodeNoES(const shared_ptr<spy_node_t>& node, const seq_len_t& suffixLen, bool& isConsistent, SPYObservationTree& ot) {
+		const auto& cn = node->convergentNode.lock();
+		if (node != ot.stateNodes[node->state]->convergent.front()) {
+			for (auto snIt = node->refStates.begin(); snIt != node->refStates.end();) {
+				if (areNodesDifferentUnder(node, ot.stateNodes[*snIt]->convergent.front(), suffixLen)) {
+					snIt = node->refStates.erase(snIt);
+				}
+				else {
+					++snIt;
+				}
+			}
+			isConsistent &= checkNodeNoES(node, ot);
+		}
+		else {
+			checkAgainstAllNodesNoES(node, suffixLen, isConsistent, ot);
+		}
+		if (isConsistent) {
 			for (auto cnIt = cn->domain.begin(); cnIt != cn->domain.end();) {
 				if (areNodeAndConvergentDifferentUnder(node, *cnIt)) {
 					(*cnIt)->domain.erase(cn.get());
+					isConsistent &= checkNodeNoES((*cnIt)->convergent.front(), ot);
+#if CHECK_PREDECESSORS
+					if (isConsistent) {
+						ot.changedNodes.insert(*cnIt);
+					}
+#endif
 					cnIt = cn->domain.erase(cnIt);
 				}
 				else ++cnIt;
 			}
+#if CHECK_PREDECESSORS
+			if (isConsistent) {
+				isConsistent &= processChangedNodes(ot);
+			}
+			else {
+				ot.changedNodes.clear();
+			}
+#endif
 		}
 	}
 
 	static bool checkPreviousNoES(shared_ptr<spy_node_t> node, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
-		bool isConsistent = ot.inconsistentNodes.empty();
+		bool isConsistent = ot.inconsistentNodes.empty() && ot.inconsistentSequence.empty();
 		seq_len_t suffixLen = 0;
 		input_t input(STOUT_INPUT);
 		do {
 			node->lastQueriedInput = input;
 			if (suffixLen > node->maxSuffixLen) node->maxSuffixLen = suffixLen;
-			if ((node->state == NULL_STATE) || (node != ot.stateNodes[node->state]->convergent.front())) {
+			if (node->state == NULL_STATE) {
 				reduceDomainNoES(node, suffixLen, isConsistent, ot);
 				isConsistent &= checkNodeNoES(node, ot);
-			} else {// reference state node
-				isConsistent &= checkAgainstAllNodesNoES(node, suffixLen, ot);
+			} else {// state node
+				reduceDomainStateNodeNoES(node, suffixLen, isConsistent, ot);
 			}
 			if (!node->accessSequence.empty()) input = node->accessSequence.back();
 			node = node->parent.lock();
@@ -1496,7 +1589,8 @@ namespace FSMlearning {
 					ot.stateNodes[state]->domain.emplace(nextCN.get());
 				}*/
 				if (nextCN->convergent.front()->accessSequence.size() > currNode->accessSequence.size()) {
-					nextCN->convergent.emplace_front(currNode);
+					//nextCN->convergent.emplace_front(currNode);
+					nextCN->convergent.emplace_back(currNode);
 				}
 				else {
 					nextCN->convergent.emplace_back(currNode);
@@ -1680,8 +1774,154 @@ namespace FSMlearning {
 		return false;
 	}
 
-	
-	static shared_ptr<spy_node_t> queryIfNotQueried(shared_ptr<spy_node_t> node, sequence_in_t seq, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+
+	static bool querySequenceAndCheck(shared_ptr<spy_node_t> currNode, const sequence_in_t& seq,
+		SPYObservationTree& ot, const unique_ptr<Teacher>& teacher, bool allowIdentification = true) {
+		bool isConsistent = true;
+		if ((ot.numberOfExtraStates == 0) && allowIdentification) {
+			ot.inconsistentSequence.push_front(STOUT_INPUT);
+			auto numStates = ot.stateNodes.size();
+			auto numInconsistent = ot.inconsistentNodes.size();
+			for (auto& input : seq) {
+				moveAndCheckNoES(currNode, input, ot, teacher);
+			}
+			if (!ot.inconsistentSequence.empty())
+				ot.inconsistentSequence.pop_front();
+			isConsistent = (numStates == ot.stateNodes.size()) && (numInconsistent == ot.inconsistentNodes.size());
+		}
+		else {
+			//seq_len_t suffixLen = seq.size();
+			long long suffixAdded = 0;
+			/*
+			if (currNode != ot.stateNodes[0]->convergent.front()) {
+			suffixLen += currNode->accessSequence.size();
+			auto n = ot.stateNodes[0]->convergent.front();
+			for (auto& input : currNode->accessSequence) {
+			if (n->maxSuffixLen < suffixLen) {
+			n->maxSuffixLen = suffixLen;
+			}
+			suffixLen--;
+			n = n->next[input];
+			}
+			}*/
+			for (auto& input : seq) {
+				/*
+				if (currNode->maxSuffixLen < suffixLen) {
+				currNode->maxSuffixLen = suffixLen;
+				}
+				suffixLen--;*/
+				if (!currNode->next[input]) {
+					query(currNode, input, ot, teacher);
+					suffixAdded--;
+				}
+				currNode = currNode->next[input];
+			}
+			isConsistent = checkPrevious(move(currNode), ot, suffixAdded);
+			if (allowIdentification) {
+				if (!ot.identifiedNodes.empty()) {// new state
+					isConsistent &= makeStateNode(move(ot.identifiedNodes.front()), ot, teacher);
+				}
+				else {
+					isConsistent &= processConfirmedTransitions(ot);
+				}
+			}
+		}
+		return isConsistent;
+	}
+
+	static bool makeStateNode(shared_ptr<spy_node_t> node, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		auto parent = node->parent.lock();
+		if ((parent->state == NULL_STATE) || (ot.stateNodes[parent->state]->convergent.front() != parent)) {
+			ot.identifiedNodes.clear();
+			auto state = parent->assumedState;
+			if (state == NULL_STATE) {
+				if (parent->refStates.size() > 1) {
+					return false;
+				}
+				state = *(parent->refStates.begin());
+			}
+			else if (!parent->refStates.count(state)) {
+				return false;
+			}
+			auto newSN = ot.stateNodes[state]->convergent.front();
+			auto& input = node->accessSequence.back();
+			if (!newSN->next[input]) {
+				query(newSN, input, ot, teacher);
+				newSN = newSN->next[input];
+				checkPrevious(newSN, ot);
+			}
+			else {
+				newSN = newSN->next[input];
+			}
+			while (!newSN->refStates.empty() && !parent->refStates.empty()) {
+				auto state = *(newSN->refStates.begin());
+				sequence_in_t sepSeq;
+				if ((node->assumedState == NULL_STATE) || (node->assumedState == state) ||
+					!isSeparatingSequenceQueried(node, state, sepSeq, ot)) {
+					sepSeq = getQueriedSeparatingSequence(node, ot.stateNodes[state]->convergent.front());
+				}
+				querySequenceAndCheck(newSN, sepSeq, ot, teacher, false);
+			}
+			if (newSN->refStates.empty()) {
+				node = newSN;
+			}
+			else {
+				return makeStateNode(parent, ot, teacher);
+			}
+		}
+
+		sequence_set_t hsi;
+		// update hsi
+		for (state_t state = 0; state < ot.stateNodes.size(); state++) {
+			sequence_in_t sepSeq;
+			if ((node->assumedState == NULL_STATE) || (node->assumedState == state) ||
+				!isSeparatingSequenceQueried(node, state, sepSeq, ot)) {
+				sepSeq = getQueriedSeparatingSequence(node, ot.stateNodes[state]->convergent.front());
+				if (!isPrefix(sepSeq, ot.stateIdentifier[state])) {
+					removePrefixes(sepSeq, ot.stateIdentifier[state]);
+					ot.stateIdentifier[state].emplace(sepSeq);
+				}
+			}// else sepSeq is set to a separating prefix of the sep. seq. of (state,node->assumedState), see isSeparatingSequenceQueried
+			if (!isPrefix(sepSeq, hsi)) {
+				removePrefixes(sepSeq, hsi);
+				hsi.emplace(sepSeq);
+			}
+			ot.separatingSequences.emplace_back(move(sepSeq));
+		}
+		ot.stateIdentifier.emplace_back(move(hsi));
+
+		node->state = ot.conjecture->addState(node->stateOutput);
+		ot.stateNodes.emplace_back(make_shared<convergent_node_t>(node));
+		ot.stateNodes.back()->requestedQueries = make_shared<requested_query_node_t>();
+		auto& cn = node->convergentNode.lock();
+		if (cn) {
+			cn->convergent.remove(node);
+		}
+		node->convergentNode = ot.stateNodes.back();
+
+		// update OTree with new state and fill ot.identifiedNodes with nodes with |domain|<= 1
+		ot.identifiedNodes.clear();
+		updateOTreeWithNewState(node, ot);
+
+		ot.numberOfExtraStates = 0;
+		if (!ot.identifiedNodes.empty() && (ot.identifiedNodes.front()->refStates.empty())) {// new state
+			return makeStateNode(move(ot.identifiedNodes.front()), ot, teacher);
+		}
+		ot.testedState = 0;
+		generateRequestedQueries(ot);
+
+		ot.inconsistentSequence.clear();
+		ot.inconsistentNodes.clear();
+#if CHECK_PREDECESSORS
+		if (!reduceDomainsBySuccessors(ot)) {
+			return false;
+		}
+#endif
+		return processIdentified(ot);
+	}
+
+	static shared_ptr<spy_node_t> queryIfNotQueried(shared_ptr<spy_node_t> node, sequence_in_t seq, 
+			SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
 		while (!seq.empty()) {
 			if (!node->next[seq.front()]) {
 				if (!querySequenceAndCheck(node, seq, ot, teacher)) {
@@ -1695,6 +1935,237 @@ namespace FSMlearning {
 		return move(node);
 	}
 	
+	static bool proveSepSeqOfEmptyDomainIntersection(shared_ptr<spy_node_t> n1, list<shared_ptr<spy_node_t>>& nodes2,
+			sequence_in_t& sepSeq, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		n1 = queryIfNotQueried(n1, sepSeq, ot, teacher);
+		if (!n1) {
+			return true;
+		}
+		bool found = false;
+		auto d1 = n1->refStates;
+		for (auto& s : d1) {
+			if (n1->refStates.count(s)) {
+				for (const auto& n2 : nodes2) {
+					if (!n2->refStates.count(s)) {
+						auto seq = getQueriedSeparatingSequence(n2, ot.stateNodes[s]->convergent.front());
+						if (!queryIfNotQueried(n1, seq, ot, teacher)) {
+							return true;
+						}
+						if (n1->refStates.count(s) || areNodesDifferentUnder(n1, n2, seq.size())) {
+							sepSeq.splice(sepSeq.end(), move(seq));
+							found = true;
+						}
+						break;
+					}
+				}
+				if (found) break;
+			}
+		}
+		if (!found) {
+			d1 = n1->refStates;
+			for (auto& s : d1) {
+				if (n1->refStates.count(s)) {
+					if (ot.numberOfExtraStates == 0) {
+						auto seq = getQueriedSeparatingSequenceOfCN(nodes2.front()->convergentNode.lock(), ot.stateNodes[s]);
+						if (!seq.empty()) {
+							seq.pop_front();// STOUT
+							auto cn2 = nodes2.front()->convergentNode.lock();
+							for (auto& input : seq) {
+								cn2 = cn2->next[input];
+							}
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[s]->convergent.front(),
+								cn2->convergent, seq, ot, teacher)) {
+								return true;
+							}
+							if (!queryIfNotQueried(n1, seq, ot, teacher)) {
+								return true;
+							}
+							if (n1->refStates.count(s) || areNodeAndConvergentDifferentUnder(n1, nodes2.front()->convergentNode.lock().get())) {
+								sepSeq.splice(sepSeq.end(), move(seq));
+								found = true;
+							}
+						} else {
+							auto seq = getQueriedSeparatingSequenceOfCN(n1->convergentNode.lock(), ot.stateNodes[s]);
+							if (seq.empty()) {
+								continue;
+							}
+							seq.pop_front();// STOUT
+							auto cn1 = n1->convergentNode.lock();
+							for (auto& input : sepSeq) {
+								cn1 = cn1->next[input];
+							}
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[s]->convergent.front(),
+								cn1->convergent, seq, ot, teacher)) {
+								return true;
+							}
+							if (!queryIfNotQueried(nodes2.front(), seq, ot, teacher)) {
+								return true;
+							}
+							if (nodes2.front()->refStates.count(s) || areNodesDifferentUnder(nodes2.front(), n1, seq.size())) {
+								sepSeq.splice(sepSeq.end(), move(seq));
+								found = true;
+							}
+						}
+					}
+					else {
+						for (const auto& n2 : nodes2) {
+							auto seq = getQueriedSeparatingSequence(n2, ot.stateNodes[s]->convergent.front());
+							if (seq.empty()) continue;
+							seq.pop_front();// STOUT
+							auto next2 = queryIfNotQueried(n2, seq, ot, teacher);
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[s]->convergent.front(), 
+								list<shared_ptr<spy_node_t>>({ next2 }), seq, ot, teacher)) {
+								return true;
+							}
+							if (!queryIfNotQueried(n1, seq, ot, teacher)) {
+								return true;
+							}
+							if (n1->refStates.count(s) || areNodesDifferentUnder(n1, n2, seq.size())) {
+								sepSeq.splice(sepSeq.end(), move(seq));
+								found = true;
+							}
+							break;
+						}
+						if (!found) {
+							auto seq = getQueriedSeparatingSequence(n1, ot.stateNodes[s]->convergent.front());
+							if (seq.empty()) {
+								continue;
+							}
+							seq.pop_front();// STOUT
+							auto next1 = queryIfNotQueried(n1, seq, ot, teacher);
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[s]->convergent.front(),
+								list<shared_ptr<spy_node_t>>({ next1 }), seq, ot, teacher)) {
+								return true;
+							}
+							if (!queryIfNotQueried(nodes2.front(), seq, ot, teacher)) {
+								return true;
+							}
+							if (nodes2.front()->refStates.count(s) || areNodesDifferentUnder(nodes2.front(), n1, seq.size())) {
+								sepSeq.splice(sepSeq.end(), move(seq));
+								found = true;
+							}
+						}
+					}
+					if (found) break;
+				}
+			}
+			if (!found) {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	static bool proveSepSeqOfEmptyDomainIntersection(const shared_ptr<spy_node_t>& n1, shared_ptr<convergent_node_t> cn2,
+		sequence_in_t& sepSeq, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		sepSeq.pop_front();
+		for (auto& input : sepSeq) {
+			cn2 = cn2->next[input];
+		}
+		return proveSepSeqOfEmptyDomainIntersection(n1, cn2->convergent, sepSeq, ot, teacher);
+	}
+
+	static bool eliminateSeparatedStatesFromDomain(const shared_ptr<spy_node_t>& node, const shared_ptr<convergent_node_t>& cn,
+			SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		auto domain = node->refStates;
+		for (auto state : domain) {
+			if (node->refStates.count(state)) {
+				auto sepSeq = getQueriedSeparatingSequenceOfCN(cn, ot.stateNodes[state]);
+				if (sepSeq.empty()) {
+					return false;
+				}
+				if (sepSeq.front() == STOUT_INPUT) {
+					if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[state]->convergent.front(), cn, sepSeq, ot, teacher)) {
+						return true;
+					}
+				}
+				if (!queryIfNotQueried(node, sepSeq, ot, teacher)) {
+					return true;
+				}
+				if (!queryIfNotQueried(ot.stateNodes[state]->convergent.front(), move(sepSeq), ot, teacher)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	static sequence_in_t getQueriedSeparatingSequenceForSuccessor(state_t diffState, state_t parentState,
+		const sequence_in_t& transferSeq, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
+		sequence_in_t sepSeq;
+#if CHECK_PREDECESSORS
+		sequence_in_t seqToDistDomains;
+		shared_ptr<spy_node_t> distDomN1, distDomN2;
+#endif
+		list<shared_ptr<spy_node_t>> diffCN, cn;
+		queue<shared_ptr<spy_node_t>> nodes;
+		nodes.emplace(ot.stateNodes[0]->convergent.front());//root
+		while (!nodes.empty()) {
+			auto node = move(nodes.front());
+			nodes.pop();
+			if (node->assumedState == diffState) {
+				for (const auto& n : cn) {
+					sepSeq = getQueriedSeparatingSequence(node, n);
+					if (!sepSeq.empty()) {
+#if CHECK_PREDECESSORS
+						if (sepSeq.front() == STOUT_INPUT) {
+							if (seqToDistDomains.empty() || (seqToDistDomains.size() > sepSeq.size())) {
+								sepSeq.pop_front();
+								seqToDistDomains = move(sepSeq);
+								distDomN1 = node;
+								distDomN2 = n;
+							}
+						}
+						else
+#endif
+							return sepSeq;
+					}
+				}
+				diffCN.emplace_back(node);
+			}
+			if (node->assumedState == parentState) {
+				auto n = node;
+				for (auto& input : transferSeq) {
+					n = n->next[input];
+					if (!n) break;
+				}
+				if (n) {
+					for (const auto& diffN : diffCN) {
+						sepSeq = getQueriedSeparatingSequence(n, diffN);
+						if (!sepSeq.empty()) {
+#if CHECK_PREDECESSORS
+							if (sepSeq.front() == STOUT_INPUT) {
+								if (seqToDistDomains.empty() || (seqToDistDomains.size() > sepSeq.size())) {
+									sepSeq.pop_front();
+									seqToDistDomains = move(sepSeq);
+									distDomN1 = n;
+									distDomN2 = diffN;
+								}
+							}
+							else
+#endif
+								return sepSeq;
+						}
+					}
+					cn.emplace_back(n);
+				}
+			}
+			for (const auto& nn : node->next) {
+				if (nn) nodes.emplace(nn);
+			}
+		}
+#if CHECK_PREDECESSORS
+		if (!seqToDistDomains.empty()) {
+			sepSeq = move(seqToDistDomains);
+			distDomN2 = queryIfNotQueried(distDomN2, sepSeq, ot, teacher);
+			if (proveSepSeqOfEmptyDomainIntersection(distDomN1, list<shared_ptr<spy_node_t>>({distDomN2}), sepSeq, ot, teacher)) {
+				return seqToDistDomains;
+			}
+		}
+#endif
+		return sepSeq;
+	}
+
 	static void processInconsistent(SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
 		auto n1 = move(ot.inconsistentNodes.front());
 		ot.inconsistentNodes.pop_front();
@@ -1706,63 +2177,112 @@ namespace FSMlearning {
 				sepSeq.emplace_front(n2->accessSequence.back());
 				n2 = n2->parent.lock();
 			}
+			if (!n2->refStates.count(n2->assumedState)) return;
 			if ((n2->state != NULL_STATE) && (n2 == ot.stateNodes[n2->state]->convergent.front())) {
 				auto cn2 = n2->convergentNode.lock();
 				auto transferSeq = move(sepSeq);
 				auto domain = n1->refStates;
 				for (auto state : domain) {
+					if (!n1->refStates.count(state)) continue;
 					sepSeq.clear();
-					for (auto n : cn2->convergent) {
-						for (auto& input : transferSeq) {
-							n = n->next[input];
-							if (!n) break;
-						}
-						if (n) {
-							sepSeq = getQueriedSeparatingSequence(n, ot.stateNodes[state]->convergent.front());
-							if (!sepSeq.empty()) {
-								break;
+					sequence_in_t seqToDistDom;
+					if (ot.numberOfExtraStates == 0) {
+						for (auto n : cn2->convergent) {
+							for (auto& input : transferSeq) {
+								n = n->next[input];
+								if (!n) break;
 							}
-						}
-					}
-					if (sepSeq.empty()) {
-						if (ot.numberOfExtraStates == 0) {
-							for (auto n : cn2->convergent) {
-								for (auto& input : transferSeq) {
-									n = n->next[input];
-									if (!n) break;
-								}
-								if (n) {
-									sepSeq = getQueriedSeparatingSequenceFromSN(n, ot.stateNodes[state]);
-									if (!sepSeq.empty()) {
-										break;
+							if (n) {
+								sepSeq = getQueriedSeparatingSequenceFromSN(n, ot.stateNodes[state]);
+								if (!sepSeq.empty()) {
+#if CHECK_PREDECESSORS
+									if (sepSeq.front() == STOUT_INPUT) {
+										sepSeq.pop_front();
+										seqToDistDom = move(sepSeq);
 									}
+#endif
+									break;
 								}
 							}
-						} else {
-							sepSeq = getQueriedSeparatingSequenceForSuccessor(state, n2->state, transferSeq, ot);
 						}
+#if CHECK_PREDECESSORS
+						if (sepSeq.empty() && !seqToDistDom.empty()) {
+							sepSeq = move(seqToDistDom);
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[state]->convergent.front(), 
+									n1->convergentNode.lock(), sepSeq, ot, teacher)) {
+								return;
+							}
+						}
+#endif
 						if (sepSeq.empty()) {
 							return;
 						}
 						if (!queryIfNotQueried(ot.stateNodes[state]->convergent.front(), sepSeq, ot, teacher)) {
 							return;
 						}
+					} else {
+						shared_ptr<spy_node_t> distN2;
+						for (auto n : cn2->convergent) {
+							for (auto& input : transferSeq) {
+								n = n->next[input];
+								if (!n) break;
+							}
+							if (n) {
+								sepSeq = getQueriedSeparatingSequence(n, ot.stateNodes[state]->convergent.front());
+								if (!sepSeq.empty()) {
+#if CHECK_PREDECESSORS
+									if (sepSeq.front() == STOUT_INPUT) {
+										sepSeq.pop_front();
+										seqToDistDom = move(sepSeq);
+										distN2 = n;
+									}
+#endif
+									break;
+								}
+							}
+						}
+#if CHECK_PREDECESSORS
+						if (sepSeq.empty() && !seqToDistDom.empty()) {
+							sepSeq = move(seqToDistDom);
+							distN2 = queryIfNotQueried(distN2, sepSeq, ot, teacher);
+							if (proveSepSeqOfEmptyDomainIntersection(ot.stateNodes[state]->convergent.front(),
+									list<shared_ptr<spy_node_t>>({distN2}), sepSeq, ot, teacher)) {
+								return;
+							}
+						}
+#endif
+						if (sepSeq.empty()) {
+							sepSeq = getQueriedSeparatingSequenceForSuccessor(state, n2->state, transferSeq, ot, teacher);
+							if (sepSeq.empty()) {// already resolved
+								return;
+							}
+							if (!queryIfNotQueried(ot.stateNodes[state]->convergent.front(), sepSeq, ot, teacher)) {
+								return;
+							}
+						}
 					}
 					if (!queryIfNotQueried(n1, move(sepSeq), ot, teacher)) {
 						return;
 					}
+					return;
 				} 
 			} else {
 				if (n1->assumedState != WRONG_STATE) {
+					sequence_in_t sepSuffix;
 					if ((ot.numberOfExtraStates == 0) && isPrefix(n1->accessSequence, ot.bbNode->accessSequence)) {
-						sepSeq.splice(sepSeq.end(), getQueriedSeparatingSequenceFromSN(n1, ot.stateNodes[n1->assumedState]));
+						sepSuffix = getQueriedSeparatingSequenceFromSN(n1, ot.stateNodes[n1->assumedState]);
 					} else {
-						sepSeq.splice(sepSeq.end(), getQueriedSeparatingSequence(n1, ot.stateNodes[n1->assumedState]->convergent.front()));
+						sepSuffix = getQueriedSeparatingSequence(n1, ot.stateNodes[n1->assumedState]->convergent.front());
 					}
+					if (sepSuffix.empty() || (sepSuffix.front() == STOUT_INPUT)) {
+						return;
+					}
+					sepSeq.splice(sepSeq.end(), move(sepSuffix));
 				}
 				if (!querySequenceAndCheck(ot.stateNodes[n2->assumedState]->convergent.front(), sepSeq, ot, teacher)) {
 					return;
 				}
+				return;
 			}
 		}
 		else {
@@ -1775,6 +2295,7 @@ namespace FSMlearning {
 					sepSeq.emplace_front(n2->accessSequence.back());
 					n2 = n2->parent.lock();
 				}
+				if (!n2->refStates.count(n2->assumedState)) return;
 				if (n2 != ot.stateNodes[n2->state]->convergent.front()) {
 					n2 = ot.stateNodes[n2->state]->convergent.front();
 					n1 = queryIfNotQueried(n2, move(sepSeq), ot, teacher);
@@ -1782,17 +2303,10 @@ namespace FSMlearning {
 						return;
 					}
 				}
-				auto& cn1 = n1->convergentNode.lock();
-				auto domain = n1->refStates;
-				for (auto state : domain) {
-					sepSeq = getQueriedSeparatingSequenceOfCN(cn1, ot.stateNodes[state]);
-					if (!queryIfNotQueried(n1, sepSeq, ot, teacher)) {
-						return;
-					}
-					if (!queryIfNotQueried(ot.stateNodes[state]->convergent.front(), move(sepSeq), ot, teacher)) {
-						return;
-					}
+				if (eliminateSeparatedStatesFromDomain(n1, n1->convergentNode.lock(), ot, teacher)) {
+					return;
 				}
+				return;
 			}
 			else {
 				auto n2 = move(ot.inconsistentNodes.front());
@@ -1804,22 +2318,25 @@ namespace FSMlearning {
 				n2 = queryIfNotQueried(n2, ot.inconsistentSequence, ot, teacher);
 				if (!n2) {
 					return;
-				}
+				}/*
 				if (fn1 == fn2) {// empty domain
-					auto& cn1 = fn1->convergentNode.lock();
-					auto domain = n2->refStates;
-					for (auto state : domain) {
-						auto sepSeq = getQueriedSeparatingSequenceOfCN(cn1, ot.stateNodes[state]);
-						if (!queryIfNotQueried(n2, sepSeq, ot, teacher)) {
-							return;
-						}
-						if (!queryIfNotQueried(ot.stateNodes[state]->convergent.front(), move(sepSeq), ot, teacher)) {
+					if (eliminateSeparatedStatesFromDomain(n2, fn1->convergentNode.lock(), ot, teacher)) {
+						return;
+					}
+					return;
+				}
+				else {*/
+					auto sepSeq = getQueriedSeparatingSequenceOfCN(fn1->convergentNode.lock(), fn2->convergentNode.lock());
+					if (sepSeq.empty()) {
+						return;
+					}
+#if CHECK_PREDECESSORS
+					if (sepSeq.front() == STOUT_INPUT) {
+						if (proveSepSeqOfEmptyDomainIntersection(n2, fn1->convergentNode.lock(), sepSeq, ot, teacher)) {
 							return;
 						}
 					}
-				}
-				else {
-					auto sepSeq = getQueriedSeparatingSequenceOfCN(fn1->convergentNode.lock(), fn2->convergentNode.lock());
+#endif
 					if (!queryIfNotQueried(n2, sepSeq, ot, teacher)) {
 						return;
 					}
@@ -1827,8 +2344,8 @@ namespace FSMlearning {
 					if (!queryIfNotQueried(n1, move(ot.inconsistentSequence), ot, teacher)) {
 						return;
 					}
-
-				}			
+					return;
+				//}			
 			}
 		}
 	}
@@ -1896,16 +2413,18 @@ namespace FSMlearning {
 							}
 							rqIt = cn->requestedQueries->next.find(ot.testedInput);
 						} while ((rqIt != cn->requestedQueries->next.end()) && (rqIt->second->seqCount > 0));
-						auto reqIt = ot.queriesFromNextState.find(ot.testedState * numInputs + ot.testedInput);
-						if (reqIt != ot.queriesFromNextState.end()) {
-							auto nextState = ot.conjecture->getNextState(ot.testedState, ot.testedInput);
-							while ((ot.numberOfExtraStates > 0) && !reqIt->second.empty()) {
-								if (queryRequiredSequence(nextState, reqIt->second.front(), ot, teacher)) {
-									break;
+						if (ot.inconsistentNodes.empty()) {
+							auto reqIt = ot.queriesFromNextState.find(ot.testedState * numInputs + ot.testedInput);
+							if (reqIt != ot.queriesFromNextState.end()) {
+								auto nextState = ot.conjecture->getNextState(ot.testedState, ot.testedInput);
+								while ((ot.numberOfExtraStates > 0) && !reqIt->second.empty()) {
+									if (queryRequiredSequence(nextState, reqIt->second.front(), ot, teacher)) {
+										break;
+									}
 								}
+								if ((ot.numberOfExtraStates > 0) && (ot.inconsistentNodes.empty()))
+									ot.queriesFromNextState.erase(reqIt);
 							}
-							if (ot.numberOfExtraStates > 0)
-								ot.queriesFromNextState.erase(reqIt);
 						}
 					}
 				}
@@ -1940,14 +2459,15 @@ namespace FSMlearning {
 								else ++it;
 							}
 						}
+						/*
 						if (ot.numberOfExtraStates == 0) {
 							auto currNode = ot.stateNodes[0]->convergent.front();
 							for (auto input : ce) {
 								moveAndCheckNoES(currNode, input, ot, teacher);
 							}
-						} else {
+						} else {*/
 							querySequenceAndCheck(ot.stateNodes[0]->convergent.front(), ce, ot, teacher);
-						}
+						//}
 						continue;
 					}
 				}

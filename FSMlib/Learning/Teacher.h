@@ -30,6 +30,8 @@ public:
 		_equivalenceQueryCounter(0) {
 	}
 
+	virtual ~Teacher() {}
+
 	/**
 	* @return True if the Teacher replies with the last output symbol, i.e. Output Query = Membership Query,
 	*		  False if the Teacher replies with all outputs along the input sequence asked in OQ.

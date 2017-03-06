@@ -27,6 +27,8 @@ public:
 		TeacherDFSM(blackBox, true) {
 	}
 
+	virtual ~TeacherRL() {}
+
 	bool isProvidedOnlyMQ() {
 		return true;
 	}

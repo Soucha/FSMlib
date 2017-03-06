@@ -44,6 +44,8 @@ public:
 		_usedStateIDs.clear();
 	}
 
+	virtual ~FSM() {}
+
 	// implicit copy and move constructors and assignment operators
 
 	//<-- GENERAL INFORMATION -->//
