@@ -446,7 +446,7 @@ int main(int argc, char** argv) {
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(1045);
 #endif
-	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "4", "-sg", "9", "-sl", "49"}; testDir(10, vals);
+	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
@@ -460,9 +460,9 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R50_ylWfw.fsm"; 
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R60_nPWoO.fsm"; 
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
-	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn
+	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
@@ -470,22 +470,13 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
-	/* // to determine maxLen for GoodSplit
-	auto vec = getStatePairsShortestSeparatingSequences(fsm, true);
-	seq_len_t len = 0;
-	for (auto& seq : vec) {
-		if (len < seq.size()) len = seq.size();
-	}
-	cout << len << endl;
-	//* /
 	//testLStarAllVariants();
-	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
+	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//* /
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
-	COMPUTATION_TIME(auto model = SPYlearner(teacher, 0, showConjecture, true));// showAndStop);
+	COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = ObservationTreeAlgorithm(teacher, 0, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
 	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
