@@ -170,6 +170,9 @@
     <ClCompile Include="Learning\OTreeAlgTests.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Testing\SPYH-methodTests.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

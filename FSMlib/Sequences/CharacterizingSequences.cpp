@@ -45,6 +45,16 @@ namespace FSMsequence {
 			((s1 * (s1 - 1)) / 2 + s2);
 	}
 
+	pair<state_t, state_t> getStatesOfStatePairIdx(const state_t& statePairIdx) {
+		state_t s2 = state_t(floor(sqrt(2*statePairIdx)));
+		state_t s1 = statePairIdx - (s2 * (s2 - 1)) / 2;
+		while (s1 >= s2) {
+			s2++;
+			s1 = statePairIdx - (s2 * (s2 - 1)) / 2;
+		}
+		return make_pair(s1, s2);
+	}
+
 	state_t getIdx(const vector<state_t>& states, state_t stateId) {
 		if ((stateId < states.size()) && (states[stateId] == stateId)) return stateId;
 		auto lower = std::lower_bound(states.begin(), states.end(), stateId);
