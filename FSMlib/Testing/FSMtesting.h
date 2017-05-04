@@ -214,8 +214,29 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	*/
 	//FSMLIB_API sequence_set_t P_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 
-	/// Attempts
-	//FSMLIB_API sequence_set_t GSPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);// is it correct?
+	/**
+	* Designs a test suite in which all states and transitions are confirmed
+	* using separating sequences chosen on the fly that
+	* are distributed over states reached by already proven convergent sequences.
+	* States are distinguished pairwise as in the H-method.
+	*
+	* Based on source:
+	* Article (simao2012reducing)
+	* Simao, A.; Petrenko, A. & Yevtushenko, N.
+	* On reducing test length for fsms with extra states
+	* Software Testing, Verification and Reliability, Wiley Online Library, 2012, 22, 435-454
+	*
+	* InCollection (dorofeeva2005improved)
+	* Dorofeeva, R.; El-Fakih, K. & Yevtushenko, N. 
+	* An improved conformance testing method 
+	* Formal Techniques for Networked and Distributed Systems-FORTE 2005, Springer, 2005, 204-218
+	*
+	* @param fsm - Deterministic FSM
+	* @param extraStates - how many extra states shall be considered,
+	*		 default is no extra state, needs to be positive or 0
+	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
+	*/
+	FSMLIB_API sequence_set_t SPYH_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -233,7 +254,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	*		 default is no extra state, needs to be positive or 0
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t SPYH_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);// is it correct?
+	FSMLIB_API sequence_set_t S_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence

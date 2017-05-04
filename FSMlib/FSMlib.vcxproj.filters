@@ -239,6 +239,9 @@
     <ClCompile Include="Learning\SPYlearner.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Testing\S-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
     <ClCompile Include="Testing\SPYH-method.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>

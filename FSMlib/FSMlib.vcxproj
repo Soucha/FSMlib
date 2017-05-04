@@ -293,9 +293,10 @@
     <ClCompile Include="Testing\Ma-method.cpp" />
     <ClCompile Include="Testing\Mg-method.cpp" />
     <ClCompile Include="Testing\Mstar-method.cpp" />
+    <ClCompile Include="Testing\SPYH-method.cpp" />
     <ClCompile Include="Testing\PDS-method.cpp" />
     <ClCompile Include="Testing\SPY-method.cpp" />
-    <ClCompile Include="Testing\SPYH-method.cpp" />
+    <ClCompile Include="Testing\S-method.cpp" />
     <ClCompile Include="Testing\SVS-method.cpp" />
     <ClCompile Include="Testing\W-method.cpp" />
     <ClCompile Include="Testing\Wp-method.cpp" />

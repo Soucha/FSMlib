@@ -443,7 +443,7 @@ namespace FSMlearning {
 							printf("%d T(eps, %s) = %s addSuffixAfterLastStateToE\n", teacher->getOutputQueryCount(), 
 							FSMmodel::getInSequenceAsString(ce).c_str(), FSMmodel::getOutSequenceAsString(bbOutput).c_str());
 #endif // DUMP_OQ
-							state_t prevState, state = 0;
+							state_t prevState(0), state(0);
 							for (const auto& input : ce) {
 								if (input != STOUT_INPUT) {
 									if (prefix != stateNodes[state]->accessSequence) {

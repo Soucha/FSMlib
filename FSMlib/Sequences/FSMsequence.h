@@ -417,6 +417,12 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*/
 	FSMLIB_API state_t getStatePairIdx(const state_t& s1, const state_t& s2);
 
+	/**
+	* Calculates state pair (i,j) for given state pair index k
+	* such that k = getStatePairIdx(i,j).
+	* @param statePairIdx k
+	* @return state pair (i,j) such that i < j
+	*/
 	FSMLIB_API pair<state_t,state_t> getStatesOfStatePairIdx(const state_t& statePairIdx);
 
 	/**

@@ -222,7 +222,7 @@ namespace FSMlearning {
 		}
 		conjecture->setTransition(state, input, dtNode->state);
 		if (conjecture->isOutputTransition()) {
-			output_t output;
+			output_t output(DEFAULT_OUTPUT);
 			if (components[state].E[input].front() == input) {
 				output = components[state].T[components[state].S][input].front();
 			}

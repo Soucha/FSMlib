@@ -43,7 +43,7 @@ using namespace FSMlearning;
 	auto end = chrono::system_clock::now(); \
 	chrono::duration<double> elapsed_seconds = end - start; 
 
-static unique_ptr<DFSM> fsm, fsm2;
+static unique_ptr<DFSM> fsm;
 static FILE * outFile;
 
 static bool showConjecture(const unique_ptr<DFSM>& conjecture) {

@@ -336,7 +336,8 @@ namespace FSMtesting {
 							continue;
 						}
 						if (fromNode->next[i]->isRefState) {
-							fromNode->next[i]->prev = toNode->varIdx;
+							if (fromNode->next[i]->prev == fromNode->varIdx)
+								fromNode->next[i]->prev = toNode->varIdx;
 							if (toNode->next[i]->instance == NULL_STATE) {
 								toNode->next[i]->domain = fromNode->next[i]->domain;
 								if (!instantiate(toNode->next[i], var, refStates, instantiated)) return false;
@@ -540,7 +541,7 @@ namespace FSMtesting {
 				vector<shared_ptr<StateVariable>>& var, vector<state_t>& refStates, stack<state_t>& instantiated) {
 			//printf("search: %d %d %d\n", level, rootIdx, idx);
 			bool fail;
-			state_t newRootIdx = state_t(var.size()), newIdx;
+			state_t newRootIdx = state_t(var.size()), newIdx(NULL_STATE);
 			for (state_t state = state_t(var[idx]->domain.find_first());
 					((state != state_t(var[idx]->domain.npos)) && (state <= state_t(refStates.size()))); // it can be new ref state
 					state = state_t(var[idx]->domain.find_next(state))) {

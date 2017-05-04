@@ -443,6 +443,7 @@ static void printTS(sequence_set_t & TS, string filename) {
 
 
 extern void testDir(int argc, char** argv);
+extern void testDirTesting(int argc, char** argv);
 
 //extern void testBBport();
 
@@ -450,7 +451,7 @@ int main(int argc, char** argv) {
 	//generate();return 0;
 	//compareTestingMethods();	return 0;
 	//testBBport();
-	//testDir(DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/", "");
+	testDirTesting(argc, argv);/*
 	//testDir(argc, argv);/*
 #if DBG_MEMORY_LEAK
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -458,6 +459,7 @@ int main(int argc, char** argv) {
 	//_CrtSetBreakAlloc(1045);
 #endif
 	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
+	//char* vals[12] = { "", "../data/experiments/10multi/", "-ts", "256", "-cs", "0", "-m", "12", "-sg", "9", "-sl", "49" }; testDirTesting(12, vals);
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
@@ -471,28 +473,31 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R60_nPWoO.fsm"; 
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_ZpUmQ.fsm"; 
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
-	string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm"; //DFA_R4_SCSet
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
 
-	for (int extraStates = 0; extraStates < 3; extraStates++) {
+	bool test = true;
+	for (int extraStates = 0; extraStates <= 2; extraStates++) {
 		auto TS = SPYH_method(fsm, extraStates);
 		printTS(TS, fileName);
-		ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
-		auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
-		ARE_EQUAL(1, int(indistinguishable.size()), "The SPY-method (%d extra states) has not complete fault coverage,"
-			" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
-		ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
+		if (test) {
+			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+			auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
+			ARE_EQUAL(1, int(indistinguishable.size()), "The SPY-method (%d extra states) has not complete fault coverage,"
+				" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
+			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
+		}
 	}
 
-	/*/testLStarAllVariants();
+	/* /testLStarAllVariants();
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
@@ -564,6 +569,7 @@ int main(int argc, char** argv) {
 	*/
 	
 	char c;
+	//printf("type any key to end: ");
 	cin >> c;
 	return 0;
 }

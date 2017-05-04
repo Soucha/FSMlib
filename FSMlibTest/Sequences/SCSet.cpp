@@ -205,7 +205,7 @@ namespace FSMlibTest
 			auto HCSet = getHarmonizedStateIdentifiers(fsm);
 			state_t N = fsm->getNumberOfStates();
 			FSMlib::PrefixSet pset;
-			seq_len_t len;
+			seq_len_t len(0);
 			sequence_in_t test;
 			sequence_in_t::iterator sIt;
 			DEBUG_MSG("HSI family of %s:\n", filename.c_str());

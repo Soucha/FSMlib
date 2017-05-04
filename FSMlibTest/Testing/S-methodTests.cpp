@@ -21,14 +21,14 @@ using namespace FSMtesting;
 
 namespace FSMlibTest
 {
-	TEST_CLASS(SPYHmethod)
+	TEST_CLASS(Smethod)
 	{
 	public:
 		unique_ptr<DFSM> fsm;
 
 		// TODO: incomplete machines
 
-		TEST_METHOD(TestSPYHmethod_DFSM)
+		TEST_METHOD(TestSmethod_DFSM)
 		{
 			fsm = make_unique<DFSM>();
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
@@ -37,7 +37,7 @@ namespace FSMlibTest
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSPYHmethod_Mealy)
+		TEST_METHOD(TestSmethod_Mealy)
 		{
 			fsm = make_unique<Mealy>();
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm");
@@ -46,7 +46,7 @@ namespace FSMlibTest
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSPYHmethod_Moore)
+		TEST_METHOD(TestSmethod_Moore)
 		{
 			fsm = make_unique<Moore>();
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
@@ -55,7 +55,7 @@ namespace FSMlibTest
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm");
 		}
 
-		TEST_METHOD(TestSPYHmethod_DFA)
+		TEST_METHOD(TestSmethod_DFA)
 		{
 			fsm = make_unique<DFA>();
 			testSPYHmethod(DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm");
@@ -74,11 +74,11 @@ namespace FSMlibTest
 		void testSPYHmethod(string filename) {
 			fsm->load(filename);
 			for (int extraStates = 0; extraStates < 3; extraStates++) {
-				auto TS = SPYH_method(fsm, extraStates);
+				auto TS = S_method(fsm, extraStates);
 				printTS(TS, filename);
 				ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
 				auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
-				ARE_EQUAL(1, int(indistinguishable.size()), "The SPYH-method (%d extra states) has not complete fault coverage,"
+				ARE_EQUAL(1, int(indistinguishable.size()), "The SPY-method (%d extra states) has not complete fault coverage,"
 					" it produces %d indistinguishable FSMs.", extraStates, indistinguishable.size());
 				ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
 			}

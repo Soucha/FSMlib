@@ -173,7 +173,7 @@ namespace FSMlibTest
 								FSMmodel::getInSequenceAsString(it->second->input).c_str(), it->second->initialStates[i],
 								it->second->currentStates[i]);
 							ARE_EQUAL(fsm->getOutputAlongPath(it->second->initialStates[i], ads->input).back(), it->first,
-								"Input sequence %S and initial state %d do not produce last output symbol %d",
+								"Input sequence %s and initial state %d do not produce last output symbol %d",
 								FSMmodel::getInSequenceAsString(ads->input).c_str(), it->second->initialStates[i], it->first);
 							ARE_EQUAL(true, states.insert(it->second->initialStates[i]).second,
 								"Node with entire input %s has more initial states with id %d in its children.",

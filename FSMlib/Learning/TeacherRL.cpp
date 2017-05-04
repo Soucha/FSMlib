@@ -21,7 +21,7 @@
 sequence_out_t TeacherRL::outputQuery(const sequence_in_t& inputSequence) {
 	_outputQueryCounter++;
 	if (inputSequence.empty()) return sequence_out_t();
-	output_t output;
+	output_t output(DEFAULT_OUTPUT);
 	for (const auto& input : inputSequence) {
 		output = TeacherDFSM::outputQuery(input);
 		_outputQueryCounter--;

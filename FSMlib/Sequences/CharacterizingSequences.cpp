@@ -255,7 +255,7 @@ namespace FSMsequence {
 				outJ = fsm->getOutputAlongPath(dist[k], shortSeq);
 			}
 			else {// CSet reduction
-				state_t i, j;
+				state_t i, j(0);
 				for (i = 0; i < N - 1; i++) {// searching for indexes i, j
 					j = dist[k] + 1 - i * N + (i * (i + 3)) / 2;
 					if (i < j && j < N) {
