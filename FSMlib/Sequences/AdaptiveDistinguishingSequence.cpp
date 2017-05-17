@@ -19,12 +19,6 @@
 #include "FSMsequence.h"
 
 namespace FSMsequence {
-	struct st_node_t {// Splitting Tree node
-		vector<state_t> block, nextStates;
-		sequence_in_t sequence;
-		vector<pair<output_t, shared_ptr<st_node_t>>> succ;
-	};
-
 	struct blockcomp {
 
 		/**
@@ -46,6 +40,12 @@ namespace FSMsequence {
 		bool operator() (const pair<seq_len_t, state_t>& lp, const pair<seq_len_t, state_t>& rp) const {
 			return lp.first < rp.first;
 		}
+	};
+
+	struct dependent_info_t {
+		vector<shared_ptr<st_node_t>> dependent;
+		vector<vector<pair<input_t, state_t>>> link;
+		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp> bfsqueue;
 	};
 
 	sequence_vec_t getAdaptiveDistinguishingSet(const unique_ptr<DFSM>& fsm, const unique_ptr<AdaptiveDS>& ads) {
@@ -132,19 +132,17 @@ namespace FSMsequence {
 		}
 	}
 
-	static vector<vector<pair<input_t, state_t>>> prepareLinks(const vector<shared_ptr<st_node_t>>& dependent,
-		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
-		const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished) {
-
-		vector<vector<pair<input_t, state_t>>> link(dependent.size());
+	static void prepareLinks(dependent_info_t& depInfo, const unique_ptr<SplittingTree>& st) {
+		depInfo.link.clear();
+		depInfo.link.resize(depInfo.dependent.size());
 		
 		// add link to dependent vector
-		for (state_t dI = 0; dI < dependent.size(); dI++) {
-			dependent[dI]->nextStates.emplace_back(dI);
+		for (state_t dI = 0; dI < depInfo.dependent.size(); dI++) {
+			depInfo.dependent[dI]->nextStates.emplace_back(dI);
 		}
 		// check dependent
-		for (state_t dI = 0; dI < dependent.size(); dI++) {
-			auto node = dependent[dI];
+		for (state_t dI = 0; dI < depInfo.dependent.size(); dI++) {
+			auto node = depInfo.dependent[dI];
 			auto seqInIt = node->sequence.begin();
 			shared_ptr<st_node_t> bestNext;
 			input_t bestInput = STOUT_INPUT;
@@ -154,10 +152,10 @@ namespace FSMsequence {
 				vector<state_t> diffStates;
 				state_t pivot = node->succ[i].second->nextStates[0];
 				for (const auto& stateI : node->succ[i].second->nextStates) {
-					if (curNode[pivot] != curNode[stateI]) {
+					if (st->curNode[pivot] != st->curNode[stateI]) {
 						bool inDiff = false;
 						for (const auto& diffState : diffStates) {
-							if (curNode[stateI] == curNode[diffState]) {
+							if (st->curNode[stateI] == st->curNode[diffState]) {
 								inDiff = true;
 								break;
 							}
@@ -168,17 +166,17 @@ namespace FSMsequence {
 					}
 				}
 				if (diffStates.empty()) {// input to another dependent block
-					if (curNode[pivot] != node) {
-						link[curNode[pivot]->nextStates[0]].emplace_back(i, dI);
+					if (st->curNode[pivot] != node) {
+						depInfo.link[st->curNode[pivot]->nextStates[0]].emplace_back(i, dI);
 					}
 				}
 				else {// distinguishing input
-					auto next = curNode[pivot];
+					auto next = st->curNode[pivot];
 					// find lowest node of ST with block of all diffStates and pivot
 					for (const auto& diffState : diffStates) {
 						auto idx = getStatePairIdx(pivot, diffState);
-						if (next->block.size() < distinguished[idx]->block.size()) {
-							next = distinguished[idx];
+						if (next->block.size() < st->distinguished[idx]->block.size()) {
+							next = st->distinguished[idx];
 						}
 					}
 					if (!bestNext || (bestNext->sequence.size() > next->sequence.size())) {
@@ -188,24 +186,21 @@ namespace FSMsequence {
 				}
 			}
 			if (bestNext) {
-				bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
+				depInfo.bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
 				node->succ.emplace_back(bestInput, move(bestNext));
 			}
 		}
-		return link;
 	}
 
-	static bool processDependent(const vector<shared_ptr<st_node_t>>& dependent,
-		vector<vector<pair<input_t, state_t>>>& link,
+	static bool processDependent(dependent_info_t& depInfo,
 		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp>& partition,
-		priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp>& bfsqueue,
-		vector<shared_ptr<st_node_t>>& curNode, vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
+		const unique_ptr<SplittingTree>& st, bool useStout) {
 		
-		auto distCounter = dependent.size();
-		while (!bfsqueue.empty()) {
-			auto dI = bfsqueue.top().second;
-			auto node = dependent[dI];
-			bfsqueue.pop();
+		auto distCounter = depInfo.dependent.size();
+		while (!depInfo.bfsqueue.empty()) {
+			auto dI = depInfo.bfsqueue.top().second;
+			auto node = depInfo.dependent[dI];
+			depInfo.bfsqueue.pop();
 			if (node->nextStates.size() == 1) {// undistinguished
 				node->sequence.clear();
 				// hack (input stored in place of output -> it does not have to be found in node->sequence by iteration first)
@@ -256,11 +251,11 @@ namespace FSMsequence {
 						partition.emplace(next);
 					}
 					for (state_t stateI : next->block) {
-						curNode[stateI] = next;
+						st->curNode[stateI] = next;
 						for (output_t j = i + 1; j < node->succ.size(); j++) {
 							for (state_t stateJ : node->succ[j].second->block) {
 								auto idx = getStatePairIdx(stateI, stateJ);
-								distinguished[idx] = node;// where two states were distinguished
+								st->distinguished[idx] = node;// where two states were distinguished
 							}
 						}
 					}
@@ -268,28 +263,119 @@ namespace FSMsequence {
 				// count resolved dependent
 				distCounter--;
 				// push unresolved dependent to queue
-				for (const auto& p : link[dI]) {
-					next = dependent[p.second];
+				for (const auto& p : depInfo.link[dI]) {
+					next = depInfo.dependent[p.second];
 					if (next->nextStates.size() == 1) {// still unresolved
 						if (next->sequence.size() == next->succ.size()) {// best not set
 							next->succ.emplace_back(p.first, node);
-							bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
+							depInfo.bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 						}
 						else if (next->succ.back().second->sequence.size() > node->sequence.size()) {// update best
 							next->succ.back().first = p.first;
 							next->succ.back().second = node;
-							bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
+							depInfo.bfsqueue.emplace(seq_len_t(node->sequence.size()), next->nextStates[0]);
 						}
 					}
 				}
-				link[dI].clear();
+				depInfo.link[dI].clear();
 			}
 		}
 		return (distCounter == 0);
 	}
 
-	static unique_ptr<AdaptiveDS> buildAds(const vector<state_t>& block, 
-			const vector<shared_ptr<st_node_t>>& curNode, const vector<shared_ptr<st_node_t>>& distinguished, bool useStout) {
+	unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& fsm, bool useStout) {
+		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getSplittingTree", nullptr);
+		state_t N = fsm->getNumberOfStates();
+		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
+		auto st = make_unique<SplittingTree>(N);
+		dependent_info_t depInfo;
+		if (fsm->isOutputState()) {
+			auto node = st->rootST;
+			node->sequence.push_back(STOUT_INPUT);
+			for (state_t state = 0; state < N; state++) {
+				node->block.push_back(state);
+				node->nextStates.push_back(state);
+				bool found = false;
+				auto output = fsm->getOutput(state, STOUT_INPUT);
+				for (const auto &p : node->succ) {
+					if (p.first == output) {
+						p.second->block.emplace_back(state);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					auto next = make_shared<st_node_t>();
+					next->block.emplace_back(state);
+					node->succ.emplace_back(output, move(next));
+				}
+			}
+			for (output_t i = 0; i < node->succ.size(); i++) {
+				auto &next = node->succ[i].second;
+				if (next->block.size() > 1) {// child is not singleton
+					partition.emplace(next);
+				}
+				for (state_t stateI : next->block) {
+					st->curNode[stateI] = next;
+					for (output_t j = i + 1; j < node->succ.size(); j++) {
+						for (state_t stateJ : node->succ[j].second->block) {
+							auto idx = getStatePairIdx(stateI, stateJ);
+							st->distinguished[idx] = node;// where two states were distinguished
+						}
+					}
+				}
+			}
+		}
+		else {
+			for (state_t state = 0; state < N; state++) {
+				st->rootST->block.emplace_back(state);
+			}
+			partition.emplace(st->rootST);
+		}
+		while (!partition.empty()) {
+			auto node = partition.top();
+			partition.pop();
+			// find distinguishing input or sort out other valid inputs
+			distinguishSTnode(fsm, node);
+			if (node->succ.empty()) {// no valid input - possible only by root
+				return nullptr;
+			}
+			if (!node->nextStates.empty()) {// block is distinguished by an input
+				for (output_t i = 0; i < node->succ.size(); i++) {
+					auto & next = node->succ[i].second;
+					if (next->block.size() > 1) {// child is not singleton
+						partition.emplace(next);
+					}
+					for (state_t stateI : next->block) {
+						st->curNode[stateI] = next;
+						for (output_t j = i + 1; j < node->succ.size(); j++) {
+							for (state_t stateJ : node->succ[j].second->block) {
+								auto idx = getStatePairIdx(stateI, stateJ);
+								st->distinguished[idx] = node;// where two states were distinguished
+							}
+						}
+					}
+				}
+			}
+			else {
+				depInfo.dependent.emplace_back(node);
+			}
+			// are all blocks with max cardinality distinguished by one input?
+			if (!depInfo.dependent.empty() && (partition.empty() || (partition.top()->block.size() != node->block.size()))) {
+				prepareLinks(depInfo, st);
+				// check that all dependent was divided
+				if (!processDependent(depInfo, partition, st, useStout)) {
+					return nullptr;
+				}
+				depInfo.dependent.clear();
+			}
+		}
+		return st;
+	}
+
+	unique_ptr<AdaptiveDS> buildADS(const vector<state_t>& block,
+		const unique_ptr<SplittingTree>& st, bool useStout) {
+		if (!st) return nullptr;
 		auto outADS = make_unique<AdaptiveDS>();
 		outADS->initialStates = outADS->currentStates = block;
 
@@ -300,12 +386,12 @@ namespace FSMsequence {
 			fifo.pop();
 			if (adsNode->currentStates.size() == 1) continue;
 			auto pivot = adsNode->currentStates[0];
-			auto next = curNode[pivot];
+			auto next = st->distinguished[getStatePairIdx(pivot, adsNode->currentStates[1])];
 			// find lowest node of ST with block of all currentStates
-			for (state_t j = 1; j < adsNode->currentStates.size(); j++) {
+			for (state_t j = 2; j < adsNode->currentStates.size(); j++) {
 				auto idx = getStatePairIdx(pivot, adsNode->currentStates[j]);
-				if (next->block.size() < distinguished[idx]->block.size()) {
-					next = distinguished[idx];
+				if (next->block.size() < st->distinguished[idx]->block.size()) {
+					next = st->distinguished[idx];
 				}
 			}
 			// set distinguishing input sequence
@@ -338,96 +424,10 @@ namespace FSMsequence {
 
 	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
-		state_t N = fsm->getNumberOfStates();
-		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
-		auto rootST = make_shared<st_node_t>();
-		vector<shared_ptr<st_node_t>> curNode(N, rootST);
-		vector<shared_ptr<st_node_t>> distinguished(((N - 1) * N) / 2, nullptr);
-		vector<shared_ptr<st_node_t>> dependent;
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
-		if (fsm->isOutputState()) {
-			auto node = rootST;
-			node->sequence.push_back(STOUT_INPUT);
-			for (state_t state = 0; state < N; state++) {
-				node->block.push_back(state);
-				node->nextStates.push_back(state);
-				bool found = false;
-				auto output = fsm->getOutput(state, STOUT_INPUT);
-				for (const auto &p : node->succ) {
-					if (p.first == output) {
-						p.second->block.emplace_back(state);
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					auto next = make_shared<st_node_t>();
-					next->block.emplace_back(state);
-					node->succ.emplace_back(output, move(next));
-				}
-			}
-			for (output_t i = 0; i < node->succ.size(); i++) {
-				auto &next = node->succ[i].second;
-				if (next->block.size() > 1) {// child is not singleton
-					partition.emplace(next);
-				}
-				for (state_t stateI : next->block) {
-					curNode[stateI] = next;
-					for (output_t j = i + 1; j < node->succ.size(); j++) {
-						for (state_t stateJ : node->succ[j].second->block) {
-							auto idx = getStatePairIdx(stateI, stateJ);
-							distinguished[idx] = node;// where two states were distinguished
-						}
-					}
-				}
-			}
-		}
-		else {
-			for (state_t state = 0; state < N; state++) {
-				rootST->block.emplace_back(state);
-			}
-			partition.emplace(rootST);
-		}
-		while (!partition.empty()) {
-			auto node = partition.top();
-			partition.pop();
-			// find distinguishing input or sort out other valid inputs
-			distinguishSTnode(fsm, node);
-			if (node->succ.empty()) {// no valid input - possible only by root
-				return nullptr;
-			}
-			if (!node->nextStates.empty()) {// block is distinguished by an input
-				for (output_t i = 0; i < node->succ.size(); i++) {
-					auto & next = node->succ[i].second;
-					if (next->block.size() > 1) {// child is not singleton
-						partition.emplace(next);
-					}
-					for (state_t stateI : next->block) {
-						curNode[stateI] = next;
-						for (output_t j = i + 1; j < node->succ.size(); j++) {
-							for (state_t stateJ : node->succ[j].second->block) {
-								auto idx = getStatePairIdx(stateI, stateJ);
-								distinguished[idx] = node;// where two states were distinguished
-							}
-						}
-					}
-				}
-			}
-			else {
-				dependent.emplace_back(node);
-			}
-			// are all blocks with max cardinality distinguished by one input?
-			if (!dependent.empty() && (partition.empty() || (partition.top()->block.size() != node->block.size()))) {				
-				priority_queue<pair<seq_len_t, state_t>, vector<pair<seq_len_t, state_t>>, lencomp> bfsqueue;
-				auto link = prepareLinks(dependent, bfsqueue, curNode, distinguished);
-				// check that all dependent was divided
-				if (!processDependent(dependent, link, partition, bfsqueue, curNode, distinguished, useStout)) {
-					return nullptr;
-				}
-				dependent.clear();
-			}
-		}
+		auto st = getSplittingTree(fsm, useStout);
+		if (!st) return nullptr;
 		// build ADS from ST
-		return buildAds(rootST->block, curNode, distinguished, useStout);
+		return buildADS(st->rootST->block, st, useStout);
 	}
 }

@@ -54,6 +54,23 @@ struct seqcomp {
 typedef vector<sequence_in_t> sequence_vec_t;
 typedef set<sequence_in_t, seqcomp> sequence_set_t;
 
+struct st_node_t {// Splitting Tree node
+	vector<state_t> block, nextStates;
+	sequence_in_t sequence;
+	vector<pair<output_t, shared_ptr<st_node_t>>> succ;
+};
+
+struct SplittingTree {
+	shared_ptr<st_node_t> rootST = make_shared<st_node_t>();
+	vector<shared_ptr<st_node_t>> curNode;
+	vector<shared_ptr<st_node_t>> distinguished;
+
+	SplittingTree(state_t numberOfStates) :
+		curNode(numberOfStates, rootST),
+		distinguished(((numberOfStates - 1) * numberOfStates) / 2, nullptr) {
+	}
+};
+
 struct AdaptiveDS {
 	sequence_in_t input;
 	vector<state_t> initialStates, currentStates;
@@ -520,4 +537,35 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @param outSCSet - SCSet of given state to reduce (output set as well)
 	*/
 	FSMLIB_API void reduceSCSet_EqualLength(const unique_ptr<DFSM>& dfsm, state_t state, sequence_set_t & outSCSet);	
+
+	/**
+	* Creates a splitting tree for the given machine.
+	*
+	* Source:
+	* Article (lee1994testing) 
+	* Lee, D. & Yannakakis, M. 
+	* Testing finite-state machines: State identification and verification 
+	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
+	*
+	* @param dfsm - Deterministic FSM
+	* @param useStout - STOUT_INPUT follows each transition input (except the last one) in any sequence of ST if true
+	* @return a Splitting Tree, or nullptr if there is no ADS or the FSM is not compact
+	*/
+	FSMLIB_API unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& dfsm, bool useStout);
+
+	/**
+	* Creates an Adaptive Distinguishing Sequence starting with the given set of states based on the given splitting tree.
+	*
+	* Source:
+	* Article (lee1994testing)
+	* Lee, D. & Yannakakis, M.
+	* Testing finite-state machines: State identification and verification
+	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
+	*
+	* @param block - a set of starting states
+	* @param st - a splitting tree
+	* @param useStout - STOUT_INPUT follows each transition input (except the last one) in ADS if true
+	* @return an Adaptive Distinguishing Sequence, or nullptr if the splitting tree is empty
+	*/
+	FSMLIB_API unique_ptr<AdaptiveDS> buildADS(const vector<state_t>& block, const unique_ptr<SplittingTree>& st, bool useStout);
 }
