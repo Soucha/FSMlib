@@ -459,7 +459,7 @@ int main(int argc, char** argv) {
 	//_CrtSetBreakAlloc(1045);
 #endif
 	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
-	//char* vals[12] = { "", "../data/experiments/10multi/", "-ts", "256", "-cs", "0", "-m", "12", "-sg", "9", "-sl", "49" }; testDirTesting(12, vals);
+	char* vals[12] = { "", "../data/experiments/10multi/", "-ts", "512", "-cs", "0", "-m", "12", "-co", "1", "-es", "0" }; testDirTesting(12, vals);/*
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
@@ -470,14 +470,14 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R300_L5E63.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_ZpUmQ.fsm"; 
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_uCaOs.fsm"; 
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
-	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R4_SCSet.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
@@ -485,8 +485,8 @@ int main(int argc, char** argv) {
 	auto fsm = FSMmodel::loadFSM(fileName);
 
 	bool test = true;
-	for (int extraStates = 0; extraStates <= 2; extraStates++) {
-		auto TS = SPYH_method(fsm, extraStates);
+	for (int extraStates = 0; extraStates <= 1; extraStates++) {
+		auto TS = S_method(fsm, extraStates);
 		printTS(TS, fileName);
 		if (test) {
 			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
