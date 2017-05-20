@@ -548,7 +548,6 @@ namespace FSMtesting {
 		return ot;
 	}
 
-
 	static void printTStree(const shared_ptr<TestNodeS>& node, string prefix = "") {
 		printf("%s%d/%d <- %d\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput);
 		input_t i = 0;
@@ -561,24 +560,15 @@ namespace FSMtesting {
 		}
 	}
 	
-	
 	static void distinguish(const shared_ptr<ConvergentNodeS>& cn, const list<shared_ptr<ConvergentNodeS>>& nodes,
 			const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq, const OTreeS& ot) {
 		list<shared_ptr<ConvergentNodeS>> domain;
 		auto state = cn->state;
-		//auto refCN = cn;
 		if (!cn->isRN) {
-			for (auto dIt = cn->domain.begin(); dIt != cn->domain.end();) {
+			for (auto dIt = cn->domain.begin(); dIt != cn->domain.end(); ++dIt) {
 				const auto& node = (*dIt)->convergent.front();
-				if (state == node->state) {
-					//refCN = node->convergentNode.lock();
-					++dIt;
-				//}
-				//else if (areConvergentNodesDistinguished(node->convergentNode.lock(), cn))  {
-					//dIt = cn->domain.erase(dIt);
-				} else {
+				if (state != node->state) {
 					domain.emplace_back(node->convergentNode.lock());
-					++dIt;
 				}
 			}
 		}
@@ -648,14 +638,14 @@ namespace FSMtesting {
 		list<shared_ptr<ConvergentNodeS>>& nodes, const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq,
 			int depth, const OTreeS& ot) {
 		distinguish(cn, nodes, fsm, sepSeq, ot);
-		distinguish(refCN, nodes, fsm, sepSeq, ot);
+		if (refCN) distinguish(refCN, nodes, fsm, sepSeq, ot);
 		if (depth > 0) {
 			nodes.emplace_back(cn);
-			if (!refCN->isRN) nodes.emplace_back(refCN);
+			if (refCN && !refCN->isRN) nodes.emplace_back(refCN);
 			for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
-				distinguishCNs(cn->next[i], refCN->next[i], nodes, fsm, sepSeq, depth - 1, ot);
+				distinguishCNs(cn->next[i], refCN ? refCN->next[i] : nullptr, nodes, fsm, sepSeq, depth - 1, ot);
 			}
-			if (!refCN->isRN) nodes.pop_back();
+			if (refCN && !refCN->isRN) nodes.pop_back();
 			nodes.pop_back();
 		}
 	}
@@ -717,8 +707,7 @@ namespace FSMtesting {
 		}
 		SeparatingSequencesInfo sepSeq;
 		sepSeq.st = getSplittingTree(fsm, false);
-		auto ADSet = getAdaptiveDistinguishingSet(fsm, true);
-		sepSeq.sepSeq = getSeparatingSequences(fsm);
+		//sepSeq.sepSeq = getSeparatingSequences(fsm);
 
 		auto ot = getDivergencePreservingStateCover(fsm, sepSeq, extraStates);
 		// stateNodes are initialized divergence-preserving state cover
@@ -735,8 +724,6 @@ namespace FSMtesting {
 				}
 			}
 		}
-		// stateNodes are initialized divergence-preserving state cover
-
 		transitions.sort([](const tran_t& t1, const tran_t& t2){
 			return (get<0>(t1)->convergent.front()->accessSequence.size() + get<2>(t1)->convergent.front()->accessSequence.size())
 				< (get<0>(t2)->convergent.front()->accessSequence.size() + get<2>(t2)->convergent.front()->accessSequence.size());
@@ -749,23 +736,44 @@ namespace FSMtesting {
 			auto nextStateCN = move(get<2>(transitions.front()));
 			transitions.pop_front();
 			if (startCN->next[input] && (startCN->next[input] == nextStateCN)) continue; // no ES and already verified
+			
+			//bool proveConvergence = false;  //!transitions.empty();// TODO a condition when else to omit converngence proof
+			set<state_t> startingStates;
+			for (const auto& t : transitions) {
+				startingStates.insert(get<0>(t)->state);
+			}
+			bool proveConvergence = startingStates.count(nextStateCN->state);
+			if (!proveConvergence && !startingStates.empty()) {
+				for (auto& seq : travSeqs) {
+					auto state = nextStateCN->state;
+					for (auto& i : seq) {
+						state = fsm->getNextState(state, i);
+						if (startingStates.count(state)) {
+							proveConvergence = true;
+							break;
+						}
+					}
+					if (proveConvergence) break;
+				}
+			}
+			if (!proveConvergence) printf("|");
 			// query minimal requested subtree
 			for (auto& seq : travSeqs) {
 				seq.push_front(input);
 				addSequence(startCN, seq, ot, fsm);
 				seq.pop_front();
-				addSequence(nextStateCN, seq, ot, fsm);
+				if (proveConvergence) addSequence(nextStateCN, seq, ot, fsm);
 			}
 			// identify next state
 			auto ncn = startCN->next[input];
 			list<shared_ptr<ConvergentNodeS>> tmp;
-			distinguishCNs(ncn, nextStateCN, tmp, fsm, sepSeq, extraStates, ot);
-			
-			if (startCN->next[input] != nextStateCN) {// already merged in case of no ES
+			distinguishCNs(ncn, proveConvergence ? nextStateCN : nullptr, tmp, fsm, sepSeq, extraStates, ot);
+
+			if (proveConvergence && (startCN->next[input] != nextStateCN)) {// already merged in case of no ES
 				startCN->next[input] = nextStateCN;
 				mergeCN(ncn, nextStateCN, tmp, ot.es == 0);
 				processIdentified(tmp, ot.es == 0);
-			}
+			}			
 		}		
 		// obtain TS
 		//printTStree(root);

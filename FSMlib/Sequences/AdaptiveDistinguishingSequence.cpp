@@ -149,7 +149,7 @@ namespace FSMsequence {
 			// check other valid input
 			for (input_t i = 0; i < node->sequence.size(); i++, seqInIt++) {
 				node->succ[i].first = *seqInIt; // for easier access to right input
-				vector<state_t> diffStates;
+				list<state_t> diffStates;
 				state_t pivot = node->succ[i].second->nextStates[0];
 				for (const auto& stateI : node->succ[i].second->nextStates) {
 					if (st->curNode[pivot] != st->curNode[stateI]) {
@@ -172,7 +172,7 @@ namespace FSMsequence {
 				}
 				else {// distinguishing input
 					auto next = st->curNode[pivot];
-					// find lowest node of ST with block of all diffStates and pivot
+					// find the lowest node of ST with block of all diffStates and pivot
 					for (const auto& diffState : diffStates) {
 						auto idx = getStatePairIdx(pivot, diffState);
 						if (next->block.size() < st->distinguished[idx]->block.size()) {
