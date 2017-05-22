@@ -160,7 +160,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 
 using namespace std::tr2::sys;
 
-void testDir(int argc, char** argv) {
+void testDirLearning(int argc, char** argv) {
 	string outFilename = "";
 	auto dir = string(argv[1]);
 	state_t maxExtraStates = 2;

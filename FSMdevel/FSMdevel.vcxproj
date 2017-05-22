@@ -233,6 +233,7 @@
     <ClCompile Include="experimenter.cpp" />
     <ClCompile Include="experimenterTesting.cpp" />
     <ClCompile Include="FSMgenerator.cpp" />
+    <ClCompile Include="MachinesAnalysis.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

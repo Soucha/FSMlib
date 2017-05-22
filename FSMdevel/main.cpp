@@ -442,19 +442,32 @@ static void printTS(sequence_set_t & TS, string filename) {
 	if (expected != actual) printf(format, ##__VA_ARGS__); }
 
 
-extern void testDir(int argc, char** argv);
-extern void testDirTesting(int argc, char** argv);
 extern void generateMachines(int argc, char** argv);
+extern void analyseDirMachines(int argc, char** argv);
+extern void testDirTesting(int argc, char** argv);
+extern void testDirLearning(int argc, char** argv);
 
 //extern void testBBport();
 
 int main(int argc, char** argv) {
-	//generate();return 0;
-	//compareTestingMethods();	return 0;
-	//testBBport();
-	generateMachines(argc, argv);/*
-	testDirTesting(argc, argv);/*
-	//testDir(argc, argv);/*
+	int prog = 2;
+	switch (prog) {
+	case 1:
+		generateMachines(argc, argv);
+		break;
+	case 2:
+		analyseDirMachines(argc, argv);
+		break;
+	case 3:
+		testDirTesting(argc, argv);
+		break;
+	case 4:
+		testDirLearning(argc, argv);
+		break;
+	default:
+		break;
+	}
+	/*
 #if DBG_MEMORY_LEAK
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
