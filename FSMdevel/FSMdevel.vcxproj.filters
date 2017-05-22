@@ -24,5 +24,8 @@
     <ClCompile Include="experimenterTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FSMgenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

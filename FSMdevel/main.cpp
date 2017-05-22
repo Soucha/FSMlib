@@ -444,6 +444,7 @@ static void printTS(sequence_set_t & TS, string filename) {
 
 extern void testDir(int argc, char** argv);
 extern void testDirTesting(int argc, char** argv);
+extern void generateMachines(int argc, char** argv);
 
 //extern void testBBport();
 
@@ -451,6 +452,7 @@ int main(int argc, char** argv) {
 	//generate();return 0;
 	//compareTestingMethods();	return 0;
 	//testBBport();
+	generateMachines(argc, argv);/*
 	testDirTesting(argc, argv);/*
 	//testDir(argc, argv);/*
 #if DBG_MEMORY_LEAK
