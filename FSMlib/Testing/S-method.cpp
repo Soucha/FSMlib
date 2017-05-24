@@ -706,7 +706,7 @@ namespace FSMtesting {
 			return getTraversalSet(fsm, extraStates);
 		}
 		SeparatingSequencesInfo sepSeq;
-		sepSeq.st = getSplittingTree(fsm, false);
+		sepSeq.st = getSplittingTree(fsm, true, false);
 		//sepSeq.sepSeq = getSeparatingSequences(fsm);
 
 		auto ot = getDivergencePreservingStateCover(fsm, sepSeq, extraStates);
@@ -742,7 +742,7 @@ namespace FSMtesting {
 			for (const auto& t : transitions) {
 				startingStates.insert(get<0>(t)->state);
 			}
-			bool proveConvergence = startingStates.count(nextStateCN->state);
+			bool proveConvergence(bool(startingStates.count(nextStateCN->state)));
 			if (!proveConvergence && !startingStates.empty()) {
 				for (auto& seq : travSeqs) {
 					auto state = nextStateCN->state;

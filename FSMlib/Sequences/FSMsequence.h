@@ -58,6 +58,7 @@ struct st_node_t {// Splitting Tree node
 	vector<state_t> block, nextStates;
 	sequence_in_t sequence;
 	vector<pair<output_t, shared_ptr<st_node_t>>> succ;
+	size_t undistinguishedStates = 0;
 };
 
 struct SplittingTree {
@@ -548,10 +549,12 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* Computers, IEEE Transactions on, IEEE, 1994, 43, 306-320
 	*
 	* @param dfsm - Deterministic FSM
+	* @param allowInvalidInputs - states are separated by an invalid input that transfers some states into the same state
+				if true and there is no valid distinguishing input for such set of states
 	* @param useStout - STOUT_INPUT follows each transition input (except the last one) in any sequence of ST if true
-	* @return a Splitting Tree, or nullptr if there is no ADS or the FSM is not compact
+	* @return a Splitting Tree, or nullptr if there is no ADS and !allowInvalidInputs, or the FSM is not compact
 	*/
-	FSMLIB_API unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& dfsm, bool useStout);
+	FSMLIB_API unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& dfsm, bool allowInvalidInputs, bool useStout);
 
 	/**
 	* Creates an Adaptive Distinguishing Sequence starting with the given set of states based on the given splitting tree.
