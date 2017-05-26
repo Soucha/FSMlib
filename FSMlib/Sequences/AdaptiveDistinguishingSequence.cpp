@@ -38,7 +38,7 @@ namespace FSMsequence {
 		* compares two pairs by sequence lenght saved in first element
 		*/
 		bool operator() (const pair<seq_len_t, state_t>& lp, const pair<seq_len_t, state_t>& rp) const {
-			return lp.first < rp.first;
+			return lp.first > rp.first;
 		}
 	};
 
@@ -78,7 +78,7 @@ namespace FSMsequence {
 		return getAdaptiveDistinguishingSet(fsm, ads);
 	}
 
-	static void distinguishSTnode(const unique_ptr<DFSM>& fsm, const shared_ptr<st_node_t>& node, bool allowInvalidInputs = false) {
+	static void distinguishSTnode(const unique_ptr<DFSM>& fsm, const shared_ptr<st_node_t>& node, bool allowInvalidInputs) {
 		for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 			vector<set<state_t>> sameOutput;
 			auto succCount = node->succ.size();
@@ -105,7 +105,7 @@ namespace FSMsequence {
 						break;
 					}
 				}
-				if (invalidInput) break;
+				if (invalidInput && !allowInvalidInputs) break;
 				if (!found) {
 					auto next = make_shared<st_node_t>();
 					next->block.emplace_back(state);
@@ -153,9 +153,10 @@ namespace FSMsequence {
 		}
 	}
 
-	static size_t getInvalidScore(const shared_ptr<st_node_t>& node, input_t input, const shared_ptr<st_node_t>& next) {
+	static size_t getInvalidScore(const shared_ptr<st_node_t>& node, input_t input, 
+			const shared_ptr<st_node_t>& next, bool countDistinguished = true) {
 		size_t invalidScore(node->block.size() * node->block.size());
-		state_t undistinguished(0);
+		state_t undistinguished(0), succCount(0);
 		auto& nextStates = node->succ[input].second->nextStates;
 		for (const auto& p : next->succ) {
 			set<state_t> diffStates;
@@ -170,10 +171,15 @@ namespace FSMsequence {
 					}
 				}
 			}
-			if (currUndist == undistinguished) {
+			if (!diffStates.empty()) {
+				succCount++;
+			}
+			if ((currUndist == undistinguished) && countDistinguished) {
 				invalidScore -= (diffStates.size() * node->block.size() + 1);
 			}
 		}
+		invalidScore *= node->block.size();
+		invalidScore -= succCount;
 		invalidScore *= node->block.size();
 		invalidScore += undistinguished;
 		return invalidScore;
@@ -192,9 +198,9 @@ namespace FSMsequence {
 			auto node = depInfo.dependent[dI];
 			if (node->nextStates.size() > 1) continue;// added block with a valid input
 			auto seqInIt = node->sequence.begin();
-			shared_ptr<st_node_t> bestNext;
+			shared_ptr<st_node_t> bestNext, bestInvalidNext;
 			input_t bestInput(STOUT_INPUT), bestInvalidInput(STOUT_INPUT);
-			size_t bestInvalidScore;
+			size_t bestInvalidScore(0);
 			bool hasLinkToOtherDependent = false;
 			auto depSize = depInfo.dependent.size();
 			// check other valid input
@@ -235,18 +241,22 @@ namespace FSMsequence {
 						}
 						if ((next->undistinguishedStates > 0) // next has an invalid sequence
 							&& (!bestNext || (bestNext->undistinguishedStates > 0)) // bestNext as well
-							&& (next->block.size() > node->succ[i].second->nextStates.size())) {
+							&& (next->block.size() > node->block.size())) {
 							// next has an invalid input -> check for a better input fot current nextStates
 							size_t depI = depInfo.initDepSize;
+							auto nextStatesSorted = node->succ[i].second->nextStates;
+							sort(nextStatesSorted.begin(), nextStatesSorted.end());
 							for(; depI < depInfo.dependent.size(); depI++) {
-								if (node->succ[i].second->nextStates == depInfo.dependent[depI]->block) {
+								if (nextStatesSorted == depInfo.dependent[depI]->block) {
 									break;
 								}
 							}
 							if (depI < depInfo.dependent.size()) {
 								if (depInfo.dependent[depI]->nextStates.size() == 1) {// undistinguished
-									depInfo.link[depI].emplace_back(i, dI);
-									//hasLinkToOtherDependent = true;
+									if (depI != dI) {
+										depInfo.link[depI].emplace_back(i, dI);
+										//hasLinkToOtherDependent = true;
+									}
 								}
 								else {
 									bestNext = depInfo.dependent[depI];
@@ -255,7 +265,7 @@ namespace FSMsequence {
 							}
 							else {
 								auto nextStateNode = make_shared<st_node_t>();
-								nextStateNode->block = node->succ[i].second->nextStates;
+								nextStateNode->block = move(nextStatesSorted);
 								distinguishSTnode(fsm, nextStateNode, true);
 								if (!nextStateNode->nextStates.empty()) {// valid separating input
 									bestNext = nextStateNode;
@@ -277,17 +287,79 @@ namespace FSMsequence {
 					}
 				}
 				else {// invalid input
-					size_t invalidScore(node->block.size() * node->block.size());
-					for (const auto& p : node->succ[i].second->succ) {
-						if (p.second->undistinguishedStates == 0) {
-							invalidScore -= (p.second->block.size() * node->block.size() + 1);
+					if (node->succ[i].second->succ.size() == 1) {
+						if (node->succ[i].second->undistinguishedStates + 1 < node->block.size()) {
+							list<state_t> diffStates;
+							set<state_t> diffNS;
+							state_t pivot = node->succ[i].second->nextStates[0];
+							for (const auto& stateI : node->succ[i].second->nextStates) {
+								diffNS.insert(stateI);
+								if (st->curNode[pivot] != st->curNode[stateI]) {
+									bool inDiff = false;
+									for (const auto& diffState : diffStates) {
+										if (st->curNode[stateI] == st->curNode[diffState]) {
+											inDiff = true;
+											break;
+										}
+									}
+									if (!inDiff) {
+										diffStates.emplace_back(stateI);
+									}
+								}
+							}
+							auto next = st->curNode[pivot];
+							// find the lowest node of ST with block of all diffStates and pivot
+							for (const auto& diffState : diffStates) {
+								auto idx = getStatePairIdx(pivot, diffState);
+								if (next->block.size() < st->distinguished[idx]->block.size()) {
+									next = st->distinguished[idx];
+								}
+							}
+							if (diffStates.empty() || (next->undistinguishedStates > 0)) {
+								auto nextStateNode = make_shared<st_node_t>();
+								nextStateNode->block.assign(diffNS.begin(), diffNS.end());
+								distinguishSTnode(fsm, nextStateNode, true);
+								if (!nextStateNode->nextStates.empty()) {// valid separating input
+									next = nextStateNode;
+								}
+								else if (diffStates.empty()) {// both next and nextStateNode were not distinguished
+									if ((bestInvalidInput == STOUT_INPUT) && !bestNext &&
+										!hasLinkToOtherDependent && (i == (node->sequence.size() - 1))) {
+										//TODO it needs to be solved somehow
+										throw "";
+									}
+									else {// forget about the input - already observed are sufficient
+										next = nullptr;
+									}
+								}
+							}
+							if (next) {
+								auto invalidScore = getInvalidScore(node, i, next, false);
+								invalidScore += node->succ[i].second->undistinguishedStates;
+								if ((bestInvalidInput == STOUT_INPUT) || (bestInvalidScore > invalidScore)) {
+									bestInvalidNext = next;
+									bestInvalidInput = i;
+									bestInvalidScore = invalidScore;
+								}
+							}
 						}
 					}
-					invalidScore *= node->block.size();
-					invalidScore += node->succ[i].second->undistinguishedStates;
-					if ((bestInvalidInput == STOUT_INPUT) || (bestInvalidScore > invalidScore)) {
-						bestInvalidInput = i;
-						bestInvalidScore = invalidScore;
+					else {
+						size_t invalidScore(node->block.size() * node->block.size());
+						for (const auto& p : node->succ[i].second->succ) {
+							if (p.second->undistinguishedStates == 0) {
+								invalidScore -= (p.second->block.size() * node->block.size() + 1);
+							}
+						}
+						invalidScore *= node->block.size();
+						invalidScore -= node->succ[i].second->succ.size();
+						invalidScore *= node->block.size();
+						invalidScore += node->succ[i].second->undistinguishedStates;
+						if ((bestInvalidInput == STOUT_INPUT) || (bestInvalidScore > invalidScore)) {
+							bestInvalidNext = nullptr;
+							bestInvalidInput = i;
+							bestInvalidScore = invalidScore;
+						}
 					}
 				}
 			}
@@ -316,12 +388,11 @@ namespace FSMsequence {
 	//					depInfo.bfsqueue.emplace(seq_len_t(bestNext->sequence.size()), dI);
 					//} else 
 					if (bestInvalidScore > invalidScore) {
-						bestInvalidInput = bestInput;
 						bestInvalidScore = invalidScore;
 					}
 					else {
 						bestInput = bestInvalidInput;
-						bestNext = nullptr;
+						bestNext = bestInvalidNext;
 					}
 					node->undistinguishedStates = bestInvalidScore;
 				}
@@ -330,7 +401,7 @@ namespace FSMsequence {
 			else if (bestInvalidInput != STOUT_INPUT) {
 				//if (hasLinkToOtherDependent) {
 				node->undistinguishedStates = bestInvalidScore;
-				node->succ.emplace_back(bestInvalidInput, nullptr);
+				node->succ.emplace_back(bestInvalidInput, move(bestInvalidNext));
 				//}
 				//else {// only invalid inputs
 
@@ -368,6 +439,8 @@ namespace FSMsequence {
 							node->succ[i].first = next->succ[i].first;
 							node->succ[i].second->block.clear();
 							node->succ[i].second->nextStates.clear();
+							node->succ[i].second->succ.clear();
+							node->succ[i].second->undistinguishedStates = 0;
 						}
 					}
 					// distinguish block of states
@@ -384,7 +457,6 @@ namespace FSMsequence {
 							}
 						}
 					}
-					node->undistinguishedStates %= node->block.size();
 					// remove unused output
 					for (long i = long(node->succ.size() - 1); i >= 0; i--) {
 						if (node->succ[i].second->block.empty()) {
@@ -392,12 +464,16 @@ namespace FSMsequence {
 							node->succ.pop_back();
 						}
 					}
+					node->undistinguishedStates %= node->block.size();
 				}
 				else {// invalid input
 					next = node->succ[node->succ.back().first].second;
 					node->undistinguishedStates = next->undistinguishedStates;
 					node->nextStates.swap(next->nextStates);
 					node->succ.swap(next->succ);
+					for (const auto& p : node->succ) {
+						p.second->undistinguishedStates = 0;
+					}
 				}
 				if (dI < depInfo.initDepSize) {
 					// update links
@@ -527,7 +603,7 @@ namespace FSMsequence {
 			auto node = partition.top();
 			partition.pop();
 			// find distinguishing input or sort out other valid inputs
-			distinguishSTnode(fsm, node);
+			distinguishSTnode(fsm, node, allowInvalidInputs);
 			if (node->succ.empty()) {// no valid input - possible only by root
 				return nullptr;
 			}
@@ -558,6 +634,7 @@ namespace FSMsequence {
 				// check that all dependent was divided
 				if (!processDependent(depInfo, partition, st, useStout)) {
 					if (allowInvalidInputs) {
+						prepareLinksOfInvalid(depInfo);
 						if (!processDependent(depInfo, partition, st, useStout)) {
 							throw "";
 						}

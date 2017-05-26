@@ -230,7 +230,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="experimenter.cpp" />
+    <ClCompile Include="experimenterLearning.cpp" />
     <ClCompile Include="experimenterTesting.cpp" />
     <ClCompile Include="FSMgenerator.cpp" />
     <ClCompile Include="MachinesAnalysis.cpp" />

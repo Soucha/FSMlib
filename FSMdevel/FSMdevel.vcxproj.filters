@@ -18,9 +18,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="experimenter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="experimenterTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -28,6 +25,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MachinesAnalysis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="experimenterLearning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

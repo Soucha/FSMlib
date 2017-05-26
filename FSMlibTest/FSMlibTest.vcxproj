@@ -246,6 +246,7 @@
     <ClCompile Include="Model\UtilsTests.cpp" />
     <ClCompile Include="PrefixSetTests.cpp" />
     <ClCompile Include="Sequences\ADS.cpp" />
+    <ClCompile Include="Sequences\ASepSeq.cpp" />
     <ClCompile Include="Sequences\CoverTests.cpp" />
     <ClCompile Include="Sequences\DS.cpp" />
     <ClCompile Include="Sequences\HS.cpp" />

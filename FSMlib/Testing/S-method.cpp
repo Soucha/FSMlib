@@ -756,7 +756,8 @@ namespace FSMtesting {
 					if (proveConvergence) break;
 				}
 			}
-			if (!proveConvergence) printf("|");
+			//if (!proveConvergence) printf("|");
+			proveConvergence = true;
 			// query minimal requested subtree
 			for (auto& seq : travSeqs) {
 				seq.push_front(input);

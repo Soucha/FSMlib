@@ -119,134 +119,6 @@ void testSepSeqs() {
 	groupTest(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_SVS.fsm");
 }
 
-static void testAllMethod(string filename) {
-	sequence_vec_t hint;
-	sequence_in_t CS;
-	int extraStates = 0;
-	
-	fsm->load(filename);
-	printf("%d;%d;%d;%d;%d;1;%d;", fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(),
-		fsm->getType(), (int)fsm->isReduced(), extraStates);
-
-	auto TS = SPY_method(fsm, extraStates);
-	seq_len_t len = 0;
-	for (sequence_in_t seq : TS) len += seq_len_t(seq.size() + 1);
-	auto indist = FaultCoverageChecker::getFSMs(fsm, TS, extraStates);
-	printf("%d;%d;", len, indist.size());
-}
-
-static void testAll() {
-	fsm = make_unique<Mealy>();
-	testAllMethod(DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm");
-	
-	fsm = make_unique<Moore>();
-	testAllMethod(DATA_PATH + EXAMPLES_DIR + "Moore_R4_PDS.fsm");
-
-	fsm = make_unique<DFSM>();
-	testAllMethod(DATA_PATH + EXAMPLES_DIR + "DFSM_R5_PDS.fsm");
-
-}
-
-static void compareTestingMethods() {
-	path dirPath("../" + DATA_PATH + EXPERIMENTS_DIR + "100multi/");
-	directory_iterator endDir;
-	printf("FSMtype\tStates\tInputs\tOutputs\tES\tH\tH-indist\tSPY\tSPY-indist\tfileName\n");
-	for (directory_iterator it(dirPath); it != endDir; ++it) {
-		if (is_regular_file(it->status())) {
-			path fn(it->path());
-			if (fn.extension().compare(".fsm") == 0) {
-				fsm = FSMmodel::loadFSM(fn.string());
-				if (fsm) {// && (fsm->getNumberOfStates() == 664)) {
-					for (state_t ES = 0; ES < 4; ES++) {
-						printf("%d\t%d\t%d\t%d\t%d\t",
-							fsm->getType(), fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), ES);
-						auto TS = H_method(fsm, ES);
-						seq_len_t len = 0;
-						for (auto& seq : TS) len += seq.size() + 1;
-						auto indist = sequence_vec_t();// FaultCoverageChecker::getFSMs(fsm, TS, ES);
-						printf("%d\t%d\t", len, indist.size());
-
-						TS = SPY_method(fsm, ES);
-						len = 0;
-						for (auto& seq : TS) len += seq.size() + 1;
-						//indist = FaultCoverageChecker::getFSMs(fsm, TS, ES);
-						printf("%d\t%d\t", len, indist.size());
-
-						printf("%s\n", fn.filename().c_str());
-					}
-				}
-			}
-		}
-	}
-}
-
-static void generate() {
-	srand(time(NULL));
-	int cU, cS, cNS, cNADS, c = 0;
-	fsm = make_unique<Mealy>();
-	for (state_t states = 10; states <= 100; states += 10) {
-		//while (c < 10) {
-		cS = cU = cNS = cNADS = 0;
-		input_t inputs = states * 2;
-		output_t outputs = 2;//states / 10;
-		while (cS < 10) {
-			try {
-				fsm->generate(states, inputs, outputs);
-				if (fsm->getType() == TYPE_DFSM) {
-					bool properDFSM = false;
-					for (state_t state = 0; !properDFSM && (state < states); state++) {
-						for (input_t i = 0; i < inputs; i++) {
-							if (fsm->getOutput(state, i) != fsm->getOutput(fsm->getNextState(state, i), STOUT_INPUT)) {
-								properDFSM = true;
-								break;
-							}
-						}
-					}
-					if (!properDFSM) continue;
-				}
-				fsm->minimize();
-				if (states == fsm->getNumberOfStates()) {
-					if (FSMmodel::isStronglyConnected(fsm)) {
-						auto ads = FSMsequence::getAdaptiveDistinguishingSequence(fsm);
-						if (ads) {
-							fsm->save(DATA_PATH + EXPERIMENTS_DIR + "10multiIn2nOutBin/");
-							cS++;
-						}
-						else {
-							//fsm->save("data/experiments/NoADS/");
-							cNADS++;
-						}
-					}
-					else {
-						//fsm->save("data/experiments/NotStronglyConnected/");
-						cNS++;
-					}
-				}
-				else {
-					cU++;
-				}
-			}
-			catch (const char * ex) {
-				printf(ex);
-				//return EXIT_FAILURE;
-			}
-			catch (string ex) {
-				printf(ex.c_str());
-			}
-			catch (exception& e) {
-				printf("%s\n", e.what());
-				//return EXIT_FAILURE;
-			}
-			catch (...) {
-				printf("wtf\n");
-				//return EXIT_FAILURE;
-			}
-		}
-		printf("%d;%d;%d;%d;%d;%d;%d;%d\n", states, cS, cNADS, cNS, cU, fsm->getType(), inputs, outputs);
-		c++;
-	}
-}
-
 static DFSM getFSM() {
 	DFSM dfsm;
 	dfsm.create(3, 4, 5);
@@ -285,127 +157,11 @@ bool showAndStop(const unique_ptr<DFSM>& conjecture) {
 	return !ce.empty();
 }
 
-static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, double sec, const string& description) {
-	printf("%d;%d;%d;%d;%d;%f;%s\n", FSMmodel::areIsomorphic(fsm, model), teacher->getAppliedResetCount(),
-		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), sec, description.c_str());
-}
-
-static void testLstar(const unique_ptr<Teacher>& teacher,
-	function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)> processCE,
-	string fnName, bool checkConsistency = false) {
-	auto model = Lstar(teacher, processCE, showConjecture, false, true);
-	string desc = ";L*;" + fnName + ";;;";
-	printCSV(teacher, model, 0, desc);
-	/*
-	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
-	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
-	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\t" << fnName << endl;*/
-}
-
-static void testLStarAllVariants() {
-	//fsm = make_unique<Moore>();
-	//fsm->load(DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm");
-
-	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
-	//ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
-	//ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
-	//ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
-
-	for (size_t i = 0; i < ceFunc.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
-	}
-
-	for (size_t i = 0; i < ceFunc.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
-	}
-
-	for (size_t i = 0; i < ceFunc.size(); i++) {
-		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, SPY_method);
-		testLstar(teacher, ceFunc[i].first, ceFunc[i].second, (i == 0));
-	}
-}
-
 #define COMPUTATION_TIME(com) \
 	auto start = chrono::system_clock::now(); \
 	com; \
 	auto end = chrono::system_clock::now(); \
 	chrono::duration<double> elapsed_seconds = end - start; 
-
-static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates = 1, seq_len_t maxDistLen = 2) {
-	printf("Correct;#Resets;#OQs;#EQs;#symbols;seconds;fileName;Algorithm;CEprocessing;Teacher;BB;\n");
-	vector<string> descriptions;
-	vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
-#if 1 // L*
-	vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
-	ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
-	ceFunc.emplace_back(PTRandSTR(addAllSuffixesAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffix1by1ToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
-	ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
-	for (size_t i = 0; i < ceFunc.size(); i++) {
-		descriptions.emplace_back(fnName + ";L*;" + ceFunc[i].second + ";");
-		algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 0), (i > 2)));
-	}
-#endif
-#if 1 // DT
-	descriptions.emplace_back(fnName + ";DT;;");
-	algorithms.emplace_back(bind(DiscriminationTreeAlgorithm, placeholders::_1, nullptr));
-#endif
-#if 1 // OP
-	vector<pair<OP_CEprocessing, string>> opCeFunc;
-	opCeFunc.emplace_back(PTRandSTR(AllGlobally));
-	opCeFunc.emplace_back(PTRandSTR(OneGlobally));
-	opCeFunc.emplace_back(PTRandSTR(OneLocally));
-	for (size_t i = 0; i < opCeFunc.size(); i++) {
-		descriptions.emplace_back(fnName + ";OP;" + opCeFunc[i].second + ";");
-		algorithms.emplace_back(bind(ObservationPackAlgorithm, placeholders::_1, opCeFunc[i].first, nullptr));
-	}
-#endif
-#if 1 // TTT
-	descriptions.emplace_back(fnName + ";TTT;;");
-	algorithms.emplace_back(bind(TTT, placeholders::_1, nullptr));
-#endif
-#if 1 // Quotient
-	descriptions.emplace_back(fnName + ";Quotient;;");
-	algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
-#endif
-#if 1 // GoodSplit
-	descriptions.emplace_back(fnName + ";GoodSplit;maxDistLen:" + to_string(maxDistLen) + ";");
-	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, true));
-#endif
-#if 1 // ObservationTreeAlgorithm
-	descriptions.emplace_back(fnName + ";OTree;ExtraStates:" + to_string(maxExtraStates) + ";");
-	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, nullptr, true));
-#endif
-
-#if 0 // TeacherDFSM
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher))
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM;;");
-	}
-#endif
-#if 1 // TeacherRL
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher))
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL;;");
-	}
-#endif
-#if 1 // TeacherBB
-	for (size_t i = 0; i < algorithms.size(); i++) {
-		shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-		unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-		COMPUTATION_TIME(auto model = algorithms[i](teacher))
-		printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherBB:SPY_method (3 extra states);BlackBoxDFSM;");
-	}
-#endif
-}
 
 static void translateLearnLibDFAtoFSMformat(string fileName) {
 	fsm = make_unique<DFA>();
@@ -433,14 +189,16 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 
 static void printTS(sequence_set_t & TS, string filename) {
 	printf("Set of %d test sequences (%s):\n", TS.size(), filename.c_str());
+	seq_len_t len(0);
 	for (sequence_in_t cSeq : TS) {
+		len += cSeq.size();
 		printf("%s\n", FSMmodel::getInSequenceAsString(cSeq).c_str());
 	}
+	printf("Total length: %d\n", len);
 }
 
 #define ARE_EQUAL(expected, actual, format, ...) {\
 	if (expected != actual) printf(format, ##__VA_ARGS__); }
-
 
 extern void generateMachines(int argc, char** argv);
 extern void analyseDirMachines(int argc, char** argv);
@@ -450,7 +208,7 @@ extern void testDirLearning(int argc, char** argv);
 //extern void testBBport();
 
 int main(int argc, char** argv) {
-	int prog = 2;
+	int prog = 3;
 	switch (prog) {
 	case 1:
 		generateMachines(argc, argv);
@@ -465,9 +223,7 @@ int main(int argc, char** argv) {
 		testDirLearning(argc, argv);
 		break;
 	default:
-		break;
-	}
-	/*
+	//*
 #if DBG_MEMORY_LEAK
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
@@ -483,12 +239,12 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R20_8Ddyp.fsm"; 
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R20_8Ddyp.fsm"; 
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
@@ -498,9 +254,10 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
-
+	//auto st = getSplittingTree(fsm, true, false);
+	
 	bool test = true;
-	for (int extraStates = 1; extraStates <= 1; extraStates++) {
+	for (int extraStates = 0; extraStates <= 2; extraStates++) {
 		auto TS = S_method(fsm, extraStates);
 		printTS(TS, fileName);
 		if (test) {
@@ -512,7 +269,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	/* /testLStarAllVariants();
+	/* /
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
@@ -532,11 +289,7 @@ int main(int argc, char** argv) {
 		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(),
 		elapsed_seconds.count());
 	/* /
-	cout << "Correct: " << FSMmodel::areIsomorphic(fsm, model) << ", reset: " << teacher->getAppliedResetCount();
-	cout << ",\tOQ: " << teacher->getOutputQueryCount() << ",\tEQ: " << teacher->getEquivalenceQueryCount();
-	cout << ",\tsymbols: " << teacher->getQueriedSymbolsCount() << ",\ttime:" << elapsed_seconds.count() << endl;
 	//*/
-	//compareLearningAlgorithms(fileName, 1, 2);
 	//translateLearnLibDFAtoFSMformat(DATA_PATH + "sched5.dfa");
 	/*
 	sequence_set_t TS;
@@ -582,7 +335,9 @@ int main(int argc, char** argv) {
 		}
 	}
 	*/
-	
+	break;
+	}
+
 	char c;
 	//printf("type any key to end: ");
 	cin >> c;
