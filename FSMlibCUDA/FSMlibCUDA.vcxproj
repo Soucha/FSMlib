@@ -277,6 +277,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClCompile Include="..\FSMlib\Sequences\FSMcovers.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\HomingSequence.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\PresetDistinguishingSequence.cpp" />
+    <ClCompile Include="..\FSMlib\Sequences\SplittingTree.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\StateVerifyingSequence.cpp" />
     <ClCompile Include="..\FSMlib\Sequences\SynchronizingSequence.cpp" />
     <ClCompile Include="..\FSMlib\stdafx.cpp">

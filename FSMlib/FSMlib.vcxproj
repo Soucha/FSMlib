@@ -275,6 +275,7 @@
     <ClCompile Include="Sequences\FSMcovers.cpp" />
     <ClCompile Include="Sequences\HomingSequence.cpp" />
     <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp" />
+    <ClCompile Include="Sequences\SplittingTree.cpp" />
     <ClCompile Include="Sequences\StateVerifyingSequence.cpp" />
     <ClCompile Include="Sequences\SynchronizingSequence.cpp" />
     <ClCompile Include="stdafx.cpp">

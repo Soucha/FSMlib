@@ -253,6 +253,7 @@
     <ClCompile Include="Sequences\PDS.cpp" />
     <ClCompile Include="Sequences\SCSet.cpp" />
     <ClCompile Include="Sequences\SS.cpp" />
+    <ClCompile Include="Sequences\ST.cpp" />
     <ClCompile Include="Sequences\SVS.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

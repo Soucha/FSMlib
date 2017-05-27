@@ -370,55 +370,6 @@ namespace FSMtesting {
 		appendSequence(*bestStartNodeIt, seq, ot, fsm);
 	}
 
-	static sequence_in_t getSeparatingSequenceFromST(state_t state, set<state_t> states, 
-		const unique_ptr<SplittingTree>& st, const unique_ptr<DFSM>& fsm) {
-		sequence_in_t seq;
-		while (states.size() > 1) {
-			auto it = states.begin();
-			auto pivot = *it;
-			++it;
-			auto next = st->distinguished[getStatePairIdx(pivot, *it)];
-			// find lowest node of ST with block of all states
-			for (++it; it != states.end(); ++it) {
-				auto idx = getStatePairIdx(pivot, *it);
-				if (next->block.size() < st->distinguished[idx]->block.size()) {
-					next = st->distinguished[idx];
-				}
-			}
-			seq.insert(seq.end(), next->sequence.begin(), next->sequence.end());
-			//if (useStout && (seq.back() != STOUT_INPUT)) seq.push_back(STOUT_INPUT);
-			auto out = fsm->getOutputAlongPath(state, next->sequence).back();
-			set<state_t> nextStates;
-			for (const auto &p : next->succ) {
-				if (p.first == out) {
-					auto bIt = next->block.begin(); 
-					auto nIt = next->nextStates.begin();
-					auto nbIt = p.second->block.begin();
-					for (auto& s : states) {
-						for (; (nbIt != p.second->block.end()) && (*nbIt < s); ++nbIt);
-						if (nbIt == p.second->block.end()) break;
-						if (*nbIt == s) {// state s has the same output
-							for (; (bIt != next->block.end()) && (*bIt < s); ++bIt, ++nIt);
-							nextStates.insert(*nIt);
-						}
-					}
-					break;
-				}
-			}
-			/* alternatively get next states from FSM
-			for (auto& s : states) {
-			if (out == fsm->getOutputAlongPath(s, next->sequence).back()) {
-			nextStates.insert(fsm->getEndPathState(s, next->sequence));
-			}
-			}
-			*/
-
-			state = fsm->getEndPathState(state, next->sequence);
-			states.swap(nextStates);
-		}
-		return seq;
-	}
-
 	static void generateConvergentSubtree(const shared_ptr<ConvergentNodeS>& cn, const OTreeS& ot,
 			list<shared_ptr<TestNodeS>>& leaves) {
 		const auto& node = cn->convergent.front();
@@ -459,7 +410,7 @@ namespace FSMtesting {
 		for (state_t i = 0; i < stateNodes.size(); i++) {
 			states.emplace(i);
 		}
-		auto seq = getSeparatingSequenceFromST(0, states, sepSeq.st, fsm);
+		auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, 0, states, true);
 		appendSequence(root, seq, ot, fsm, false);
 		
 		queue<shared_ptr<TestNodeS>> fifo, fifoNext;
@@ -475,7 +426,7 @@ namespace FSMtesting {
 						stateNodes[nn->state] = make_shared<ConvergentNodeS>(nn, true);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
-						auto seq = getSeparatingSequenceFromST(nn->state, states, sepSeq.st, fsm);
+						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, nn->state, states, true);
 						appendSequence(nn, seq, ot, fsm, false);
 						fifoNext.emplace(nn);
 					}
@@ -488,7 +439,7 @@ namespace FSMtesting {
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					auto nextState = fsm->getNextState(node->state, input);
 					if ((nextState != NULL_STATE) && !stateNodes[nextState]) {
-						auto seq = getSeparatingSequenceFromST(nextState, states, sepSeq.st, fsm);
+						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, nextState, states, true);
 						seq.push_front(input);
 						appendSequence(node, seq, ot, fsm, false);
 						auto& nn = node->next[input];
@@ -512,7 +463,7 @@ namespace FSMtesting {
 				}
 			}
 			while (states.size() > 1) {
-				auto seq = getSeparatingSequenceFromST(sn->state, states, sepSeq.st, fsm);
+				auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, sn->state, states, true);
 				appendSequence(refNode, seq, ot, fsm, false);
 				auto refOut = fsm->getOutputAlongPath(sn->state, seq);
 				for (auto it = states.begin(); it != states.end();) {
@@ -583,7 +534,7 @@ namespace FSMtesting {
 				diffStates.insert(n->state);
 			}
 			diffStates.insert(state);
-			auto seq = getSeparatingSequenceFromST(state, diffStates, sepSeq.st, fsm);
+			auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, state, diffStates, true);
 			/*
 			auto seq = getShortestSepSeq(state, diffStates, sepSeq, fsm);
 			cost_t cost(getLenCost(cn, seq), state_t(domain.size()));

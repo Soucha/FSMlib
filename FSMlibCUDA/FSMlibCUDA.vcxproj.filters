@@ -178,6 +178,9 @@
     <ClCompile Include="..\FSMlib\UnionFind.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\FSMlib\Sequences\SplittingTree.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\FSMvis.html" />

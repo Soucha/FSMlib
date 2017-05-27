@@ -97,6 +97,7 @@ namespace FSMlibTestCUDA
 
 		void groupTest(string filename) {
 			testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences));
+			testGetSeparatingSequences(filename, PTRandSTR(getStatePairsSeparatingSequencesFromSplittingTree));
 #ifdef PARALLEL_COMPUTING
 			testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences_ParallelSF));
 			testGetSeparatingSequences(filename, PTRandSTR(getStatePairsShortestSeparatingSequences_ParallelQueue));

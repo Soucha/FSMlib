@@ -551,10 +551,52 @@ namespace FSMsequence {// all design functions require a compact FSM
 	* @param dfsm - Deterministic FSM
 	* @param allowInvalidInputs - states are separated by an invalid input that transfers some states into the same state
 				if true and there is no valid distinguishing input for such set of states
-	* @param useStout - STOUT_INPUT follows each transition input (except the last one) in any sequence of ST if true
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a Splitting Tree, or nullptr if there is no ADS and !allowInvalidInputs, or the FSM is not compact
 	*/
-	FSMLIB_API unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& dfsm, bool allowInvalidInputs, bool useStout);
+	FSMLIB_API unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& dfsm, bool allowInvalidInputs, bool omitUnnecessaryStoutInputs = false);
+
+	/**
+	* Builds a sequence that separates the most states of the given set from the given state
+	* based on the given Splitting Tree of dfsm.
+	* @param dfsm - Deterministic FSM
+	* @param st - the Splitting Tree of dfsm
+	* @param state - a particular state for which the separating sequence is to be designed
+	* @param states - a set of states (including the given state) from which the state is to be separated
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
+	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
+	*/
+	FSMLIB_API sequence_in_t getSeparatingSequenceFromSplittingTree(const unique_ptr<DFSM>& dfsm, const unique_ptr<SplittingTree>& st,
+		state_t state, set<state_t> states, bool omitUnnecessaryStoutInputs = false);
+
+	/**
+	* Builds separating sequences that distinguish related pairs of states based on the Splitting Tree of dfsm.
+	* See getStatePairIdx() to obtain state pair index from indexes of states.
+	*
+	* @param dfsm - Deterministic FSM
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
+	* @return a collection of shortest separating sequences for each state pair, or an empty collection if the FSM is not compact
+	*/
+	FSMLIB_API sequence_vec_t getStatePairsSeparatingSequencesFromSplittingTree(const unique_ptr<DFSM>& dfsm, bool omitUnnecessaryStoutInputs = false);
+
+	/**
+	* Finds state characterizing sets for all states of FSM<br>
+	* such that each pair of sets contains <br>
+	* same separating sequence of related states.<br>
+	* Result is thus a family of harmonized state identifiers.
+	* Output vector will have length of the number of states.<br>
+	* Sequence set outSCSets[i] belongs to state i (for all i < dfsm->getNumberOfStates()).
+	* @param dfsm - Deterministic FSM
+	* @param st - the Splitting Tree of dfsm
+	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
+	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
+	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
+	*/
+	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& dfsm,
+		const unique_ptr<SplittingTree>& st, bool omitUnnecessaryStoutInputs = false);
 
 	/**
 	* Creates an Adaptive Distinguishing Sequence starting with the given set of states based on the given splitting tree.

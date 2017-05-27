@@ -179,6 +179,9 @@
     <ClCompile Include="Sequences\ASepSeq.cpp">
       <Filter>Source Files\Sequences</Filter>
     </ClCompile>
+    <ClCompile Include="Sequences\ST.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
