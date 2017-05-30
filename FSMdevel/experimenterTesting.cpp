@@ -172,7 +172,7 @@ using namespace std::tr2::sys;
 
 void testDirTesting(int argc, char** argv) {
 	string outFilename = "";
-	auto dir = string(argv[1]);
+	auto dir = string(argv[2]);
 	state_t maxExtraStates = 2;
 	unsigned int machineTypeMask = unsigned int(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
@@ -181,7 +181,7 @@ void testDirTesting(int argc, char** argv) {
 	bool TSalgAllowed = true;
 	bool CSalgAllowed = true;
 	bool checkCorrectness = true;
-	for (int i = 2; i < argc; i++) {
+	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
 			outFilename = string(argv[++i]);
 		}
@@ -204,8 +204,8 @@ void testDirTesting(int argc, char** argv) {
 		}
 		else if (strcmp(argv[i], "-at") == 0) {//algorithm type
 			auto algorithmTypeMask = atoi(argv[++i]);
-			TSalgAllowed = 1 & algorithmTypeMask;
-			CSalgAllowed = 2 & algorithmTypeMask;
+			TSalgAllowed = bool((1 & algorithmTypeMask) != 0);
+			CSalgAllowed = bool((2 & algorithmTypeMask) != 0);
 		}
 		else if (strcmp(argv[i], "-ts") == 0) {//algorithm TS
 			TSalgorithmMask = atoi(argv[++i]);
@@ -214,10 +214,10 @@ void testDirTesting(int argc, char** argv) {
 			CSalgorithmMask = atoi(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-co") == 0) {//check correctness
-			checkCorrectness = atoi(argv[++i]);
+			checkCorrectness = bool(atoi(argv[++i]) != 0);
 		}
 	}
-	if (outFilename.empty()) outFilename = dir + "resultsTesting.csv";
+	if (outFilename.empty()) outFilename = dir + "_resultsTesting.csv";
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;

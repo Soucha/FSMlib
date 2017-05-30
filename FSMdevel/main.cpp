@@ -197,6 +197,37 @@ static void printTS(sequence_set_t & TS, string filename) {
 	printf("Total length: %d\n", len);
 }
 
+static void printCSV(const unique_ptr<DFSM>& fsm, vector<sequence_set_t>& hsi, double sec,
+	int algId, const string& algName, const string& fnName) {
+	size_t seqs(0);
+	seq_len_t len(0);
+	for (const auto& h : hsi) {
+		seqs += h.size();
+		for (const auto& seq : h) {
+			len += seq.size();
+		}
+	}
+	printf("%d\t%d\t%d\t%d\t%d\t%d\t%f\t%s\t%d\t%s\n", fsm->getType(),
+		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(),
+		seqs, len, sec, algName.c_str(), algId, fnName.c_str());
+}
+
+static void compareDesignAlgoritms(const unique_ptr<DFSM>& fsm, const string& fnName) {
+	{
+		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiers(fsm, getStatePairsShortestSeparatingSequences));
+		printCSV(fsm, hsi, elapsed_seconds.count(), 0, "ShortestSeparatingSequences", fnName);
+	}
+	{
+		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiers(fsm, getStatePairsSeparatingSequencesFromSplittingTree));
+		printCSV(fsm, hsi, elapsed_seconds.count(), 1, "SeparatingSequencesFromSplittingTree", fnName);
+	}
+	{
+		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiers(fsm, getSplittingTree(fsm, true)));
+		printCSV(fsm, hsi, elapsed_seconds.count(), 2, "SplittingTreeBased", fnName);
+	}
+	//printf(".");
+}
+
 #define ARE_EQUAL(expected, actual, format, ...) {\
 	if (expected != actual) printf(format, ##__VA_ARGS__); }
 
@@ -204,11 +235,12 @@ extern void generateMachines(int argc, char** argv);
 extern void analyseDirMachines(int argc, char** argv);
 extern void testDirTesting(int argc, char** argv);
 extern void testDirLearning(int argc, char** argv);
+extern void compareHSIdesigns(int argc, char** argv);
 
 //extern void testBBport();
 
 int main(int argc, char** argv) {
-	int prog = 0;
+	int prog = (argc > 1) ? atoi(argv[1]) : 0;
 	switch (prog) {
 	case 1:
 		generateMachines(argc, argv);
@@ -222,6 +254,9 @@ int main(int argc, char** argv) {
 	case 4:
 		testDirLearning(argc, argv);
 		break;
+	case 5:
+		compareHSIdesigns(argc, argv);
+		break;
 	default:
 	//*
 #if DBG_MEMORY_LEAK
@@ -229,8 +264,8 @@ int main(int argc, char** argv) {
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(1045);
 #endif
-	//char* vals[10] = { "", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
-	//char* vals[12] = { "", "../data/experiments/10multi/", "-ts", "512", "-cs", "0", "-m", "12", "-co", "1", "-es", "0" }; testDirTesting(12, vals);/*
+	//char* vals[11] = { "", "4", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
+	//char* vals[13] = { "", "3", "../data/experiments/10multi/", "-ts", "512", "-cs", "0", "-m", "12", "-co", "1", "-es", "0" }; testDirTesting(12, vals);/*
 	//getCSet();
 	//fsm = make_unique<Mealy>();
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R50_peterson2.fsm"; 
@@ -245,7 +280,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	string fileName = DATA_PATH + "10multi/" + "DFA_R100_XXYV8.fsm";
+	string fileName = DATA_PATH + "10multi/" + "DFA_R10_lwEcI.fsm";//DFA_R100_0N9k1
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
@@ -255,8 +290,9 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
-	auto st = getSplittingTree(fsm, true, false);
-	
+ 	auto st = getSplittingTree(fsm, true);
+	compareDesignAlgoritms(fsm, fileName);
+
 	bool test = true;
 	for (int extraStates = 0; extraStates <= 2; extraStates++) {
 		auto TS = S_method(fsm, extraStates);

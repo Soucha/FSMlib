@@ -162,7 +162,7 @@ using namespace std::tr2::sys;
 
 void testDirLearning(int argc, char** argv) {
 	string outFilename = "";
-	auto dir = string(argv[1]);
+	auto dir = string(argv[2]);
 	state_t maxExtraStates = 2;
 	seq_len_t maxDistLen = 2;
 	bool isEQallowed = true;
@@ -170,7 +170,7 @@ void testDirLearning(int argc, char** argv) {
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
 	unsigned int algorithmMask = unsigned int(-1);//all
 	unsigned int teacherMask = 1;//TEACHER_DFSM
-	for (int i = 2; i < argc; i++) {
+	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
 			outFilename = string(argv[++i]);
 		}
@@ -181,7 +181,7 @@ void testDirLearning(int argc, char** argv) {
 			maxDistLen = seq_len_t(atoi(argv[++i]));
 		}
 		else if (strcmp(argv[i], "-eq") == 0) {
-			isEQallowed = bool(atoi(argv[++i]));
+			isEQallowed = bool(atoi(argv[++i]) != 0);
 		}
 		else if (strcmp(argv[i], "-m") == 0) {//machine type
 			machineTypeMask = atoi(argv[++i]);
@@ -204,7 +204,7 @@ void testDirLearning(int argc, char** argv) {
 			teacherMask = atoi(argv[++i]);
 		}
 	}
-	if (outFilename.empty()) outFilename = dir + "results.csv";
+	if (outFilename.empty()) outFilename = dir + "_resultsLearning.csv";
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;

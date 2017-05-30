@@ -74,7 +74,7 @@ static void analyse(const unique_ptr<DFSM>& fsm) {
 
 	// state verifying sequences
 	auto SVSet = getVerifyingSet(fsm, true);
-	for (long int i = SVSet.size() - 1; i >= 0; i--) {
+	for (long i = long(SVSet.size()) - 1; i >= 0; i--) {
 		if (SVSet[i].empty()) {
 			SVSet[i].swap(SVSet.back());
 			SVSet.pop_back();
@@ -98,13 +98,13 @@ using namespace std::tr2::sys;
 
 void analyseDirMachines(int argc, char** argv) {
 	string outFilename = "";
-	auto dir = string(argv[1]);
+	auto dir = string(argv[2]);
 	unsigned int machineTypeMask = unsigned int(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
 	input_t inputsRestrictionLess = STOUT_INPUT, inputsRestrictionGreater = STOUT_INPUT;
 	output_t outputsRestrictionLess = DEFAULT_OUTPUT, outputsRestrictionGreater = DEFAULT_OUTPUT;
 	bool reducedOnly = false;
-	for (int i = 2; i < argc; i++) {
+	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
 			outFilename = string(argv[++i]);
 		}
@@ -145,7 +145,7 @@ void analyseDirMachines(int argc, char** argv) {
 			outputsRestrictionGreater = state_t(atoi(argv[++i]));
 		}
 		else if (strcmp(argv[i], "-re") == 0) {//reduced only?
-			reducedOnly = bool(atoi(argv[++i]));
+			reducedOnly = bool(atoi(argv[++i]) != 0);
 		}
 	}
 	if (outFilename.empty()) outFilename = dir + "machinesAnalysis.csv";

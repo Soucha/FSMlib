@@ -30,5 +30,8 @@
     <ClCompile Include="experimenterLearning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HSIdesignComparison.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

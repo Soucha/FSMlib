@@ -233,6 +233,7 @@
     <ClCompile Include="experimenterLearning.cpp" />
     <ClCompile Include="experimenterTesting.cpp" />
     <ClCompile Include="FSMgenerator.cpp" />
+    <ClCompile Include="HSIdesignComparison.cpp" />
     <ClCompile Include="MachinesAnalysis.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

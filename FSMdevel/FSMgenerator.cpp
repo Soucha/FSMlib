@@ -46,7 +46,7 @@ static bool checkSolution(vector<unique_ptr<DFSM>>& indistinguishable, const uni
 }
 
 void generateMachines(int argc, char** argv) {
-	auto dir = string(argv[1]);
+	auto dir = string(argv[2]);
 	unsigned int machineTypeMask = unsigned int(-1);// all
 	size_t numMachines(10);
 	state_t Nmin(10), Nstep(1), Nmax(10);
@@ -56,7 +56,7 @@ void generateMachines(int argc, char** argv) {
 	bool reqStronglyConnected = true;
 	bool reqADS = false;
 	bool checkEquivalence = true;
-	for (int i = 2; i < argc; i++) {
+	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-m") == 0) {//machine type
 			machineTypeMask = atoi(argv[++i]);
 		}
@@ -96,21 +96,21 @@ void generateMachines(int argc, char** argv) {
 			OUTmin = OUTmax = 0;
 		}
 		else if (strcmp(argv[i], "-re") == 0) {//reduced machines?
-			reqMinimized = bool(atoi(argv[++i]));
+			reqMinimized = bool(atoi(argv[++i]) != 0);
 		}
 		else if (strcmp(argv[i], "-sc") == 0) {//strongly connected machines?
-			reqStronglyConnected = bool(atoi(argv[++i]));
+			reqStronglyConnected = bool(atoi(argv[++i]) != 0);
 		}
 		else if (strcmp(argv[i], "-ads") == 0) {//machines with ADS?
-			reqADS = bool(atoi(argv[++i]));
+			reqADS = bool(atoi(argv[++i]) != 0);
 		}
 		else if (strcmp(argv[i], "-d") == 0) {//check equivalence/difference of machines?
-			checkEquivalence = bool(atoi(argv[++i]));
+			checkEquivalence = bool(atoi(argv[++i]) != 0);
 		}
 	}
 	if (dir.back() != '/') dir.push_back('/');
 
-	srand(time(NULL));
+	srand(int(time(NULL)));
 	printf("DifferentMachines\tFSMtype\tStates\tInputs\tOutputs\t"
 		"Generated\tDuplicates\tNoADS\tNotStronglyConnected\tUnreduced\n");
 	size_t cUnreduced, cNotSC, cNoADS, cEq, cSat;
