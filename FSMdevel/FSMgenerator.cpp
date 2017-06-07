@@ -45,30 +45,13 @@ static bool checkSolution(vector<unique_ptr<DFSM>>& indistinguishable, const uni
 	return true;
 }
 
-static inline output_t getNumOutputs(output_t& addNum, output_t& multiAll, output_t& divAll,
-	state_t& numStates, input_t& numInputs, machine_type_t& machineType) {
-	switch (machineType) {
-	case TYPE_DFSM:
-		return;
-	case TYPE_MEALY:
-		fsm = move(make_unique<Mealy>());
-		break;
-	case TYPE_MOORE:
-		fsm = move(make_unique<Moore>());
-		break;
-	case TYPE_DFA:
-		fsm = move(make_unique<DFA>());
-		break;
-	}
-}
-
 void generateMachines(int argc, char** argv) {
 	auto dir = string(argv[2]);
 	unsigned int machineTypeMask = unsigned int(-1);// all
 	size_t numMachines(10);
 	state_t Nmin(10), Nstep(1), Nmax(10);
 	input_t INmin(2), INstep(1), INmax(2), INmultiN(0), INdivN(1);
-	output_t OUTmin(2), OUTstep(1), OUTmax(2), OUTmultiN(0);
+	output_t OUTmin(2), OUTstep(1), OUTmax(2), OUTmultiAll(0), OUTdivAll(1);
 	bool reqMinimized = true;
 	bool reqStronglyConnected = true;
 	bool reqADS = false;
@@ -117,8 +100,14 @@ void generateMachines(int argc, char** argv) {
 			if (OUTstep == 0) OUTstep = 1; 
 			OUTmax = output_t(atoi(argv[++i]));
 		}
-		else if (strcmp(argv[i], "-om") == 0) {//number of outputs as multiple of states
-			OUTmultiN = output_t(atoi(argv[++i]));
+		else if (strcmp(argv[i], "-om") == 0) {//number of outputs as multiple of all possible outputs
+			OUTmultiAll = input_t(atoi(argv[++i]));
+			OUTmin = OUTmax = 0;
+		}
+		else if (strcmp(argv[i], "-od") == 0) {//number of outputs as division of all possible outputs
+			OUTdivAll = output_t(atoi(argv[++i]));
+			if (OUTdivAll == 0) OUTdivAll = 1;
+			if (OUTmultiAll == 0) OUTmultiAll = 1;
 			OUTmin = OUTmax = 0;
 		}
 		else if (strcmp(argv[i], "-re") == 0) {//reduced machines?
@@ -135,6 +124,7 @@ void generateMachines(int argc, char** argv) {
 		}
 	}
 	if (dir.back() != '/') dir.push_back('/');
+	if (OUTmultiAll > OUTdivAll) OUTmultiAll = OUTmultiAll = 0;
 
 	srand(int(time(NULL)));
 	printf("DifferentMachines\tFSMtype\tStates\tInputs\tOutputs\t"
@@ -161,8 +151,11 @@ void generateMachines(int argc, char** argv) {
 			for (state_t states = Nmin; states <= Nmax; states += Nstep) {
 				for (input_t inputs = INmin + INmultiN * states / INdivN;
 						inputs <= INmax + INmultiN * states / INdivN; inputs += INstep) {
-					for (output_t outputs = OUTmin + OUTmultiN * states;
-							outputs <= OUTmax + OUTmultiN * states; outputs += OUTstep) {
+					for (output_t outputs = (machineType == TYPE_DFA) ? output_t(2) :
+							OUTmin + OUTmultiAll * states * (inputs * fsm->isOutputTransition() + fsm->isOutputState()) / OUTdivAll;
+							outputs <= output_t((machineType == TYPE_DFA) ? 2 :
+							OUTmax + OUTmultiAll * states * (inputs * int(fsm->isOutputTransition()) + int(fsm->isOutputState())) / OUTdivAll);
+							outputs += OUTstep) {
 						cSat = cEq = cNoADS = cNotSC = cUnreduced = 0;
 						generated.clear();
 						while (cSat < numMachines) {

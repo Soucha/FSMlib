@@ -59,7 +59,7 @@ static void printStat(sequence_vec_t& vec) {
 	fprintf(outFile, "%d\t%f\t%f\t%f\t", maxLen, mean, getMedian(vec), variance);
 }
 
-static void analyse(const unique_ptr<DFSM>& fsm) {
+static void analyseAll(const unique_ptr<DFSM>& fsm) {
 	fprintf(outFile, "%d\t%d\t%d\t%d\t%d\t%d\t", fsm->getType(),
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(),
 		fsm->isReduced(), FSMmodel::isStronglyConnected(fsm));
@@ -94,10 +94,34 @@ static void analyse(const unique_ptr<DFSM>& fsm) {
 	fflush(outFile);
 }
 
+static void analyse(const unique_ptr<DFSM>& fsm) {
+	// acceess seq
+	auto sc = getStateCover(fsm, true);
+	
+	// state verifying sequences
+	auto SVSet = getVerifyingSet(fsm, true);
+	
+	auto it = sc.begin();
+	for (state_t s = 0; s < sc.size(); s++, it++) {
+		fprintf(outFile, "%u\t%u\n", it->size(), SVSet[s].size());
+	}
+	fflush(outFile);
+}
+
+static void analyseSepSeq(const unique_ptr<DFSM>& fsm) {
+	// separating sequences
+	auto sepSeq = getStatePairsShortestSeparatingSequences(fsm, true);
+	for (const auto& seq : sepSeq) {
+		fprintf(outFile, "%u\n", seq.size());
+	}
+	fflush(outFile);
+}
+
+
 using namespace std::tr2::sys;
 
 void analyseDirMachines(int argc, char** argv) {
-	string outFilename = "";
+	string outDir = "";
 	auto dir = string(argv[2]);
 	unsigned int machineTypeMask = unsigned int(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
@@ -105,8 +129,8 @@ void analyseDirMachines(int argc, char** argv) {
 	output_t outputsRestrictionLess = DEFAULT_OUTPUT, outputsRestrictionGreater = DEFAULT_OUTPUT;
 	bool reducedOnly = false;
 	for (int i = 3; i < argc; i++) {
-		if (strcmp(argv[i], "-o") == 0) {
-			outFilename = string(argv[++i]);
+		if (strcmp(argv[i], "-dir") == 0) {
+			outDir = string(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-m") == 0) {//machine type
 			machineTypeMask = atoi(argv[++i]);
@@ -148,17 +172,8 @@ void analyseDirMachines(int argc, char** argv) {
 			reducedOnly = bool(atoi(argv[++i]) != 0);
 		}
 	}
-	if (outFilename.empty()) outFilename = dir + "machinesAnalysis.csv";
-	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
-		cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
-		return;
-	}
-	fprintf(outFile, "FSMtype\tStates\tInputs\tOutputs\tReduced\tStronglyConnected\t"
-		"AccessSmax\tAccessSmean\tAccessSmedian\tAccessSvariance\t"
-		"SepSmax\tSepSmean\tSepSmedian\tSepSvariance\t"
-		"noSVS\tSVSmax\tSVSmean\tSVSmedian\tSVSvariance\t"
-		"ADSmax\tADSmean\tADSmedian\tADSvariance\tFilename\n");
-
+	if (outDir.empty()) outDir = dir + "machinesAnalysis/";
+	map<int, FILE*> files;
 	path dirPath(dir);
 	directory_iterator endDir;
 	for (directory_iterator it(dirPath); it != endDir; ++it) {
@@ -174,13 +189,41 @@ void analyseDirMachines(int argc, char** argv) {
 					((outputsRestrictionLess == DEFAULT_OUTPUT) || (fsm->getNumberOfOutputs() < outputsRestrictionLess)) &&
 					((outputsRestrictionGreater == DEFAULT_OUTPUT) || (outputsRestrictionGreater < fsm->getNumberOfOutputs())))
 				{
+					auto it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType());
+					if (it == files.end()) {
+						auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + ".csv";
+						if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+							cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
+							return;
+						}
+						fprintf(outFile, "AccessSeq\tSVS\n");
+						files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType(), outFile);
+					}
+					else {
+						outFile = it->second;
+					}
 					analyse(fsm);
-					fprintf(outFile, "%s\n", fn.filename().c_str());
+					it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1);
+					if (it == files.end()) {
+						auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + "_SepSeq.csv";
+						if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+							cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
+							return;
+						}
+						fprintf(outFile, "SepSeq\n");
+						files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1, outFile);
+					}
+					else {
+						outFile = it->second;
+					}
+					analyseSepSeq(fsm);
 					printf(".");
 				}
 			}
 		}
 	}
-	fclose(outFile);
+	for (auto p : files) {
+		fclose(p.second);
+	}
 	printf("complete.\n");
 }
