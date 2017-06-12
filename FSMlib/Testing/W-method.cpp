@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+	sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates, sequence_set_t& CSet) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::W_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
@@ -30,7 +30,7 @@ namespace FSMtesting {
 
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
+		if (CSet.empty()) CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
 		bool startWithStout = (CSet.begin()->front() == STOUT_INPUT);
 		
 		FSMlib::PrefixSet pset;

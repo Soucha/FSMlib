@@ -59,7 +59,7 @@ static void compareDesignAlgoritms(const unique_ptr<DFSM>& fsm, const string& fn
 		printCSV(fsm, hsi, elapsed_seconds.count(), 1, "SeparatingSequencesFromSplittingTree", fnName);
 	}
 	{
-		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiers(fsm, getSplittingTree(fsm, true)));
+		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiersFromSplittingTree(fsm, getSplittingTree(fsm, true)));
 		printCSV(fsm, hsi, elapsed_seconds.count(), 2, "SplittingTreeBased", fnName);
 	}
 	fflush(outFile);

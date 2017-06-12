@@ -362,8 +362,9 @@ namespace FSMtesting {
 						nSeq.push_front(n->accessSequence.back());
 						if (hasLeafBack(nPrevCN)) {
 							nSeq.insert(nSeq.end(), seq.begin(), seq.end());
-							appendSequence(nPrevCN->leafNodes.back(), nSeq, ot, fsm);
+							auto ln = nPrevCN->leafNodes.back();
 							nPrevCN->leafNodes.pop_back();
+							appendSequence(ln, nSeq, ot, fsm);
 							return;
 						}
 						if ((nSeq.size() < minLen) && (!nPrevCN->isRN || (nPrevCN->state != 0))) {
@@ -702,7 +703,7 @@ namespace FSMtesting {
 			for (const auto& t : transitions) {
 				startingStates.insert(get<0>(t)->state);
 			}
-			bool proveConvergence(bool(startingStates.count(nextStateCN->state)));
+			bool proveConvergence(startingStates.count(nextStateCN->state) > 0 ? true : false);
 			if (!proveConvergence && !startingStates.empty()) {
 				for (auto& seq : travSeqs) {
 					auto state = nextStateCN->state;

@@ -150,7 +150,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	if (mask & 4) { // TeacherBB
 		for (size_t i = 0; i < algorithms.size(); i++) {
 			shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-			unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, maxExtraStates + 1);
+			unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::S_method, maxExtraStates + 1);
 			COMPUTATION_TIME(auto model = algorithms[i](teacher));
 			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] +
 				"TeacherBB:SPY_method(ExtraStates:" + to_string(maxExtraStates + 1) + ")\tBlackBoxDFSM\t" + fnName, bb);

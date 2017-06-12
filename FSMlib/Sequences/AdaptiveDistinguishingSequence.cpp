@@ -70,6 +70,7 @@ namespace FSMsequence {
 				}
 			}
 			// set distinguishing input sequence
+			if (useStout && !adsNode->input.empty() && (next->sequence.front() == STOUT_INPUT)) adsNode->input.clear();
 			adsNode->input.insert(adsNode->input.end(), next->sequence.begin(), next->sequence.end());
 			for (state_t sI = 0; sI < adsNode->initialStates.size(); sI++) {
 				for (const auto &p : next->succ) {
@@ -99,10 +100,9 @@ namespace FSMsequence {
 
 	unique_ptr<AdaptiveDS> getAdaptiveDistinguishingSequence(const unique_ptr<DFSM>& fsm, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getAdaptiveDistinguishingSequence", nullptr);
-		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
-		auto st = getSplittingTree(fsm, false, useStout);
+		auto st = getSplittingTree(fsm, false, omitUnnecessaryStoutInputs);
 		if (!st) return nullptr;
 		// build ADS from ST
-		return buildADS(st->rootST->block, st, useStout);
+		return buildADS(st->rootST->block, st, !omitUnnecessaryStoutInputs && fsm->isOutputState());
 	}
 }

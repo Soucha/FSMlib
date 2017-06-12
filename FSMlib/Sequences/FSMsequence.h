@@ -595,7 +595,7 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
 	*/
-	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& dfsm,
+	FSMLIB_API vector<sequence_set_t> getHarmonizedStateIdentifiersFromSplittingTree(const unique_ptr<DFSM>& dfsm,
 		const unique_ptr<SplittingTree>& st, bool omitUnnecessaryStoutInputs = false);
 
 	/**

@@ -63,15 +63,35 @@ static void loadTSAlgorithms(unsigned int mask) {
 	}
 	if (mask & 8) { // W-method
 		descriptions.emplace_back("TS\tW-method\t" + to_string(descriptions.size()) + "\t");
-		TSalgorithms.emplace_back(bind(W_method, placeholders::_1, placeholders::_2));
+		TSalgorithms.emplace_back(bind(W_method, placeholders::_1, placeholders::_2,
+			bind(getCharacterizingSet, placeholders::_1, getStatePairsShortestSeparatingSequences, true,
+			reduceCSet_LS_SL, false)));
+		descriptions.emplace_back("TS\tW-methodST\t" + to_string(descriptions.size()) + "\t");
+		TSalgorithms.emplace_back(bind(W_method, placeholders::_1, placeholders::_2,
+			bind(getCharacterizingSet, placeholders::_1, getStatePairsSeparatingSequencesFromSplittingTree, false,
+			nullptr, false)));
 	}
 	if (mask & 16) { // Wp-method
 		descriptions.emplace_back("TS\tWp-method\t" + to_string(descriptions.size()) + "\t");
-		TSalgorithms.emplace_back(bind(Wp_method, placeholders::_1, placeholders::_2));
+		TSalgorithms.emplace_back(bind(Wp_method, placeholders::_1, placeholders::_2,
+			bind(getStatesCharacterizingSets, placeholders::_1, getStatePairsShortestSeparatingSequences, true,
+			reduceSCSet_LS_SL, false)));
+		descriptions.emplace_back("TS\tWp-methodST\t" + to_string(descriptions.size()) + "\t");
+		TSalgorithms.emplace_back(bind(Wp_method, placeholders::_1, placeholders::_2,
+			bind(getStatesCharacterizingSets, placeholders::_1, getStatePairsSeparatingSequencesFromSplittingTree, false,
+			nullptr, false)));
 	}
 	if (mask & 32) { // HSI-method
+		auto getHSI = bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
+			true, nullptr, false);
 		descriptions.emplace_back("TS\tHSI-method\t" + to_string(descriptions.size()) + "\t");
-		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2));
+		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2,
+			bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
+			true, nullptr, false)));
+		descriptions.emplace_back("TS\tHSI-methodST\t" + to_string(descriptions.size()) + "\t");
+		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2,
+			bind(getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+			bind(getSplittingTree, placeholders::_1, true, false), false)));
 	}
 	if (mask & 64) { // H-method
 		descriptions.emplace_back("TS\tH-method\t" + to_string(descriptions.size()) + "\t");
@@ -79,7 +99,13 @@ static void loadTSAlgorithms(unsigned int mask) {
 	}
 	if (mask & 128) { // SPY-method
 		descriptions.emplace_back("TS\tSPY-method\t" + to_string(descriptions.size()) + "\t");
-		TSalgorithms.emplace_back(bind(SPY_method, placeholders::_1, placeholders::_2));
+		TSalgorithms.emplace_back(bind(SPY_method, placeholders::_1, placeholders::_2,
+			bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
+			true, nullptr, false)));
+		descriptions.emplace_back("TS\tSPY-methodST\t" + to_string(descriptions.size()) + "\t");
+		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2,
+			bind(getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+			bind(getSplittingTree, placeholders::_1, true, false), false)));
 	}
 	if (mask & 256) { // SPYH-method
 		descriptions.emplace_back("TS\tSPYH-method\t" + to_string(descriptions.size()) + "\t");

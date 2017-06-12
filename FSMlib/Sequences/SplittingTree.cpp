@@ -837,7 +837,7 @@ namespace FSMsequence {
 		return seq;
 	}
 
-	vector<sequence_set_t> getHarmonizedStateIdentifiers(const unique_ptr<DFSM>& fsm,
+	vector<sequence_set_t> getHarmonizedStateIdentifiersFromSplittingTree(const unique_ptr<DFSM>& fsm,
 		const unique_ptr<SplittingTree>& st, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getHarmonizedStateIdentifiers", vector<sequence_set_t>());
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();

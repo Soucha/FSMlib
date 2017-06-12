@@ -222,7 +222,7 @@ static void compareDesignAlgoritms(const unique_ptr<DFSM>& fsm, const string& fn
 		printCSV(fsm, hsi, elapsed_seconds.count(), 1, "SeparatingSequencesFromSplittingTree", fnName);
 	}
 	{
-		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiers(fsm, getSplittingTree(fsm, true)));
+		COMPUTATION_TIME(auto hsi = getHarmonizedStateIdentifiersFromSplittingTree(fsm, getSplittingTree(fsm, true)));
 		printCSV(fsm, hsi, elapsed_seconds.count(), 2, "SplittingTreeBased", fnName);
 	}
 	//printf(".");
@@ -279,8 +279,8 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R60_7YTZQ.fsm"; //Mealy_R60_WdoSu 
-	string fileName = DATA_PATH + "10multi/" + "DFA_R10_lwEcI.fsm";//DFA_R100_0N9k1
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R10_9TYD2.fsm"; //Mealy_R60_WdoSu 
+	string fileName = DATA_PATH + "10multi/" + "DFSM_R10.fsm";//DFA_R100_0N9k1
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
@@ -290,12 +290,12 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
- 	auto st = getSplittingTree(fsm, true);
-	compareDesignAlgoritms(fsm, fileName);
+ 	//auto st = getSplittingTree(fsm, true);
+	//compareDesignAlgoritms(fsm, fileName);
 
 	bool test = true;
 	for (int extraStates = 0; extraStates <= 2; extraStates++) {
-		auto TS = S_method(fsm, extraStates);
+		auto TS = Mra_method(fsm, extraStates);
 		printTS(TS, fileName);
 		if (test) {
 			ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");

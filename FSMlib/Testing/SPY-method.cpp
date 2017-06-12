@@ -211,7 +211,7 @@ namespace FSMtesting {
 		return TS;
 	}
 
-	sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+	sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates, vector<sequence_set_t>& H) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::SPY_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
@@ -220,8 +220,8 @@ namespace FSMtesting {
 			return getTraversalSet(fsm, extraStates);
 		}
 				
-		auto H = getHarmonizedStateIdentifiers(fsm);
-
+		if (H.empty()) H = getHarmonizedStateIdentifiers(fsm);
+		
 		if (fsm->isOutputState()) {
 			for (state_t i = 0; i < H.size(); i++) {
 				sequence_set_t tmp;

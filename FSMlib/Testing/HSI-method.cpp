@@ -22,14 +22,14 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+	sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates, vector<sequence_set_t>& H) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::HSI_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
 		}
 		auto transitionCover = getTransitionCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
-		auto H = getHarmonizedStateIdentifiers(fsm);
+		if (H.empty()) H = getHarmonizedStateIdentifiers(fsm);
 		bool startWithStout = (H[0].begin()->front() == STOUT_INPUT);
 		
 		FSMlib::PrefixSet pset;

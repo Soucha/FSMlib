@@ -94,9 +94,13 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @param CSet - Characterizing Set of the given DFSM,
+	*		 if the parametr is missing, then it is designed by 
+	*		 FSMsequence::getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL)
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	FSMLIB_API sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
+		sequence_set_t& CSet = sequence_set_t());
 	
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -113,9 +117,13 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @param SCSets - State Characterizing Set of all states of the given DFSM,
+	*		 if the parametr is missing, then it is designed by 
+	*		 FSMsequence::getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL)	
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	FSMLIB_API sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
+		vector<sequence_set_t>& SCSets = vector<sequence_set_t>());
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -130,9 +138,12 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @param HSI - Harmonized State Identifiers of the given DFSM,
+	*		 it is designed by FSMsequence::getHarmonizedStateIdentifiers(fsm) if the parametr is missing
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	FSMLIB_API sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
+		vector<sequence_set_t>& HSI = vector<sequence_set_t>());
 
 	/**
 	* Designs a test suite in which all state pairs are distinguished and thus confirmed
@@ -165,9 +176,12 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @param fsm - Deterministic FSM
 	* @param extraStates - how many extra states shall be considered,
 	*		 default is no extra state, needs to be positive or 0
+	* @param HSI - Harmonized State Identifiers of the given DFSM,
+	*		 it is designed by FSMsequence::getHarmonizedStateIdentifiers(fsm) if the parametr is missing
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
-	FSMLIB_API sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
+	FSMLIB_API sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
+		vector<sequence_set_t>& HSI = vector<sequence_set_t>());
 
 	/// TODO
 	/**
