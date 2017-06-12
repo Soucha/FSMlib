@@ -101,12 +101,18 @@ namespace FSMtesting {
 	}
 
 	static bool areConvergentNodesDistinguished(const shared_ptr<ConvergentNodeS>& cn1, const shared_ptr<ConvergentNodeS>& cn2,
-			bool noES) {
+			bool noES, set<pair<state_t, ConvergentNodeS*>>& closed) {
 		if ((cn1 == cn2) || (cn1->state == cn2->state)) return false;
 		if (cn1->convergent.front()->stateOutput != cn2->convergent.front()->stateOutput) return true;
 		if (cn1->isRN || cn2->isRN)  {
 			if ((cn1->isRN && cn2->isRN) || // different RNs are distinguished
 				!cn1->domain.count(cn2.get())) return true;
+			if (cn1->isRN) {
+				if (!closed.emplace(cn1->state, cn2.get()).second) return false;
+			}
+			else {
+				if (!closed.emplace(cn2->state, cn1.get()).second) return false;
+			}
 		}
 		else if (noES && isIntersectionEmpty(cn1->domain, cn2->domain)) return true;
 		for (input_t i = 0; i < cn1->next.size(); i++) {
@@ -120,7 +126,7 @@ namespace FSMtesting {
 					++it2;
 				}
 				if (((*it1)->next[i]->incomingOutput != (*it2)->next[i]->incomingOutput)
-					|| areConvergentNodesDistinguished(cn1->next[i], cn2->next[i], noES))
+					|| areConvergentNodesDistinguished(cn1->next[i], cn2->next[i], noES, closed))
 					return true;
 			}
 		}
@@ -189,8 +195,9 @@ namespace FSMtesting {
 			}
 		}
 		for (auto toIt = toCN->domain.begin(); toIt != toCN->domain.end();) {
+			set<pair<state_t, ConvergentNodeS*>> closed;
 			if ((!toCN->isRN && !fromCN->domain.count(*toIt)) ||
-				(toCN->isRN && areConvergentNodesDistinguished(toCN, (*toIt)->convergent.front()->convergentNode.lock(), noES))) {
+				(toCN->isRN && areConvergentNodesDistinguished(toCN, (*toIt)->convergent.front()->convergentNode.lock(), noES, closed))) {
 				(*toIt)->domain.erase(toCN.get());
 				toIt = toCN->domain.erase(toIt);
 			}
@@ -524,7 +531,8 @@ namespace FSMtesting {
 			}
 		}
 		for (const auto& np : nodes) {
-			if ((state != np->state) && !areConvergentNodesDistinguished(np, cn, ot.es == 0))  {
+			set<pair<state_t, ConvergentNodeS*>> closed;
+			if ((state != np->state) && !areConvergentNodesDistinguished(np, cn, ot.es == 0, closed))  {
 				domain.emplace_back(np);
 			}
 		}
@@ -573,9 +581,10 @@ namespace FSMtesting {
 			}
 			// check for a possible separation by the recent added sequences
 			for (auto dIt = domain.begin(); dIt != domain.end();) {
+				set<pair<state_t, ConvergentNodeS*>> closed;
 				if (!cn->domain.count((*dIt).get()) &&
 					((find(nodes.begin(), nodes.end(), *dIt) == nodes.end()) 
-					|| areConvergentNodesDistinguished(cn, *dIt, ot.es == 0))) {
+					|| areConvergentNodesDistinguished(cn, *dIt, ot.es == 0, closed))) {
 					dIt = domain.erase(dIt);
 				}
 				else {

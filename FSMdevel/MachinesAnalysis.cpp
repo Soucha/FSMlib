@@ -94,6 +94,47 @@ static void analyseAll(const unique_ptr<DFSM>& fsm) {
 	fflush(outFile);
 }
 
+static void analyseCounts(const unique_ptr<DFSM>& fsm, map<int, vector<size_t>>& counts) {
+	auto idx = fsm->getNumberOfStates() * 30 + 3 * fsm->getType();
+	// acceess seq
+	auto sc = getStateCover(fsm, true);
+	auto it = counts.find(idx);
+	if (it == counts.end()) {
+		counts.emplace(idx, vector<size_t>());
+		it = counts.find(idx);
+	}
+	for (const auto& seq : sc) {
+		if (seq.size() >= it->second.size()) it->second.resize(seq.size() + 1, 0);
+		it->second[seq.size()]++;
+	}
+	
+	// state verifying sequences
+	auto SVSet = getVerifyingSet(fsm, true);
+	idx++;
+	it = counts.find(idx);
+	if (it == counts.end()) {
+		counts.emplace(idx, vector<size_t>());
+		it = counts.find(idx);
+	}
+	for (const auto& seq : SVSet) {
+		if (seq.size() >= it->second.size()) it->second.resize(seq.size() + 1, 0);
+		it->second[seq.size()]++;
+	}
+
+	// separating sequences
+	auto sepSeq = getStatePairsShortestSeparatingSequences(fsm, true);
+	idx++;
+	it = counts.find(idx);
+	if (it == counts.end()) {
+		counts.emplace(idx, vector<size_t>());
+		it = counts.find(idx);
+	}
+	for (const auto& seq : sepSeq) {
+		if (seq.size() >= it->second.size()) it->second.resize(seq.size() + 1, 0);
+		it->second[seq.size()]++;
+	}
+}
+
 static void analyse(const unique_ptr<DFSM>& fsm) {
 	// acceess seq
 	auto sc = getStateCover(fsm, true);
@@ -174,6 +215,8 @@ void analyseDirMachines(int argc, char** argv) {
 	}
 	if (outDir.empty()) outDir = dir + "machinesAnalysis/";
 	map<int, FILE*> files;
+	map<int, vector<size_t>> counts;
+	bool severalFiles = false;
 	path dirPath(dir);
 	directory_iterator endDir;
 	for (directory_iterator it(dirPath); it != endDir; ++it) {
@@ -189,34 +232,39 @@ void analyseDirMachines(int argc, char** argv) {
 					((outputsRestrictionLess == DEFAULT_OUTPUT) || (fsm->getNumberOfOutputs() < outputsRestrictionLess)) &&
 					((outputsRestrictionGreater == DEFAULT_OUTPUT) || (outputsRestrictionGreater < fsm->getNumberOfOutputs())))
 				{
-					auto it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType());
-					if (it == files.end()) {
-						auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + ".csv";
-						if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
-							cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
-							return;
+					if (severalFiles) {
+						auto it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType());
+						if (it == files.end()) {
+							auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + ".csv";
+							if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+								cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
+								return;
+							}
+							fprintf(outFile, "AccessSeq\tSVS\n");
+							files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType(), outFile);
 						}
-						fprintf(outFile, "AccessSeq\tSVS\n");
-						files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType(), outFile);
+						else {
+							outFile = it->second;
+						}
+						analyse(fsm);
+						it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1);
+						if (it == files.end()) {
+							auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + "_SepSeq.csv";
+							if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+								cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
+								return;
+							}
+							fprintf(outFile, "SepSeq\n");
+							files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1, outFile);
+						}
+						else {
+							outFile = it->second;
+						}
+						analyseSepSeq(fsm);
 					}
 					else {
-						outFile = it->second;
+						analyseCounts(fsm, counts);
 					}
-					analyse(fsm);
-					it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1);
-					if (it == files.end()) {
-						auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + "_SepSeq.csv";
-						if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
-							cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
-							return;
-						}
-						fprintf(outFile, "SepSeq\n");
-						files.emplace(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1, outFile);
-					}
-					else {
-						outFile = it->second;
-					}
-					analyseSepSeq(fsm);
 					printf(".");
 				}
 			}
@@ -224,6 +272,25 @@ void analyseDirMachines(int argc, char** argv) {
 	}
 	for (auto p : files) {
 		fclose(p.second);
+	}
+	if (!severalFiles) {
+		auto outFilename = outDir + "SeqCounts.csv";
+		if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+			cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
+			return;
+		}
+		for (auto p : counts) {
+			auto numStates = p.first / 30;
+			auto machineType = p.first % 30;
+			auto seqType = machineType % 3;
+			machineType /= 3;
+			fprintf(outFile, "%s_%d_%s", machineTypeNames[machineType], numStates, 
+				(seqType == 0) ? "as" : ((seqType == 1) ? "svs" : "sepSeq"));
+			for (auto num : p.second) {
+				fprintf(outFile, "\t%d", num);
+			}
+			fprintf(outFile, "\n");
+		}
 	}
 	printf("complete.\n");
 }
