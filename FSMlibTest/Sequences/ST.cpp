@@ -225,7 +225,7 @@ namespace FSMlibTest
 
 		void testGetHSIsFromST(string filename) {
 			if (!filename.empty())  fsm->load(filename);
-			auto HCSet = getHarmonizedStateIdentifiers(fsm, getSplittingTree(fsm, true));
+			auto HCSet = getHarmonizedStateIdentifiersFromSplittingTree(fsm, getSplittingTree(fsm, true));
 			state_t N = fsm->getNumberOfStates();
 			FSMlib::PrefixSet pset;
 			seq_len_t len(0);

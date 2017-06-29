@@ -657,10 +657,11 @@ namespace FSMsequence {
 	
 	unique_ptr<SplittingTree> getSplittingTree(const unique_ptr<DFSM>& fsm, bool allowInvalidInputs, bool omitUnnecessaryStoutInputs) {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getSplittingTree", nullptr);
-		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 		state_t N = fsm->getNumberOfStates();
-		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
 		auto st = make_unique<SplittingTree>(N);
+		if (N == 1) return st;
+		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
+		priority_queue<shared_ptr<st_node_t>, vector<shared_ptr<st_node_t>>, blockcomp> partition;
 		dependent_info_t depInfo;
 		if (fsm->isOutputState()) {
 			auto node = st->rootST;

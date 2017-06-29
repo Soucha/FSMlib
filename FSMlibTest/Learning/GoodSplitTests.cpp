@@ -66,7 +66,7 @@ namespace FSMlibTest
 		TEST_METHOD(TestGoodSplit_Moore)
 		{
 			fsm = make_unique<Moore>();
-			//*
+			/*
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			//testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm", 15);// too hard
 			testGoodSplit(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");//98
@@ -115,8 +115,10 @@ namespace FSMlibTest
 			testGoodSplitAlgorithm(teacher, "TeacherRL", filename, maxLen);
 
 			shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
-			testGoodSplitAlgorithm(teacher, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename, maxLen);
+			teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+				bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+				bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
+			testGoodSplitAlgorithm(teacher, "BlackBoxDFSM, TeacherBB:HSI_method (3 extra states)", filename, maxLen);
 		}
 	};
 }

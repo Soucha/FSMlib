@@ -167,9 +167,6 @@
     <ClCompile Include="Learning\GoodSplitTests.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
-    <ClCompile Include="Learning\OTreeAlgTests.cpp">
-      <Filter>Source Files\Learning</Filter>
-    </ClCompile>
     <ClCompile Include="Testing\S-methodTests.cpp">
       <Filter>Source Files\Testing</Filter>
     </ClCompile>
@@ -181,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="Sequences\ST.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\HlearnerTests.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\SPYlearnerTests.cpp">
+      <Filter>Source Files\Learning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

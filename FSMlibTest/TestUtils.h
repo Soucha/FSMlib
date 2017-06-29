@@ -15,6 +15,7 @@
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
+#pragma warning (disable:4503)
 
 #include <iostream>
 #include <stdarg.h>

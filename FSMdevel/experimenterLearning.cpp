@@ -114,11 +114,11 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 			(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 		algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 	}
-	if (mask & 64) { // ObservationTreeAlgorithm
+	if (mask & 64) { // Hlearner
 		for (state_t i = 0; i <= maxExtraStates; i++) {
-			descriptions.emplace_back("OTree\tExtraStates:" + to_string(i) + 
+			descriptions.emplace_back("Hlearner\tExtraStates:" + to_string(i) + 
 				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
-			algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, i, nullptr, isEQallowed));
+			algorithms.emplace_back(bind(Hlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
 	if (mask & 128) { // SPYlearner

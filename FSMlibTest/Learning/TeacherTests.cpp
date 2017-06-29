@@ -17,8 +17,6 @@
 #include "stdafx.h"
 #include "../TestUtils.h"
 
-using namespace FSMtesting;
-
 namespace FSMlibTest
 {
 	TEST_CLASS(TeacherTests)
@@ -53,7 +51,9 @@ namespace FSMlibTest
 			auto fsm = make_unique<DFSM>();
 			create(fsm);
 			auto bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, HSI_method);
+			teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+				bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+				bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)));
 			testTeacher(true, true);
 			teacher->resetBlackBox();
 			testTeacherDFSM(true);

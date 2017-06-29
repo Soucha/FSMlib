@@ -97,9 +97,9 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, writeDot ? showConjecture : nullptr, isEQallowed));
 #endif
-#if 1 // ObservationTreeAlgorithm
+#if 1 // Hlearner
 	descriptions.emplace_back("OTree\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
-	algorithms.emplace_back(bind(ObservationTreeAlgorithm, placeholders::_1, maxExtraStates, writeDot ? showConjecture : nullptr, isEQallowed));
+	algorithms.emplace_back(bind(Hlearner, placeholders::_1, maxExtraStates, writeDot ? showConjecture : nullptr, isEQallowed));
 #endif
 }
 

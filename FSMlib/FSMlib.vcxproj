@@ -256,7 +256,7 @@
     <ClCompile Include="Learning\GoodSplit.cpp" />
     <ClCompile Include="Learning\Lstar.cpp" />
     <ClCompile Include="Learning\ObservationPackAlgorithm.cpp" />
-    <ClCompile Include="Learning\ObservationTreeAlgorithm.cpp" />
+    <ClCompile Include="Learning\Hlearner.cpp" />
     <ClCompile Include="Learning\QuotientAlgorithm.cpp" />
     <ClCompile Include="Learning\SPYlearner.cpp" />
     <ClCompile Include="Learning\TeacherBB.cpp" />

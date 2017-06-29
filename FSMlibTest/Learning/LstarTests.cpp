@@ -139,8 +139,10 @@ namespace FSMlibTest
 
 			for (size_t i = 0; i < ceFunc.size(); i++) {
 				shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method);
-				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename, (i == 2), (i > 2));
+				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+					bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+					bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
+				testLstar(teacher, ceFunc[i].first, ceFunc[i].second, "BlackBoxDFSM, TeacherBB:HSI_method (3 extra states)", filename, (i == 2), (i > 2));
 			}
 		}
 	};

@@ -784,10 +784,10 @@ namespace FSMlearning {
 		} while (ot.uncheckedNodes.front() != ot.stateNodes[0]);
 	}
 
-	unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+	unique_ptr<DFSM> Hlearner(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel, bool isEQallowed) {
 		if (!teacher->isBlackBoxResettable()) {
-			ERROR_MESSAGE("FSMlearning::ObservationTreeAlgorithm - the Black Box needs to be resettable");
+			ERROR_MESSAGE("FSMlearning::Hlearner - the Black Box needs to be resettable");
 			return nullptr;
 		}
 

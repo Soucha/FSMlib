@@ -233,9 +233,6 @@
     <ClCompile Include="Learning\GoodSplit.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
-    <ClCompile Include="Learning\ObservationTreeAlgorithm.cpp">
-      <Filter>Source Files\Learning</Filter>
-    </ClCompile>
     <ClCompile Include="Learning\SPYlearner.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="Sequences\SplittingTree.cpp">
       <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\Hlearner.cpp">
+      <Filter>Source Files\Learning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

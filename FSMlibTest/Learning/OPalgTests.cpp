@@ -55,7 +55,7 @@ namespace FSMlibTest
 		TEST_METHOD(TestOP_Mealy)
 		{
 			fsm = make_unique<Mealy>();
-			//*
+			/*
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm");
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_1.fsm");
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Mealy_R100_PDS_l99.fsm");
@@ -77,7 +77,7 @@ namespace FSMlibTest
 		TEST_METHOD(TestOP_Moore)
 		{
 			fsm = make_unique<Moore>();
-			//*
+			/*
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm");
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS.fsm"); // too hard
 			testOPalg(DATA_PATH + SEQUENCES_DIR + "Moore_R100_PDS_l99.fsm");
@@ -131,8 +131,10 @@ namespace FSMlibTest
 
 			for (size_t i = 0; i < ceFunc.size(); i++) {
 				shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 3);
-				testOPalgorithm(teacher, "BlackBoxDFSM, TeacherBB:SPY_method (3 extra states)", filename, ceFunc[i].first, ceFunc[i].second);
+				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+					bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+					bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
+				testOPalgorithm(teacher, "BlackBoxDFSM, TeacherBB:HSI_method (3 extra states)", filename, ceFunc[i].first, ceFunc[i].second);
 			}
 		}
 	};

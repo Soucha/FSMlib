@@ -264,7 +264,7 @@ namespace FSMlearning {
 	*						maxExtraStates is used as the number of assumed extra states
 	* @return A learned model
 	*/
-	FSMLIB_API unique_ptr<DFSM> ObservationTreeAlgorithm(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+	FSMLIB_API unique_ptr<DFSM> Hlearner(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 
 	/**
