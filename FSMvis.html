@@ -546,9 +546,12 @@
             function parseDotData(data) {
                 var maxStateId = 0;
                 data.nodes.forEach(function (node) {
+                    if (String(node.id).startsWith('s')) {
+                        node.id = node.id.slice(1);
+                    }
                     var id = Number(node.id);
                     if (isNaN(id) || !Number.isInteger(id) || id < 0)
-                        throw 'Expected nonnegative numerical state ID! (State ' + node.id + ')';
+                        throw 'Expected nonnegative numerical state ID! (State ' + node.id + ')' + id;
                     node.id = id;
                     if (maxStateId < id + 1)
                         maxStateId = id + 1;
@@ -584,6 +587,12 @@
                 for (var i = 0; i < fsm.numEdges; i++) {
                     var strs = fsm.edges[i].label.split(' ');
                     fsm.edges[i].id = i;
+                    if (String(fsm.edges[i].from).startsWith('s')) {
+                        fsm.edges[i].from = fsm.edges[i].from.slice(1);
+                    }
+                    if (String(fsm.edges[i].to).startsWith('s')) {
+                        fsm.edges[i].to = fsm.edges[i].to.slice(1);
+                    }
                     fsm.edges[i].input = updateInputs(strs[0]);
                     fsm.edges[i].used = true;
                     if (strs.length > 1) {

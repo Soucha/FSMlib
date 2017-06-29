@@ -107,10 +107,11 @@ static void analyseCounts(const unique_ptr<DFSM>& fsm, map<int, vector<size_t>>&
 		if (seq.size() >= it->second.size()) it->second.resize(seq.size() + 1, 0);
 		it->second[seq.size()]++;
 	}
-	
+	//printf(".");
 	// state verifying sequences
 	auto SVSet = getVerifyingSet(fsm, true);
 	idx++;
+	
 	it = counts.find(idx);
 	if (it == counts.end()) {
 		counts.emplace(idx, vector<size_t>());

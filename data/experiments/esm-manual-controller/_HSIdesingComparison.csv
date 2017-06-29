@@ -1,0 +1,4 @@
+FSMtype	States	Inputs	Outputs	Sequences	Symbols	Seconds	Algorithm	AlgId	fileName
+2	3410	78	151	38324	56273	7.509988	ShortestSeparatingSequences	0	Mealy_3410_esm.fsm
+2	3410	78	151	31953	52540	6.267162	SeparatingSequencesFromSplittingTree	1	Mealy_3410_esm.fsm
+2	3410	78	151	4110	46454	25.240762	SplittingTreeBased	2	Mealy_3410_esm.fsm

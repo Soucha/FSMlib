@@ -75,6 +75,8 @@ namespace FSMtesting {
 		state_t es;
 	};
 
+	//static size_t AllocatedSize = 0;
+
 	static bool isIntersectionEmpty(const set<ConvergentNodeS*>& domain1, const set<ConvergentNodeS*>& domain2) {
 		//if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
@@ -258,6 +260,8 @@ namespace FSMtesting {
 		auto nextNode = make_shared<TestNodeS>(node, input,
 			outputTransition, outputState, state, fsm->getNumberOfInputs());
 		node->next[input] = nextNode;
+		//AllocatedSize++;
+		//if (AllocatedSize % 10 == 0) printf("%u ", AllocatedSize);
 		return nextNode;
 	}
 
@@ -460,7 +464,7 @@ namespace FSMtesting {
 			}
 			fifo.swap(fifoNext);
 		} while (!fifo.empty());
-
+		//printf("sc\n");
 		// make state cover divergence preserving
 		for (const auto& sn : stateNodes) {
 			states.clear();
@@ -497,7 +501,7 @@ namespace FSMtesting {
 				}
 			}
 		}
-
+		//printf("div sc\n");
 		// generate convergent and init domains
 		list<shared_ptr<TestNodeS>> leaves;
 		generateConvergentSubtree(stateNodes[0], ot, leaves);
@@ -669,11 +673,11 @@ namespace FSMtesting {
 		SeparatingSequencesInfo sepSeq;
 		sepSeq.st = getSplittingTree(fsm, true, false);
 		//sepSeq.sepSeq = getSeparatingSequences(fsm);
-
+		//printf("ST designed\n");
 		auto ot = getDivergencePreservingStateCover(fsm, sepSeq, extraStates);
 		// stateNodes are initialized divergence-preserving state cover
 		auto& stateNodes = ot.rn;
-
+		//printf("divPres SC designed\n");
 		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), extraStates);
 
 		using tran_t = tuple<shared_ptr<ConvergentNodeS>, input_t, shared_ptr<ConvergentNodeS>>;
@@ -692,6 +696,7 @@ namespace FSMtesting {
 
 		// confirm all transitions -> convergence-preserving transition cover
 		while (!transitions.empty()) {
+			//printf("%u\n", transitions.size());
 			auto startCN = move(get<0>(transitions.front()));
 			auto input = get<1>(transitions.front());
 			auto nextStateCN = move(get<2>(transitions.front()));

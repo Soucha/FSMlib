@@ -69,7 +69,7 @@ static void loadTSAlgorithms(unsigned int mask) {
 		descriptions.emplace_back("TS\tW-methodST\t" + to_string(descriptions.size()) + "\t");
 		TSalgorithms.emplace_back(bind(W_method, placeholders::_1, placeholders::_2,
 			bind(getCharacterizingSet, placeholders::_1, getStatePairsSeparatingSequencesFromSplittingTree, false,
-			nullptr, false)));
+			reduceCSet_LS_SL, false)));
 	}
 	if (mask & 16) { // Wp-method
 		descriptions.emplace_back("TS\tWp-method\t" + to_string(descriptions.size()) + "\t");
@@ -79,11 +79,9 @@ static void loadTSAlgorithms(unsigned int mask) {
 		descriptions.emplace_back("TS\tWp-methodST\t" + to_string(descriptions.size()) + "\t");
 		TSalgorithms.emplace_back(bind(Wp_method, placeholders::_1, placeholders::_2,
 			bind(getStatesCharacterizingSets, placeholders::_1, getStatePairsSeparatingSequencesFromSplittingTree, false,
-			nullptr, false)));
+			reduceSCSet_LS_SL, false)));
 	}
 	if (mask & 32) { // HSI-method
-		auto getHSI = bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
-			true, nullptr, false);
 		descriptions.emplace_back("TS\tHSI-method\t" + to_string(descriptions.size()) + "\t");
 		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2,
 			bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
