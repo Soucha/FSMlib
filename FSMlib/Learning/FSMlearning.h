@@ -254,6 +254,14 @@ namespace FSMlearning {
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 
 	/**
+	* The H-learner is inspired by the testing theory of the H-method and follows the Observation Tree approach.
+	* When a complete conjectured model is learnt, the Observation Tree is extended with additional separating sequences
+	* to confirm that the black box has not a particular number of extra states.
+	* The number of extra states increases gradually until the given maxExtraStates.
+	* If an inconsistency between the conjecture and the OTree occurs, the conjecture is updated with a new state and
+	* the number of assumed extra states is reset to 0.
+	* Separating sequences are chosen on the fly from those captured in the OTree such that
+	* they identify the given OTree node with a minimal extension of the OTree.
 	*
 	* @param Teacher
 	* @param maxExtraStates - the learning stops when the conjecture is correct with the assumption of given number of extra states
@@ -268,6 +276,15 @@ namespace FSMlearning {
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 
 	/**
+	* The SPY-learner is inspired by the testing theory of the SPY-method and follows the Observation Tree approach.
+	* When a complete conjectured model is learnt, the Observation Tree is extended with additional separating sequences
+	* to confirm that the black box has not a particular number of extra states.
+	* The number of extra states increases gradually until the given maxExtraStates.
+	* If an inconsistency between the conjecture and the OTree occurs, the conjecture is updated with a new state and
+	* the number of assumed extra states is reset to 0.
+	* Separating sequences that reveal a new state are used as a Harmonized State Identifiers (HSI).
+	* An entire HSI of state i is applied to verify a particular OTree that corresponds to state i.
+	* Sequences of this HSI are distributed over nodes that were previously proven to be convergent.
 	*
 	* @param Teacher
 	* @param maxExtraStates - the learning stops when the conjecture is correct with the assumption of given number of extra states
@@ -281,4 +298,25 @@ namespace FSMlearning {
 	FSMLIB_API unique_ptr<DFSM> SPYlearner(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
 		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 
+	/**
+	* The S-learner is inspired by the testing theory of the S-method and follows the Observation Tree approach.
+	* When a complete conjectured model is learnt, the Observation Tree is extended with additional separating sequences
+	* to confirm that the black box has not a particular number of extra states.
+	* The number of extra states increases gradually until the given maxExtraStates.
+	* If an inconsistency between the conjecture and the OTree occurs, the conjecture is updated with a new state and
+	* the number of assumed extra states is reset to 0.
+	* Separating sequences are chosen on the fly from the splitting tree obtained from the conjectured model.
+	* These separatating sequences are distributed over OTree nodes that were previously proven to be convergent.
+	*
+	* @param Teacher
+	* @param maxExtraStates - the learning stops when the conjecture is correct with the assumption of given number of extra states
+	* @param provideTentativeModel - a function that is called if any change occurs to conjectured model.
+	*							If the function returns false, then the learning stops immediately.
+	* @param isEQallowed - an Equivalence Query is asked after the stop condition is met if this parameter is true,
+	*						then the learning continues if a counterexample is returned,
+	*						maxExtraStates is used as the number of assumed extra states
+	* @return A learned model
+	*/
+	FSMLIB_API unique_ptr<DFSM> Slearner(const unique_ptr<Teacher>& teacher, state_t maxExtraStates,
+		function<bool(const unique_ptr<DFSM>& conjecture)> provideTentativeModel = nullptr, bool isEQallowed = false);
 }

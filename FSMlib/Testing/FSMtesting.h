@@ -21,6 +21,52 @@
 namespace FSMtesting {// all testing methods require a compact FSM
 	//<-- Resettable machines -->// 
 
+	struct ConvergentNode;
+
+	struct OTreeNode {
+		sequence_in_t accessSequence;
+		output_t incomingOutput;
+		output_t stateOutput;
+		state_t state;
+		weak_ptr<OTreeNode> parent;
+		vector<shared_ptr<OTreeNode>> next;
+		weak_ptr<ConvergentNode> convergentNode;
+		input_t lastQueriedInput;
+		
+		// learning attributes
+		set<state_t> refStates;// domain
+		state_t assumedState = NULL_STATE;
+		seq_len_t maxSuffixLen = 0;
+
+		OTreeNode(output_t stateOutput, state_t state, input_t numberOfInputs) :
+			incomingOutput(DEFAULT_OUTPUT), stateOutput(stateOutput), state(state),
+			next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
+		{
+		}
+
+		OTreeNode(const shared_ptr<OTreeNode>& parent, input_t input,
+			output_t transitionOutput, output_t stateOutput, state_t state, input_t numberOfInputs) :
+			accessSequence(parent->accessSequence), incomingOutput(transitionOutput), stateOutput(stateOutput),
+			state(state), parent(parent), next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
+		{
+			accessSequence.push_back(input);
+		}
+	};
+
+	struct ConvergentNode {
+		list<shared_ptr<OTreeNode>> convergent;
+		list<shared_ptr<OTreeNode>> leafNodes;
+		vector<shared_ptr<ConvergentNode>> next;
+		set<ConvergentNode*> domain;
+		state_t state;
+		bool isRN = false;
+
+		ConvergentNode(const shared_ptr<OTreeNode>& node, bool isRN = false) :
+			state(node->state), next(node->next.size()), isRN(isRN) {
+			convergent.emplace_back(node);
+		}
+	};
+
 	/**
 	* Designs a test suite in which all transitions are confirmed
 	* using appended Preset Distinguishing Sequence.
@@ -254,7 +300,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
-	* using separating sequences chosen on the fly that
+	* using separating sequences (chosen on the fly from the splitting tree) that
 	* are distributed over states reached by already proven convergent sequences.
 	*
 	* Based on source:

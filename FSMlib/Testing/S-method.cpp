@@ -21,26 +21,26 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
+	/*
+	struct ConvergentNode;
 
-	struct ConvergentNodeS;
-
-	struct TestNodeS {
+	struct OTreeNode {
 		sequence_in_t accessSequence;
 		output_t incomingOutput;
 		output_t stateOutput;
 		state_t state;
-		weak_ptr<TestNodeS> parent;
-		vector<shared_ptr<TestNodeS>> next;
-		weak_ptr<ConvergentNodeS> convergentNode;
+		weak_ptr<OTreeNode> parent;
+		vector<shared_ptr<OTreeNode>> next;
+		weak_ptr<ConvergentNode> convergentNode;
 		input_t lastQueriedInput;
 
-		TestNodeS(output_t stateOutput, state_t state, input_t numberOfInputs) :
+		OTreeNode(output_t stateOutput, state_t state, input_t numberOfInputs) :
 			incomingOutput(DEFAULT_OUTPUT), stateOutput(stateOutput), state(state),
 			next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
 		{
 		}
 		
-		TestNodeS(const shared_ptr<TestNodeS>& parent, input_t input,
+		OTreeNode(const shared_ptr<OTreeNode>& parent, input_t input,
 			output_t transitionOutput, output_t stateOutput, state_t state, input_t numberOfInputs) :
 			accessSequence(parent->accessSequence), incomingOutput(transitionOutput), stateOutput(stateOutput),
 			state(state), parent(parent), next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
@@ -49,21 +49,21 @@ namespace FSMtesting {
 		}
 	};
 
-	struct ConvergentNodeS {
-		list<shared_ptr<TestNodeS>> leafNodes, convergent;
-		set<ConvergentNodeS*> domain;
-		vector<shared_ptr<ConvergentNodeS>> next;
+	struct ConvergentNode {
+		list<shared_ptr<OTreeNode>> leafNodes, convergent;
+		set<ConvergentNode*> domain;
+		vector<shared_ptr<ConvergentNode>> next;
 		state_t state;
 		bool isRN = false;
 
-		ConvergentNodeS(input_t numberOfInputs) : next(numberOfInputs) {}
+		ConvergentNode(input_t numberOfInputs) : next(numberOfInputs) {}
 
-		ConvergentNodeS(const shared_ptr<TestNodeS>& node, bool isRN = false) : 
+		ConvergentNode(const shared_ptr<OTreeNode>& node, bool isRN = false) : 
 			state(node->state), next(node->next.size()), isRN(isRN) {
 			convergent.emplace_back(node);
 		}
 	};
-
+	*/
 	struct SeparatingSequencesInfo {
 		vector<LinkCell> sepSeq;
 		map<set<state_t>, sequence_in_t> bestSeq;
@@ -71,13 +71,13 @@ namespace FSMtesting {
 	};
 
 	struct OTreeS {
-		vector<shared_ptr<ConvergentNodeS>> rn;
+		vector<shared_ptr<ConvergentNode>> rn;
 		state_t es;
 	};
 
 	//static size_t AllocatedSize = 0;
 
-	static bool isIntersectionEmpty(const set<ConvergentNodeS*>& domain1, const set<ConvergentNodeS*>& domain2) {
+	static bool isIntersectionEmpty(const set<ConvergentNode*>& domain1, const set<ConvergentNode*>& domain2) {
 		//if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
 			for (auto& cn : domain1) {
@@ -92,7 +92,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static bool areNodesDifferent(const shared_ptr<TestNodeS>& n1, const shared_ptr<TestNodeS>& n2) {
+	static bool areNodesDifferent(const shared_ptr<OTreeNode>& n1, const shared_ptr<OTreeNode>& n2) {
 		if (n1->stateOutput != n2->stateOutput) return true;
 		for (input_t i = 0; i < n1->next.size(); i++) {
 			if ((n1->next[i]) && (n2->next[i]) && ((n1->next[i]->incomingOutput != n2->next[i]->incomingOutput)
@@ -102,8 +102,8 @@ namespace FSMtesting {
 		return false;
 	}
 
-	static bool areConvergentNodesDistinguished(const shared_ptr<ConvergentNodeS>& cn1, const shared_ptr<ConvergentNodeS>& cn2,
-			bool noES, set<pair<state_t, ConvergentNodeS*>>& closed) {
+	static bool areConvergentNodesDistinguished(const shared_ptr<ConvergentNode>& cn1, const shared_ptr<ConvergentNode>& cn2,
+			bool noES, set<pair<state_t, ConvergentNode*>>& closed) {
 		if ((cn1 == cn2) || (cn1->state == cn2->state)) return false;
 		if (cn1->convergent.front()->stateOutput != cn2->convergent.front()->stateOutput) return true;
 		if (cn1->isRN || cn2->isRN)  {
@@ -135,7 +135,7 @@ namespace FSMtesting {
 		return false;
 	}
 	
-	static bool areDistinguishedUnder(const shared_ptr<TestNodeS>& node, ConvergentNodeS* cn, bool noES) {
+	static bool areDistinguishedUnder(const shared_ptr<OTreeNode>& node, ConvergentNode* cn, bool noES) {
 		if (node->stateOutput != cn->convergent.front()->stateOutput) return true;
 		auto& cn1 = node->convergentNode.lock();
 		if (cn->isRN || cn1->isRN)  {
@@ -155,8 +155,8 @@ namespace FSMtesting {
 			|| areDistinguishedUnder(node->next[input], cn->next[input].get(), noES));
 	}
 
-	static void mergeCN(const shared_ptr<ConvergentNodeS>& fromCN, const shared_ptr<ConvergentNodeS>& toCN,
-		list<shared_ptr<ConvergentNodeS>>& identifiedNodes, bool noES) {
+	static void mergeCN(const shared_ptr<ConvergentNode>& fromCN, const shared_ptr<ConvergentNode>& toCN,
+		list<shared_ptr<ConvergentNode>>& identifiedNodes, bool noES) {
 		if (fromCN->convergent.front()->accessSequence.size() < toCN->convergent.front()->accessSequence.size()) {
 			toCN->convergent.emplace_front(move(fromCN->convergent.front()));
 			fromCN->convergent.pop_front();
@@ -197,7 +197,7 @@ namespace FSMtesting {
 			}
 		}
 		for (auto toIt = toCN->domain.begin(); toIt != toCN->domain.end();) {
-			set<pair<state_t, ConvergentNodeS*>> closed;
+			set<pair<state_t, ConvergentNode*>> closed;
 			if ((!toCN->isRN && !fromCN->domain.count(*toIt)) ||
 				(toCN->isRN && areConvergentNodesDistinguished(toCN, (*toIt)->convergent.front()->convergentNode.lock(), noES, closed))) {
 				(*toIt)->domain.erase(toCN.get());
@@ -211,7 +211,7 @@ namespace FSMtesting {
 		fromCN->domain.clear();
 	}
 
-	static void processIdentified(list<shared_ptr<ConvergentNodeS>>& identifiedNodes, bool noES) {
+	static void processIdentified(list<shared_ptr<ConvergentNode>>& identifiedNodes, bool noES) {
 		while (!identifiedNodes.empty()) {
 			auto& identifiedCN = identifiedNodes.front();
 			if (!identifiedCN->convergent.empty()) {
@@ -226,9 +226,9 @@ namespace FSMtesting {
 		}
 	}
 
-	static void updateDomains(shared_ptr<TestNodeS> node, bool noES) {
+	static void updateDomains(shared_ptr<OTreeNode> node, bool noES) {
 		input_t input(STOUT_INPUT);
-		list<shared_ptr<ConvergentNodeS>> identifiedNodes;
+		list<shared_ptr<ConvergentNode>> identifiedNodes;
 		do {
 			node->lastQueriedInput = input;
 			auto cn = node->convergentNode.lock();
@@ -251,13 +251,13 @@ namespace FSMtesting {
 		processIdentified(identifiedNodes, noES);
 	}
 
-	static shared_ptr<TestNodeS> extendNodeWithInput(const shared_ptr<TestNodeS>& node, input_t input, const unique_ptr<DFSM>& fsm) {
+	static shared_ptr<OTreeNode> extendNodeWithInput(const shared_ptr<OTreeNode>& node, input_t input, const unique_ptr<DFSM>& fsm) {
 		state_t state = fsm->getNextState(node->state, input);
 		output_t outputState = (state == NULL_STATE) ? WRONG_OUTPUT :
 			(fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 		output_t outputTransition = (state == NULL_STATE) ? WRONG_OUTPUT :
 			(fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
-		auto nextNode = make_shared<TestNodeS>(node, input,
+		auto nextNode = make_shared<OTreeNode>(node, input,
 			outputTransition, outputState, state, fsm->getNumberOfInputs());
 		node->next[input] = nextNode;
 		//AllocatedSize++;
@@ -265,9 +265,9 @@ namespace FSMtesting {
 		return nextNode;
 	}
 
-	static shared_ptr<TestNodeS> appendSequence(shared_ptr<TestNodeS> node,
+	static shared_ptr<OTreeNode> appendSequence(shared_ptr<OTreeNode> node,
 			const sequence_in_t& seq, const OTreeS& ot, const unique_ptr<DFSM>& fsm, bool checkDomains = true) {
-		shared_ptr<ConvergentNodeS> cn = (checkDomains) ? node->convergentNode.lock() : nullptr;
+		shared_ptr<ConvergentNode> cn = (checkDomains) ? node->convergentNode.lock() : nullptr;
 		auto it = seq.begin();
 		for (; it != seq.end(); ++it) {
 			if (*it == STOUT_INPUT) continue;
@@ -283,7 +283,7 @@ namespace FSMtesting {
 				node = extendNodeWithInput(node, *it, fsm);
 				if (checkDomains) {
 					if (!cn->next[*it]) {
-						cn->next[*it] = make_shared<ConvergentNodeS>(node);
+						cn->next[*it] = make_shared<ConvergentNode>(node);
 						cn = cn->next[*it];
 						if (fsm->isOutputState()) {
 							for (state_t i = 0; i < ot.rn.size(); i++) {
@@ -320,14 +320,14 @@ namespace FSMtesting {
 		return node;
 	}
 
-	static bool hasLeafBack(const shared_ptr<ConvergentNodeS>& prevCN) {
+	static bool hasLeafBack(const shared_ptr<ConvergentNode>& prevCN) {
 		while (!prevCN->leafNodes.empty() && (prevCN->leafNodes.back()->lastQueriedInput != STOUT_INPUT)) {
 			prevCN->leafNodes.pop_back();
 		}
 		return !prevCN->leafNodes.empty();
 	}
 
-	static void addSequence(const shared_ptr<ConvergentNodeS>& cn, const sequence_in_t& seq, 
+	static void addSequence(const shared_ptr<ConvergentNode>& cn, const sequence_in_t& seq, 
 			const OTreeS& ot, const unique_ptr<DFSM>& fsm) {
 		auto bestStartNodeIt = cn->convergent.begin();
 		seq_len_t maxLen(0);
@@ -352,9 +352,9 @@ namespace FSMtesting {
 		}
 		if ((maxLen == 0) && (cn->state != 0)) {
 			auto minLen = (*bestStartNodeIt)->accessSequence.size() - 1;
-			queue<pair<shared_ptr<ConvergentNodeS>, sequence_in_t>> fifo;
+			queue<pair<shared_ptr<ConvergentNode>, sequence_in_t>> fifo;
 			fifo.emplace(cn, sequence_in_t());
-			set<ConvergentNodeS*> closedCNs;
+			set<ConvergentNode*> closedCNs;
 			closedCNs.insert(cn.get());
 			while (!fifo.empty()) {
 				auto p = move(fifo.front());
@@ -382,8 +382,8 @@ namespace FSMtesting {
 		appendSequence(*bestStartNodeIt, seq, ot, fsm);
 	}
 
-	static void generateConvergentSubtree(const shared_ptr<ConvergentNodeS>& cn, const OTreeS& ot,
-			list<shared_ptr<TestNodeS>>& leaves) {
+	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const OTreeS& ot,
+			list<shared_ptr<OTreeNode>>& leaves) {
 		const auto& node = cn->convergent.front();
 		node->convergentNode = cn;
 		if (!cn->isRN) {
@@ -396,7 +396,7 @@ namespace FSMtesting {
 		for (input_t input = 0; input < cn->next.size(); input++) {
 			if (node->next[input]) {
 				if (!node->next[input]->convergentNode.lock()) {// not a state node
-					cn->next[input] = make_shared<ConvergentNodeS>(node->next[input]);
+					cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
 				}
 				generateConvergentSubtree(cn->next[input], ot, leaves);
 				isLeaf = false;
@@ -414,9 +414,9 @@ namespace FSMtesting {
 		ot.rn.resize(fsm->getNumberOfStates());
 		auto& stateNodes = ot.rn;
 		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		auto root = make_shared<TestNodeS>(outputState, 0, fsm->getNumberOfInputs());
+		auto root = make_shared<OTreeNode>(outputState, 0, fsm->getNumberOfInputs());
 		
-		stateNodes[0] = make_shared<ConvergentNodeS>(root, true);
+		stateNodes[0] = make_shared<ConvergentNode>(root, true);
 		root->convergentNode = stateNodes[0];
 		set<state_t> states;// (fsm->getNumberOfStates());
 		for (state_t i = 0; i < stateNodes.size(); i++) {
@@ -425,7 +425,7 @@ namespace FSMtesting {
 		auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, 0, states, true);
 		appendSequence(root, seq, ot, fsm, false);
 		
-		queue<shared_ptr<TestNodeS>> fifo, fifoNext;
+		queue<shared_ptr<OTreeNode>> fifo, fifoNext;
 		fifo.emplace(root);
 		do {
 			auto numNodes = fifo.size();
@@ -435,7 +435,7 @@ namespace FSMtesting {
 				for (input_t input = 0; input < numInputs; input++) {
 					const auto& nn = node->next[input];
 					if (nn && !stateNodes[nn->state]) {
-						stateNodes[nn->state] = make_shared<ConvergentNodeS>(nn, true);
+						stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, nn->state, states, true);
@@ -455,7 +455,7 @@ namespace FSMtesting {
 						seq.push_front(input);
 						appendSequence(node, seq, ot, fsm, false);
 						auto& nn = node->next[input];
-						stateNodes[nn->state] = make_shared<ConvergentNodeS>(nn, true);
+						stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						fifoNext.emplace(nn);
@@ -503,7 +503,7 @@ namespace FSMtesting {
 		}
 		//printf("div sc\n");
 		// generate convergent and init domains
-		list<shared_ptr<TestNodeS>> leaves;
+		list<shared_ptr<OTreeNode>> leaves;
 		generateConvergentSubtree(stateNodes[0], ot, leaves);
 		for (auto& node : leaves) {
 			updateDomains(node, es == 0);
@@ -511,7 +511,7 @@ namespace FSMtesting {
 		return ot;
 	}
 
-	static void printTStree(const shared_ptr<TestNodeS>& node, string prefix = "") {
+	static void printTStree(const shared_ptr<OTreeNode>& node, string prefix = "") {
 		printf("%s%d/%d <- %d\n", prefix.c_str(), node->state, node->stateOutput, node->incomingOutput);
 		input_t i = 0;
 		for (auto nn : node->next) {
@@ -523,9 +523,9 @@ namespace FSMtesting {
 		}
 	}
 	
-	static void distinguish(const shared_ptr<ConvergentNodeS>& cn, const list<shared_ptr<ConvergentNodeS>>& nodes,
+	static void distinguish(const shared_ptr<ConvergentNode>& cn, const list<shared_ptr<ConvergentNode>>& nodes,
 			const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq, const OTreeS& ot) {
-		list<shared_ptr<ConvergentNodeS>> domain;
+		list<shared_ptr<ConvergentNode>> domain;
 		auto state = cn->state;
 		if (!cn->isRN) {
 			for (auto dIt = cn->domain.begin(); dIt != cn->domain.end(); ++dIt) {
@@ -536,7 +536,7 @@ namespace FSMtesting {
 			}
 		}
 		for (const auto& np : nodes) {
-			set<pair<state_t, ConvergentNodeS*>> closed;
+			set<pair<state_t, ConvergentNode*>> closed;
 			if ((state != np->state) && !areConvergentNodesDistinguished(np, cn, ot.es == 0, closed))  {
 				domain.emplace_back(np);
 			}
@@ -586,7 +586,7 @@ namespace FSMtesting {
 			}
 			// check for a possible separation by the recent added sequences
 			for (auto dIt = domain.begin(); dIt != domain.end();) {
-				set<pair<state_t, ConvergentNodeS*>> closed;
+				set<pair<state_t, ConvergentNode*>> closed;
 				if (!cn->domain.count((*dIt).get()) &&
 					((find(nodes.begin(), nodes.end(), *dIt) == nodes.end()) 
 					|| areConvergentNodesDistinguished(cn, *dIt, ot.es == 0, closed))) {
@@ -599,8 +599,8 @@ namespace FSMtesting {
 		}
 	}
 
-	static void distinguishCNs(const shared_ptr<ConvergentNodeS>& cn, const shared_ptr<ConvergentNodeS>& refCN,
-		list<shared_ptr<ConvergentNodeS>>& nodes, const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq,
+	static void distinguishCNs(const shared_ptr<ConvergentNode>& cn, const shared_ptr<ConvergentNode>& refCN,
+		list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq,
 			int depth, const OTreeS& ot) {
 		distinguish(cn, nodes, fsm, sepSeq, ot);
 		if (refCN) distinguish(refCN, nodes, fsm, sepSeq, ot);
@@ -636,9 +636,9 @@ namespace FSMtesting {
 		return sequences;
 	}
 
-	static sequence_set_t getSequences(const shared_ptr<TestNodeS>& node, const unique_ptr<DFSM>& fsm) {
+	static sequence_set_t getSequences(const shared_ptr<OTreeNode>& node, const unique_ptr<DFSM>& fsm) {
 		sequence_set_t TS;
-		stack<pair<shared_ptr<TestNodeS>, sequence_in_t>> lifo;
+		stack<pair<shared_ptr<OTreeNode>, sequence_in_t>> lifo;
 		sequence_in_t seq;
 		if (fsm->isOutputState()) seq.push_back(STOUT_INPUT);
 		lifo.emplace(node, move(seq));
@@ -680,7 +680,7 @@ namespace FSMtesting {
 		//printf("divPres SC designed\n");
 		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), extraStates);
 
-		using tran_t = tuple<shared_ptr<ConvergentNodeS>, input_t, shared_ptr<ConvergentNodeS>>;
+		using tran_t = tuple<shared_ptr<ConvergentNode>, input_t, shared_ptr<ConvergentNode>>;
 		list<tran_t> transitions;
 		for (const auto& sn : stateNodes) {
 			for (input_t i = 0; i < sn->next.size(); i++) {
@@ -733,7 +733,7 @@ namespace FSMtesting {
 			}
 			// identify next state
 			auto ncn = startCN->next[input];
-			list<shared_ptr<ConvergentNodeS>> tmp;
+			list<shared_ptr<ConvergentNode>> tmp;
 			distinguishCNs(ncn, proveConvergence ? nextStateCN : nullptr, tmp, fsm, sepSeq, extraStates, ot);
 
 			if (proveConvergence && (startCN->next[input] != nextStateCN)) {// already merged in case of no ES
@@ -752,7 +752,7 @@ namespace FSMtesting {
 }
 
 /*
-	static void appendSequence(shared_ptr<TestNodeS> node, const sequence_in_t& seq, const unique_ptr<DFSM>& fsm) {
+	static void appendSequence(shared_ptr<OTreeNode> node, const sequence_in_t& seq, const unique_ptr<DFSM>& fsm) {
 		auto it = seq.begin();
 		for (; it != seq.end(); ++it) {
 			if (*it == STOUT_INPUT) continue;
@@ -769,7 +769,7 @@ namespace FSMtesting {
 				(fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
 			output_t outputTransition = (state == NULL_STATE) ? WRONG_OUTPUT :
 				(fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
-			auto nextNode = make_shared<TestNodeS>(node, input,
+			auto nextNode = make_shared<OTreeNode>(node, input,
 				outputTransition, outputState, state, fsm->getNumberOfInputs());
 				//node->accessSequence.size() + 1, outputTransition, outputState, state, fsm->getNumberOfInputs());
 			node->next[input] = nextNode;
@@ -778,7 +778,7 @@ namespace FSMtesting {
 		}
 	}
 
-	static inline bool isLeaf(const shared_ptr<TestNodeS>& node) {
+	static inline bool isLeaf(const shared_ptr<OTreeNode>& node) {
 		for (const auto& nn : node->next) {
 			if (nn) {
 				return false;
@@ -787,7 +787,7 @@ namespace FSMtesting {
 		return true;
 	}
 
-	static inline bool hasLeaf(const shared_ptr<ConvergentNodeS>& cn) {
+	static inline bool hasLeaf(const shared_ptr<ConvergentNode>& cn) {
 		for (const auto& n : cn->convergent) {
 			if (isLeaf(n)) {
 				return true;
@@ -796,7 +796,7 @@ namespace FSMtesting {
 		return false;
 	}
 
-	static seq_len_t getLenCost(const shared_ptr<ConvergentNodeS>& cn, const sequence_in_t& seq) {
+	static seq_len_t getLenCost(const shared_ptr<ConvergentNode>& cn, const sequence_in_t& seq) {
 		seq_len_t minCost = seq.size() + cn->convergent.front()->accessSequence.size() + 1;
 		auto cost = seq.size() + 1;
 		auto currCN = cn;
@@ -823,13 +823,13 @@ namespace FSMtesting {
 		return minCost;
 	}
 
-	static void mapNodeToCN(shared_ptr<TestNodeS> node, shared_ptr<ConvergentNodeS> cn, 
-			const sequence_in_t& seq, const set<ConvergentNodeS*>& allStatesDomain) {
+	static void mapNodeToCN(shared_ptr<OTreeNode> node, shared_ptr<ConvergentNode> cn, 
+			const sequence_in_t& seq, const set<ConvergentNode*>& allStatesDomain) {
 		for (auto input : seq) {
 			if (input == STOUT_INPUT) continue;
 			node = node->next[input];
 			if (!cn->next[input]) {
-				cn->next[input] = make_shared<ConvergentNodeS>(node);
+				cn->next[input] = make_shared<ConvergentNode>(node);
 				cn->next[input]->domain = allStatesDomain;
 			}
 			else {
@@ -846,8 +846,8 @@ namespace FSMtesting {
 		}
 	}
 
-	static void addSequence(const shared_ptr<ConvergentNodeS>& cn, sequence_in_t seq, 
-			const unique_ptr<DFSM>& fsm, const set<ConvergentNodeS*>& allStatesDomain) {
+	static void addSequence(const shared_ptr<ConvergentNode>& cn, sequence_in_t seq, 
+			const unique_ptr<DFSM>& fsm, const set<ConvergentNode*>& allStatesDomain) {
 		auto cost = getLenCost(cn, seq);
 		if (cost > seq.size()) {
 			appendSequence(cn->convergent.front(), seq, fsm);
@@ -1022,12 +1022,12 @@ namespace FSMtesting {
 		return bestSepSeq;
 	}
 
-	static vector<shared_ptr<ConvergentNodeS>> createDivPresStateCoverTree(const unique_ptr<DFSM>& fsm, 
+	static vector<shared_ptr<ConvergentNode>> createDivPresStateCoverTree(const unique_ptr<DFSM>& fsm, 
 		const vector<sequence_in_t>& ADSet, SeparatingSequencesInfo& sepSeq) {
-		vector<shared_ptr<ConvergentNodeS>> stateNodes(fsm->getNumberOfStates());
+		vector<shared_ptr<ConvergentNode>> stateNodes(fsm->getNumberOfStates());
 		// root
 		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		auto root = make_shared<TestNodeS>(outputState, 0, fsm->getNumberOfInputs());
+		auto root = make_shared<OTreeNode>(outputState, 0, fsm->getNumberOfInputs());
 		if (ADSet.empty()) {
 			set<state_t> diffStates;
 			for (state_t s = 1; s < fsm->getNumberOfStates(); s++) {
@@ -1039,9 +1039,9 @@ namespace FSMtesting {
 		else {
 			appendSequence(root, ADSet[0], fsm);
 		}
-		stateNodes[0] = make_shared<ConvergentNodeS>(root);
+		stateNodes[0] = make_shared<ConvergentNode>(root);
 		root->convergentNode = stateNodes[0];
-		queue<shared_ptr<TestNodeS>> fifo, fifoNext;
+		queue<shared_ptr<OTreeNode>> fifo, fifoNext;
 		fifo.emplace(root);
 		do {
 			auto numNodes = fifo.size();
@@ -1051,7 +1051,7 @@ namespace FSMtesting {
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					const auto& nn = node->next[input];
 					if (nn && !stateNodes[nn->state]) {
-						stateNodes[nn->state] = make_shared<ConvergentNodeS>(nn);
+						stateNodes[nn->state] = make_shared<ConvergentNode>(nn);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						if (ADSet.empty()) {
@@ -1080,7 +1080,7 @@ namespace FSMtesting {
 					if ((nextState != NULL_STATE) && !stateNodes[nextState]) {
 						appendSequence(node, sequence_in_t({input}), fsm);
 						auto& nn = node->next[input];
-						stateNodes[nn->state] = make_shared<ConvergentNodeS>(nn);
+						stateNodes[nn->state] = make_shared<ConvergentNode>(nn);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						if (ADSet.empty()) {
@@ -1105,21 +1105,21 @@ namespace FSMtesting {
 		return stateNodes;
 	}
 
-	static void generateConvergentSubtree(const shared_ptr<ConvergentNodeS>& cn, const set<ConvergentNodeS*>& allStatesDomain) {
+	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const set<ConvergentNode*>& allStatesDomain) {
 		const auto& node = cn->convergent.front();
 		node->convergentNode = cn;
 		cn->domain = allStatesDomain;
 		for (input_t input = 0; input < cn->next.size(); input++) {
 			if (node->next[input]) {
 				if (!node->next[input]->convergentNode.lock()) {// not a state node
-					cn->next[input] = make_shared<ConvergentNodeS>(node->next[input]);
+					cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
 				}
 				generateConvergentSubtree(cn->next[input], allStatesDomain);
 			}
 		}
 	}
 
-	static size_t checkSucc(const shared_ptr<ConvergentNodeS>& cn, const vector<shared_ptr<ConvergentNodeS>>& stateNodes, seq_len_t depth) {
+	static size_t checkSucc(const shared_ptr<ConvergentNode>& cn, const vector<shared_ptr<ConvergentNode>>& stateNodes, seq_len_t depth) {
 		size_t cost = (cn->domain.size() != 1);
 		if (depth > 0) {
 			for (input_t i = 0; i < cn->next.size(); i++) {
@@ -1134,7 +1134,7 @@ namespace FSMtesting {
 		return cost;
 	}
 
-	static void chooseTransition2(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNodeS>>& stateNodes, 
+	static void chooseTransition2(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNode>>& stateNodes, 
 			const unique_ptr<DFSM>& fsm, seq_len_t extraStates) {
 		size_t minCost = size_t(-1);
 		for (const auto& cn : stateNodes) {
@@ -1163,7 +1163,7 @@ namespace FSMtesting {
 
 	
 	static void calcCost(cost_t& cost, const sequence_in_t& seq, const sequence_out_t& refOut,
-			const list<shared_ptr<ConvergentNodeS>>& nodes, const unique_ptr<DFSM>& fsm) {
+			const list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm) {
 		for (const auto& n : nodes) {
 			auto out = fsm->getOutputAlongPath(n->convergent.front()->state, seq);
 			auto outIt = out.begin();
@@ -1185,8 +1185,8 @@ namespace FSMtesting {
 		}
 	}
 
-	static sequence_in_t chooseSepSeqAsExtension(const shared_ptr<ConvergentNodeS>& cn, cost_t& minCost, cost_t& currCost,
-		const list<shared_ptr<ConvergentNodeS>>& nodes, const list<cost_t>& extNodes,
+	static sequence_in_t chooseSepSeqAsExtension(const shared_ptr<ConvergentNode>& cn, cost_t& minCost, cost_t& currCost,
+		const list<shared_ptr<ConvergentNode>>& nodes, const list<cost_t>& extNodes,
 		const unique_ptr<DFSM>& fsm, SeparatingSequencesInfo& sepSeq) {
 
 		sequence_in_t bestSeq;
@@ -1233,7 +1233,7 @@ namespace FSMtesting {
 			if (cn->next[i]) {
 				auto& nextState = cn->next[i]->state;
 				auto refOut = fsm->getOutput(cn->state, i);
-				list<shared_ptr<ConvergentNodeS>> succNodes;
+				list<shared_ptr<ConvergentNode>> succNodes;
 				list<cost_t> succExtNodes;
 				cost_t succCost = currCost;// (cost so far, distinguished)
 				seq_len_t estCost = 0;
@@ -1298,7 +1298,7 @@ namespace FSMtesting {
 		return bestSeq;
 	}
 
-	static void chooseTransition(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNodeS>>& stateNodes,
+	static void chooseTransition(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNode>>& stateNodes,
 			const unique_ptr<DFSM>& fsm, seq_len_t extraStates) {
 		size_t minCost = size_t(-1);
 		for (const auto& cn : stateNodes) {
