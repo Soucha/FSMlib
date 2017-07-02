@@ -292,8 +292,22 @@ int main(int argc, char** argv) {
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
  	//auto st = getSplittingTree(fsm, true);
-	/*/compareDesignAlgoritms(fsm, fileName);
-	
+	//compareDesignAlgoritms(fsm, fileName);
+	OTree ot;
+	ot.es = 0;
+	StateCharacterization sc;
+	auto TS = S_method_ext(fsm, ot, sc);
+	printTS(TS, fileName);
+	ARE_EQUAL(false, TS.empty(), "Obtained TS is empty.");
+	auto indistinguishable = FaultCoverageChecker::getFSMs(fsm, TS, ot.es);
+	ARE_EQUAL(1, int(indistinguishable.size()), "The S-method (%d extra states) has not complete fault coverage,"
+		" it produces %d indistinguishable FSMs.", ot.es, indistinguishable.size());
+	ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
+
+	ot.es = 1;
+	auto TS1 = S_method_ext(fsm, ot, sc);
+	printTS(TS1, fileName);
+
 	bool test = false;
 	for (int extraStates = 0; extraStates <= 2; extraStates++) {
 		auto TS = S_method(fsm, extraStates);
@@ -307,7 +321,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	// */
+	/*/
 	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
 		bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,

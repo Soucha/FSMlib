@@ -775,6 +775,7 @@ namespace FSMsequence {
 			ERROR_MESSAGE("FSMsequence::getSeparatingSequenceFromSplittingTree - invalid parameters");
 			return sequence_in_t();
 		}
+		states.insert(state);
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
 		sequence_in_t seq;
 		while (states.size() > 1) {

@@ -63,20 +63,18 @@ namespace FSMtesting {
 			convergent.emplace_back(node);
 		}
 	};
-	*/
-	struct SeparatingSequencesInfo {
+
+	struct OTree {
+		vector<shared_ptr<ConvergentNode>> rn;
+		state_t es;
+	};
+	
+	struct StateCharacterization {
 		vector<LinkCell> sepSeq;
 		map<set<state_t>, sequence_in_t> bestSeq;
 		unique_ptr<SplittingTree> st;
 	};
-
-	struct OTreeS {
-		vector<shared_ptr<ConvergentNode>> rn;
-		state_t es;
-	};
-
-	//static size_t AllocatedSize = 0;
-
+*/
 	static bool isIntersectionEmpty(const set<ConvergentNode*>& domain1, const set<ConvergentNode*>& domain2) {
 		//if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
@@ -260,13 +258,11 @@ namespace FSMtesting {
 		auto nextNode = make_shared<OTreeNode>(node, input,
 			outputTransition, outputState, state, fsm->getNumberOfInputs());
 		node->next[input] = nextNode;
-		//AllocatedSize++;
-		//if (AllocatedSize % 10 == 0) printf("%u ", AllocatedSize);
 		return nextNode;
 	}
 
 	static shared_ptr<OTreeNode> appendSequence(shared_ptr<OTreeNode> node,
-			const sequence_in_t& seq, const OTreeS& ot, const unique_ptr<DFSM>& fsm, bool checkDomains = true) {
+			const sequence_in_t& seq, const OTree& ot, const unique_ptr<DFSM>& fsm, bool checkDomains = true) {
 		shared_ptr<ConvergentNode> cn = (checkDomains) ? node->convergentNode.lock() : nullptr;
 		auto it = seq.begin();
 		for (; it != seq.end(); ++it) {
@@ -328,7 +324,7 @@ namespace FSMtesting {
 	}
 
 	static void addSequence(const shared_ptr<ConvergentNode>& cn, const sequence_in_t& seq, 
-			const OTreeS& ot, const unique_ptr<DFSM>& fsm) {
+			const OTree& ot, const unique_ptr<DFSM>& fsm) {
 		auto bestStartNodeIt = cn->convergent.begin();
 		seq_len_t maxLen(0);
 		for (auto nodeIt = cn->convergent.begin(); nodeIt != cn->convergent.end(); ++nodeIt) {
@@ -382,7 +378,7 @@ namespace FSMtesting {
 		appendSequence(*bestStartNodeIt, seq, ot, fsm);
 	}
 
-	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const OTreeS& ot,
+	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const OTree& ot,
 			list<shared_ptr<OTreeNode>>& leaves) {
 		const auto& node = cn->convergent.front();
 		node->convergentNode = cn;
@@ -401,32 +397,36 @@ namespace FSMtesting {
 				generateConvergentSubtree(cn->next[input], ot, leaves);
 				isLeaf = false;
 			}
+			else if (cn->next[input]) {
+				cn->next[input].reset();
+			}
 		}
 		if (isLeaf) {
 			leaves.emplace_back(node);
 		}
 	}
 
-	static OTreeS getDivergencePreservingStateCover(const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq, state_t es) {
-		OTreeS ot;
-		ot.es = es;
+	static void createDivergencePreservingStateCover(const unique_ptr<DFSM>& fsm, OTree& ot, const StateCharacterization& sc) {
 		const auto numInputs = fsm->getNumberOfInputs();
 		ot.rn.resize(fsm->getNumberOfStates());
+		vector<bool> covered(fsm->getNumberOfStates(), false);
 		auto& stateNodes = ot.rn;
-		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		auto root = make_shared<OTreeNode>(outputState, 0, fsm->getNumberOfInputs());
-		
-		stateNodes[0] = make_shared<ConvergentNode>(root, true);
-		root->convergentNode = stateNodes[0];
-		set<state_t> states;// (fsm->getNumberOfStates());
-		for (state_t i = 0; i < stateNodes.size(); i++) {
-			states.emplace(i);
+		if (!stateNodes[0]) {
+			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
+			auto root = make_shared<OTreeNode>(outputState, 0, fsm->getNumberOfInputs());
+
+			stateNodes[0] = make_shared<ConvergentNode>(root, true);
+			root->convergentNode = stateNodes[0];
+
+			for (state_t i = 0; i < stateNodes.size(); i++) {
+				root->domain.emplace(i);
+			}
+			auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, 0, root->domain, true);
+			appendSequence(root, seq, ot, fsm, false);
 		}
-		auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, 0, states, true);
-		appendSequence(root, seq, ot, fsm, false);
-		
+		covered[0] = true;
 		queue<shared_ptr<OTreeNode>> fifo, fifoNext;
-		fifo.emplace(root);
+		fifo.emplace(stateNodes[0]->convergent.front());
 		do {
 			auto numNodes = fifo.size();
 			for (size_t i = 0; i < numNodes; i++) {
@@ -434,12 +434,18 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < numInputs; input++) {
 					const auto& nn = node->next[input];
-					if (nn && !stateNodes[nn->state]) {
-						stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
-						nn->convergentNode = stateNodes[nn->state];
-						stateNodes[node->state]->next[input] = stateNodes[nn->state];
-						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, nn->state, states, true);
-						appendSequence(nn, seq, ot, fsm, false);
+					if (nn && !covered[nn->state] && (!stateNodes[nn->state] || (stateNodes[nn->state]->convergent.front() == nn))) {
+						if (!stateNodes[nn->state]) {
+							stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
+							nn->convergentNode = stateNodes[nn->state];
+							stateNodes[node->state]->next[input] = stateNodes[nn->state];
+							for (state_t i = 0; i < stateNodes.size(); i++) {
+								nn->domain.emplace(i);
+							}
+							auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, nn->state, nn->domain, true);
+							appendSequence(nn, seq, ot, fsm, false);
+						}
+						covered[nn->state];
 						fifoNext.emplace(nn);
 					}
 				}
@@ -450,15 +456,21 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					auto nextState = fsm->getNextState(node->state, input);
-					if ((nextState != NULL_STATE) && !stateNodes[nextState]) {
-						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, nextState, states, true);
+					if ((nextState != NULL_STATE) && !covered[nextState] && !stateNodes[nextState]) {
+						set<state_t> states;
+						for (state_t i = 0; i < stateNodes.size(); i++) {
+							states.emplace(i);
+						}
+						auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, nextState, states, true);
 						seq.push_front(input);
 						appendSequence(node, seq, ot, fsm, false);
 						auto& nn = node->next[input];
+						nn->domain.swap(states);
 						stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						fifoNext.emplace(nn);
+						covered[nextState];
 					}
 				}
 			}
@@ -467,18 +479,25 @@ namespace FSMtesting {
 		//printf("sc\n");
 		// make state cover divergence preserving
 		for (const auto& sn : stateNodes) {
-			states.clear();
-			const auto& refNode = sn->convergent.front();
-			for (state_t i = 0; i < stateNodes.size(); i++) {
-				if ((sn->state == i) || !areNodesDifferent(refNode, stateNodes[i]->convergent.front())) {
-					states.emplace(i);
+			while (sn->convergent.size() > 1) {
+				sn->convergent.back()->convergentNode.reset();
+				sn->convergent.pop_back();
+			}
+			sn->leafNodes.clear();
+			const auto& node = sn->convergent.front();
+			for (auto snIt = node->domain.begin(); snIt != node->domain.end();) {
+				if ((node->state != *snIt) && areNodesDifferent(node, stateNodes[*snIt]->convergent.front())) {
+					snIt = node->domain.erase(snIt);
+				}
+				else {
+					++snIt;
 				}
 			}
-			while (states.size() > 1) {
-				auto seq = getSeparatingSequenceFromSplittingTree(fsm, sepSeq.st, sn->state, states, true);
-				appendSequence(refNode, seq, ot, fsm, false);
+			while (node->domain.size() > 1) {
+				auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, sn->state, node->domain, true);
+				appendSequence(node, seq, ot, fsm, false);
 				auto refOut = fsm->getOutputAlongPath(sn->state, seq);
-				for (auto it = states.begin(); it != states.end();) {
+				for (auto it = node->domain.begin(); it != node->domain.end();) {
 					if (*it != sn->state) {
 						auto out = fsm->getOutputAlongPath(*it, seq);
 						auto outIt = out.begin();
@@ -493,7 +512,7 @@ namespace FSMtesting {
 							++inIt;
 							sequence_in_t diffSeq(seq.begin(), inIt);
 							appendSequence(stateNodes[*it]->convergent.front(), diffSeq, ot, fsm, false);
-							it = states.erase(it);
+							it = node->domain.erase(it);
 						}
 						else ++it;
 					}
@@ -506,9 +525,8 @@ namespace FSMtesting {
 		list<shared_ptr<OTreeNode>> leaves;
 		generateConvergentSubtree(stateNodes[0], ot, leaves);
 		for (auto& node : leaves) {
-			updateDomains(node, es == 0);
+			updateDomains(node, ot.es == 0);
 		}
-		return ot;
 	}
 
 	static void printTStree(const shared_ptr<OTreeNode>& node, string prefix = "") {
@@ -524,7 +542,7 @@ namespace FSMtesting {
 	}
 	
 	static void distinguish(const shared_ptr<ConvergentNode>& cn, const list<shared_ptr<ConvergentNode>>& nodes,
-			const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq, const OTreeS& ot) {
+			const unique_ptr<DFSM>& fsm, const StateCharacterization& sepSeq, const OTree& ot) {
 		list<shared_ptr<ConvergentNode>> domain;
 		auto state = cn->state;
 		if (!cn->isRN) {
@@ -600,8 +618,8 @@ namespace FSMtesting {
 	}
 
 	static void distinguishCNs(const shared_ptr<ConvergentNode>& cn, const shared_ptr<ConvergentNode>& refCN,
-		list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm, const SeparatingSequencesInfo& sepSeq,
-			int depth, const OTreeS& ot) {
+		list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm, const StateCharacterization& sepSeq,
+			int depth, const OTree& ot) {
 		distinguish(cn, nodes, fsm, sepSeq, ot);
 		if (refCN) distinguish(refCN, nodes, fsm, sepSeq, ot);
 		if (depth > 0) {
@@ -655,36 +673,34 @@ namespace FSMtesting {
 					lifo.emplace(p.first->next[i], move(seq));
 				}
 			}
-			if (!hasSucc) {
+			if (!hasSucc && (p.first->assumedState == NULL_STATE)) {
 				TS.emplace(move(p.second));
 			}
 		}
 		return TS;
 	}
 
-	sequence_set_t S_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+	sequence_set_t S_method_ext(const unique_ptr<DFSM>& fsm, OTree& ot, StateCharacterization& sc) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::S_method", sequence_set_t());
-		if (extraStates < 0) {
+		if (ot.es < 0) {
 			return sequence_set_t();
 		}
-		if (fsm->getNumberOfStates() == 1) {
-			return getTraversalSet(fsm, extraStates);
-		}
-		SeparatingSequencesInfo sepSeq;
-		sepSeq.st = getSplittingTree(fsm, true, false);
-		//sepSeq.sepSeq = getSeparatingSequences(fsm);
-		//printf("ST designed\n");
-		auto ot = getDivergencePreservingStateCover(fsm, sepSeq, extraStates);
+		if (!sc.st)
+			sc.st = getSplittingTree(fsm, true, false);
+		createDivergencePreservingStateCover(fsm, ot, sc);
 		// stateNodes are initialized divergence-preserving state cover
 		auto& stateNodes = ot.rn;
+		if (fsm->getNumberOfStates() == 1) {
+			return getSequences(stateNodes[0]->convergent.front(), fsm);
+		}
 		//printf("divPres SC designed\n");
-		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), extraStates);
+		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), ot.es);
 
 		using tran_t = tuple<shared_ptr<ConvergentNode>, input_t, shared_ptr<ConvergentNode>>;
 		list<tran_t> transitions;
 		for (const auto& sn : stateNodes) {
 			for (input_t i = 0; i < sn->next.size(); i++) {
-				if ((!sn->next[i] || !sn->next[i]->isRN) &&	(fsm->getNextState(sn->state, i) != NULL_STATE)) {
+				if ((!sn->next[i] || !sn->next[i]->isRN) && (fsm->getNextState(sn->state, i) != NULL_STATE)) {
 					transitions.emplace_back(sn, i, stateNodes[fsm->getNextState(sn->state, i)]);
 				}
 			}
@@ -702,7 +718,7 @@ namespace FSMtesting {
 			auto nextStateCN = move(get<2>(transitions.front()));
 			transitions.pop_front();
 			if (startCN->next[input] && (startCN->next[input] == nextStateCN)) continue; // no ES and already verified
-			
+
 			//bool proveConvergence = false;  //!transitions.empty();// TODO a condition when else to omit converngence proof
 			set<state_t> startingStates;
 			for (const auto& t : transitions) {
@@ -734,587 +750,28 @@ namespace FSMtesting {
 			// identify next state
 			auto ncn = startCN->next[input];
 			list<shared_ptr<ConvergentNode>> tmp;
-			distinguishCNs(ncn, proveConvergence ? nextStateCN : nullptr, tmp, fsm, sepSeq, extraStates, ot);
+			distinguishCNs(ncn, proveConvergence ? nextStateCN : nullptr, tmp, fsm, sc, ot.es, ot);
 
 			if (proveConvergence && (startCN->next[input] != nextStateCN)) {// already merged in case of no ES
 				startCN->next[input] = nextStateCN;
 				mergeCN(ncn, nextStateCN, tmp, ot.es == 0);
 				processIdentified(tmp, ot.es == 0);
-			}			
-		}		
+			}
+		}
 		// obtain TS
 		//printTStree(root);
-		for (auto& sn : stateNodes) {
-			sn->next.clear();
-		}
 		return getSequences(stateNodes[0]->convergent.front(), fsm);
+	}
+
+	sequence_set_t S_method(const unique_ptr<DFSM>& fsm, int extraStates) {
+		RETURN_IF_UNREDUCED(fsm, "FSMtesting::S_method", sequence_set_t());
+		if (extraStates < 0) {
+			return sequence_set_t();
+		}
+		OTree ot;
+		ot.es = extraStates;
+		return S_method_ext(fsm, ot, StateCharacterization());
 	}
 }
 
-/*
-	static void appendSequence(shared_ptr<OTreeNode> node, const sequence_in_t& seq, const unique_ptr<DFSM>& fsm) {
-		auto it = seq.begin();
-		for (; it != seq.end(); ++it) {
-			if (*it == STOUT_INPUT) continue;
-			if (node->next[*it]) {
-				node = node->next[*it];
-			}
-			else break;
-		}
-		for (; it != seq.end(); ++it) {
-			if (*it == STOUT_INPUT) continue;
-			const auto& input = *it;
-			state_t state = fsm->getNextState(node->state, input);
-			output_t outputState = (state == NULL_STATE) ? WRONG_OUTPUT :
-				(fsm->isOutputState()) ? fsm->getOutput(state, STOUT_INPUT) : DEFAULT_OUTPUT;
-			output_t outputTransition = (state == NULL_STATE) ? WRONG_OUTPUT :
-				(fsm->isOutputTransition()) ? fsm->getOutput(node->state, input) : DEFAULT_OUTPUT;
-			auto nextNode = make_shared<OTreeNode>(node, input,
-				outputTransition, outputState, state, fsm->getNumberOfInputs());
-				//node->accessSequence.size() + 1, outputTransition, outputState, state, fsm->getNumberOfInputs());
-			node->next[input] = nextNode;
-			if (state == NULL_STATE) continue;
-			node = move(nextNode);
-		}
-	}
-
-	static inline bool isLeaf(const shared_ptr<OTreeNode>& node) {
-		for (const auto& nn : node->next) {
-			if (nn) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	static inline bool hasLeaf(const shared_ptr<ConvergentNode>& cn) {
-		for (const auto& n : cn->convergent) {
-			if (isLeaf(n)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	static seq_len_t getLenCost(const shared_ptr<ConvergentNode>& cn, const sequence_in_t& seq) {
-		seq_len_t minCost = seq.size() + cn->convergent.front()->accessSequence.size() + 1;
-		auto cost = seq.size() + 1;
-		auto currCN = cn;
-		for (auto input : seq) {
-			cost--;
-			if (input == STOUT_INPUT) continue;
-			for (const auto& node : currCN->convergent) {
-				if (isLeaf(node)) {
-					minCost = cost;
-					break;
-				}
-			}
-			if (currCN->next[input]) {
-				currCN = currCN->next[input];
-			}
-			else {
-				currCN = nullptr;
-				break;
-			}
-		}
-		if (currCN) {
-			minCost = 0;
-		}
-		return minCost;
-	}
-
-	static void mapNodeToCN(shared_ptr<OTreeNode> node, shared_ptr<ConvergentNode> cn, 
-			const sequence_in_t& seq, const set<ConvergentNode*>& allStatesDomain) {
-		for (auto input : seq) {
-			if (input == STOUT_INPUT) continue;
-			node = node->next[input];
-			if (!cn->next[input]) {
-				cn->next[input] = make_shared<ConvergentNode>(node);
-				cn->next[input]->domain = allStatesDomain;
-			}
-			else {
-				auto& ncn = cn->next[input]->convergent;
-				if (node->accessSequence.size() < ncn.front()->accessSequence.size()) {
-					ncn.emplace_front(node);
-				}
-				else {
-					ncn.emplace_back(node);
-				}
-			}
-			cn = cn->next[input];
-			node->convergentNode = cn;
-		}
-	}
-
-	static void addSequence(const shared_ptr<ConvergentNode>& cn, sequence_in_t seq, 
-			const unique_ptr<DFSM>& fsm, const set<ConvergentNode*>& allStatesDomain) {
-		auto cost = getLenCost(cn, seq);
-		if (cost > seq.size()) {
-			appendSequence(cn->convergent.front(), seq, fsm);
-			mapNodeToCN(cn->convergent.front(), cn, seq, allStatesDomain);
-		}
-		else if (cost > 0) {
-			auto currCN = cn;
-			while (cost != seq.size()) {
-				if (seq.front() != STOUT_INPUT) {
-					currCN = currCN->next[seq.front()];
-				}
-				seq.pop_front();
-			}
-			for (const auto& node : currCN->convergent) {
-				if (isLeaf(node)) {
-					appendSequence(node, seq, fsm);
-					mapNodeToCN(node, currCN, seq, allStatesDomain);
-					currCN = nullptr;// for test purposes
-					break;
-				}
-			}
-			if (currCN) {
-				throw "";
-			}
-		}
-	}
-
-	typedef pair<seq_len_t, state_t> cost_t;// (num of needed symbols, num of distinguished)
-
-	static inline bool cmpCosts(const cost_t& c1, const cost_t& c2) {
-		if ((c1.second == 0) || (c2.second == 0))
-			return (c1.second != 0) || ((c2.second == 0) && (c1.first < c2.first));
-		if (c1.second >= c2.second)
-			return (c1.first < (c1.second - c2.second + 1) * c2.first);
-		return ((c2.second - c1.second + 1) * c1.first < c2.first);
-			//((c1.second > c2.second) || ((c1.second == c2.second) && (c1.first < c2.first)));
-			//((c1.second >= c2.second) && ((c2.second == 0) || (c1.first < (c1.second - c2.second + 1) * c2.first))) ||
-			//((c1.second < c2.second) && (c1.second != 0) && ((c2.second - c1.second + 1) * c1.first < c2.first));
-			//(c1.first + c2.second < c1.second + c2.first) && ((c1.first <= c2.first) || (c1.second >= c2.second)));
-	}
-
-	static inline bool hasStatePairDifferentStateOutput(state_t statePairIdx, const SeparatingSequencesInfo& sepSeq, const unique_ptr<DFSM>& fsm) {
-		if (sepSeq.sepSeq[statePairIdx].minLen != 1) return false;
-		auto p = getStatesOfStatePairIdx(statePairIdx);
-		return (fsm->getOutput(p.first, STOUT_INPUT) != fsm->getOutput(p.second, STOUT_INPUT));
-	}
-
-	static sequence_in_t getShortestSepSeq(state_t statePairIdx, const SeparatingSequencesInfo& sepSeq, const unique_ptr<DFSM>& fsm) {
-		sequence_in_t seq;
-		input_t P = fsm->getNumberOfInputs();
-		while (true) {
-			if (fsm->isOutputState()) {
-				seq.push_back(STOUT_INPUT);
-				if (hasStatePairDifferentStateOutput(statePairIdx, sepSeq, fsm)) {
-					return seq;
-				}
-			}
-			for (input_t i = 0; i < P; i++) {
-				const auto& nextIdx = sepSeq.sepSeq[statePairIdx].next[i];
-				if (nextIdx == NULL_STATE) continue;
-				if (nextIdx == statePairIdx) {
-					seq.push_back(i);
-					return seq;
-				}
-				if (sepSeq.sepSeq[nextIdx].minLen == sepSeq.sepSeq[statePairIdx].minLen - 1) {
-					seq.push_back(i);
-					statePairIdx = nextIdx;
-					break;
-				}
-			}
-		}
-	}
-
-	static sequence_in_t getShortestSepSeq(state_t state, set<state_t>& diffStates,
-		SeparatingSequencesInfo& sepSeq, const unique_ptr<DFSM>& fsm) {
-		set<state_t> statePairs;
-		for (const auto& s : diffStates) {
-			statePairs.insert(getStatePairIdx(state, s));
-		}
-		auto it = sepSeq.bestSeq.find(statePairs);
-		if (it != sepSeq.bestSeq.end()) {
-			return it->second;
-		}
-		if (statePairs.size() == 1) {
-			auto seq = getShortestSepSeq(*statePairs.begin(), sepSeq, fsm);
-			sepSeq.bestSeq.emplace(move(statePairs), seq);
-			return seq;
-		}
-		cost_t minCost(seq_len_t(fsm->getNumberOfStates()), 0);// max separating sequence and no distinguished states
-		sequence_in_t bestSepSeq;
-		using seqTuple = tuple<cost_t, sequence_in_t, set<state_t>>;
-		auto tupleComp = [](const seqTuple& e1, const seqTuple& e2) {
-			auto gt = cmpCosts(get<0>(e2), get<0>(e1));
-			if (!cmpCosts(get<0>(e1), get<0>(e2)) && !gt) {// equal
-				if (get<1>(e1).size() == get<1>(e2).size())
-					return get<1>(e1) > get<1>(e2);
-				return get<1>(e1).size() > get<1>(e2).size();
-			}
-			return gt; 
-		};
-		priority_queue<seqTuple, vector<seqTuple>, decltype(tupleComp)> pq(tupleComp);
-		pq.emplace(cost_t(0, state_t(statePairs.size())), sequence_in_t(), statePairs);
-		while (!pq.empty()) {
-			auto p = move(pq.top());
-			pq.pop();
-			if (!cmpCosts(get<0>(p), minCost)) {
-				break;
-			}
-			auto currStatePairs = move(get<2>(p));
-			if (fsm->isOutputState()) {
-				for (auto it = currStatePairs.begin(); it != currStatePairs.end();) {
-					if (hasStatePairDifferentStateOutput(*it, sepSeq, fsm)) {
-						it = currStatePairs.erase(it);
-					}
-					else ++it;
-				}
-				auto it = sepSeq.bestSeq.find(currStatePairs);
-				if ((it != sepSeq.bestSeq.end()) || (currStatePairs.size() == 1))  {
-					sequence_in_t seq = (it != sepSeq.bestSeq.end()) ? it->second : getShortestSepSeq(*currStatePairs.begin(), sepSeq, fsm);
-					if (it == sepSeq.bestSeq.end()) sepSeq.bestSeq.emplace(move(currStatePairs), seq);
-					get<0>(p).first = get<1>(p).size() + seq.size();
-					if (cmpCosts(get<0>(p), minCost)) {
-						minCost.swap(get<0>(p));
-						bestSepSeq = move(get<1>(p));
-						bestSepSeq.splice(bestSepSeq.end(), move(seq));
-					}
-					continue;
-				}
-				get<1>(p).emplace_back(STOUT_INPUT);
-			}
-			for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
-				set<state_t> nextStatePairs;
-				auto cost = get<0>(p);
-				cost.first = 0;
-				for (const auto& sp : currStatePairs) {
-					auto& idx = sepSeq.sepSeq[sp].next[i];
-					if (idx == NULL_STATE) {
-						cost.second--;
-					}
-					else if (idx != sp) {// not distinguished
-						nextStatePairs.insert(idx);
-						if (cost.first < sepSeq.sepSeq[idx].minLen) {
-							cost.first = sepSeq.sepSeq[idx].minLen;
-						}
-					}
-				}
-				sequence_in_t seq(get<1>(p));
-				seq.push_back(i);
-				auto it = sepSeq.bestSeq.find(nextStatePairs);
-				bool isCached = (it != sepSeq.bestSeq.end());
-				if (isCached || (nextStatePairs.size() <= 1)) {
-					if (isCached || nextStatePairs.size() == 1) {
-						sequence_in_t suffix = isCached ? it->second : getShortestSepSeq(*nextStatePairs.begin(), sepSeq, fsm);
-						if (!isCached) sepSeq.bestSeq.emplace(move(nextStatePairs), suffix);
-						seq.splice(seq.end(), move(suffix));
-					}
-					cost.first = seq.size();
-					if (cmpCosts(cost, minCost)) {
-						minCost.swap(cost);
-						bestSepSeq.swap(seq);
-					}
-				}
-				else {
-					cost.first += seq.size();
-					if (cmpCosts(cost, minCost)) {
-						pq.emplace(move(cost), move(seq), move(nextStatePairs));
-					}
-				}
-			}
-		}
-		sepSeq.bestSeq.emplace(move(statePairs), bestSepSeq);
-		return bestSepSeq;
-	}
-
-	static vector<shared_ptr<ConvergentNode>> createDivPresStateCoverTree(const unique_ptr<DFSM>& fsm, 
-		const vector<sequence_in_t>& ADSet, SeparatingSequencesInfo& sepSeq) {
-		vector<shared_ptr<ConvergentNode>> stateNodes(fsm->getNumberOfStates());
-		// root
-		output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
-		auto root = make_shared<OTreeNode>(outputState, 0, fsm->getNumberOfInputs());
-		if (ADSet.empty()) {
-			set<state_t> diffStates;
-			for (state_t s = 1; s < fsm->getNumberOfStates(); s++) {
-				diffStates.insert(s);
-			}
-			auto seq = getShortestSepSeq(0, diffStates, sepSeq, fsm);
-			appendSequence(root, seq, fsm);
-		}
-		else {
-			appendSequence(root, ADSet[0], fsm);
-		}
-		stateNodes[0] = make_shared<ConvergentNode>(root);
-		root->convergentNode = stateNodes[0];
-		queue<shared_ptr<OTreeNode>> fifo, fifoNext;
-		fifo.emplace(root);
-		do {
-			auto numNodes = fifo.size();
-			for (size_t i = 0; i < numNodes; i++) {
-				auto node = move(fifo.front());
-				fifo.pop();
-				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-					const auto& nn = node->next[input];
-					if (nn && !stateNodes[nn->state]) {
-						stateNodes[nn->state] = make_shared<ConvergentNode>(nn);
-						nn->convergentNode = stateNodes[nn->state];
-						stateNodes[node->state]->next[input] = stateNodes[nn->state];
-						if (ADSet.empty()) {
-							set<state_t> diffStates;
-							for (state_t s = 0; s < fsm->getNumberOfStates(); s++) {
-								if ((nn->state != s) && (!stateNodes[s] || !areNodesDifferent(nn, stateNodes[s]->convergent.front()))) {
-									diffStates.insert(s);
-								}
-							}
-							auto seq = getShortestSepSeq(nn->state, diffStates, sepSeq, fsm);
-							appendSequence(root, seq, fsm);
-						}
-						else {
-							appendSequence(nn, ADSet[nn->state], fsm);
-						}
-						fifoNext.emplace(nn);
-					}
-				}
-				fifo.emplace(node);
-			}
-			while (!fifo.empty()) {
-				auto node = move(fifo.front());
-				fifo.pop();
-				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
-					auto nextState = fsm->getNextState(node->state, input);
-					if ((nextState != NULL_STATE) && !stateNodes[nextState]) {
-						appendSequence(node, sequence_in_t({input}), fsm);
-						auto& nn = node->next[input];
-						stateNodes[nn->state] = make_shared<ConvergentNode>(nn);
-						nn->convergentNode = stateNodes[nn->state];
-						stateNodes[node->state]->next[input] = stateNodes[nn->state];
-						if (ADSet.empty()) {
-							set<state_t> diffStates;
-							for (state_t s = 0; s < fsm->getNumberOfStates(); s++) {
-								if ((nn->state != s) && (!stateNodes[s] || !areNodesDifferent(nn, stateNodes[s]->convergent.front()))) {
-									diffStates.insert(s);
-								}
-							}
-							auto seq = getShortestSepSeq(nn->state, diffStates, sepSeq, fsm);
-							appendSequence(root, seq, fsm);
-						}
-						else {
-							appendSequence(nn, ADSet[nextState], fsm);
-						}
-						fifoNext.emplace(nn);
-					}
-				}
-			}
-			fifo.swap(fifoNext);
-		} while (!fifo.empty());
-		return stateNodes;
-	}
-
-	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const set<ConvergentNode*>& allStatesDomain) {
-		const auto& node = cn->convergent.front();
-		node->convergentNode = cn;
-		cn->domain = allStatesDomain;
-		for (input_t input = 0; input < cn->next.size(); input++) {
-			if (node->next[input]) {
-				if (!node->next[input]->convergentNode.lock()) {// not a state node
-					cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
-				}
-				generateConvergentSubtree(cn->next[input], allStatesDomain);
-			}
-		}
-	}
-
-	static size_t checkSucc(const shared_ptr<ConvergentNode>& cn, const vector<shared_ptr<ConvergentNode>>& stateNodes, seq_len_t depth) {
-		size_t cost = (cn->domain.size() != 1);
-		if (depth > 0) {
-			for (input_t i = 0; i < cn->next.size(); i++) {
-				if (cn->next[i]) {
-					cost += checkSucc(cn->next[i], stateNodes, depth - 1);
-				}
-				else {
-					cost += size_t((1 - pow(cn->next.size(), depth)) / (1 - cn->next.size()));
-				}
-			}
-		}
-		return cost;
-	}
-
-	static void chooseTransition2(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNode>>& stateNodes, 
-			const unique_ptr<DFSM>& fsm, seq_len_t extraStates) {
-		size_t minCost = size_t(-1);
-		for (const auto& cn : stateNodes) {
-			for (input_t i = 0; i < cn->next.size(); i++) {
-				if (cn->next[i]) {
-					if (stateNodes[cn->next[i]->state] != cn->next[i]) {
-						auto cost = checkSucc(cn->next[i], stateNodes, extraStates);
-						if (minCost > cost) {
-							minCost = cost;
-							state = cn->state;
-							input = i;
-						}
-					}
-				}
-				else {
-					auto cost = 1 + size_t(((1 - pow(cn->next.size(), extraStates)) / (1 - cn->next.size())));
-					if (minCost > cost) {
-						minCost = cost;
-						state = cn->state;
-						input = i;
-					}
-				}
-			}
-		}
-	}
-
-	
-	static void calcCost(cost_t& cost, const sequence_in_t& seq, const sequence_out_t& refOut,
-			const list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm) {
-		for (const auto& n : nodes) {
-			auto out = fsm->getOutputAlongPath(n->convergent.front()->state, seq);
-			auto outIt = out.begin();
-			auto refOutIt = refOut.begin();
-			auto inIt = seq.begin();
-			while ((refOutIt != refOut.end()) && (*outIt == *refOutIt)) {
-				++outIt;
-				++refOutIt;
-				++inIt;
-			}
-			if ((refOutIt == refOut.end()) || (*outIt == WRONG_OUTPUT)) {
-				cost.second--;
-			}
-			else {
-				++inIt;
-				sequence_in_t diffSeq(seq.begin(), inIt);
-				cost.first += getLenCost(n, diffSeq);
-			}
-		}
-	}
-
-	static sequence_in_t chooseSepSeqAsExtension(const shared_ptr<ConvergentNode>& cn, cost_t& minCost, cost_t& currCost,
-		const list<shared_ptr<ConvergentNode>>& nodes, const list<cost_t>& extNodes,
-		const unique_ptr<DFSM>& fsm, SeparatingSequencesInfo& sepSeq) {
-
-		sequence_in_t bestSeq;
-		for (const auto& node : cn->convergent) {
-			if (isLeaf(node)) {
-				set<state_t> diffStates;
-				for (const auto& n : nodes) {
-					diffStates.insert(n->state);
-				}
-				for (const auto& p : extNodes) {
-					diffStates.insert(p.second);
-				}
-				auto seq = getShortestSepSeq(node->state, diffStates, sepSeq, fsm);
-				auto refOut = fsm->getOutputAlongPath(node->state, seq);
-				cost_t cost = currCost;
-				cost.first += seq.size();// getLenCost(cn, seq);
-				calcCost(cost, seq, refOut, nodes, fsm);
-				for (const auto& p : extNodes) {
-					auto out = fsm->getOutputAlongPath(p.second, seq);
-					auto outIt = out.begin();
-					auto refOutIt = refOut.begin();
-					auto inIt = seq.begin();
-					while ((refOutIt != refOut.end()) && (*outIt == *refOutIt)) {
-						++outIt;
-						++refOutIt;
-						++inIt;
-					}
-					if ((refOutIt == refOut.end()) || (*outIt == WRONG_OUTPUT)) {
-						cost.second--;
-					}
-					else {
-						++inIt;
-						cost.first += p.first + distance(seq.begin(), inIt);
-					}
-				}
-				if (cmpCosts(cost, minCost)) {
-					minCost.swap(cost);
-					bestSeq.swap(seq);
-				}
-				break;
-			}
-		}
-		for (input_t i = 0; i < fsm->getNumberOfInputs(); i++) {
-			if (cn->next[i]) {
-				auto& nextState = cn->next[i]->state;
-				auto refOut = fsm->getOutput(cn->state, i);
-				list<shared_ptr<ConvergentNode>> succNodes;
-				list<cost_t> succExtNodes;
-				cost_t succCost = currCost;// (cost so far, distinguished)
-				seq_len_t estCost = 0;
-				for (const auto& n : nodes) {
-					if (n->next[i] && (n->next[i]->state != nextState)) {
-						succNodes.emplace_back(n->next[i]);
-					}
-					else {
-						auto succState = fsm->getNextState(n->state, i);
-						if (succState == NULL_STATE) {
-							succCost.second--;
-						}
-						else {
-							auto succOut = fsm->getOutput(n->state, i);
-							if ((refOut != succOut) || (fsm->isOutputState() && 
-								(fsm->getOutput(nextState, STOUT_INPUT) != fsm->getOutput(succState, STOUT_INPUT)))) {
-								succCost.first += (hasLeaf(n) ? 1 : (n->convergent.front()->accessSequence.size() + 1));
-							}
-							else if (succState == nextState) {
-								succCost.second--;
-							}
-							else {
-								succExtNodes.emplace_back((hasLeaf(n) ? 1 : (n->convergent.front()->accessSequence.size() + 1)), succState);
-								estCost += succExtNodes.back().first;
-							}
-						}
-					}
-				}
-				for (const auto& p : extNodes) {
-					auto succState = fsm->getNextState(p.second, i);
-					if (succState == NULL_STATE) {
-						succCost.second--;
-					}
-					else {
-						auto succOut = fsm->getOutput(p.second, i);
-						if ((refOut != succOut) || (fsm->isOutputState() &&
-							(fsm->getOutput(nextState, STOUT_INPUT) != fsm->getOutput(succState, STOUT_INPUT)))) {
-							succCost.first += p.first + 1;
-						}
-						else if (succState == nextState) {
-							succCost.second--;
-						}
-						else {
-							succExtNodes.emplace_back(p.first + 1, succState);
-							estCost += p.first + 1;
-						}
-					}
-				}
-				succCost.first += estCost;
-				if (((succNodes.size() + succExtNodes.size()) != 0) && !cmpCosts(minCost, succCost)) {
-					succCost.first -= estCost;
-					auto succMinCost = minCost;
-					auto succSeq = chooseSepSeqAsExtension(cn->next[i], succMinCost, succCost, succNodes, succExtNodes, fsm, sepSeq);
-					if (cmpCosts(succMinCost, minCost)) {
-						minCost.swap(succMinCost);
-						bestSeq.swap(succSeq);
-						bestSeq.push_front(i);
-					}
-				}
-			}
-		}
-		return bestSeq;
-	}
-
-	static void chooseTransition(state_t& state, input_t& input, const vector<shared_ptr<ConvergentNode>>& stateNodes,
-			const unique_ptr<DFSM>& fsm, seq_len_t extraStates) {
-		size_t minCost = size_t(-1);
-		for (const auto& cn : stateNodes) {
-			const auto& cost = cn->convergent.front()->accessSequence.size();
-			for (input_t i = 0; i < cn->next.size(); i++) {
-				if (!cn->next[i] || (stateNodes[cn->next[i]->state] != cn->next[i])) {
-					auto nextState = fsm->getNextState(cn->state, i);
-					if (nextState == NULL_STATE) continue;
-					if (minCost > cost + stateNodes[nextState]->convergent.front()->accessSequence.size()) {
-						minCost = cost + stateNodes[nextState]->convergent.front()->accessSequence.size();
-						state = cn->state;
-						input = i;
-					}
-				}
-			}
-		}
-	}
-	*/
 

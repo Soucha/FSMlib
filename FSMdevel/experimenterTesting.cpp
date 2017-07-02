@@ -14,6 +14,8 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
+#pragma warning (disable:4503)
+
 #include <iostream>
 #include <chrono>
 #include <fstream>

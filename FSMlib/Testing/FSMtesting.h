@@ -23,6 +23,9 @@ namespace FSMtesting {// all testing methods require a compact FSM
 
 	struct ConvergentNode;
 
+	/**
+	* Observation Tree node to use both in testing and learning
+	*/
 	struct OTreeNode {
 		sequence_in_t accessSequence;
 		output_t incomingOutput;
@@ -32,9 +35,9 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		vector<shared_ptr<OTreeNode>> next;
 		weak_ptr<ConvergentNode> convergentNode;
 		input_t lastQueriedInput;
-		
+		set<state_t> domain;
+
 		// learning attributes
-		set<state_t> refStates;// domain
 		state_t assumedState = NULL_STATE;
 		seq_len_t maxSuffixLen = 0;
 
@@ -53,6 +56,9 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		}
 	};
 
+	/**
+	* Convergent node groups OTree nodes that represent the same state and are proven to be convergent
+	*/
 	struct ConvergentNode {
 		list<shared_ptr<OTreeNode>> convergent;
 		list<shared_ptr<OTreeNode>> leafNodes;
@@ -65,6 +71,30 @@ namespace FSMtesting {// all testing methods require a compact FSM
 			state(node->state), next(node->next.size()), isRN(isRN) {
 			convergent.emplace_back(node);
 		}
+	};
+
+	/**
+	* Observation Tree
+	*/
+	struct OTree {
+		/// reference nodes, or state nodes; the first one represents the initial state
+		vector<shared_ptr<ConvergentNode>> rn;
+		/// number of extra states assumed
+		state_t es;
+
+		virtual ~OTree() {
+			for (auto& sn : rn) {
+				sn->next.clear();
+			}
+		}
+	};
+
+	/**
+	* Groups characterization of states
+	*/
+	struct StateCharacterization {
+		/// Splitting Tree
+		unique_ptr<SplittingTree> st;
 	};
 
 	/**
@@ -316,6 +346,27 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	*/
 	FSMLIB_API sequence_set_t S_method(const unique_ptr<DFSM>& fsm, int extraStates = 0);
 	
+	/**
+	* Extends the given test suite such that it becomes complete for the given number of extra states.
+	* All states and transitions are confirmed using separating sequences (chosen on the fly from the splitting tree)
+	* that are distributed over states reached by already proven convergent sequences.
+	* Splitting tree of the given machine can be provided.
+	* 
+	*
+	* Based on source:
+	* Article (simao2012reducing)
+	* Simao, A.; Petrenko, A. & Yevtushenko, N.
+	* On reducing test length for fsms with extra states
+	* Software Testing, Verification and Reliability, Wiley Online Library, 2012, 22, 435-454
+	*
+	* @param fsm - Deterministic FSM
+	* @param ot - a partial test suite that should be extended and the number of extra states that shall be considered
+	* @param sc - a splitting tree of the given machine
+	* @return a set of sequences that extend the given test suite,
+	*		or an empty collection if extraStates is negative or the FSM is not compact
+	*/
+	FSMLIB_API sequence_set_t S_method_ext(const unique_ptr<DFSM>& fsm, OTree& ot, StateCharacterization& sc);
+
 	/**
 	* Designs a checking sequence by appending an adaptive distinguishing sequence
 	* such that each transition and state is verified by ADS in resulting CS.
