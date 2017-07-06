@@ -398,5 +398,6 @@
     <None Include="..\data\examples\Mealy_R5.fsm">
       <Filter>Resource Files\examples</Filter>
     </None>
+    <None Include="FSMlibTest.testsettings" />
   </ItemGroup>
 </Project>

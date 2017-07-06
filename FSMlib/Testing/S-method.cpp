@@ -690,12 +690,16 @@ namespace FSMtesting {
 		createDivergencePreservingStateCover(fsm, ot, sc);
 		// stateNodes are initialized divergence-preserving state cover
 		auto& stateNodes = ot.rn;
+		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), ot.es);
+
 		if (fsm->getNumberOfStates() == 1) {
+			for (auto& seq : travSeqs) {
+				addSequence(stateNodes[0], seq, ot, fsm);
+			}
 			return getSequences(stateNodes[0]->convergent.front(), fsm);
 		}
 		//printf("divPres SC designed\n");
-		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), ot.es);
-
+		
 		using tran_t = tuple<shared_ptr<ConvergentNode>, input_t, shared_ptr<ConvergentNode>>;
 		list<tran_t> transitions;
 		for (const auto& sn : stateNodes) {

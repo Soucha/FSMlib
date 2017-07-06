@@ -65,7 +65,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		vector<shared_ptr<ConvergentNode>> next;
 		set<ConvergentNode*> domain;
 		state_t state;
-		bool isRN = false;
+		bool isRN;
 
 		ConvergentNode(const shared_ptr<OTreeNode>& node, bool isRN = false) :
 			state(node->state), next(node->next.size()), isRN(isRN) {

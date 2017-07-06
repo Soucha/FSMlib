@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "esm-manual-controller/Mealy_3410_esm.fsm";
-	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
+	string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
@@ -287,12 +287,12 @@ int main(int argc, char** argv) {
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
-	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm"; //DFA_R4_SCSet
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
  	//auto st = getSplittingTree(fsm, true);
-	//compareDesignAlgoritms(fsm, fileName);
+	/*/compareDesignAlgoritms(fsm, fileName);
 	OTree ot;
 	ot.es = 0;
 	StateCharacterization sc;
@@ -322,19 +322,20 @@ int main(int argc, char** argv) {
 	}
 
 	/*/
-	shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-	unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
-		bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
-		bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
+	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+	//	bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+//		bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
 	//shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, FSMtesting::SPY_method, 2);
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
-	//unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);//
+	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+	COMPUTATION_TIME(auto model = Slearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
-	//COMPUTATION_TIME(auto model = Hlearner(teacher, 0, nullptr, true));// showAndStop);
+	//COMPUTATION_TIME(auto model = Hlearner(teacher, 1, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)
-	COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
+	//COMPUTATION_TIME(auto model = DiscriminationTreeAlgorithm(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = ObservationPackAlgorithm(teacher, OneLocally, nullptr);)
 	//COMPUTATION_TIME(auto model = TTT(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = QuotientAlgorithm(teacher, nullptr);)

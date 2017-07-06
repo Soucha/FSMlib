@@ -203,6 +203,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
@@ -362,6 +363,7 @@
     <None Include="..\data\tests\sequences\Moore_R4_SS.fsm" />
     <None Include="..\data\tests\sequences\Moore_R6_ADS.fsm" />
     <None Include="FSMlibTest.runsettings" />
+    <None Include="FSMlibTest.testsettings" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
