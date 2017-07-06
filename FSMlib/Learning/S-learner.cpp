@@ -491,7 +491,8 @@ namespace FSMlearning {
 			li.conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - li.conjecture->getNumberOfInputs());
 		}
 		auto leaf = node->next[input] ? node->next[input] :
-			make_shared<OTreeNode>(node, input, transitionOutput, stateOutput, NULL_STATE, li.conjecture->getNumberOfInputs());// teacher->getNextPossibleInputs());
+			make_shared<OTreeNode>(node, input, transitionOutput, stateOutput,
+			li.ot.es > 0 ? li.conjecture->getNextState(node->state, input) : NULL_STATE, li.conjecture->getNumberOfInputs());// teacher->getNextPossibleInputs());
 		bool isConsistent = true;
 		leaf->assumedState = 0;// queried
 		if (node->next[input]) {// verification - ES > 0
@@ -900,20 +901,18 @@ namespace FSMlearning {
 			storeIdentifiedNode(node, li);
 			return false;
 		}
-		else if ((node->state != NULL_STATE) && !node->domain.count(node->state)) {// inconsistent node
-			storeInconsistentNode(node, li);
-			//node->convergentNode.lock()->convergent.remove(node);
-			//node->state = NULL_STATE;
-			return false;
-		}
 		else if (node->state == NULL_STATE) {
 			if (node->convergentNode.lock()->domain.empty()) {
-				storeInconsistentNode(node, li); 
+				storeInconsistentNode(node, li);
 				return false;
 			}
 			else if (node->convergentNode.lock()->domain.size() == 1) {
 				storeIdentifiedNode(node, li);
 			}
+		}
+		else if (!node->domain.count(node->state)) {// inconsistent node
+			storeInconsistentNode(node, li);
+			return false;
 		}
 		return true;
 	}
@@ -1117,23 +1116,24 @@ namespace FSMlearning {
 			undistinguishedStates = numStates - state_t(ads->nodes.size());
 			map<output_t, shared_ptr<s_ads_cv_t>> next;
 			for (auto& cn : ads->nodes) {
-				bool isUndistinguished = true;
+				auto it = next.end();
 				for (auto& node : cn) {
 					if (node->next[i]) {
-						auto it = next.find(node->next[i]->incomingOutput);
 						if (it == next.end()) {
-							next.emplace(node->next[i]->incomingOutput, make_shared<s_ads_cv_t>(node->next[i]));
-						}
-						else if (isUndistinguished) {
-							it->second->nodes.emplace_back(list<shared_ptr<OTreeNode>>({ node->next[i] }));
+							it = next.find(node->next[i]->incomingOutput);
+							if (it == next.end()) {
+								it = next.emplace(node->next[i]->incomingOutput, make_shared<s_ads_cv_t>(node->next[i])).first;
+							}
+							else {
+								it->second->nodes.emplace_back(list<shared_ptr<OTreeNode>>({ node->next[i] }));
+							}
 						}
 						else {
 							it->second->nodes.back().emplace_back(node->next[i]);
 						}
-						isUndistinguished = false;
 					}
 				}
-				if (isUndistinguished) {
+				if (it == next.end()) {
 					undistinguishedStates++;
 				}
 			}
@@ -1148,20 +1148,11 @@ namespace FSMlearning {
 				//else if (li.conjecture->getType() == TYPE_DFSM) {
 				else if (li.conjecture->isOutputState()) {
 					for (auto& cn : p.second->nodes) {
-						bool isFirstNode = true;
-						for (auto& node : cn) {
-							auto it = p.second->next.find(node->stateOutput);
-							if (it == p.second->next.end()) {
-								p.second->next.emplace(node->stateOutput, make_shared<s_ads_cv_t>(node));
-							}
-							else if (isFirstNode) {
-								it->second->nodes.emplace_back(list<shared_ptr<OTreeNode>>({ node }));
-								isFirstNode = false;
-							}
-							else {
-								it->second->nodes.back().emplace_back(node);
-							}
+						auto it = p.second->next.find(cn.front()->stateOutput);
+						if (it == p.second->next.end()) {
+							it = p.second->next.emplace(cn.front()->stateOutput, make_shared<s_ads_cv_t>()).first;
 						}
+						it->second->nodes.emplace_back(list<shared_ptr<OTreeNode>>(cn));
 					}
 					for (auto& sp : p.second->next) {
 						if ((sp.second->nodes.size() == 1) || (!areDistinguished(sp.second->nodes))) {
@@ -1240,19 +1231,18 @@ namespace FSMlearning {
 		if (cn->domain.size() < 2) {
 			return false;
 		}
-		/*
 		if (cn->domain.size() == 2) {// query sepSeq
-			auto idx = FSMsequence::getStatePairIdx(
-				(*(cn->domain.begin()))->state,
-				(*(cn->domain.rbegin()))->state);
-			auto& sepSeq = li.separatingSequences[idx];
+			//auto idx = FSMsequence::getStatePairIdx((*(cn->domain.begin()))->state, (*(cn->domain.rbegin()))->state);
+			auto sepSeq = getQueriedSeparatingSequenceOfCN(
+				li.ot.rn[(*(cn->domain.begin()))->state], 
+				li.ot.rn[(*(cn->domain.rbegin()))->state]);//li.separatingSequences[idx];
 			for (auto input : sepSeq) {
 				if (!moveAndCheckNoES(currNode, input, li, teacher)) {
 					return false;
 				}
 			}
 		}
-		else {*/
+		else {
 			// choose ads
 			auto ads = make_shared<s_ads_cv_t>();
 			for (auto& sn : cn->domain) {
@@ -1264,7 +1254,7 @@ namespace FSMlearning {
 			if (identifyByADS(currNode, ads, li, teacher)) {
 				return false;
 			}
-		//}
+		}
 		return true;
 	}
 
@@ -1349,6 +1339,7 @@ namespace FSMlearning {
 			auto numStates = li.ot.rn.size();
 			auto numInconsistent = li.inconsistentNodes.size();
 			for (auto& input : seq) {
+				if (input == STOUT_INPUT) continue;
 				moveAndCheckNoES(currNode, input, li, teacher);
 			}
 			if (!li.inconsistentSequence.empty())
@@ -2312,9 +2303,9 @@ namespace FSMlearning {
 									else ++it;
 								}
 							}*/
-							querySequenceAndCheck(li.ot.rn[0]->convergent.front(), ce, li, teacher);
 							if (li.numberOfExtraStates > 1) li.numberOfExtraStates--;
-							li.ot.es = 0;
+							else li.ot.es--;
+							querySequenceAndCheck(li.ot.rn[0]->convergent.front(), ce, li, teacher);
 							continue;
 						}
 					}

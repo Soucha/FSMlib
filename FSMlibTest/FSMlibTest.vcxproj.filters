@@ -185,6 +185,9 @@
     <ClCompile Include="Learning\SPYlearnerTests.cpp">
       <Filter>Source Files\Learning</Filter>
     </ClCompile>
+    <ClCompile Include="Learning\SlearnerTests.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

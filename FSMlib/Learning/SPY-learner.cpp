@@ -1553,23 +1553,24 @@ namespace FSMlearning {
 			undistinguishedStates = numStates - state_t(ads->nodes.size());
 			map<output_t, shared_ptr<ads_cv_t>> next;
 			for (auto& cn : ads->nodes) {
-				bool isUndistinguished = true;
+				auto it = next.end();
 				for (auto& node : cn) {
 					if (node->next[i]) {
-						auto it = next.find(node->next[i]->incomingOutput);
 						if (it == next.end()) {
-							next.emplace(node->next[i]->incomingOutput, make_shared<ads_cv_t>(node->next[i]));
-						}
-						else if (isUndistinguished) {
-							it->second->nodes.emplace_back(list<shared_ptr<spy_node_t>>({ node->next[i] }));
+							it = next.find(node->next[i]->incomingOutput);
+							if (it == next.end()) {
+								it = next.emplace(node->next[i]->incomingOutput, make_shared<ads_cv_t>(node->next[i])).first;
+							}
+							else {
+								it->second->nodes.emplace_back(list<shared_ptr<spy_node_t>>({ node->next[i] }));
+							}
 						}
 						else {
 							it->second->nodes.back().emplace_back(node->next[i]);
 						}
-						isUndistinguished = false;
 					}
 				}
-				if (isUndistinguished) {
+				if (it == next.end()) {
 					undistinguishedStates++;
 				}
 			}
@@ -1585,17 +1586,11 @@ namespace FSMlearning {
 					for (auto& cn : p.second->nodes) {
 						bool isFirstNode = true;
 						for (auto& node : cn) {
-							auto it = p.second->next.find(node->stateOutput);
+							auto it = p.second->next.find(cn.front()->stateOutput);
 							if (it == p.second->next.end()) {
-								p.second->next.emplace(node->stateOutput, make_shared<ads_cv_t>(node));
+								it = p.second->next.emplace(cn.front()->stateOutput, make_shared<ads_cv_t>()).first;
 							}
-							else if (isFirstNode) {
-								it->second->nodes.emplace_back(list<shared_ptr<spy_node_t>>({ node }));
-								isFirstNode = false;
-							}
-							else {
-								it->second->nodes.back().emplace_back(node);
-							}
+							it->second->nodes.emplace_back(list<shared_ptr<spy_node_t>>(cn));
 						}
 					}
 					for (auto& sp : p.second->next) {

@@ -238,6 +238,7 @@
     <ClCompile Include="Learning\OPalgTests.cpp" />
     <ClCompile Include="Learning\HlearnerTests.cpp" />
     <ClCompile Include="Learning\QuotientAlgTests.cpp" />
+    <ClCompile Include="Learning\SlearnerTests.cpp" />
     <ClCompile Include="Learning\SPYlearnerTests.cpp" />
     <ClCompile Include="Learning\TeacherTests.cpp" />
     <ClCompile Include="Learning\TTTalgTests.cpp" />

@@ -108,17 +108,23 @@ namespace FSMlibTest
 		void testSPYlearner(string filename, state_t maxExtraStates = 1) {
 			fsm->load(filename);
 
-			unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-			runTestSPYlearner(teacher, "TeacherDFSM", filename, maxExtraStates);
+			for (state_t es = 0; es <= maxExtraStates; es++) {
+				unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+				runTestSPYlearner(teacher, "TeacherDFSM", filename, es);
+			}
 
-			teacher = make_unique<TeacherRL>(fsm);
-			runTestSPYlearner(teacher, "TeacherRL", filename, maxExtraStates);
+			for (state_t es = 0; es <= maxExtraStates; es++) {
+				unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+				runTestSPYlearner(teacher, "TeacherRL", filename, es);
+			}
 
-			shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
-			teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
-				bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
-				bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
-			runTestSPYlearner(teacher, "BlackBoxDFSM, TeacherBB:HSI_method (3 extra states)", filename, maxExtraStates);
+			for (state_t es = 0; es <= maxExtraStates; es++) {
+				shared_ptr<BlackBox> bb = make_shared<BlackBoxDFSM>(fsm, true);
+				unique_ptr<Teacher> teacher = make_unique<TeacherBB>(bb, bind(FSMtesting::HSI_method, placeholders::_1, placeholders::_2,
+					bind(FSMsequence::getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
+					bind(FSMsequence::getSplittingTree, placeholders::_1, true, false), false)), 3);
+				runTestSPYlearner(teacher, "BlackBoxDFSM, TeacherBB:HSI_method (3 extra states)", filename, es);
+			}
 		}
 	};
 }
