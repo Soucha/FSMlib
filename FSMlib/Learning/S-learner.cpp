@@ -449,7 +449,7 @@ namespace FSMlearning {
 			if ((transitionOutput != leaf->incomingOutput) || (stateOutput != leaf->stateOutput)) {
 				leaf->incomingOutput = transitionOutput;
 				leaf->stateOutput = stateOutput;
-				leaf->assumedState = WRONG_STATE;
+				leaf->state = WRONG_STATE;
 				isConsistent = false;
 			}
 		}
@@ -1232,6 +1232,7 @@ namespace FSMlearning {
 				if (!query(currNode, input, li, teacher)) {
 					currNode = currNode->next[input];
 					cleanOTreeFromRequestedQueries(li);
+					li.ot.es = 0;
 					break;
 				}
 				if (li.ot.es == 0) {
@@ -1841,7 +1842,7 @@ namespace FSMlearning {
 			}
 			else {
 				auto parentState = n2->state;
-				n2->state = NULL_STATE;
+				//n2->state = NULL_STATE;
 				if (n1->state != WRONG_STATE) {
 					sequence_in_t sepSuffix;
 					if ((li.ot.es == 0) && isPrefix(n1->accessSequence, li.bbNode->accessSequence)) {
@@ -1858,7 +1859,7 @@ namespace FSMlearning {
 				if (!querySequenceAndCheck(li.ot.rn[parentState]->convergent.front(), sepSeq, li, teacher)) {
 					return;
 				}
-				storeInconsistentNode(n1, li);
+				//storeInconsistentNode(n1, li);
 				return;
 			}
 		}
