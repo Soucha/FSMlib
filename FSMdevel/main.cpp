@@ -285,7 +285,7 @@ int main(int argc, char** argv) {
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
 	// solved Mealy_R40_xeCCe Mealy_R50_j40nK Mealy_R50_p3m9k Mealy_R60 Mealy_R60_97Nbx Mealy_R50
-	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_PDS.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_PDS.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
