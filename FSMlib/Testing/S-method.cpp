@@ -434,7 +434,7 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < numInputs; input++) {
 					const auto& nn = node->next[input];
-					if (nn && !covered[nn->state] && (!stateNodes[nn->state] || (stateNodes[nn->state]->convergent.front() == nn))) {
+					if (nn && !covered[nn->state] && (!stateNodes[nn->state] || (nn->observationStatus == OTreeNode::QUERIED_RN))) {
 						if (!stateNodes[nn->state]) {
 							stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 							nn->convergentNode = stateNodes[nn->state];
@@ -480,6 +480,9 @@ namespace FSMtesting {
 		// make state cover divergence preserving
 		for (const auto& sn : stateNodes) {
 			while (sn->convergent.size() > 1) {
+				if (sn->convergent.back()->observationStatus == OTreeNode::QUERIED_RN) {
+					swap(sn->convergent.front(), sn->convergent.back());
+				}
 				sn->convergent.back()->convergentNode.reset();
 				sn->convergent.pop_back();
 			}
@@ -673,7 +676,7 @@ namespace FSMtesting {
 					lifo.emplace(p.first->next[i], move(seq));
 				}
 			}
-			if (!hasSucc && (p.first->assumedState == NULL_STATE)) {
+			if (!hasSucc && (p.first->observationStatus == OTreeNode::NOT_QUERIED)) {
 				TS.emplace(move(p.second));
 			}
 		}

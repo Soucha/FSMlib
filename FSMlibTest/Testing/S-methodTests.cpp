@@ -71,10 +71,12 @@ namespace FSMlibTest
 			}
 		}
 
-		void setAssumedState(const shared_ptr<OTreeNode>& node) {
-			node->assumedState = node->state;
+		void setObservationStatus(const shared_ptr<OTreeNode>& node) {
+			node->observationStatus =
+				(node->convergentNode.lock()->convergent.front() == node) ?
+				OTreeNode::QUERIED_RN : OTreeNode::QUERIED_NOT_RN;
 			for (auto& n : node->next) {
-				if (n) setAssumedState(n);
+				if (n) setObservationStatus(n);
 			}
 		}
 
@@ -101,7 +103,7 @@ namespace FSMlibTest
 				" it produces %d indistinguishable FSMs.", ot.es, indistinguishable.size());
 			ARE_EQUAL(true, FSMmodel::areIsomorphic(fsm, indistinguishable.front()), "FCC found a machine different from the specification.");
 
-			setAssumedState(ot.rn[0]->convergent.front());
+			setObservationStatus(ot.rn[0]->convergent.front());
 
 			ot.es = 1;
 			auto TS1 = S_method_ext(fsm, ot, sc);

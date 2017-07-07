@@ -143,6 +143,27 @@
                 min-width: 45px;
             }
 
+            #configPopUp {
+                display: none;
+                position: absolute;
+                min-width: 180px;
+                max-width: 540px;
+                min-height: 144px;
+                max-height: 500px;
+                overflow-x: hidden;
+                overflow-y: auto;
+                top: 10%;
+                left: 10%;
+                z-index:299;
+                background-color: #f9f9f9;
+                border-style:solid;
+                border-width:3px;
+                border-color: #5394ed;
+                border-radius: 5px;
+                padding: 12px;
+                text-align: center;
+            }
+            
             #networkPopUp {
                 display: none;
                 position: absolute;
@@ -190,6 +211,7 @@
         </div>
         <div id="middle">
             <div id="controlPanel">
+                <input type="checkbox" id="visConfig" title="Show visualization config" onchange="showConfig(this)">
                 <button id="draw" title="Visualize (Ctrl+Enter)">></button>
                 <button id="store" title="Store graph"><</button>
             </div>
@@ -214,6 +236,7 @@
                 <button id="saveButton">Save</button>
                 <button id="cancelButton">Cancel</button>
             </div>
+            <div id="configPopUp"></div>
             <div id="mynetwork"></div>
         </div>
 
@@ -235,10 +258,24 @@
 
 // visjs
             var options = {
-                physics: {
-                    stabilization: false,
-                    barnesHut: {
-                        springLength: 200
+                configure: {
+                    enabled: true,
+                    //filter: 'nodes,edges',
+                    container: document.getElementById('configPopUp'),
+                    showButton: false
+                },
+                physics: false,
+                layout:{
+                    hierarchical: {
+                        enabled: false,
+                        //levelSeparation: 150,
+                        //nodeSpacing: 100,
+                        //treeSpacing: 200,
+                        //blockShifting: true,
+                        //edgeMinimization: true,
+                        //parentCentralization: true,
+                        //direction: 'UD',        // UD, DU, LR, RL
+                        sortMethod: 'directed'   // hubsize, directed
                     }
                 },
                 edges: {
@@ -383,7 +420,7 @@
                 var output = document.getElementById('editOutput').value;
                 console.log(output, fsm.outputs);
                 fsm.outputs.findIndex(function (o) {
-                    console.log(o.label, output, o.label === output, o.label == output);
+                    console.log(o.label, output, o.label === output, o.label === output);
                     return o.label === output;
                 });
                 if ((fsm.type === 4) && (fsm.numOutputs === 2) && (output !== DEFAULT_OUTPUT_SYMBOL) &&
@@ -1054,6 +1091,14 @@
                     event.preventDefault();
                 }
             });
+            
+            function showConfig(el) {
+                if (el.checked) {
+                    document.getElementById('configPopUp').style.display = 'block';
+                } else {
+                    document.getElementById('configPopUp').style.display = 'none';
+                }
+            }
 
             function draw() {
                 $('#error').html('');

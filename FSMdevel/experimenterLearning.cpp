@@ -128,6 +128,13 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 			algorithms.emplace_back(bind(SPYlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
+	if (mask & 256) { // SPYlearner
+		for (state_t i = 0; i <= maxExtraStates; i++) {
+			descriptions.emplace_back("Slearner\tExtraStates:" + to_string(i) +
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+			algorithms.emplace_back(bind(Slearner, placeholders::_1, i, nullptr, isEQallowed));
+		}
+	}
 }
 
 static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {

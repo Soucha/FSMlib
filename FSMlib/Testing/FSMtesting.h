@@ -38,7 +38,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		set<state_t> domain;
 
 		// learning attributes
-		state_t assumedState = NULL_STATE;
+		enum condition { NOT_QUERIED, QUERIED_NOT_RN, QUERIED_RN } observationStatus = NOT_QUERIED;
 		seq_len_t maxSuffixLen = 0;
 
 		OTreeNode(output_t stateOutput, state_t state, input_t numberOfInputs) :
