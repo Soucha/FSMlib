@@ -132,7 +132,7 @@ namespace FSMlearning {
 		cn_set_t nodesWithChangedDomain;
 #endif
 #if DUMP_OQ
-		unique_ptr<DFSM> OTree;
+		unique_ptr<DFSM> observationTree;
 #endif
 	};
 
@@ -547,9 +547,9 @@ namespace FSMlearning {
 			}
 		}
 #if DUMP_OQ 
-		auto otreeState = ot.OTree->addState(stateOutput);
-		auto otreeStartState = ot.OTree->getEndPathState(0, node->accessSequence);
-		ot.OTree->setTransition(otreeStartState, input, otreeState, (ot.OTree->isOutputTransition() ? transitionOutput : DEFAULT_OUTPUT));
+		auto otreeState = ot.observationTree->addState(stateOutput);
+		auto otreeStartState = ot.observationTree->getEndPathState(0, node->accessSequence);
+		ot.observationTree->setTransition(otreeStartState, input, otreeState, (ot.observationTree->isOutputTransition() ? transitionOutput : DEFAULT_OUTPUT));
 #endif // DUMP_OQ
 		checkNumberOfOutputs(teacher, ot.conjecture);
 		auto leaf = make_shared<spy_node_t>(node, input, transitionOutput, stateOutput, ot.conjecture->getNumberOfInputs());// teacher->getNextPossibleInputs());
@@ -2604,9 +2604,9 @@ namespace FSMlearning {
 			ot.conjecture->setOutput(0, node->stateOutput);
 		}
 #if DUMP_OQ
-		ot.OTree = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, numInputs, teacher->getNumberOfOutputs());
-		if (ot.OTree->isOutputState()) {
-			ot.OTree->setOutput(0, node->stateOutput);
+		ot.observationTree = FSMmodel::createFSM(teacher->getBlackBoxModelType(), 1, numInputs, teacher->getNumberOfOutputs());
+		if (ot.observationTree->isOutputState()) {
+			ot.observationTree->setOutput(0, node->stateOutput);
 		}
 #endif
 		ot.bbNode = node;
@@ -2735,7 +2735,7 @@ namespace FSMlearning {
 				}
 				if (provideTentativeModel) {
 #if DUMP_OQ
-					unlearned = provideTentativeModel(ot.OTree);
+					unlearned = provideTentativeModel(ot.observationTree);
 #else
 					unlearned = provideTentativeModel(ot.conjecture);
 #endif // DUMP_OQ

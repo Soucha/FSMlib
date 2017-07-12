@@ -21,60 +21,6 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	/*
-	struct ConvergentNode;
-
-	struct OTreeNode {
-		sequence_in_t accessSequence;
-		output_t incomingOutput;
-		output_t stateOutput;
-		state_t state;
-		weak_ptr<OTreeNode> parent;
-		vector<shared_ptr<OTreeNode>> next;
-		weak_ptr<ConvergentNode> convergentNode;
-		input_t lastQueriedInput;
-
-		OTreeNode(output_t stateOutput, state_t state, input_t numberOfInputs) :
-			incomingOutput(DEFAULT_OUTPUT), stateOutput(stateOutput), state(state),
-			next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
-		{
-		}
-		
-		OTreeNode(const shared_ptr<OTreeNode>& parent, input_t input,
-			output_t transitionOutput, output_t stateOutput, state_t state, input_t numberOfInputs) :
-			accessSequence(parent->accessSequence), incomingOutput(transitionOutput), stateOutput(stateOutput),
-			state(state), parent(parent), next(numberOfInputs), lastQueriedInput(STOUT_INPUT)
-		{
-			accessSequence.push_back(input);
-		}
-	};
-
-	struct ConvergentNode {
-		list<shared_ptr<OTreeNode>> leafNodes, convergent;
-		set<ConvergentNode*> domain;
-		vector<shared_ptr<ConvergentNode>> next;
-		state_t state;
-		bool isRN = false;
-
-		ConvergentNode(input_t numberOfInputs) : next(numberOfInputs) {}
-
-		ConvergentNode(const shared_ptr<OTreeNode>& node, bool isRN = false) : 
-			state(node->state), next(node->next.size()), isRN(isRN) {
-			convergent.emplace_back(node);
-		}
-	};
-
-	struct OTree {
-		vector<shared_ptr<ConvergentNode>> rn;
-		state_t es;
-	};
-	
-	struct StateCharacterization {
-		vector<LinkCell> sepSeq;
-		map<set<state_t>, sequence_in_t> bestSeq;
-		unique_ptr<SplittingTree> st;
-	};
-*/
 	static bool isIntersectionEmpty(const set<ConvergentNode*>& domain1, const set<ConvergentNode*>& domain2) {
 		//if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
@@ -683,6 +629,41 @@ namespace FSMtesting {
 		return TS;
 	}
 
+	static void extendWithTravSeqs(const shared_ptr<ConvergentNode>& sn, const list<sequence_in_t>& travSeqs, const unique_ptr<DFSM>& fsm) {
+		sn->leafNodes.clear();
+		for (auto& cn : sn->domain) {
+			auto& node = cn->convergent.front();
+			node->convergentNode = sn;
+			sn->convergent.emplace_back(node);
+			input_t i = 0;
+			for (; i < node->next.size(); i++) {
+				if (node->next[i]) break;
+			}
+			if (i == node->next.size()) {
+				sn->leafNodes.emplace_back(node);
+			}
+		}
+		sn->domain.clear();
+		for (auto& seq : travSeqs) {
+			auto node = sn->convergent.front();
+			for (auto& input : seq) {
+				if (node->next[input]) {
+					node = node->next[input];
+				}
+				else {
+					node = extendNodeWithInput(node, input, fsm);
+					node->convergentNode = sn;
+					sn->convergent.emplace_back(node);
+				}
+			}
+			if (node->observationStatus == OTreeNode::NOT_QUERIED)
+				sn->leafNodes.emplace_back(node);
+		}
+		for (input_t i = 0; i < sn->next.size(); i++) {
+			sn->next[i] = sn;
+		}
+	}
+
 	sequence_set_t S_method_ext(const unique_ptr<DFSM>& fsm, OTree& ot, StateCharacterization& sc) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::S_method", sequence_set_t());
 		if (ot.es < 0) {
@@ -696,9 +677,7 @@ namespace FSMtesting {
 		auto travSeqs = getLongestTraversalSequences(fsm->getNumberOfInputs(), ot.es);
 
 		if (fsm->getNumberOfStates() == 1) {
-			for (auto& seq : travSeqs) {
-				addSequence(stateNodes[0], seq, ot, fsm);
-			}
+			extendWithTravSeqs(stateNodes[0], travSeqs, fsm);
 			return getSequences(stateNodes[0]->convergent.front(), fsm);
 		}
 		//printf("divPres SC designed\n");
