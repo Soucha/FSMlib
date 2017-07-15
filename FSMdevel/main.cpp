@@ -264,7 +264,7 @@ int main(int argc, char** argv) {
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(1045);
 #endif
-	//char* vals[11] = { "", "4", "../data/experiments/10multi/", "-a", "128", "-m", "12", "-sg", "9", "-sl", "49"}; testDir(10, vals);
+	//char* vals[11] = { "", "4", "../data/experiments/10multi/", "-a", "256", "-m", "12", "-sg", "9", "-sl", "49"}; testDirLearning(11, vals);
 	//char* vals[13] = { "", "3", "../data/experiments/10multi/", "-ts", "512", "-cs", "0", "-m", "12", "-co", "1", "-es", "0" }; testDirTesting(12, vals);/*
 	//getCSet();
 	//fsm = make_unique<Mealy>();
@@ -280,7 +280,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R20_08i2n.fsm"; //Mealy_R60_WdoSu 
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R40_NQmTB.fsm"; //Mealy_R60_WdoSu 
 	//string fileName = DATA_PATH + "10multi/" + "DFSM_R10.fsm";//DFA_R100_0N9k1
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
@@ -331,7 +331,7 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	COMPUTATION_TIME(auto model = Slearner(teacher, 2, showConjecture, true));// showAndStop);
+	COMPUTATION_TIME(auto model = Slearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Hlearner(teacher, 1, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)

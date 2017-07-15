@@ -62,14 +62,14 @@ namespace FSMlearning {
 		map<input_t, shared_ptr<requested_query_node_t>> next;
 	};
 
-	inline bool CNcompare(const convergent_node_t* ls, const convergent_node_t* rs);
+	inline bool spyCNcompare(const convergent_node_t* ls, const convergent_node_t* rs);
 
-	struct CNcomp {
+	struct spyCNcomp {
 		bool operator() (const convergent_node_t* ls, const convergent_node_t* rs) const {
-			return CNcompare(ls, rs);
+			return spyCNcompare(ls, rs);
 		}
 	};
-	/*struct CNcomp {
+	/*struct spyCNcomp {
 	bool operator() (const convergent_node_t* ls, const convergent_node_t* rs) const {
 	const auto& las = ls->convergent.front()->accessSequence;
 	const auto& ras = rs->convergent.front()->accessSequence;
@@ -78,12 +78,12 @@ namespace FSMlearning {
 	}
 	//};*/
 
-	typedef set<convergent_node_t*, CNcomp> cn_set_t;
+	typedef set<convergent_node_t*, spyCNcomp> spy_cn_set_t;
 
 	struct convergent_node_t {
 		list<shared_ptr<spy_node_t>> convergent;
 		vector<shared_ptr<convergent_node_t>> next;
-		cn_set_t domain;// or consistent cn in case of state nodes
+		spy_cn_set_t domain;// or consistent cn in case of state nodes
 		shared_ptr<requested_query_node_t> requestedQueries;
 
 		convergent_node_t(const shared_ptr<spy_node_t>& node) {
@@ -92,7 +92,7 @@ namespace FSMlearning {
 		}
 	};
 
-	inline bool CNcompare(const convergent_node_t* ls, const convergent_node_t* rs) {
+	inline bool spyCNcompare(const convergent_node_t* ls, const convergent_node_t* rs) {
 		const auto& las = ls->convergent.front()->accessSequence;
 		const auto& ras = rs->convergent.front()->accessSequence;
 		if (las.size() != ras.size()) return las.size() < ras.size();
@@ -129,7 +129,7 @@ namespace FSMlearning {
 		input_t testedInput;
 		sequence_in_t inconsistentSequence;
 #if CHECK_PREDECESSORS
-		cn_set_t nodesWithChangedDomain;
+		spy_cn_set_t nodesWithChangedDomain;
 #endif
 #if DUMP_OQ
 		unique_ptr<DFSM> observationTree;
@@ -208,7 +208,7 @@ namespace FSMlearning {
 			|| areNodesDifferentUnder(n1->next[idx], n2->next[idx], len - 1)));
  	}
 
-	static bool isIntersectionEmpty(const cn_set_t& domain1, const cn_set_t& domain2) {
+	static bool isIntersectionEmpty(const spy_cn_set_t& domain1, const spy_cn_set_t& domain2) {
 		if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
 			for (auto& cn : domain1) {
@@ -676,7 +676,7 @@ namespace FSMlearning {
 
 	static bool isCNdifferent(const shared_ptr<convergent_node_t>& cn1, const shared_ptr<convergent_node_t>& cn2) {
 		// cn1 has empty domain
-		cn_set_t domain(cn2->domain);
+		spy_cn_set_t domain(cn2->domain);
 		for (auto& node : cn1->convergent) {
 			for (auto it = domain.begin(); it != domain.end();) {
 				if (!node->refStates.count((*it)->convergent.front()->state)){
@@ -1133,13 +1133,13 @@ namespace FSMlearning {
 			auto toIt = toCN->domain.begin();
 			auto fromIt = fromCN->domain.begin();
 			while ((toIt != toCN->domain.end()) && (fromIt != fromCN->domain.end())) {
-				if (CNcompare(*toIt, *fromIt)) {
+				if (spyCNcompare(*toIt, *fromIt)) {
 					(*toIt)->domain.erase(toCN.get());
 					toIt = toCN->domain.erase(toIt);
 					reduced = true;
 				}
 				else {
-					if (!(CNcompare(*fromIt, *toIt))) {
+					if (!(spyCNcompare(*fromIt, *toIt))) {
 						++toIt;
 					}
 					(*fromIt)->domain.erase(fromCN.get());

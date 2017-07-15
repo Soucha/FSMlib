@@ -21,7 +21,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	static bool isIntersectionEmpty(const set<ConvergentNode*>& domain1, const set<ConvergentNode*>& domain2) {
+	static bool isIntersectionEmpty(const cn_set_t& domain1, const cn_set_t& domain2) {
 		//if (domain1.empty() || domain2.empty()) return false;
 		if (domain1.size() < domain2.size()) {
 			for (auto& cn : domain1) {
@@ -99,10 +99,23 @@ namespace FSMtesting {
 			|| areDistinguishedUnder(node->next[input], cn->next[input].get(), noES));
 	}
 
+	static void changeFirstNode(const shared_ptr<ConvergentNode>& cn, const shared_ptr<OTreeNode>& node) {
+		for (auto& n : cn->domain) {
+			n->domain.erase(cn.get());
+		}
+		cn->convergent.emplace_front(node);
+		for (auto& n : cn->domain) {
+			n->domain.insert(cn.get());
+		}
+	}
+
 	static void mergeCN(const shared_ptr<ConvergentNode>& fromCN, const shared_ptr<ConvergentNode>& toCN,
 		list<shared_ptr<ConvergentNode>>& identifiedNodes, bool noES) {
+		for (auto& rn : fromCN->domain) {
+			rn->domain.erase(fromCN.get());
+		}
 		if (fromCN->convergent.front()->accessSequence.size() < toCN->convergent.front()->accessSequence.size()) {
-			toCN->convergent.emplace_front(move(fromCN->convergent.front()));
+			changeFirstNode(toCN, fromCN->convergent.front());
 			fromCN->convergent.pop_front();
 			toCN->convergent.front()->convergentNode = toCN;
 		}
@@ -116,9 +129,6 @@ namespace FSMtesting {
 		}
 		fromCN->leafNodes.clear();
 
-		for (auto& rn : fromCN->domain) {
-			rn->domain.erase(fromCN.get());
-		}
 		// merge successors
 		for (input_t i = 0; i < fromCN->next.size(); i++) {
 			if (fromCN->next[i]) {
@@ -245,7 +255,7 @@ namespace FSMtesting {
 					else {
 						cn = cn->next[*it];
 						if (node->accessSequence.size() < cn->convergent.front()->accessSequence.size()) {
-							cn->convergent.emplace_front(node);
+							changeFirstNode(cn, node);
 						}
 						else {
 							cn->convergent.emplace_back(node);
