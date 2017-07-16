@@ -56,15 +56,15 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		}
 	};
 
-	inline bool CNcompare(const ConvergentNode* ls, const ConvergentNode* rs);
+	inline bool CNcompare(const ConvergentNode*& ls, const ConvergentNode*& rs);
 
 	struct CNcomp {
-		bool operator() (const ConvergentNode* ls, const ConvergentNode* rs) const {
+		bool operator() (const ConvergentNode*& ls, const ConvergentNode*& rs) const {
 			return CNcompare(ls, rs);
 		}
 	};
 
-	typedef set<ConvergentNode*, CNcomp> cn_set_t;
+	typedef unordered_set<ConvergentNode*> cn_set_t;
 
 	/**
 	* Convergent node groups OTree nodes that represent the same state and are proven to be convergent
@@ -83,7 +83,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		}
 	};
 
-	inline bool CNcompare(const ConvergentNode* ls, const ConvergentNode* rs) {
+	inline bool CNcompare(const ConvergentNode*& ls, const ConvergentNode*& rs) {
 		const auto& las = ls->convergent.front()->accessSequence;
 		const auto& ras = rs->convergent.front()->accessSequence;
 		if (las.size() != ras.size()) return las.size() > ras.size();

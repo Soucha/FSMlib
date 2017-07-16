@@ -280,7 +280,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R40_NQmTB.fsm"; //Mealy_R60_WdoSu 
+	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R10_OfW88.fsm"; //Mealy_R60_WdoSu 
 	//string fileName = DATA_PATH + "10multi/" + "DFSM_R10.fsm";//DFA_R100_0N9k1
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
