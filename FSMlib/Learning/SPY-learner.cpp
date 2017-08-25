@@ -1035,7 +1035,6 @@ namespace FSMlearning {
 		} while (reduced);
 		return true;
 	}
-#endif
 
 	static bool processChangedNodes(SPYObservationTree& ot) {
 		while (!ot.nodesWithChangedDomain.empty()) {
@@ -1074,6 +1073,7 @@ namespace FSMlearning {
 		}
 		return processChangedNodes(ot);
 	}
+#endif
 
 	static bool mergeConvergentNoES(shared_ptr<convergent_node_t>& fromCN, const shared_ptr<convergent_node_t>& toCN, SPYObservationTree& ot) {
 		if (toCN->requestedQueries) {// a state node
@@ -1265,7 +1265,9 @@ namespace FSMlearning {
 					node->convergentNode = parentCN->next[input];
 					storeInconsistentNode(node, refCN->convergent.front(), ot);
 					ot.identifiedNodes.clear();
+#if CHECK_PREDECESSORS
 					ot.nodesWithChangedDomain.clear();
+#endif	
 					return false;
 				}
 				if (!ot.inconsistentNodes.empty()
@@ -1273,7 +1275,9 @@ namespace FSMlearning {
 						|| !processChangedNodes(ot)
 #endif	
 					) {
+#if CHECK_PREDECESSORS
 					ot.nodesWithChangedDomain.clear();
+#endif	
 					ot.identifiedNodes.clear();
 					return false;
 				}

@@ -88,7 +88,7 @@ namespace FSMsequence {
 				node->succ[succCount].second->nextStates.emplace_back(nextState);
 			}
 			if (invalidInput) {
-				if (allowInvalidInputs) {
+				if (allowInvalidInputs && ((sameOutput.size() > 1) || (sameOutput[0].size() > 1))) {
 					auto& refSucc = node->succ[succCount].second;
 					auto next = make_shared<st_node_t>();
 					next->block.swap(refSucc->block);
@@ -129,18 +129,20 @@ namespace FSMsequence {
 		size_t B = node->block.size();
 		size_t invalidScore(B * B);
 		state_t undistinguished(0), succCount(0);
-		auto& nextStates = node->succ[input].second->nextStates;
+		const auto& nextStates = node->succ[input].second->nextStates;
 		for (const auto& p : next->succ) {
 			set<state_t> diffStates;
 			auto currUndist = undistinguished;
 			for (const auto& nState : p.second->block) {
-				if (find(nextStates.begin(), nextStates.end(), nState) != nextStates.end()) {
+				auto c = count(nextStates.begin(), nextStates.end(), nState);
+				if (c > 0) {
 					auto it = lower_bound(next->block.begin(), next->block.end(), nState);
 					auto nIt = next->nextStates.begin();
 					advance(nIt, distance(next->block.begin(), it));
 					if (!diffStates.insert(*nIt).second) {
 						undistinguished++;
 					}
+					undistinguished += (c - 1);
 				}
 			}
 			if (!diffStates.empty()) {
@@ -153,7 +155,7 @@ namespace FSMsequence {
 		invalidScore *= B;
 		invalidScore -= succCount;
 		invalidScore *= B;
-		invalidScore += undistinguished + node->succ[input].second->undistinguishedStates;
+		invalidScore += undistinguished;// +node->succ[input].second->undistinguishedStates;
 		invalidScore *= B;
 		invalidScore += next->sequence.size() + 1;// +((incomingUndistinguished > 0) ? 1 : 0);
 		return invalidScore;

@@ -276,11 +276,11 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "esm-manual-controller/Mealy_3410_esm.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R10_PDS.fsm";
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
+	string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Mealy_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
-	string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Moore_R10_OfW88.fsm"; //Mealy_R60_WdoSu 
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_GHwoR.fsm"; //Mealy_R60_WdoSu 
 	//string fileName = DATA_PATH + "10multi/" + "DFSM_R10.fsm";//DFA_R100_0N9k1
 	// ES0 Mealy_R50_n4FnI Mealy_R60_o7cia 
 	// ES1 Mealy_R60_WdoSu Moore_R40_1zxZn  Mealy_R40_xeCCe Mealy_R60_97Nbx Moore_R50_ylWfw
@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
- 	//auto st = getSplittingTree(fsm, true);
+ 	auto st = getSplittingTree(fsm, true);
 	/*/compareDesignAlgoritms(fsm, fileName);
 	OTree ot;
 	ot.es = 0;
@@ -331,7 +331,7 @@ int main(int argc, char** argv) {
 	//unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
 	//auto model = Lstar(teacher, addSuffixAfterLastStateToE, showConjecture, false, true);
 	unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
-	COMPUTATION_TIME(auto model = Slearner(teacher, 1, showConjecture, true));// showAndStop);
+	COMPUTATION_TIME(auto model = Slearner(teacher, 0, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Hlearner(teacher, 1, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = Lstar(teacher, addAllPrefixesToS, nullptr, false, false);)

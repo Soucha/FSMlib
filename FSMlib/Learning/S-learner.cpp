@@ -665,15 +665,18 @@ namespace FSMlearning {
 					li.testedState = NULL_STATE;
 					if (li.inconsistentSequence.empty()) {
 						li.inconsistentSequence = getQueriedSeparatingSequenceOfCN(fromCN, toCN, cn_pair_set_t());
-
+						li.testedState = toCN->state;
+						li.testedInput = STOUT_INPUT;
 						if (li.inconsistentSequence.empty()) {
-							li.testedState = toCN->state;
 							li.inconsistentNodes.push_back(fromCN->convergent.front());
 							//throw "";
 						} else if (li.inconsistentSequence.front() == STOUT_INPUT) {
 							throw "";
 							li.inconsistentSequence.pop_front();
 							li.inconsistentSequence.push_back(STOUT_INPUT);
+						}
+						else {
+							li.testedInput = input_t(li.inconsistentSequence.size()); // a hack to derive separating suffix
 						}
 					}
 					//storeInconsistentNode(fromCN->convergent.front(), toCN->convergent.front(), li, LearningInfo::EMPTY_CN_DOMAIN);
@@ -891,12 +894,13 @@ namespace FSMlearning {
 						return false;
 					}
 #else
-					if (li.testedState != NULL_STATE) {
+					if ((li.testedState != NULL_STATE) && (li.testedInput == STOUT_INPUT)) {
 						 auto sepSeq = getQueriedSeparatingSequenceOfCN(li.inconsistentNodes.back()->convergentNode.lock(),
 							 li.ot.rn[li.testedState], cn_pair_set_t());
 						 if (sepSeq.empty()) {
 							 throw;
 						 }
+						 li.testedInput = input_t(sepSeq.size()); // a hack to derive separating suffix
 						 li.inconsistentSequence.splice(li.inconsistentSequence.end(), move(sepSeq));
 					}
 					li.inconsistentNodes.clear();
@@ -1899,9 +1903,44 @@ namespace FSMlearning {
 				if (!queryIfNotQueried(inconsNode, li.inconsistentSequence, li, teacher)) {
 					return;
 				}
-				if (!cn1->domain.empty() && !queryIfNotQueried((*(cn1->domain.begin()))->convergent.front(),
-						move(li.inconsistentSequence), li, teacher)) {
-					return;
+				if (!cn1->domain.empty()) {
+					if (!queryIfNotQueried((*(cn1->domain.begin()))->convergent.front(), li.inconsistentSequence, li, teacher)) {
+						return;
+					}
+					if (li.inconsistentNodes.empty()) {
+						auto cn = li.ot.rn[(*(cn1->domain.begin()))->state];
+						auto it = li.inconsistentSequence.begin();
+						while ((cn != cn1) && (it != li.inconsistentSequence.end())) {
+							cn = cn->next[*it];
+							++it;
+						}
+						if (cn == cn1) {
+							auto bIt = li.inconsistentSequence.begin();
+							auto eIt = it;
+							do {
+								while ((bIt != eIt) && (it != li.inconsistentSequence.end()) && (*bIt == *it)) {
+									++bIt;
+									++it;
+								}
+								if (bIt == eIt) {
+									eIt = it;
+								}
+							} while ((it != li.inconsistentSequence.end()) && (*bIt == *it));
+							sequence_in_t sepSeq(eIt, li.inconsistentSequence.end());
+							if (!queryIfNotQueried((*(cn1->domain.begin()))->convergent.front(), move(sepSeq), li, teacher)) {
+								return;
+							}
+						}
+						if (li.inconsistentNodes.empty()) {
+							if (li.testedState != NULL_STATE) {
+								while (li.inconsistentSequence.size() > li.testedInput) li.inconsistentSequence.pop_front();
+								if (!queryIfNotQueried(li.ot.rn[li.testedState]->convergent.front(), li.inconsistentSequence, li, teacher)) {
+									return;
+								}
+								li.testedState = NULL_STATE;
+							}
+						}
+					}
 				}
 				return;
 			}
@@ -2088,8 +2127,8 @@ namespace FSMlearning {
 				processInconsistent(li, teacher);
 				if (numStates == li.ot.rn.size()) {
 					if (li.inconsistentNodes.empty()) {
-						updateAndInitCN(nullptr, li, teacher);
-						//throw;
+						//updateAndInitCN(nullptr, li, teacher);
+						throw;
 					}
 					else {
 						auto& inconsNode = li.inconsistentNodes.front();
