@@ -95,13 +95,17 @@ namespace FSMlibTest
 
 		void groupTest(string filename) {
 			testGetCharacterizingSet(filename);
+			testGetCharacterizingSet("", 1);
+			testGetCharacterizingSet("", 2);
 			testGetStatesCharacterizingSets("");
-			testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
-			testGetHarmonizedStateIdentifiers("");
+			testGetStatesCharacterizingSets("",1);
+			testGetStatesCharacterizingSets("",2);
+			//testGetStateCharacterizingSet("", (rand() % fsm->getNumberOfStates()));
+			//testGetHarmonizedStateIdentifiers("");
 			//testGetSeparatingSequences("");
 		}
 
-		void testSCSet(state_t state, sequence_set_t& sCSet) {
+		void testSCSet(state_t state, sequence_set_t& sCSet, bool reduced=true) {
 			state_t N = fsm->getNumberOfStates();
 			vector<bool> distinguished(N, false);
 			bool distinguishState, hasMinLen;
@@ -128,10 +132,20 @@ namespace FSMlibTest
 						}
 					}
 				}
-				ARE_EQUAL(true, distinguishState, "Sequence %s does not distinguished any states.",
-					FSMmodel::getInSequenceAsString(*sIt).c_str());
-				ARE_EQUAL(true, hasMinLen, "Sequence %s could be shorter.",
-					FSMmodel::getInSequenceAsString(*sIt).c_str());
+				if (reduced) {
+					ARE_EQUAL(true, distinguishState, "Sequence %s does not distinguished any states.",
+						FSMmodel::getInSequenceAsString(*sIt).c_str());
+					ARE_EQUAL(true, hasMinLen, "Sequence %s could be shorter.",
+						FSMmodel::getInSequenceAsString(*sIt).c_str());
+				}
+				else {
+					if (!distinguishState)
+						DEBUG_MSG("Sequence %s does not distinguished any states.",
+							FSMmodel::getInSequenceAsString(*sIt).c_str());
+					if (!hasMinLen)
+						DEBUG_MSG("Sequence %s could be shorter.",
+							FSMmodel::getInSequenceAsString(*sIt).c_str());
+				}
 			}
 			distinguished[state] = true;
 			for (state_t i = 0; i < N; i++) {
@@ -145,17 +159,39 @@ namespace FSMlibTest
 			testSCSet(state, sCSet);
 		}
 
-		void testGetStatesCharacterizingSets(string filename) {
+		void testGetStatesCharacterizingSets(string filename, int version = 0) {
 			if (!filename.empty()) fsm->load(filename);
-			auto sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
+			vector<sequence_set_t> sCSets;
+			switch (version) {
+			case 0:
+				sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences);
+				break;
+			case 1:
+				sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_EqualLength);
+				break;
+			case 2:
+				sCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, false, reduceSCSet_LS_SL);
+				break;
+			}
 			for (state_t i = 0; i < fsm->getNumberOfStates(); i++) {
-				testSCSet(i, sCSets[i]);
+				testSCSet(i, sCSets[i], false);
 			}
 		}
 
-		void testGetCharacterizingSet(string filename) {
+		void testGetCharacterizingSet(string filename, int version = 0) {
 			if (!filename.empty()) fsm->load(filename);
-			auto CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, true, reduceCSet_LS_SL);
+			sequence_set_t CSet;
+			switch (version) {
+			case 0:
+				CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences);
+				break;
+			case 1:
+				CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_EqualLength);
+				break;
+			case 2:
+				CSet = getCharacterizingSet(fsm, getStatePairsShortestSeparatingSequences, false, reduceCSet_LS_SL);
+				break;
+			}
 			state_t N = fsm->getNumberOfStates();
 			vector < vector<bool> > distinguished(N - 1);
 			bool distinguishState, hasMinLen;
