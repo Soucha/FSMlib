@@ -264,8 +264,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted SCSet is a prefix of another one if true
 	* @param reduceSCSet - function that can reduce the size of resulted SCSet additionally,
+	*			- filterPrefixes is set to false if reduceSCSet is provided
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
-	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return State Characterizing Set of given state, or an empty collection if the FSM is not compact
@@ -284,8 +284,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceSCSet - function that can reduce the size of each resulted SCSet additionally,
+	*			- filterPrefixes is set to false if reduceSCSet is provided
 	*			- reduceSCSet_LS_SL or reduceSCSet_EqualLength are examples
-	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a collection of State Charactirizing Sets of all states, or an empty collection if the FSM is not compact
@@ -307,6 +307,7 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of any SCSet is a prefix of another one of the same SCSet if true
 	* @param reduceSCSet - function that can reduce the size of each resulted HSI additionally,
+	*			- filterPrefixes is set to false if reduceCSet is provided
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return a family of Harmonized State Identifiers, or an empty collection if the FSM is not compact
@@ -325,8 +326,8 @@ namespace FSMsequence {// all design functions require a compact FSM
 	*			see default function getStatePairsShortestSeparatingSequences
 	* @param filterPrefixes - no sequence of resulted CSet is a prefix of another one if true
 	* @param reduceCSet - function that can reduce the size of resulted CSet additionally,
+	*			- filterPrefixes is set to false if reduceCSet is provided
 	*			- reduceCSet_LS_SL or reduceCSet_EqualLength are examples
-	*			- NOTE that some require not to filter prefixes
 	* @param omitUnnecessaryStoutInputs - STOUT_INPUT follows each transition input (except the last one) in all sequences
 	*		if fsm->isOutputState() and false is set, otherwise only necessary STOUT_INPUTs are preserved
 	* @return Characterizing Set, or an empty collection if the FSM is not compact

@@ -75,8 +75,9 @@ namespace FSMtesting {
 				}
 			}
 		}
-		for (auto node : coreNodes) {
-			for (const auto& seq : H[node->state]) {
+		for (const auto& rn : coreNodes) {
+			for (const auto& seq : H[rn->state]) {
+				auto node = rn;
 				for (const auto& input : seq) {
 					auto nIt = node->next.find(input);
 					if (nIt == node->next.end()) {
@@ -178,7 +179,8 @@ namespace FSMtesting {
 
 	static void closure(state_t state, input_t input,
 			vector<vector<bool>>& coveredTransitions, vector<vector<shared_ptr<TestNodeSPY>>>& confirmedNodes) {
-		for (int i = 0; i < confirmedNodes[state].size(); i++) {// confirmedNodes[state] can be changed in the inner closure function
+		auto cnNumber = confirmedNodes[state].size();
+		for (int i = 0; i < cnNumber; i++) {// confirmedNodes[state] can be changed in the inner closure function
 			auto& n = confirmedNodes[state][i];
 			auto nextIt = n->next.find(input);
 			if (nextIt != n->next.end()) {

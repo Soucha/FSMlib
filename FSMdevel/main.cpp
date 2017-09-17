@@ -188,13 +188,17 @@ static void translateLearnLibDFAtoFSMformat(string fileName) {
 }
 
 static void printTS(sequence_set_t & TS, string filename) {
-	printf("Set of %d test sequences (%s):\n", TS.size(), filename.c_str());
+	//printf("Set of %d test sequences (%s):\n", TS.size(), filename.c_str());
+	FSMlib::PrefixSet ps;
 	seq_len_t len(0);
-	for (sequence_in_t cSeq : TS) {
+	for (const auto& cSeq : TS) {
 		len += cSeq.size();
-		printf("%s\n", FSMmodel::getInSequenceAsString(cSeq).c_str());
+		ps.insert(cSeq);
+		//printf("%s\n", FSMmodel::getInSequenceAsString(cSeq).c_str());
 	}
-	printf("Total length: %d\n", len);
+	//printf("Total length: %d\n", len);
+	auto syms = ps.getNumberOfSymbols();
+	printf("%d,%d,%d,%f,%d,%f\n", TS.size(), len, TS.size()+len, double(len)/TS.size(), syms, double(syms)/len);
 }
 
 static void printCSV(const unique_ptr<DFSM>& fsm, vector<sequence_set_t>& hsi, double sec,
@@ -291,7 +295,27 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	//fsm->load(fileName);
 	auto fsm = FSMmodel::loadFSM(fileName);
- 	auto st = getSplittingTree(fsm, true);
+	auto st = getSplittingTree(fsm, true);
+	auto hsiST = getHarmonizedStateIdentifiersFromSplittingTree(fsm, st);
+	for (state_t ES = 0; ES < 3; ES++) {
+		auto TSwp = Wp_method(fsm, ES);
+		auto TShsi = HSI_method(fsm, ES);
+		auto TShsiST = HSI_method(fsm, ES, hsiST);
+		auto TSh = H_method(fsm, ES);
+		auto TSspy = SPY_method(fsm, ES);
+		auto TSspyST = SPY_method(fsm, ES, hsiST);
+		auto TSspyh = SPYH_method(fsm, ES);
+		auto TSs = S_method(fsm, ES);
+		printf("Wp,"); printTS(TSwp, fileName);
+		printf("HSI,"); printTS(TShsi, fileName);
+		printf("HSI-ST,"); printTS(TShsiST, fileName);
+		printf("H,"); printTS(TSh, fileName);
+		printf("SPY,"); printTS(TSspy, fileName);
+		printf("SPY-ST,"); printTS(TSspyST, fileName);
+		printf("SPYH,"); printTS(TSspyh, fileName);
+		printf("S,"); printTS(TSs, fileName);
+		printf("\n");
+	}
 	/*/compareDesignAlgoritms(fsm, fileName);
 	OTree ot;
 	ot.es = 0;

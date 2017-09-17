@@ -96,13 +96,9 @@ namespace FSMsequence {
 						// only one next state cannot be NULL_STATE due to distinguishing be outputs (WRONG_OUTPUT)
 						if (nextStateI != nextStateJ) {
 							auto nextIdx = getStatePairIdx(nextStateI, nextStateJ);
-							if (seq[nextIdx].empty()) {
-								if (nextIdx != idx)
-									link[nextIdx].emplace_back(idx, input);
-							}
-							else {// distinguished by word of length 2
+							if (nextIdx != idx)
 								link[nextIdx].emplace_back(idx, input);
-								unchecked.emplace(nextIdx);
+							if (!seq[nextIdx].empty()) {// distinguished by word of length 2
 								break;
 							}
 						}
@@ -111,8 +107,9 @@ namespace FSMsequence {
 			}
 		}
 		bool useStout = !omitUnnecessaryStoutInputs && fsm->isOutputState();
+		auto undistCount = M - unchecked.size();
 		// fill all undistinguished pair gradually using links
-		while (!unchecked.empty()) {
+		while (undistCount > 0) {
 			auto idx = unchecked.front();
 			unchecked.pop();
 			for (state_t k = 0; k < link[idx].size(); k++) {
@@ -122,6 +119,7 @@ namespace FSMsequence {
 					if (useStout && seq[idx].front() != STOUT_INPUT) seq[nextIdx].push_back(STOUT_INPUT);
 					seq[nextIdx].insert(seq[nextIdx].end(), seq[idx].begin(), seq[idx].end());
 					unchecked.emplace(nextIdx);
+					undistCount--;
 				}
 			}
 			link[idx].clear();
@@ -730,6 +728,7 @@ namespace FSMsequence {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getStatesCharacterizingSets", vector<sequence_set_t>());
 		state_t N = fsm->getNumberOfStates();
 		auto seq = getSeparatingSequences(fsm, omitUnnecessaryStoutInputs);
+		if (reduceSCSet) filterPrefixes = false;
 		vector<sequence_set_t> outSCSets(N);
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {
@@ -748,6 +747,7 @@ namespace FSMsequence {
 		RETURN_IF_UNREDUCED(fsm, "FSMsequence::getHarmonizedStateIdentifiers", vector<sequence_set_t>());
 		state_t N = fsm->getNumberOfStates();
 		auto seq = getSeparatingSequences(fsm, omitUnnecessaryStoutInputs);
+		if (reduceSCSet) filterPrefixes = false;
 		vector<sequence_set_t> outSCSets(N);
 		// grab sequence from table seq incident with state i
 		for (state_t i = 0; i < N; i++) {

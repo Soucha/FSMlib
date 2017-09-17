@@ -167,4 +167,17 @@ namespace FSMlib {
 		}
 		return seq_len_t(len - seq.size());
 	}
+
+	static size_t getNumberOfSymbolsInSubtree(shared_ptr<prefix_set_node_t> ps) {
+		size_t num(0);
+		while (ps) {
+			num += getNumberOfSymbolsInSubtree(ps->child) + 1;
+			ps = ps->neighbor;
+		}
+		return num;
+	}
+
+	size_t PrefixSet::getNumberOfSymbols() {
+		return getNumberOfSymbolsInSubtree(root);
+	}
 }

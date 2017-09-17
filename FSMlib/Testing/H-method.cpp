@@ -238,6 +238,9 @@ namespace FSMtesting {
 
 	static void distinguish(vector<shared_ptr<TestNodeH>>& nodes, const shared_ptr<TestNodeH>& currNode, 
 		const unique_ptr<DFSM>& fsm, const vector<LinkCell>& sepSeq , int depth, bool extend = false) {
+		for (const auto& n : nodes) {
+			distinguish(n, currNode, fsm, sepSeq);
+		}
 		if (depth > 0) {
 			if (extend) nodes.emplace_back(currNode);
 			for (const auto& pNext : currNode->next) {
@@ -245,9 +248,7 @@ namespace FSMtesting {
 			}
 			if (extend) nodes.pop_back();
 		}
-		for (const auto& n : nodes) {
-			distinguish(n, currNode, fsm, sepSeq);
-		}
+		
 	}
 
 	static sequence_set_t getSequences(const shared_ptr<TestNodeH>& node, const unique_ptr<DFSM>& fsm) {

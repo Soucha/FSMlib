@@ -74,6 +74,12 @@ namespace FSMlib {
 		*/
 		seq_len_t contains(sequence_in_t seq);
 
+		/**
+		* Counts total length of all sequences such that duplicated prefixes are counted once.
+		* It corresponds to the size of the PrefixSet.
+		* @return the number of symbols
+		*/
+		size_t getNumberOfSymbols();
 	private:
 		shared_ptr<prefix_set_node_t> root;
 	};

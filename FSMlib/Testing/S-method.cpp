@@ -302,12 +302,13 @@ namespace FSMtesting {
 			}
 			if (node) return;// sequence already queried
 		}
-		if ((maxLen == 0) && (cn->state != 0)) {
-			auto minLen = (*bestStartNodeIt)->accessSequence.size() - 1;
+		if ((maxLen == 0) && (!cn->isRN || (cn->state != 0))) {
+			auto minLen = (*bestStartNodeIt)->accessSequence.size();
 			queue<pair<shared_ptr<ConvergentNode>, sequence_in_t>> fifo;
 			fifo.emplace(cn, sequence_in_t());
 			set<ConvergentNode*> closedCNs;
 			closedCNs.insert(cn.get());
+			sequence_in_t bestTransferSeq;
 			while (!fifo.empty()) {
 				auto p = move(fifo.front());
 				fifo.pop();
@@ -323,15 +324,24 @@ namespace FSMtesting {
 							appendSequence(ln, nSeq, ot, fsm);
 							return;
 						}
+						if ((nPrevCN->convergent.front()->accessSequence.size() + nSeq.size()) < 
+							((*bestStartNodeIt)->accessSequence.size() + bestTransferSeq.size())) {
+							bestTransferSeq = nSeq;
+							bestStartNodeIt = nPrevCN->convergent.begin();
+						}
 						if ((nSeq.size() < minLen) && (!nPrevCN->isRN || (nPrevCN->state != 0))) {
 							fifo.emplace(move(nPrevCN), move(nSeq));
 						}
 					}
 					if (!p.first->isRN) break;
 				}
-			}	
+			}
+			bestTransferSeq.insert(bestTransferSeq.end(), seq.begin(), seq.end());
+			appendSequence(*bestStartNodeIt, bestTransferSeq, ot, fsm);
 		}
-		appendSequence(*bestStartNodeIt, seq, ot, fsm);
+		else {
+			appendSequence(*bestStartNodeIt, seq, ot, fsm);
+		}
 	}
 
 	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, const OTree& ot,
@@ -365,7 +375,6 @@ namespace FSMtesting {
 	static void createDivergencePreservingStateCover(const unique_ptr<DFSM>& fsm, OTree& ot, const StateCharacterization& sc) {
 		const auto numInputs = fsm->getNumberOfInputs();
 		ot.rn.resize(fsm->getNumberOfStates());
-		vector<bool> covered(fsm->getNumberOfStates(), false);
 		auto& stateNodes = ot.rn;
 		if (!stateNodes[0]) {
 			output_t outputState = (fsm->isOutputState()) ? fsm->getOutput(0, STOUT_INPUT) : DEFAULT_OUTPUT;
@@ -380,7 +389,6 @@ namespace FSMtesting {
 			auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, 0, root->domain, true);
 			appendSequence(root, seq, ot, fsm, false);
 		}
-		covered[0] = true;
 		queue<shared_ptr<OTreeNode>> fifo, fifoNext;
 		fifo.emplace(stateNodes[0]->convergent.front());
 		do {
@@ -390,7 +398,7 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < numInputs; input++) {
 					const auto& nn = node->next[input];
-					if (nn && !covered[nn->state] && (!stateNodes[nn->state] || (nn->observationStatus == OTreeNode::QUERIED_RN))) {
+					if (nn && (!stateNodes[nn->state] || (nn->observationStatus == OTreeNode::QUERIED_RN))) {
 						if (!stateNodes[nn->state]) {
 							stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 							nn->convergentNode = stateNodes[nn->state];
@@ -401,7 +409,6 @@ namespace FSMtesting {
 							auto seq = getSeparatingSequenceFromSplittingTree(fsm, sc.st, nn->state, nn->domain, true);
 							appendSequence(nn, seq, ot, fsm, false);
 						}
-						covered[nn->state];
 						fifoNext.emplace(nn);
 					}
 				}
@@ -412,7 +419,7 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < fsm->getNumberOfInputs(); input++) {
 					auto nextState = fsm->getNextState(node->state, input);
-					if ((nextState != NULL_STATE) && !covered[nextState] && !stateNodes[nextState]) {
+					if ((nextState != NULL_STATE) && !stateNodes[nextState]) {
 						set<state_t> states;
 						for (state_t i = 0; i < stateNodes.size(); i++) {
 							states.emplace(i);
@@ -426,7 +433,6 @@ namespace FSMtesting {
 						nn->convergentNode = stateNodes[nn->state];
 						stateNodes[node->state]->next[input] = stateNodes[nn->state];
 						fifoNext.emplace(nn);
-						covered[nextState];
 					}
 				}
 			}
