@@ -81,7 +81,7 @@ namespace FSMtesting {
 	
 	static bool areDistinguishedUnder(const shared_ptr<OTreeNode>& node, ConvergentNode* cn, bool noES) {
 		if (node->stateOutput != cn->convergent.front()->stateOutput) return true;
-		auto& cn1 = node->convergentNode.lock();
+		auto cn1 = node->convergentNode.lock();
 		if (cn->isRN || cn1->isRN)  {
 			if (cn->isRN && cn1->isRN) {
 				if (cn1.get() != cn) return true;
@@ -333,7 +333,7 @@ namespace FSMtesting {
 							fifo.emplace(move(nPrevCN), move(nSeq));
 						}
 					}
-					if (!p.first->isRN) break;
+					if (!p.first->isRN) break;// only RN can have different predecessors
 				}
 			}
 			bestTransferSeq.insert(bestTransferSeq.end(), seq.begin(), seq.end());
@@ -586,7 +586,7 @@ namespace FSMtesting {
 		list<shared_ptr<ConvergentNode>>& nodes, const unique_ptr<DFSM>& fsm, const StateCharacterization& sepSeq,
 			int depth, const OTree& ot) {
 		distinguish(cn, nodes, fsm, sepSeq, ot);
-		if (refCN) distinguish(refCN, nodes, fsm, sepSeq, ot);
+		if (refCN && !refCN->isRN) distinguish(refCN, nodes, fsm, sepSeq, ot);
 		if (depth > 0) {
 			nodes.emplace_back(cn);
 			if (refCN && !refCN->isRN) nodes.emplace_back(refCN);
@@ -772,7 +772,8 @@ namespace FSMtesting {
 		}
 		OTree ot;
 		ot.es = extraStates;
-		return S_method_ext(fsm, ot, StateCharacterization());
+		StateCharacterization sc;
+		return S_method_ext(fsm, ot, sc);
 	}
 }
 

@@ -14,17 +14,7 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
-#include <chrono>
-#include <fstream>
-#include <filesystem>
-
-#ifndef PARALLEL_COMPUTING
-//#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
-#endif // !PARALLEL_COMPUTING
-#include "../FSMlib/FSMlib.h"
-
-using namespace FSMsequence;
+#include "commons.h"
 
 #define COMPUTATION_TIME(com) \
 	auto start = chrono::system_clock::now(); \
@@ -66,12 +56,10 @@ static void compareDesignAlgoritms(const unique_ptr<DFSM>& fsm, const string& fn
 	printf(".");
 }
 
-using namespace std::tr2::sys;
-
 void compareHSIdesigns(int argc, char** argv) {
 	string outFilename = "";
 	auto dir = string(argv[2]);
-	unsigned int machineTypeMask = unsigned int(-1);// all
+	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
 	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
@@ -93,7 +81,12 @@ void compareHSIdesigns(int argc, char** argv) {
 		}
 	}
 	if (outFilename.empty()) outFilename = dir + "_HSIdesingComparison.csv";
+#ifdef _WIN32
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#else
+	  outFile = fopen(outFilename.c_str(), "w");
+	  if (!outFile) {
+#endif
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;
 	}

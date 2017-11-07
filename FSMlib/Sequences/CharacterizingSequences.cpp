@@ -16,6 +16,7 @@
 */
 #include "stdafx.h"
 
+#include <math.h>
 #include "FSMsequence.h"
 #include "../PrefixSet.h"
 

@@ -14,24 +14,7 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
-#include <chrono>
-#include <fstream>
-#include <filesystem>
-
-#include "../FSMlib/FSMlib.h"
-
-using namespace FSMsequence;
-using namespace FSMtesting;
-
-#define DATA_PATH			string("../data/")
-#define MINIMIZATION_DIR	string("tests/minimization/")
-#define SEQUENCES_DIR		string("tests/sequences/")
-#define EXAMPLES_DIR		string("examples/")
-#define EXPERIMENTS_DIR		string("experiments/")
-#define OUTPUT_GV			string(DATA_PATH + "tmp/output.gv").c_str()
-
-using namespace std::tr2::sys;
+#include "commons.h"
 
 static bool checkSolution(vector<unique_ptr<DFSM>>& indistinguishable, const unique_ptr<DFSM>& partial) {
 	auto accurate = FSMmodel::duplicateFSM(partial);
@@ -47,7 +30,7 @@ static bool checkSolution(vector<unique_ptr<DFSM>>& indistinguishable, const uni
 
 void generateMachines(int argc, char** argv) {
 	auto dir = string(argv[2]);
-	unsigned int machineTypeMask = unsigned int(-1);// all
+	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	size_t numMachines(10);
 	state_t Nmin(10), Nstep(1), Nmax(10);
 	input_t INmin(2), INstep(1), INmax(2), INmultiN(0), INdivN(1);
@@ -56,6 +39,7 @@ void generateMachines(int argc, char** argv) {
 	bool reqStronglyConnected = true;
 	bool reqADS = false;
 	bool checkEquivalence = true;
+	int seed = int(time(NULL));
 	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-m") == 0) {//machine type
 			machineTypeMask = atoi(argv[++i]);
@@ -122,11 +106,14 @@ void generateMachines(int argc, char** argv) {
 		else if (strcmp(argv[i], "-d") == 0) {//check equivalence/difference of machines?
 			checkEquivalence = bool(atoi(argv[++i]) != 0);
 		}
+		else if (strcmp(argv[i], "-seed") == 0) {//seed for the srand()
+			seed = atoi(argv[++i]);
+		}
 	}
 	if (dir.back() != '/') dir.push_back('/');
 	if (OUTmultiAll > OUTdivAll) OUTmultiAll = OUTmultiAll = 0;
 
-	srand(int(time(NULL)));
+	srand(seed);
 	printf("DifferentMachines\tFSMtype\tStates\tInputs\tOutputs\t"
 		"Generated\tDuplicates\tNoADS\tNotStronglyConnected\tUnreduced\n");
 	size_t cUnreduced, cNotSC, cNoADS, cEq, cSat;

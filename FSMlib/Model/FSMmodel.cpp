@@ -18,8 +18,12 @@
 #include "stdafx.h"
 
 #include <sstream>
+#ifdef _WIN32
 #include <process.h>
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
 #include "FSMmodel.h"
 
 #define SEQUENCE_SEPARATOR       ","
@@ -193,7 +197,11 @@ namespace FSMmodel {
 
 	static bool createImage(string fileName, string extension) {
 		extension = "-T" + extension;
+#ifdef _WIN32
 		auto rv = _spawnlp(P_WAIT, "dot", "dot", extension.c_str(), "-O", fileName.c_str(), NULL);
+#else
+		auto rv = 1;// TODO
+#endif
 		return (rv == 0);
 	}
 

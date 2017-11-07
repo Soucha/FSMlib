@@ -561,7 +561,7 @@ namespace FSMlearning {
 		if (!ads) {
 			state_t expectedState = NULL_STATE;
 			if (node->extraStateLevel > 1) {
-				auto& parent = node->parent.lock();
+				auto parent = node->parent.lock();
 				expectedState = ot.conjecture->getNextState(*(parent->refStates.begin()), parent->nextInputs[node->incomingInputIdx]);
 			}
 			ads = make_shared<ads_t>();
@@ -613,7 +613,7 @@ namespace FSMlearning {
 
 	// returns false if a new state was found
 	static bool distinguishFromPrefixes(const shared_ptr<ot_node_t>& node, const shared_ptr<ot_node_t>& prevNode, ObservationTree& ot, const unique_ptr<Teacher>& teacher) {
-		auto& parent = prevNode->parent.lock();
+		auto parent = prevNode->parent.lock();
 		if (parent && (parent->state != NULL_STATE)) {
 			if (!distinguishFromPrefixes(node, parent, ot, teacher)) return false;
 		}

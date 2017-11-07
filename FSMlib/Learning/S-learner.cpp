@@ -22,7 +22,7 @@ using namespace FSMtesting;
 
 namespace FSMlearning {
 
-#define DUMP_OQ 0
+#define DUMP_OQ 1
 
 #define CHECK_PREDECESSORS 0
 
@@ -664,7 +664,8 @@ namespace FSMlearning {
 					}
 					li.testedState = NULL_STATE;
 					if (li.inconsistentSequence.empty()) {
-						li.inconsistentSequence = getQueriedSeparatingSequenceOfCN(fromCN, toCN, cn_pair_set_t());
+						cn_pair_set_t closed;
+						li.inconsistentSequence = getQueriedSeparatingSequenceOfCN(fromCN, toCN, closed);
 						li.testedState = toCN->state;
 						li.testedInput = STOUT_INPUT;
 						if (li.inconsistentSequence.empty()) {
@@ -872,10 +873,10 @@ namespace FSMlearning {
 			if (node->state == NULL_STATE) {
 				auto parentCN = node->parent.lock()->convergentNode.lock();
 				auto input = node->accessSequence.back();
-				auto& refCN = (*(node->convergentNode.lock()->domain.begin()))->convergent.front()->convergentNode.lock();
+				auto refCN = (*(node->convergentNode.lock()->domain.begin()))->convergent.front()->convergentNode.lock();
 //#if CHECK_PREDECESSORS
 				cn_pair_set_t closed;
-				auto& cn = node->convergentNode.lock();
+				auto cn = node->convergentNode.lock();
 				if (areConvergentNodesDistinguished(cn, refCN, closed)) {
 					cn->domain.erase(refCN.get());
 					storeInconsistentNode(node, li, LearningInfo::EMPTY_CN_DOMAIN);
@@ -895,13 +896,14 @@ namespace FSMlearning {
 					}
 #else
 					if ((li.testedState != NULL_STATE) && (li.testedInput == STOUT_INPUT)) {
-						 auto sepSeq = getQueriedSeparatingSequenceOfCN(li.inconsistentNodes.back()->convergentNode.lock(),
-							 li.ot.rn[li.testedState], cn_pair_set_t());
-						 if (sepSeq.empty()) {
-							 throw;
-						 }
-						 li.testedInput = input_t(sepSeq.size()); // a hack to derive separating suffix
-						 li.inconsistentSequence.splice(li.inconsistentSequence.end(), move(sepSeq));
+						cn_pair_set_t closed;
+						auto sepSeq = getQueriedSeparatingSequenceOfCN(li.inconsistentNodes.back()->convergentNode.lock(),
+							li.ot.rn[li.testedState], closed);
+						if (sepSeq.empty()) {
+							throw;
+						}
+						li.testedInput = input_t(sepSeq.size()); // a hack to derive separating suffix
+						li.inconsistentSequence.splice(li.inconsistentSequence.end(), move(sepSeq));
 					}
 					li.inconsistentNodes.clear();
 					storeInconsistentNode(node, li, LearningInfo::WRONG_MERGE);
@@ -1312,7 +1314,7 @@ namespace FSMlearning {
 		}
 		if (cn->domain.size() == 2) {// query sepSeq
 			//auto idx = FSMsequence::getStatePairIdx((*(cn->domain.begin()))->state, (*(cn->domain.rbegin()))->state);
-			auto sepSeq = getQueriedSeparatingSequence((*(cn->domain.begin()))->convergent.front(), (*(cn->domain.rbegin()))->convergent.front());
+			auto sepSeq = getQueriedSeparatingSequence((*(cn->domain.begin()))->convergent.front(), (*(++(cn->domain.begin())))->convergent.front());
 			//cn_pair_set_t closed;
 			//auto sepSeq = getQueriedSeparatingSequenceOfCN(
 				//li.ot.rn[(*(cn->domain.begin()))->state], 
@@ -1442,8 +1444,10 @@ namespace FSMlearning {
 		}
 	}
 
-	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, OTree& ot) {
+	static void generateConvergentSubtree(const shared_ptr<ConvergentNode>& cn, OTree& ot, 
+			const shared_ptr<ConvergentNode>& origCN = nullptr) {
 		const auto& node = cn->convergent.front();
+		if (origCN) origCN->convergent.remove(node);
 		node->convergentNode = cn;
 		if (!cn->isRN) {
 			for (auto& state : node->domain) {
@@ -1457,7 +1461,23 @@ namespace FSMlearning {
 					//node->next[input]->state = NULL_STATE;
 					cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
 				}
-				generateConvergentSubtree(cn->next[input], ot);
+				if (origCN) {
+					if (origCN->next[input]->convergent.size() == 1) {
+						cn->next[input].swap(origCN->next[input]);
+					} else {
+						if (node->next[input]->observationStatus != OTreeNode::QUERIED_RN) {// not a state node
+							//node->next[input]->state = NULL_STATE;
+							cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
+						}
+						generateConvergentSubtree(cn->next[input], ot, origCN->next[input]);
+					}
+				} else {
+					if (node->next[input]->observationStatus != OTreeNode::QUERIED_RN) {// not a state node
+						//node->next[input]->state = NULL_STATE;
+						cn->next[input] = make_shared<ConvergentNode>(node->next[input]);
+					}
+					generateConvergentSubtree(cn->next[input], ot);
+				}
 			}
 		}
 	}
@@ -1524,42 +1544,18 @@ namespace FSMlearning {
 			}
 			parent = node->parent.lock();
 		}
-		//if (node->observationStatus == WRONG_STATE) node->observationStatus = 0;
-		/*sequence_set_t hsi;
-		// update hsi
-		for (state_t state = 0; state < li.ot.rn.size(); state++) {
-			sequence_in_t sepSeq;
-			if ((node->observationStatus == NULL_STATE) || (node->observationStatus == state) ||
-				!isSeparatingSequenceQueried(node, state, sepSeq, li)) {
-				sepSeq = getQueriedSeparatingSequence(node, li.ot.rn[state]->convergent.front());
-				if (!isPrefix(sepSeq, li.stateIdentifier[state])) {
-					removePrefixes(sepSeq, li.stateIdentifier[state]);
-					li.stateIdentifier[state].emplace(sepSeq);
-				}
-			}// else sepSeq is set to a separating prefix of the sep. seq. of (state,node->observationStatus), see isSeparatingSequenceQueried
-			if (!isPrefix(sepSeq, hsi)) {
-				removePrefixes(sepSeq, hsi);
-				hsi.emplace(sepSeq);
-			}
-			li.separatingSequences.emplace_back(move(sepSeq));
-		}
-		li.stateIdentifier.emplace_back(move(hsi));
-		*/
 		node->observationStatus = OTreeNode::QUERIED_RN;
 		node->state = li.conjecture->addState(node->stateOutput);
 		li.conjecture->setTransition(parent->state, node->accessSequence.back(), node->state,
 			(li.conjecture->isOutputTransition() ? node->incomingOutput : DEFAULT_OUTPUT));
-		li.ot.rn.emplace_back(make_shared<ConvergentNode>(node, true));
 		auto cn = node->convergentNode.lock();
-		node->convergentNode = li.ot.rn.back();
+		li.ot.rn.emplace_back(make_shared<ConvergentNode>(node, true));
+		generateConvergentSubtree(li.ot.rn.back(), li.ot, cn);
+		/*
 		if (cn) {
-			cn->convergent.remove(node);
-			if (cn->convergent.empty()) {
-				li.ot.rn.back()->next.swap(cn->next);
-				auto& parentCN = node->parent.lock()->convergentNode.lock();
-				parentCN->next[node->accessSequence.back()] = li.ot.rn.back();
-			}
-			else {
+			if (cn->isRN) {
+				cn->convergent.remove(node);
+				node->convergentNode = li.ot.rn.back();
 				for (input_t i = 0; i < cn->next.size(); i++) {
 					if (cn->next[i] && node->next[i]) {
 						bool hasSucc = false;
@@ -1575,7 +1571,18 @@ namespace FSMlearning {
 					}
 				}
 			}
+			else {
+				cn->isRN = true;
+				cn->state = node->state;
+				cn->convergent.remove(node);
+				cn->convergent.emplace_front(node);
+				li.ot.rn.emplace_back(cn);
+			}
 		}
+		else {
+			li.ot.rn.emplace_back(make_shared<ConvergentNode>(node, true));
+			node->convergentNode = li.ot.rn.back();
+		}*/
 		li.ot.rn[parent->state]->next[node->accessSequence.back()] = li.ot.rn.back();
 
 		return updateAndInitCN(node, li, teacher);
@@ -1869,11 +1876,11 @@ namespace FSMlearning {
 		auto inconsNode = move(li.inconsistentNodes.front());
 		li.inconsistentNodes.pop_front();
 		if ((inconsNode->state != NULL_STATE) && (!inconsNode->domain.count(inconsNode->state))) {
-			li.inconsistency = LearningInfo::EMPTY_CN_DOMAIN;
+			li.inconsistency = LearningInfo::INCONSISTENT_DOMAIN;
 			resolveInconsistentDomain(inconsNode, li, teacher);
 		}
 		else {
-			auto& cn1 = inconsNode->convergentNode.lock();
+			auto cn1 = inconsNode->convergentNode.lock();
 			if (cn1->domain.empty()) {
 				resolveEmptyDomain(inconsNode, li, teacher);
 			}
@@ -1949,7 +1956,7 @@ namespace FSMlearning {
 	
 	static shared_ptr<s_ads_cv_t> getADSwithFixedPrefix(shared_ptr<OTreeNode> node, LearningInfo& li) {
 		auto ads = make_shared<s_ads_cv_t>();
-		auto& cn = node->convergentNode.lock();
+		auto cn = node->convergentNode.lock();
 		for (auto& sn : cn->domain) {
 			ads->nodes.push_back(sn->convergent);
 		}

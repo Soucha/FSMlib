@@ -31,7 +31,7 @@ namespace FSMsequence {
 		}
 	};
 
-	extern int MAX_CLOSED;
+	int MAX_CLOSED = 10000;
 #if SEQUENCES_PERFORMANCE_TEST
 	extern string testOut;
 #endif // SEQUENCES_PERFORMANCE_TEST

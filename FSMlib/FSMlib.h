@@ -16,32 +16,42 @@
 */
 #pragma once
 
-#ifdef FSMLIB_EXPORTS
-#define FSMLIB_API __declspec(dllexport)
+#ifdef _WIN32
+	#ifdef FSMLIB_EXPORTS
+	#define FSMLIB_API __declspec(dllexport)
+	#else
+	#define FSMLIB_API __declspec(dllimport)
+
+	#ifdef __CUDA_ARCH__
+	#define PARALLEL_COMPUTING
+	#endif
+
+	#include "Model\FSMmodel.h"
+	#include "Sequences\FSMsequence.h"
+	#include "Testing\FSMtesting.h"
+	#include "Testing\FaultCoverageChecker.h"
+	#include "Learning\FSMlearning.h"
+
+	#include "PrefixSet.h"
+	#include "UnionFind.h"
+	#endif
 #else
-#define FSMLIB_API __declspec(dllimport)
-
-#ifdef __CUDA_ARCH__
-#define PARALLEL_COMPUTING
-#endif
-
-#include "Model\FSMmodel.h"
-#include "Sequences\FSMsequence.h"
-#include "Testing\FSMtesting.h"
-#include "Testing\FaultCoverageChecker.h"
-#include "Learning\FSMlearning.h"
-
-#include "PrefixSet.h"
-#include "UnionFind.h"
+	#define FSMLIB_API
 #endif
 
 namespace FSMlib {
 #define ERROR_MESSAGE_MAX_LEN	250
+#ifdef _WIN32
 #define ERROR_MESSAGE(format, ...) {\
 	char msg[ERROR_MESSAGE_MAX_LEN];\
 	_snprintf_s(msg, ERROR_MESSAGE_MAX_LEN, _TRUNCATE, format, ##__VA_ARGS__); \
 	FSMlib::noticeListeners(msg); }
-	
+#else
+#define ERROR_MESSAGE(format, ...) {\
+	char msg[ERROR_MESSAGE_MAX_LEN];\
+	snprintf(msg, ERROR_MESSAGE_MAX_LEN, format, ##__VA_ARGS__); \
+	FSMlib::noticeListeners(msg); }
+#endif	
 	/**
 	* Writes given error message in std::cerr stream.
 	*/

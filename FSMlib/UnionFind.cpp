@@ -16,6 +16,7 @@
 */
 #include "stdafx.h"
 
+#include <string>
 #include "UnionFind.h"
 
 namespace FSMlib {

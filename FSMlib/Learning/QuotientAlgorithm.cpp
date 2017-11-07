@@ -253,16 +253,18 @@ namespace FSMlearning {
 					}
 					conjecture->incNumberOfInputs(teacher->getNumberOfInputs() - conjecture->getNumberOfInputs());
 				}
-				if (conjecture->isOutputState()) {// check CE for interleaving with STOUT_INPUT
-					sequence_in_t newCE;
+				sequence_in_t newCE;
+				if (conjecture->isOutputState()) {// check CE for interleaving with STOUT_INPUT				      
 					for (auto& input : ce) {
 						if (input == STOUT_INPUT) continue;
 						newCE.emplace_back(input);
 						newCE.emplace_back(STOUT_INPUT);
 					}
-					ce.swap(newCE);
+					ce = newCE;
+				} else {
+					newCE = ce;
 				}
-				extendNode(ot, sequence_in_t(ce), conjecture, teacher);
+				extendNode(ot, newCE, conjecture, teacher);
 				auto node = ot;
 				while (!ce.empty()) {
 					if (ce.front() != STOUT_INPUT) {

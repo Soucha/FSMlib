@@ -14,26 +14,7 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
-#include <chrono>
-#include <fstream>
-#include <filesystem>
-
-#ifndef PARALLEL_COMPUTING
-//#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
-#endif // !PARALLEL_COMPUTING
-#include "../FSMlib/FSMlib.h"
-
-using namespace FSMsequence;
-using namespace FSMtesting;
-using namespace FSMlearning;
-
-#define DATA_PATH			string("../data/")
-#define MINIMIZATION_DIR	string("tests/minimization/")
-#define SEQUENCES_DIR		string("tests/sequences/")
-#define EXAMPLES_DIR		string("examples/")
-#define EXPERIMENTS_DIR		string("experiments/")
-#define OUTPUT_GV			string(DATA_PATH + "tmp/output.gv").c_str()
+#include "commons.h"
 
 #define PTRandSTR(f) f, #f
 
@@ -165,17 +146,15 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	}
 }
 
-using namespace std::tr2::sys;
-
 void testDirLearning(int argc, char** argv) {
 	string outFilename = "";
 	auto dir = string(argv[2]);
 	state_t maxExtraStates = 2;
 	seq_len_t maxDistLen = 2;
 	bool isEQallowed = true;
-	unsigned int machineTypeMask = unsigned int(-1);// all
+	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
-	unsigned int algorithmMask = unsigned int(-1);//all
+	unsigned int algorithmMask = (unsigned int)(-1);//all
 	unsigned int teacherMask = 1;//TEACHER_DFSM
 	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
@@ -212,7 +191,12 @@ void testDirLearning(int argc, char** argv) {
 		}
 	}
 	if (outFilename.empty()) outFilename = dir + "_resultsLearning.csv";
+#ifdef _WIN32
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#else
+	  outFile = fopen(outFilename.c_str(), "w");
+	  if (!outFile) {
+#endif
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;
 	}

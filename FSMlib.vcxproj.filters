@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{a7f16440-eec3-4ca4-a919-e014c199c8ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{268b26ae-517e-480c-af1a-65cd4e08e4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sequences">
+      <UniqueIdentifier>{ddcfba2e-55a6-48e2-b025-39598fd25bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sequences">
+      <UniqueIdentifier>{1c06fd94-5f87-48f7-9927-36ac4af32c0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Testing">
+      <UniqueIdentifier>{11ed4c6a-3abc-46cc-aef0-7647c3cdfeac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Testing">
+      <UniqueIdentifier>{b2d46ebd-51ab-4c12-93cb-0ec7eb1b66ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Learning">
+      <UniqueIdentifier>{3aba69e3-f5d4-40c0-a673-a1d7eb6aa046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Learning">
+      <UniqueIdentifier>{cb5c86f6-fe7e-444f-bc5f-b0b9ec164331}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FSMlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\FSMtypes.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Moore.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\FSM.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\DFSM.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\DFA.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\FSMmodel.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Mealy.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Sequences\FSMsequence.h">
+      <Filter>Header Files\Sequences</Filter>
+    </ClInclude>
+    <ClInclude Include="PrefixSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\FSMtesting.h">
+      <Filter>Header Files\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="UnionFind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Testing\FaultCoverageChecker.h">
+      <Filter>Header Files\Testing</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\BlackBox.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\Teacher.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\FSMlearning.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\BlackBoxDFSM.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\TeacherDFSM.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\TeacherBB.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+    <ClInclude Include="Learning\TeacherRL.h">
+      <Filter>Header Files\Learning</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Moore.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\DFA.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\DFSM.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\FSMmodel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Mealy.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="FSMlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\FSMcovers.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\PresetDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\AdaptiveDistinguishingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\StateVerifyingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\SynchronizingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\HomingSequence.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\CharacterizingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefixSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\DistinguishingSequences.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\PDS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\ADS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\SVS-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\W-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\Wp-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\HSI-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\H-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\SPY-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\C-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\Ma-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="UnionFind.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\Mg-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\Mstar-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\FaultCoverageChecker.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\BlackBoxDFSM.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherBB.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherDFSM.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\Lstar.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TeacherRL.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\DiscriminationTreeAlgorithm.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\ObservationPackAlgorithm.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\QuotientAlgorithm.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\TTT.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\GoodSplit.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\S-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Testing\SPYH-method.cpp">
+      <Filter>Source Files\Testing</Filter>
+    </ClCompile>
+    <ClCompile Include="Sequences\SplittingTree.cpp">
+      <Filter>Source Files\Sequences</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\H-learner.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\SPY-learner.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+    <ClCompile Include="Learning\S-learner.cpp">
+      <Filter>Source Files\Learning</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\FSMvis.html" />
+  </ItemGroup>
+</Project>

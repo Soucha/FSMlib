@@ -114,6 +114,9 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		unique_ptr<SplittingTree> st;
 	};
 
+	static sequence_set_t emptySeqSet;
+	static vector<sequence_set_t> emptySeqSetVector;
+
 	/**
 	* Designs a test suite in which all transitions are confirmed
 	* using appended Preset Distinguishing Sequence.
@@ -193,7 +196,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t W_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
-		sequence_set_t& CSet = sequence_set_t());
+		const sequence_set_t& CSet = emptySeqSet);
 	
 	/**
 	* Designs a test suite in which all transitions are confirmed
@@ -216,7 +219,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
-		vector<sequence_set_t>& SCSets = vector<sequence_set_t>());
+		const vector<sequence_set_t>& SCSets = emptySeqSetVector);
 	
 	/**
 	* Designs a test suite in which all states and transitions are confirmed
@@ -236,7 +239,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t HSI_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
-		vector<sequence_set_t>& HSI = vector<sequence_set_t>());
+		const vector<sequence_set_t>& HSI = emptySeqSetVector);
 
 	/**
 	* Designs a test suite in which all state pairs are distinguished and thus confirmed
@@ -274,7 +277,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	* @return a Test Suite, or an empty collection if extraStates is negative or the FSM is not compact
 	*/
 	FSMLIB_API sequence_set_t SPY_method(const unique_ptr<DFSM>& fsm, int extraStates = 0,
-		vector<sequence_set_t>& HSI = vector<sequence_set_t>());
+		const vector<sequence_set_t>& HSI = emptySeqSetVector);
 
 	/// TODO
 	/**

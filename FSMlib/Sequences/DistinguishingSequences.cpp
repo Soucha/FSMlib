@@ -20,7 +20,7 @@
 #include "../PrefixSet.h"
 
 namespace FSMsequence {
-	int MAX_CLOSED = 1000000;
+	extern int MAX_CLOSED;
 #if SEQUENCES_PERFORMANCE_TEST
 	int closedCount, openCount;
 	string testOut = "";

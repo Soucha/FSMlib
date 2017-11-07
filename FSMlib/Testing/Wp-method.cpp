@@ -22,7 +22,7 @@
 using namespace FSMsequence;
 
 namespace FSMtesting {
-	sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates, vector<sequence_set_t>& SCSets) {
+	sequence_set_t Wp_method(const unique_ptr<DFSM>& fsm, int extraStates, const vector<sequence_set_t>& H) {
 		RETURN_IF_UNREDUCED(fsm, "FSMtesting::Wp_method", sequence_set_t());
 		if (extraStates < 0) {
 			return sequence_set_t();
@@ -30,7 +30,9 @@ namespace FSMtesting {
 		auto stateCover = getStateCover(fsm);
 		auto traversalSet = getTraversalSet(fsm, extraStates);
 		traversalSet.emplace(sequence_in_t());
-		if (SCSets.empty()) SCSets = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
+		vector<sequence_set_t> SCSetsTmp, &SCSets(SCSetsTmp);
+		if (H.empty()) SCSetsTmp = getStatesCharacterizingSets(fsm, getStatePairsShortestSeparatingSequences, true, reduceSCSet_LS_SL);
+		else SCSets = H;
 		bool startWithStout = (SCSets[0].begin()->front() == STOUT_INPUT);
 		FSMlib::PrefixSet pset;
 

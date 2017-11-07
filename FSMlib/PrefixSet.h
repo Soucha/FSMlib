@@ -16,7 +16,7 @@
 */
 #pragma once
 
-#include "Sequences\FSMsequence.h"
+#include "Sequences/FSMsequence.h"
 
 namespace FSMlib {
 	struct prefix_set_node_t;

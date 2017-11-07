@@ -14,25 +14,7 @@
 * You should have received a copy of the GNU General Public License along with
 * FSMlib. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <iostream>
-#include <chrono>
-#include <fstream>
-#include <filesystem>
-
-#ifndef PARALLEL_COMPUTING
-//#define PARALLEL_COMPUTING // un/comment this if CUDA is enabled/disabled
-#endif // !PARALLEL_COMPUTING
-#include "../FSMlib/FSMlib.h"
-
-using namespace FSMsequence;
-using namespace FSMtesting;
-
-#define DATA_PATH			string("../data/")
-#define MINIMIZATION_DIR	string("tests/minimization/")
-#define SEQUENCES_DIR		string("tests/sequences/")
-#define EXAMPLES_DIR		string("examples/")
-#define EXPERIMENTS_DIR		string("experiments/")
-#define OUTPUT_GV			string(DATA_PATH + "tmp/output.gv").c_str()
+#include "commons.h"
 
 static FILE * outFile;
 
@@ -159,13 +141,10 @@ static void analyseSepSeq(const unique_ptr<DFSM>& fsm) {
 	fflush(outFile);
 }
 
-
-using namespace std::tr2::sys;
-
 void analyseDirMachines(int argc, char** argv) {
 	string outDir = "";
 	auto dir = string(argv[2]);
-	unsigned int machineTypeMask = unsigned int(-1);// all
+	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
 	input_t inputsRestrictionLess = STOUT_INPUT, inputsRestrictionGreater = STOUT_INPUT;
 	output_t outputsRestrictionLess = DEFAULT_OUTPUT, outputsRestrictionGreater = DEFAULT_OUTPUT;
@@ -237,7 +216,12 @@ void analyseDirMachines(int argc, char** argv) {
 						auto it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType());
 						if (it == files.end()) {
 							auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + ".csv";
-							if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#ifdef _WIN32
+	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#else
+	  outFile = fopen(outFilename.c_str(), "w");
+	  if (!outFile) {
+#endif
 								cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
 								return;
 							}
@@ -251,7 +235,12 @@ void analyseDirMachines(int argc, char** argv) {
 						it = files.find(fsm->getNumberOfStates() * 20 + 2 * fsm->getType() + 1);
 						if (it == files.end()) {
 							auto outFilename = outDir + machineTypeNames[fsm->getType()] + "_" + to_string(fsm->getNumberOfStates()) + "_SepSeq.csv";
-							if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#ifdef _WIN32
+	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#else
+	  outFile = fopen(outFilename.c_str(), "w");
+	  if (!outFile) {
+#endif
 								cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
 								return;
 							}
@@ -276,7 +265,12 @@ void analyseDirMachines(int argc, char** argv) {
 	}
 	if (!severalFiles) {
 		auto outFilename = outDir + "SeqCounts.csv";
-		if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#ifdef _WIN32
+	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
+#else
+	  outFile = fopen(outFilename.c_str(), "w");
+	  if (!outFile) {
+#endif
 			cerr << "Unable to open file " << outFilename << " for analysis!" << endl;
 			return;
 		}

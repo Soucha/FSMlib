@@ -142,7 +142,7 @@ namespace FSMsequence {
 					if (!diffStates.insert(*nIt).second) {
 						undistinguished++;
 					}
-					undistinguished += (c - 1);
+					undistinguished += (state_t)(c - 1);
 				}
 			}
 			if (!diffStates.empty()) {

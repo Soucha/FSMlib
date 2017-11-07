@@ -242,7 +242,7 @@ namespace FSMlearning {
 	static bool areNodeAndConvergentDifferentUnder(const shared_ptr<spy_node_t>& node, convergent_node_t* cn) {
 		if (node->stateOutput != cn->convergent.front()->stateOutput) return true;
 #if CHECK_PREDECESSORS
-		auto& cn1 = node->convergentNode.lock();
+		auto cn1 = node->convergentNode.lock();
 		if (cn->requestedQueries || cn1->requestedQueries)  {
 			if (cn->requestedQueries && cn1->requestedQueries) {
 				if (cn1.get() != cn) return true;
@@ -1258,7 +1258,7 @@ namespace FSMlearning {
 			if (node->state == NULL_STATE) {
 				auto parentCN = node->parent.lock()->convergentNode.lock();
 				auto input = node->accessSequence.back();
-				auto& refCN = (*(node->convergentNode.lock()->domain.begin()))->convergent.front()->convergentNode.lock();
+				auto refCN = (*(node->convergentNode.lock()->domain.begin()))->convergent.front()->convergentNode.lock();
 				if (!mergeConvergentNoES(parentCN->next[input], refCN, ot)) {
 					refCN->convergent.remove(node);
 					node->assumedState = node->state = NULL_STATE;
@@ -1833,7 +1833,7 @@ namespace FSMlearning {
 			cn->convergent.remove(node);
 			if (cn->convergent.size() == 0) {
 				ot.stateNodes.back()->next = move(cn->next);
-				auto& parentCN = node->parent.lock()->convergentNode.lock();
+				auto parentCN = node->parent.lock()->convergentNode.lock();
 				parentCN->next[node->accessSequence.back()] = ot.stateNodes.back();
 			}
 		}
@@ -1874,7 +1874,7 @@ namespace FSMlearning {
 		return move(node);
 	}
 	
-	static bool proveSepSeqOfEmptyDomainIntersection(shared_ptr<spy_node_t> n1, list<shared_ptr<spy_node_t>>& nodes2,
+	static bool proveSepSeqOfEmptyDomainIntersection(shared_ptr<spy_node_t> n1, const list<shared_ptr<spy_node_t>>& nodes2,
 			sequence_in_t& sepSeq, SPYObservationTree& ot, const unique_ptr<Teacher>& teacher) {
 		n1 = queryIfNotQueried(n1, sepSeq, ot, teacher);
 		if (!n1) {
@@ -2301,7 +2301,7 @@ namespace FSMlearning {
 			}
 		}
 		else {
-			auto& cn1 = n1->convergentNode.lock();
+			auto cn1 = n1->convergentNode.lock();
 			if (cn1->domain.empty()) {
 				auto n2 = n1->parent.lock();
 				sequence_in_t sepSeq;
@@ -2374,7 +2374,7 @@ namespace FSMlearning {
 	
 	static shared_ptr<ads_cv_t> getADSwithFixedPrefix(shared_ptr<spy_node_t> node, SPYObservationTree& ot) {
 		auto ads = make_shared<ads_cv_t>();
-		auto& cn = node->convergentNode.lock();
+		auto cn = node->convergentNode.lock();
 		for (auto& sn : cn->domain) {
 			ads->nodes.push_back(sn->convergent);
 		}
@@ -2691,10 +2691,12 @@ namespace FSMlearning {
 									ot.queriesFromNextState.erase(reqIt);
 									reqIt = ot.queriesFromNextState.end();
 								}
-								ot.testedState = ot.conjecture->getNextState(ot.testedState, ot.testedInput);
-								node = ot.stateNodes[ot.testedState]->convergent.front();
-								queryRequiredSequence(node, ot.stateNodes[ot.testedState]->requestedQueries,
-									reqIt->second.front(), ot, teacher);
+								if (reqIt != ot.queriesFromNextState.end()) {
+									ot.testedState = ot.conjecture->getNextState(ot.testedState, ot.testedInput);
+									node = ot.stateNodes[ot.testedState]->convergent.front();
+									queryRequiredSequence(node, ot.stateNodes[ot.testedState]->requestedQueries,
+										reqIt->second.front(), ot, teacher);
+								}
 							}
 							/*
 							while (cn->requestedQueries->seqCount == 0) {

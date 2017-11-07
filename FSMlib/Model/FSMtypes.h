@@ -32,6 +32,7 @@
 #include <memory>
 #include <functional>
 #include <time.h>
+#include <algorithm>
 
 #include "../FSMlib.h"
 

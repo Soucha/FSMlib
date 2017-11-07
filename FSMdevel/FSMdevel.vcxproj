@@ -236,6 +236,10 @@
     <ClCompile Include="HSIdesignComparison.cpp" />
     <ClCompile Include="MachinesAnalysis.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="oldFunctions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="commons.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
