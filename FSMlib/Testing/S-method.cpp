@@ -398,7 +398,7 @@ namespace FSMtesting {
 				fifo.pop();
 				for (input_t input = 0; input < numInputs; input++) {
 					const auto& nn = node->next[input];
-					if (nn && (!stateNodes[nn->state] || (nn->observationStatus == OTreeNode::QUERIED_RN))) {
+					if (nn && (!stateNodes[nn->state] || (nn->observationStatus == OTreeNode::QUERIED_SN))) {
 						if (!stateNodes[nn->state]) {
 							stateNodes[nn->state] = make_shared<ConvergentNode>(nn, true);
 							nn->convergentNode = stateNodes[nn->state];
@@ -442,7 +442,7 @@ namespace FSMtesting {
 		// make state cover divergence preserving
 		for (const auto& sn : stateNodes) {
 			while (sn->convergent.size() > 1) {
-				if (sn->convergent.back()->observationStatus == OTreeNode::QUERIED_RN) {
+				if (sn->convergent.back()->observationStatus == OTreeNode::QUERIED_SN) {
 					swap(sn->convergent.front(), sn->convergent.back());
 				}
 				sn->convergent.back()->convergentNode.reset();

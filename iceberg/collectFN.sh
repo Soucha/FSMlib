@@ -7,16 +7,23 @@
 # done
 
 for type in "DFSM"; do
-    for N in 1000; do
-	for P in 5; do
-	    for filename in /data/acp15ms/exp/FN/${type}_R${N}_${P}*.csv; do
-		#echo $(basename "${filename}") # code if not found
-		wc -l ${filename} 
-		#if ! grep -q $(basename "${filename}") /data/acp15ms/exp/testing${type}_${N}.csv
-		#then
-		 #   qsub -v MT=$type,STATES=${N},FN=$(basename "${filename}") testingExperimentFN.sh
-		#fi
+    for N in 1000 800; do
+	for P in 10; do
+	    fileCVS=/data/acp15ms/exp/testing${type}_${N}_${P}.csv
+	    rm -f ${fileCVS}
+	    #echo "line" >> $fileCVS
+	    for filename in /data/acp15ms/exp/FN/testing${type}_R${N}_${P}*.csv; do
+		if [ -f $fileCVS ] ; then
+		    sed 1d ${filename} | cat >> "$fileCVS"
+		else
+		    cat "${filename}" >> "$fileCVS"
+		fi
+#echo $(basename "${filename}") # code if not found
+		#sed -i -e '$a\' -e ${filename} /data/acp15ms/exp/testing${type}_${N}_${P}.csv
+#		echo ${filename} >> /data/acp15ms/exp/testing${type}_${N}_${P}.csv
+		#wc -l ${filename}
 	    done
+	    wc -l /data/acp15ms/exp/testing${type}_${N}_${P}.csv
 	done
     done
 done

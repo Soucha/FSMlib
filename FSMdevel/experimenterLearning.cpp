@@ -55,7 +55,7 @@ static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>&
 static vector<string> descriptions;
 static vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 
-static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {
+static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask, unsigned int startId) {
 	if (mask & 1) { // L*
 		vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 		ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
@@ -64,7 +64,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 		ceFunc.emplace_back(PTRandSTR(addSuffixAfterLastStateToE));
 		ceFunc.emplace_back(PTRandSTR(addSuffixToE_binarySearch));
 		for (size_t i = 0; i < ceFunc.size(); i++) {
-			descriptions.emplace_back("L*\t" + ceFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
+			descriptions.emplace_back("L*\t" + ceFunc[i].second + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(Lstar, placeholders::_1, ceFunc[i].first, nullptr, (i == 2), (i > 2)));
 		}
 	}
@@ -74,45 +74,45 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 		opCeFunc.emplace_back(PTRandSTR(OneGlobally));
 		opCeFunc.emplace_back(PTRandSTR(OneLocally));
 		for (size_t i = 0; i < opCeFunc.size(); i++) {
-			descriptions.emplace_back("OP\t" + opCeFunc[i].second + "\t" + to_string(descriptions.size()) + "\t");
+			descriptions.emplace_back("OP\t" + opCeFunc[i].second + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(ObservationPackAlgorithm, placeholders::_1, opCeFunc[i].first, nullptr));
 		}
 	}
 	if (mask & 4) { // DT
-		descriptions.emplace_back("DT\t\t" + to_string(descriptions.size()) + "\t");
+		descriptions.emplace_back("DT\t\t" + to_string(descriptions.size() + startId) + "\t");
 		algorithms.emplace_back(bind(DiscriminationTreeAlgorithm, placeholders::_1, nullptr));
 	}
 	if (mask & 8) { // TTT
-		descriptions.emplace_back("TTT\t\t" + to_string(descriptions.size()) + "\t");
+		descriptions.emplace_back("TTT\t\t" + to_string(descriptions.size() + startId) + "\t");
 		algorithms.emplace_back(bind(TTT, placeholders::_1, nullptr));
 	}
 	if (mask & 16) { // Quotient
-		descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size()) + "\t");
+		descriptions.emplace_back("Quotient\t\t" + to_string(descriptions.size() + startId) + "\t");
 		algorithms.emplace_back(bind(QuotientAlgorithm, placeholders::_1, nullptr));
 	}
 	if (mask & 32) { // GoodSplit
 		descriptions.emplace_back("GoodSplit\tmaxDistLen:" + to_string(maxDistLen) + 
-			(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+			(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 		algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 	}
 	if (mask & 64) { // Hlearner
 		for (state_t i = 0; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("Hlearner\tExtraStates:" + to_string(i) + 
-				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(Hlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
 	if (mask & 128) { // SPYlearner
 		for (state_t i = 0; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("SPYlearner\tExtraStates:" + to_string(i) +
-				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(SPYlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
 	if (mask & 256) { // Slearner
 		for (state_t i = 0; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("Slearner\tExtraStates:" + to_string(i) +
-				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(Slearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
@@ -156,6 +156,7 @@ void testDirLearning(int argc, char** argv) {
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
 	unsigned int algorithmMask = (unsigned int)(-1);//all
 	unsigned int teacherMask = 1;//TEACHER_DFSM
+	unsigned int algStartIdx = 0;
 	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
 			outFilename = string(argv[++i]);
@@ -186,6 +187,9 @@ void testDirLearning(int argc, char** argv) {
 		else if (strcmp(argv[i], "-a") == 0) {//algorithm
 			algorithmMask = atoi(argv[++i]);
 		}
+		else if (strcmp(argv[i], "-ai") == 0) {//algorithm start indes
+			algStartIdx = atoi(argv[++i]);
+		}
 		else if (strcmp(argv[i], "-t") == 0) {//teacher
 			teacherMask = atoi(argv[++i]);
 		}
@@ -202,7 +206,7 @@ void testDirLearning(int argc, char** argv) {
 	}
 	fprintf(outFile, "Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tBBresets\tBBsymbols\tseconds\t"
 		"Algorithm\tCEprocessing\tAlgId\tTeacher\tBB\tfileName\n");
-	loadAlgorithms(maxExtraStates, maxDistLen, isEQallowed, algorithmMask);
+	loadAlgorithms(maxExtraStates, maxDistLen, isEQallowed, algorithmMask, algStartIdx);
 	path dirPath(dir); 
 	directory_iterator endDir;
 	for (directory_iterator it(dirPath); it != endDir; ++it) {

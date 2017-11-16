@@ -74,7 +74,7 @@ namespace FSMlibTest
 		void setObservationStatus(const shared_ptr<OTreeNode>& node) {
 			node->observationStatus =
 				(node->convergentNode.lock()->convergent.front() == node) ?
-				OTreeNode::QUERIED_RN : OTreeNode::QUERIED_NOT_RN;
+				OTreeNode::QUERIED_SN : OTreeNode::QUERIED_NOT_IN_RN;
 			for (auto& n : node->next) {
 				if (n) setObservationStatus(n);
 			}

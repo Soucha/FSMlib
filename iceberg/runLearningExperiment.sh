@@ -6,21 +6,27 @@
 #    done
 # done
 
+for type in "DFSM" "Mealy" "Moore" "DFA"; do
+    for N in 10 20 30 40 50 60 70 80 90 100; do # 150 200 300 400 600 800 1000
+	qsub -v MT=$type,STATES=$N,ALG=127 learningExperiment.sh
+    done
+done
+
 #qsub -v MT="DFA",STATES=70,OUT_ID="_1",FNS="DFA_R70_10_AQblq.fsm",FNE="a" testingExperiment.sh
 #qsub -v MT="DFA",STATES=80,OUT_ID="_1",FNS="DFA_R80_10_XvTRH.fsm",FNE="a" testingExperiment.sh
 #qsub -v MT="Mealy",STATES=80,OUT_ID="_1",FNS="Mealy_R80_10_OxDt4.fsm",FNE="a" testingExperiment.sh
 
-for type in "DFSM"; do
-    for N in 600 400 300 200; do
-	for filename in /data/acp15ms/exp/${type}/${type}_R${N}*.fsm; do
-	    if ! grep -q $(basename "${filename}") /data/acp15ms/exp/testing${type}_${N}.csv
-	    then
-		echo $(basename "${filename}") # code if not found
-		qsub -v MT=$type,STATES=${N},FN=$(basename "${filename}") testingExperimentFN.sh
-	    fi
-	done
-    done
-done
+#for type in "DFSM"; do
+#    for N in 600 400 300 200; do
+#	for filename in /data/acp15ms/exp/${type}/${type}_R${N}*.fsm; do
+#	    if ! grep -q $(basename "${filename}") /data/acp15ms/exp/testing${type}_${N}.csv
+#	    then
+#		echo $(basename "${filename}") # code if not found
+#		qsub -v MT=$type,STATES=${N},FN=$(basename "${filename}") testingExperimentFN.sh
+#	    fi
+#	done
+#    done
+#done
 
 #for type in "Mealy" "DFA"; do
 #    for N in 100 90; do
@@ -61,3 +67,4 @@ done
 #qsub -v MT="DFA",STATES=90,OUT_ID="_1",FNS="DFA_R90_10_YsCA8.fsm",FNE="a" testingExperiment.sh
 #qsub -v MT="DFA",STATES=100,OUT_ID="_1",FNS="DFA_R100_10_ovaOd.fsm",FNE="a" testingExperiment.sh
 #qsub -v MT="DFA",STATES=150,OUT_ID="_1",FNS="DFA_R150_10_dgzeV.fsm",FNE="a" testingExperiment.sh
+

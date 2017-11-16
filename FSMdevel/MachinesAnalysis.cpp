@@ -18,6 +18,10 @@
 
 static FILE * outFile;
 
+#define SEQ_TYPES 3
+#define MACHINE_TYPES 10
+#define MAX_INPUTS 101
+
 static double getMedian(sequence_vec_t& vec) {
 	sort(vec.begin(), vec.end());
 	const auto& size = vec.size();
@@ -77,7 +81,7 @@ static void analyseAll(const unique_ptr<DFSM>& fsm) {
 }
 
 static void analyseCounts(const unique_ptr<DFSM>& fsm, map<int, vector<size_t>>& counts) {
-	auto idx = fsm->getNumberOfStates() * 30 + 3 * fsm->getType();
+	auto idx = ((fsm->getNumberOfStates() * MAX_INPUTS + fsm->getNumberOfInputs()) * MACHINE_TYPES + fsm->getType()) * SEQ_TYPES;
 	// acceess seq
 	auto sc = getStateCover(fsm, true);
 	auto it = counts.find(idx);
@@ -143,6 +147,7 @@ static void analyseSepSeq(const unique_ptr<DFSM>& fsm) {
 
 void analyseDirMachines(int argc, char** argv) {
 	string outDir = "";
+	string outFilename = "";
 	auto dir = string(argv[2]);
 	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
@@ -150,7 +155,10 @@ void analyseDirMachines(int argc, char** argv) {
 	output_t outputsRestrictionLess = DEFAULT_OUTPUT, outputsRestrictionGreater = DEFAULT_OUTPUT;
 	bool reducedOnly = false;
 	for (int i = 3; i < argc; i++) {
-		if (strcmp(argv[i], "-dir") == 0) {
+		if (strcmp(argv[i], "-o") == 0) {
+			outFilename = string(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-dir") == 0) {
 			outDir = string(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-m") == 0) {//machine type
@@ -264,7 +272,7 @@ void analyseDirMachines(int argc, char** argv) {
 		fclose(p.second);
 	}
 	if (!severalFiles) {
-		auto outFilename = outDir + "SeqCounts.csv";
+		if (outFilename.empty()) outFilename = outDir + "SeqCounts.csv";
 #ifdef _WIN32
 	if (fopen_s(&outFile, outFilename.c_str(), "w") != 0) {
 #else
@@ -275,11 +283,15 @@ void analyseDirMachines(int argc, char** argv) {
 			return;
 		}
 		for (auto p : counts) {
-			auto numStates = p.first / 30;
-			auto machineType = p.first % 30;
-			auto seqType = machineType % 3;
-			machineType /= 3;
-			fprintf(outFile, "%s_%d_%s", machineTypeNames[machineType], numStates, 
+			auto numStates = p.first / (SEQ_TYPES * MACHINE_TYPES);
+			auto numInputs = numStates % MAX_INPUTS;
+			numStates /= MAX_INPUTS;
+			auto machineType = p.first % (SEQ_TYPES * MACHINE_TYPES);
+			auto seqType = machineType % SEQ_TYPES;
+			machineType /= SEQ_TYPES;
+			fprintf(outFile, "%d\t%d\t%d\t%d\t%s_n%d_p%d_%s", 
+				machineType, numStates, numInputs, seqType,
+				machineTypeNames[machineType], numStates, numInputs, 
 				(seqType == 0) ? "as" : ((seqType == 1) ? "svs" : "sepSeq"));
 			for (auto num : p.second) {
 				fprintf(outFile, "\t%d", num);

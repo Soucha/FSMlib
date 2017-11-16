@@ -38,7 +38,7 @@ namespace FSMtesting {// all testing methods require a compact FSM
 		set<state_t> domain;
 
 		// learning attributes
-		enum condition { NOT_QUERIED, QUERIED_NOT_RN, QUERIED_RN } observationStatus = NOT_QUERIED;
+		enum condition { NOT_QUERIED, QUERIED_NOT_IN_RN, QUERIED_IN_RN, QUERIED_SN } observationStatus = NOT_QUERIED;
 		seq_len_t maxSuffixLen = 0;
 
 		OTreeNode(output_t stateOutput, state_t state, input_t numberOfInputs) :
@@ -112,6 +112,10 @@ namespace FSMtesting {// all testing methods require a compact FSM
 	struct StateCharacterization {
 		/// Splitting Tree
 		unique_ptr<SplittingTree> st;
+		/// state pairs' separating sequences
+		vector<sequence_in_t> separatingSequences;
+		/// (harmonized) state identifiers
+		vector<sequence_set_t> stateIdentifiers;
 	};
 
 	static sequence_set_t emptySeqSet;

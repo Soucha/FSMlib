@@ -140,10 +140,10 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "100multi/" + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/refMachines/" + "Mealy_R60.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_GHwoR.fsm"; //Mealy_R60_WdoSu 
-	//string fileName = DATA_PATH + "10multi/" + "DFSM_R10.fsm";//DFA_R100_0N9k1
-	string fileName = DATA_PATH + "DFSM_R80_FLcbu.fsm";//DFA_R100_0N9k1
+	string fileName = DATA_PATH + "10multi/" + "Mealy_R50_zYDyD.fsm";//DFA_R100_0N9k1 _1vV4O
+	//string fileName = DATA_PATH + "DFSM_R20.fsm";//DFA_R100_0N9k1 DFSM_R80_1M6Qp
 	//string fileName = DATA_PATH + "exp/DFA/DFA_R1000_5.fsm";//DFA_R100_0N9k1
-	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R5_SVS.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
 	//COMPUTATION_TIME(auto model = QuotientAlgorithm(teacher, nullptr);)
 	//COMPUTATION_TIME(auto model = GoodSplit(teacher, 2, nullptr,true);)
 	//COMPUTATION_TIME(auto model = Hlearner(teacher, 1, nullptr, true));// showAndStop);
-	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, showConjecture, true));// showAndStop);
+	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 0, nullptr, true));// showAndStop);
 	COMPUTATION_TIME(auto model = Slearner(teacher, 1, nullptr, true));// showAndStop);
 	printf("Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tseconds\n");
 	printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\n", FSMmodel::areIsomorphic(fsm, model), fsm->getType(),
