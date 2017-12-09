@@ -23,8 +23,8 @@
 */
 class FSMLIB_API TeacherRL : public TeacherDFSM {
 public:
-	TeacherRL(const unique_ptr<DFSM>& blackBox) :
-		TeacherDFSM(blackBox, true) {
+	TeacherRL(const unique_ptr<DFSM>& blackBox, bool keepQueries = false) :
+		TeacherDFSM(blackBox, true, keepQueries) {
 	}
 
 	virtual ~TeacherRL() {}

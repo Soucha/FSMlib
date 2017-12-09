@@ -7,23 +7,36 @@
 # done
 
 for type in "DFSM"; do
-    for N in 1000 800; do
+    for N in 1000 800 600 400 300 200; do
 	for P in 10; do
 	    fileCVS=/data/acp15ms/exp/testing${type}_${N}_${P}.csv
 	    rm -f ${fileCVS}
+	    incompFN=/data/acp15ms/exp/testing${type}_${N}_${P}_todo.txt
+	    rm -f ${incompFN}
 	    #echo "line" >> $fileCVS
 	    for filename in /data/acp15ms/exp/FN/testing${type}_R${N}_${P}*.csv; do
-		if [ -f $fileCVS ] ; then
-		    sed 1d ${filename} | cat >> "$fileCVS"
+		c=`wc -l < ${filename}`
+		if [ "$c" -eq "37" ]; then
+		    if [ -f $fileCVS ] ; then
+			sed 1d ${filename} | cat >> "$fileCVS"
+		    else
+			cat "${filename}" >> "$fileCVS"
+		    fi
+		    #c=0
 		else
-		    cat "${filename}" >> "$fileCVS"
+		    echo $c $(basename "${filename}") >> "${incompFN}"
 		fi
 #echo $(basename "${filename}") # code if not found
 		#sed -i -e '$a\' -e ${filename} /data/acp15ms/exp/testing${type}_${N}_${P}.csv
 #		echo ${filename} >> /data/acp15ms/exp/testing${type}_${N}_${P}.csv
 		#wc -l ${filename}
 	    done
-	    wc -l /data/acp15ms/exp/testing${type}_${N}_${P}.csv
+	    wc -l ${fileCVS}
+	    if [ -f ${incompFN} ]; then
+		wc -l ${incompFN}
+	    else
+		echo "no incomplete tests"
+	    fi
 	done
     done
 done

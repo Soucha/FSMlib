@@ -19,7 +19,7 @@
 #include <numeric>
 #include "FSMlearning.h"
 
-//#define DUMP_OQ 1
+#define DUMP_OQ 0
 
 namespace FSMlearning {
 	struct ot_node_t;

@@ -98,16 +98,26 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 	algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, writeDot ? showConjecture : nullptr, isEQallowed));
 #endif
 #if 1 // Hlearner
-	descriptions.emplace_back("OTree\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+	descriptions.emplace_back("Hlearner\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
 	algorithms.emplace_back(bind(Hlearner, placeholders::_1, maxExtraStates, writeDot ? showConjecture : nullptr, isEQallowed));
+#endif
+#if 1 // SPYlearner
+	descriptions.emplace_back("SPYlearner\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+	algorithms.emplace_back(bind(SPYlearner, placeholders::_1, maxExtraStates, writeDot ? showConjecture : nullptr, isEQallowed));
+#endif
+#if 1 // Slearner
+	descriptions.emplace_back("Slearner\tExtraStates:" + to_string(maxExtraStates) + (isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size()) + "\t");
+	algorithms.emplace_back(bind(Slearner, placeholders::_1, maxExtraStates, writeDot ? showConjecture : nullptr, isEQallowed));
 #endif
 }
 
 static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& fsm,
 	double sec, const string& description, shared_ptr<BlackBox> bb = nullptr) {
-	printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\t%s\n", (fsm->getNumberOfStates() == 25), fsm->getType(),
+	printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\t%s\n", (fsm->getNumberOfStates() == 25), fsm->getType(),
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),
-		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), sec, description.c_str());
+		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), 
+		((unique_ptr<TeacherGridWorld>&)teacher)->_resetCounterEQ, ((unique_ptr<TeacherGridWorld>&)teacher)->_querySymbolCounterEQ,
+		sec, description.c_str());
 }
 
 void learning(bool isResettable, input_t numberOfInputs, int algId) {
@@ -124,7 +134,7 @@ void learning(bool isResettable, input_t numberOfInputs, int algId) {
 
 int initLearning(bool isResettable, input_t numberOfInputs, state_t maxExtraStates, int algId, bool writeDot) {
 	//int id(0);
-	printf("Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tseconds\t"
+	printf("Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tEQresets\tEQsymbols\tseconds\t"
 		"Algorithm\tCEprocessing\tAlgId\n");
 	loadAlgorithms(maxExtraStates, maxExtraStates, false, writeDot);
 	li.prevOutput = 0;
@@ -316,6 +326,10 @@ sequence_in_t TeacherGridWorld::equivalenceQuery(const unique_ptr<DFSM>& conject
 		for (const auto& test : TS) {
 			auto bbOut = resetAndOutputQuery(test);
 			_outputQueryCounter--;
+			_resetCounter--;
+			_resetCounterEQ++;
+			_querySymbolCounter -= bbOut.size();
+			_querySymbolCounterEQ += bbOut.size();
 			sequence_out_t modelOut;
 			state_t state = 0;
 			for (const auto& input : test) {

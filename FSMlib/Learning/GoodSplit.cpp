@@ -226,6 +226,7 @@ namespace FSMlearning {
 	static size_t closeNextStates(const vector<shared_ptr<gs_node_t>>& stateNodes, const sequence_vec_t& distSequences,
 		const unique_ptr<DFSM>& conjecture, const unique_ptr<Teacher>& teacher) {
 		size_t totalSeqApplied = 0;
+		bool closed = true;
 		for (state_t state = 0; state < stateNodes.size(); state++) {
 			for (input_t i = 0; i < conjecture->getNumberOfInputs(); i++) {
 				auto & node = stateNodes[state]->succ[i];
@@ -305,13 +306,14 @@ namespace FSMlearning {
 						}
 					}
 					if (node->consistentStates.empty()) {
-						totalSeqApplied += distSequences.size() - node->counter;
+						closed = false;
+						//totalSeqApplied += distSequences.size() - node->counter;
 					}
 				}
 				totalSeqApplied += node->counter;
 			}
 		}
-		return totalSeqApplied;
+		return closed ? totalSeqApplied : size_t(-1);
 	}
 
 	static void extendDistinguishingSequences(sequence_vec_t& distSequences, list<sequence_in_t>& longestDistSequences,
@@ -419,6 +421,7 @@ namespace FSMlearning {
 			}
 			// 2. step - a greedy choice of distinguishing sequence
 			auto totalApplied = closeNextStates(stateNodes, distSequences, conjecture, teacher);
+			if (totalApplied == size_t(-1)) continue;
 			// |X^(<=len)| * |P - D| ... |P-D| = number of successor nodes of state nodes that are not states
 			auto totalDistSeq = distSequences.size() * (conjecture->getNumberOfStates() * (conjecture->getNumberOfInputs() - 1) + 1);
 			// 3. step - the increase of len

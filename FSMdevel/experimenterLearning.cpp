@@ -44,9 +44,10 @@ static bool showAndStop(const unique_ptr<DFSM>& conjecture) {
 
 static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>& model, 
 		double sec, const string& description, shared_ptr<BlackBox> bb = nullptr) {
-	fprintf(outFile, "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\t%s\n", FSMmodel::areIsomorphic(fsm, model), fsm->getType(),
+	fprintf(outFile, "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\t%d\t%d\t%f\t%s\n", FSMmodel::areIsomorphic(fsm, model), fsm->getType(),
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),
 		teacher->getOutputQueryCount(), teacher->getEquivalenceQueryCount(), teacher->getQueriedSymbolsCount(), 
+		teacher->getExplorationSize(), double(teacher->getExplorationSize()) / teacher->getQueriedSymbolsCount(),
 		(bb ? bb->getAppliedResetCount() : 0), (bb ? bb->getQueriedSymbolsCount() : 0), sec, description.c_str());
 	fflush(outFile);
 	printf(".");
@@ -55,7 +56,8 @@ static void printCSV(const unique_ptr<Teacher>& teacher, const unique_ptr<DFSM>&
 static vector<string> descriptions;
 static vector<function<unique_ptr<DFSM>(const unique_ptr<Teacher>&)>> algorithms;
 
-static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask, unsigned int startId) {
+static void loadAlgorithms(state_t minExtraStates, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, 
+		unsigned int mask, unsigned int startId) {
 	if (mask & 1) { // L*
 		vector<pair<function<void(const sequence_in_t& ce, ObservationTable& ot, const unique_ptr<Teacher>& teacher)>, string>>	ceFunc;
 		ceFunc.emplace_back(PTRandSTR(addAllPrefixesToS));
@@ -96,21 +98,21 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 		algorithms.emplace_back(bind(GoodSplit, placeholders::_1, maxDistLen, nullptr, isEQallowed));
 	}
 	if (mask & 64) { // Hlearner
-		for (state_t i = 0; i <= maxExtraStates; i++) {
+		for (state_t i = minExtraStates; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("Hlearner\tExtraStates:" + to_string(i) + 
 				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(Hlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
 	if (mask & 128) { // SPYlearner
-		for (state_t i = 0; i <= maxExtraStates; i++) {
+		for (state_t i = minExtraStates; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("SPYlearner\tExtraStates:" + to_string(i) +
 				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(SPYlearner, placeholders::_1, i, nullptr, isEQallowed));
 		}
 	}
 	if (mask & 256) { // Slearner
-		for (state_t i = 0; i <= maxExtraStates; i++) {
+		for (state_t i = minExtraStates; i <= maxExtraStates; i++) {
 			descriptions.emplace_back("Slearner\tExtraStates:" + to_string(i) +
 				(isEQallowed ? "+EQ" : "") + "\t" + to_string(descriptions.size() + startId) + "\t");
 			algorithms.emplace_back(bind(Slearner, placeholders::_1, i, nullptr, isEQallowed));
@@ -121,7 +123,7 @@ static void loadAlgorithms(state_t maxExtraStates, seq_len_t maxDistLen, bool is
 static void compareLearningAlgorithms(const string fnName, state_t maxExtraStates, seq_len_t maxDistLen, bool isEQallowed, unsigned int mask) {
 	if (mask & 1) { // TeacherDFSM
 		for (size_t i = 0; i < algorithms.size(); i++) {
-			unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true);
+			unique_ptr<Teacher> teacher = make_unique<TeacherDFSM>(fsm, true, true);
 			COMPUTATION_TIME(auto model = algorithms[i](teacher));
 			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherDFSM\t\t" + fnName);
 		}
@@ -129,7 +131,7 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 	printf(" ");
 	if (mask & 2) { // TeacherRL
 		for (size_t i = 0; i < algorithms.size(); i++) {
-			unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm);
+			unique_ptr<Teacher> teacher = make_unique<TeacherRL>(fsm, true);
 			COMPUTATION_TIME(auto model = algorithms[i](teacher));
 			printCSV(teacher, model, elapsed_seconds.count(), descriptions[i] + "TeacherRL\t\t" + fnName);
 		}
@@ -149,20 +151,25 @@ static void compareLearningAlgorithms(const string fnName, state_t maxExtraState
 void testDirLearning(int argc, char** argv) {
 	string outFilename = "";
 	auto dir = string(argv[2]);
-	state_t maxExtraStates = 2;
+	state_t maxExtraStates = 2, minExtraStates = 0;
 	seq_len_t maxDistLen = 2;
 	bool isEQallowed = true;
 	unsigned int machineTypeMask = (unsigned int)(-1);// all
 	state_t statesRestrictionLess = NULL_STATE, statesRestrictionGreater = NULL_STATE;
+	input_t inputsRestrictionLess = STOUT_INPUT, inputsRestrictionGreater = STOUT_INPUT;
 	unsigned int algorithmMask = (unsigned int)(-1);//all
 	unsigned int teacherMask = 1;//TEACHER_DFSM
 	unsigned int algStartIdx = 0;
+	string startFN = "", endFN = "", theFN = "";
 	for (int i = 3; i < argc; i++) {
 		if (strcmp(argv[i], "-o") == 0) {
 			outFilename = string(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-es") == 0) {
 			maxExtraStates = state_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-mines") == 0) {
+			minExtraStates = state_t(atoi(argv[++i]));
 		}
 		else if (strcmp(argv[i], "-dl") == 0) {
 			maxDistLen = seq_len_t(atoi(argv[++i]));
@@ -184,6 +191,17 @@ void testDirLearning(int argc, char** argv) {
 		else if (strcmp(argv[i], "-sg") == 0) {//states
 			statesRestrictionGreater = state_t(atoi(argv[++i]));
 		}
+		else if (strcmp(argv[i], "-i") == 0) {//inputs
+			inputsRestrictionLess = input_t(atoi(argv[++i]));
+			inputsRestrictionGreater = inputsRestrictionLess - 1;
+			inputsRestrictionLess++;
+		}
+		else if (strcmp(argv[i], "-il") == 0) {//inputs
+			inputsRestrictionLess = input_t(atoi(argv[++i]));
+		}
+		else if (strcmp(argv[i], "-ig") == 0) {//inputs
+			inputsRestrictionGreater = input_t(atoi(argv[++i]));
+		}
 		else if (strcmp(argv[i], "-a") == 0) {//algorithm
 			algorithmMask = atoi(argv[++i]);
 		}
@@ -192,6 +210,15 @@ void testDirLearning(int argc, char** argv) {
 		}
 		else if (strcmp(argv[i], "-t") == 0) {//teacher
 			teacherMask = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-f") == 0) {// filename to process
+			theFN = string(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-fstart") == 0) {// filename to start
+			startFN = string(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-fend") == 0) {// filename to end
+			endFN = string(argv[++i]);
 		}
 	}
 	if (outFilename.empty()) outFilename = dir + "_resultsLearning.csv";
@@ -204,23 +231,42 @@ void testDirLearning(int argc, char** argv) {
 		cerr << "Unable to open file " << outFilename << " for results!" << endl;
 		return;
 	}
-	fprintf(outFile, "Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tBBresets\tBBsymbols\tseconds\t"
-		"Algorithm\tCEprocessing\tAlgId\tTeacher\tBB\tfileName\n");
-	loadAlgorithms(maxExtraStates, maxDistLen, isEQallowed, algorithmMask, algStartIdx);
-	path dirPath(dir); 
-	directory_iterator endDir;
-	for (directory_iterator it(dirPath); it != endDir; ++it) {
-		if (is_regular_file(it->status())) {
-			path fn(it->path());
-			if (fn.extension().compare(".fsm") == 0) {
-				fsm = FSMmodel::loadFSM(fn.string());
-				if ((fsm) && (machineTypeMask & (1 << fsm->getType())) && 
-					((statesRestrictionLess == NULL_STATE) || (fsm->getNumberOfStates() < statesRestrictionLess)) &&
-					((statesRestrictionGreater == NULL_STATE) || (statesRestrictionGreater < fsm->getNumberOfStates()))) {
-					compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed, teacherMask);
-					printf("%s tested\n", fn.filename().c_str());
+	fprintf(outFile, "Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tExploration\tEE\t"
+		"BBresets\tBBsymbols\tseconds\tAlgorithm\tCEprocessing\tAlgId\tTeacher\tBB\tfileName\n");
+	loadAlgorithms(minExtraStates, maxExtraStates, maxDistLen, isEQallowed, algorithmMask, algStartIdx);
+	if (theFN == "") {
+		path dirPath(dir);
+		directory_iterator endDir;
+		for (directory_iterator it(dirPath); it != endDir; ++it) {
+			if (is_regular_file(it->status())) {
+				path fn(it->path());
+				if (fn.extension().compare(".fsm") == 0) {
+					if ((startFN != "") && (fn.filename() == startFN)) startFN = "";
+					if ((endFN != "") && (fn.filename() == endFN)) break;
+					if (startFN == "") {
+						fsm = FSMmodel::loadFSM(fn.string());
+						if ((fsm) && (machineTypeMask & (1 << fsm->getType())) &&
+							((statesRestrictionLess == NULL_STATE) || (fsm->getNumberOfStates() < statesRestrictionLess)) &&
+							((statesRestrictionGreater == NULL_STATE) || (statesRestrictionGreater < fsm->getNumberOfStates())) &&
+							((inputsRestrictionLess == STOUT_INPUT) || (fsm->getNumberOfInputs() < inputsRestrictionLess)) &&
+							((inputsRestrictionGreater == STOUT_INPUT) || (inputsRestrictionGreater < fsm->getNumberOfInputs()))) {
+							compareLearningAlgorithms(fn.filename(), maxExtraStates, maxDistLen, isEQallowed, teacherMask);
+							printf("%s tested\n", fn.filename().c_str());
+						}
+					}
 				}
 			}
+		}
+	}
+	else {
+		fsm = FSMmodel::loadFSM(dir + theFN);
+		if ((fsm) && (machineTypeMask & (1 << fsm->getType())) &&
+			((statesRestrictionLess == NULL_STATE) || (fsm->getNumberOfStates() < statesRestrictionLess)) &&
+			((statesRestrictionGreater == NULL_STATE) || (statesRestrictionGreater < fsm->getNumberOfStates())) &&
+			((inputsRestrictionLess == STOUT_INPUT) || (fsm->getNumberOfInputs() < inputsRestrictionLess)) &&
+			((inputsRestrictionGreater == STOUT_INPUT) || (inputsRestrictionGreater < fsm->getNumberOfInputs()))) {
+			compareLearningAlgorithms(theFN, maxExtraStates, maxDistLen, isEQallowed, teacherMask);
+			printf("%s tested\n", theFN.c_str());
 		}
 	}
 	fclose(outFile);

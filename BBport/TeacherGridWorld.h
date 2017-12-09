@@ -27,7 +27,9 @@ public:
 		Teacher(),
 		_isResettable(isResettable),
 		_numOfInputs(numberOfInputs),
-		_numOfObservedOutputs(0) {
+		_numOfObservedOutputs(0),
+		_querySymbolCounterEQ(0),
+		_resetCounterEQ(0) {
 	}
 
 	bool isProvidedOnlyMQ() {
@@ -68,6 +70,8 @@ public:
 
 	sequence_in_t equivalenceQuery(const unique_ptr<DFSM>& conjecture);
 
+	size_t _querySymbolCounterEQ;
+	size_t _resetCounterEQ;
 protected:
 	bool _isResettable;
 	input_t _numOfInputs;

@@ -35,6 +35,7 @@ void TeacherDFSM::resetBlackBox() {
 	}
 	_resetCounter++;
 	_currState = 0;
+	_currSequence.clear();
 }
 
 output_t TeacherDFSM::outputQuery(input_t input) {
@@ -45,6 +46,12 @@ output_t TeacherDFSM::outputQuery(input_t input) {
 	if ((ns != NULL_STATE) && (ns != WRONG_STATE)) {
 		output = _fsm->getOutput(_currState, input);
 		_currState = ns;
+	}
+	if (_keepQueries && (input != STOUT_INPUT)) {
+		_currSequence.emplace_back(input);
+		if (_ps.insert(_currSequence)) {// input added
+			_explorationCounter++;
+		}
 	}
 	return output;
 }

@@ -85,7 +85,7 @@ static void loadTSAlgorithms(unsigned int mask) {
 			bind(getHarmonizedStateIdentifiers, placeholders::_1, getStatePairsShortestSeparatingSequences,
 			true, nullptr, false)));
 		descriptions.emplace_back("TS\tSPY-methodST\t" + to_string(descriptions.size()) + "\t");
-		TSalgorithms.emplace_back(bind(HSI_method, placeholders::_1, placeholders::_2,
+		TSalgorithms.emplace_back(bind(SPY_method, placeholders::_1, placeholders::_2,
 			bind(getHarmonizedStateIdentifiersFromSplittingTree, placeholders::_1,
 			bind(getSplittingTree, placeholders::_1, true, false), false)));
 	}

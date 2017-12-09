@@ -17,17 +17,19 @@
 #pragma once
 
 #include "Teacher.h"
+#include "../PrefixSet.h"
 
 /**
 * A derived class describing behaviour of a Teacher that possesses a model of BlackBox directly.
 */
 class FSMLIB_API TeacherDFSM : public Teacher {
 public:
-	TeacherDFSM(const unique_ptr<DFSM>& blackBox, bool isResettable) :
+	TeacherDFSM(const unique_ptr<DFSM>& blackBox, bool isResettable, bool keepQueries = false) :
 		Teacher(),
 		_fsm(FSMmodel::duplicateFSM(blackBox)),
 		_isResettable(isResettable),
 		_currState(0) {
+		_keepQueries = keepQueries;
 	}
 
 	virtual ~TeacherDFSM() {}
@@ -74,4 +76,6 @@ protected:
 	unique_ptr<DFSM> _fsm;
 	bool _isResettable;
 	state_t _currState;
+	FSMlib::PrefixSet _ps;
+	sequence_in_t _currSequence;
 };

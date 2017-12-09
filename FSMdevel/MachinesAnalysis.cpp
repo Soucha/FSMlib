@@ -57,7 +57,7 @@ static void analyseAll(const unique_ptr<DFSM>& fsm) {
 	// separating sequences
 	auto sepSeq = getStatePairsShortestSeparatingSequences(fsm, true);
 	printStat(sepSeq);
-
+	/*
 	// state verifying sequences
 	auto SVSet = getVerifyingSet(fsm, true);
 	for (long i = long(SVSet.size()) - 1; i >= 0; i--) {
@@ -68,7 +68,7 @@ static void analyseAll(const unique_ptr<DFSM>& fsm) {
 	}
 	fprintf(outFile, "%d\t", sc.size() - SVSet.size());
 	printStat(SVSet);
-
+	* /
 	// adaptive distinguishing sequences
 	auto ADSet = getAdaptiveDistinguishingSet(fsm, true);
 	if (ADSet.empty()) {
@@ -76,7 +76,7 @@ static void analyseAll(const unique_ptr<DFSM>& fsm) {
 	}
 	else {
 		printStat(ADSet);
-	}
+	}*/
 	fflush(outFile);
 }
 

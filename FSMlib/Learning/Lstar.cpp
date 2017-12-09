@@ -451,6 +451,7 @@ namespace FSMlearning {
 						for (auto i = ssize; i < ot.S.size(); i++) {// increasing order of prefixes is supposed
 							fillOTonS(teacher, ot, ot.S[i]);
 							//conjecture is updated in making OT closed
+							checkNumberOfOutputs(teacher, conjecture);
 							conjecture->addState(conjecture->isOutputState() ? ot.T[ot.S[i]][0].front() : DEFAULT_OUTPUT);
 						}
 					}

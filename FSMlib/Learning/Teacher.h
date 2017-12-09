@@ -27,7 +27,9 @@ public:
 		_querySymbolCounter(0),
 		_resetCounter(0),
 		_outputQueryCounter(0),
-		_equivalenceQueryCounter(0) {
+		_equivalenceQueryCounter(0),
+		_keepQueries(false),
+		_explorationCounter(0) {
 	}
 
 	virtual ~Teacher() {}
@@ -69,6 +71,17 @@ public:
 	*/
 	size_t getEquivalenceQueryCount() const {
 		return _equivalenceQueryCounter;
+	}
+
+	/**
+	* @return How many different states were possible to reach by asked queries.
+	*/
+	size_t getExplorationSize() const {
+		if (!_keepQueries) {
+			//ERROR_MESSAGE("Teacher::getExplorationSize - cannot be provided as queries are not kept!");
+			return 0;
+		}
+		return _explorationCounter;
 	}
 
 	/**
@@ -161,4 +174,6 @@ protected:
 	size_t _resetCounter;
 	size_t _outputQueryCounter;
 	size_t _equivalenceQueryCounter;
+	bool _keepQueries;
+	size_t _explorationCounter;
 };
