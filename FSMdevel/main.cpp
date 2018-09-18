@@ -123,7 +123,8 @@ int main(int argc, char** argv) {
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 	//_CrtSetBreakAlloc(1045);
 #endif
-	//char* vals[11] = { "", "4", "../data/experiments/10multi/", "-a", "256", "-m", "12", "-sg", "9", "-sl", "49"}; testDirLearning(11, vals);
+	//char* vals[7] = { "", "4", "../data/examples/", "-f", "DFA_R4_SCSet.fsm", "-es", "1"}; testDirLearning(7, vals);
+	//char* vals[11] = { "", "4", "../data/experiments/10multi/", "-a", "256", "-m", "12", "-sg", "9", "-sl", "49" }; testDirLearning(11, vals);
 	//char* vals[13] = { "", "3", "../data/experiments/10multi/", "-ts", "512", "-cs", "0", "-m", "12", "-co", "1", "-es", "0" }; testDirTesting(12, vals);/*
 	
 #if 1 // load FSM
@@ -133,6 +134,7 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFA_R664_pots2.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "DFSM_R25_GW.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R14_cvs.fsm";
+	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "Mealy_R2_turnstile.fsm";
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "esm-manual-controller/Mealy_3410_esm.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "DFA_R6_ADS.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R5.fsm";
@@ -142,14 +144,15 @@ int main(int argc, char** argv) {
 	//string fileName = DATA_PATH + EXPERIMENTS_DIR + "10multi/" + "Mealy_R30_GHwoR.fsm"; //Mealy_R60_WdoSu 
 	//string fileName = DATA_PATH + "10multi/" + "DFSM_R20_FZZHZ.fsm";//DFA_R100_0N9k1 _1vV4O
 	//string fileName = DATA_PATH + "DFSM_R20.fsm";//DFA_R100_0N9k1 DFSM_R80_1M6Qp
-	//string fileName = DATA_PATH + "exp/DFA/DFA_R90_5_bCoC4.fsm";//DFA_R100_0N9k1 Mealy_R60_10_kyuGN
+	string fileName = DATA_PATH + "exp/DFA/DFA_R1000_10_JwsBn.fsm";//DFA_R100_0N9k1 Mealy_R60_10_kyuGN
 	//string fileName = DATA_PATH + "exp/Mealy/Mealy_R70_10_gSAMS.fsm";//DFA_R100_0N9k1 
-	string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
+	//string fileName = DATA_PATH + EXAMPLES_DIR + "DFA_R4_SCSet.fsm";
 	//string fileName = DATA_PATH + SEQUENCES_DIR + "Moore_R100.fsm";
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Mealy_R4_ADS.fsm"; //DFA_R4_SCSet
 	//string fileName = DATA_PATH + EXAMPLES_DIR + "Moore_R5_SVS.fsm";
 	fsm = FSMmodel::loadFSM(fileName);
 #endif
+	//auto T = SPYH_method(fsm, 1);
 
 #if 1 // learning
 	/*
@@ -170,7 +173,7 @@ int main(int argc, char** argv) {
 	//COMPUTATION_TIME(auto model = GoodSplit(teacher, 2, nullptr,true);)
 	//COMPUTATION_TIME(auto model = Hlearner(teacher, 1, nullptr, true));// showAndStop);
 	//COMPUTATION_TIME(auto model = SPYlearner(teacher, 1, nullptr, true));// showAndStop);
-	COMPUTATION_TIME(auto model = Slearner(teacher, 1, nullptr, true));// showAndStop);
+	COMPUTATION_TIME(auto model = Slearner(teacher, 0, nullptr, true));// showAndStop);
 	printf("Correct\tFSMtype\tStates\tInputs\tOutputs\tResets\tOQs\tEQs\tsymbols\tseconds\n");
 	printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\n", FSMmodel::areIsomorphic(fsm, model), fsm->getType(),
 		fsm->getNumberOfStates(), fsm->getNumberOfInputs(), fsm->getNumberOfOutputs(), teacher->getAppliedResetCount(),

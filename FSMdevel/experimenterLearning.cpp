@@ -205,7 +205,7 @@ void testDirLearning(int argc, char** argv) {
 		else if (strcmp(argv[i], "-a") == 0) {//algorithm
 			algorithmMask = atoi(argv[++i]);
 		}
-		else if (strcmp(argv[i], "-ai") == 0) {//algorithm start indes
+		else if (strcmp(argv[i], "-ai") == 0) {//algorithm start index
 			algStartIdx = atoi(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-t") == 0) {//teacher

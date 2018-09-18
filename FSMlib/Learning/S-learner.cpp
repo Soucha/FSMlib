@@ -1072,16 +1072,18 @@ namespace FSMlearning {
 			storeIdentifiedNode(node, li);
 			li.inconsistency = LearningInfo::NEW_STATE_REVEALED;
 		}
-		else if (node->state == NULL_STATE) {
-			if (node->convergentNode.lock()->domain.empty()) {
-				storeInconsistentNode(node, li, LearningInfo::EMPTY_CN_DOMAIN);
+		else if (li.inconsistency < LearningInfo::NEW_STATE_REVEALED) {
+			if (node->state == NULL_STATE) {
+				if (node->convergentNode.lock()->domain.empty()) {
+					storeInconsistentNode(node, li, LearningInfo::EMPTY_CN_DOMAIN);
+				}
+				else if (node->convergentNode.lock()->domain.size() == 1) {
+					storeIdentifiedNode(node, li);
+				}
 			}
-			else if (node->convergentNode.lock()->domain.size() == 1) {
-				storeIdentifiedNode(node, li);
+			else if (!node->domain.count(node->state)) {// inconsistent node
+				storeInconsistentNode(node, li, LearningInfo::INCONSISTENT_DOMAIN);
 			}
-		}
-		else if (!node->domain.count(node->state)) {// inconsistent node
-			storeInconsistentNode(node, li, LearningInfo::INCONSISTENT_DOMAIN);
 		}
 	}
 	
@@ -1119,7 +1121,7 @@ namespace FSMlearning {
 			if ((otNode != node) && (otNode->domain.count(node->state))) {
 				if (areNodesDifferentUnder(node, otNode, suffixLen)) {
 					otNode->domain.erase(node->state);
-					if ((li.ot.es == 0) //&& (li.inconsistency < LearningInfo::INCONSISTENT_DOMAIN)
+					if ((li.ot.es == 0) && (li.inconsistency < LearningInfo::NEW_STATE_REVEALED)
 						&& otNode->convergentNode.lock()->domain.erase(li.ot.rn[node->state].get())) {
 						li.ot.rn[node->state]->domain.erase(otNode->convergentNode.lock().get());
 #if CHECK_PREDECESSORS
@@ -1668,6 +1670,7 @@ namespace FSMlearning {
 			if (parent->domain.empty()) {
 				return makeStateNode(parent, li, teacher);
 			}
+			li.inconsistency = LearningInfo::NEW_STATE_REVEALED;
 			if (!moveNewStateNode(node, li, teacher)) {
 				if (!li.identifiedNodes.empty() && (li.identifiedNodes.front()->domain.empty())) {// new state
 					return makeStateNode(move(li.identifiedNodes.front()), li, teacher);
